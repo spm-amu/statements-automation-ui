@@ -1,0 +1,80 @@
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+import EditIcon from '@material-ui/icons/Edit';
+import SaveIcon from '@material-ui/icons/Save';
+import InfoIcon from '@material-ui/icons/Info';
+import DeleteIcon from '@material-ui/icons/Delete';
+import SearchIcon from '@material-ui/icons/Search';
+import ErrorIcon from '@material-ui/icons/Error';
+import Download from '@material-ui/icons/CloudDownload';
+import Upload from '@material-ui/icons/CloudUpload';
+import RotateLeft from '@material-ui/icons/RotateLeft';
+import RotateRight from '@material-ui/icons/RotateRight';
+import ZoomIn from '@material-ui/icons/ZoomIn';
+import ZoomOut from '@material-ui/icons/ZoomOut';
+import Work from '@material-ui/icons/Work';
+import Home from '@material-ui/icons/Home';
+import List from '@material-ui/icons/List';
+import Notifications from '@material-ui/icons/Notifications';
+import Person from '@material-ui/icons/Person';
+import Folder from '@material-ui/icons/Folder';
+import React, {Component} from "react";
+
+class Icon extends Component {
+
+    constructor() {
+        super();
+    }
+
+    render() {
+        if (this.props.id === 'ADD') {
+            return <AddIcon/>
+        } else if (this.props.id === 'EDIT') {
+            return <EditIcon/>
+        } else if (this.props.id === 'REMOVE') {
+            return <RemoveIcon/>
+        } else if (this.props.id === 'SAVE') {
+            return <SaveIcon/>
+        } else if (this.props.id === 'INFO') {
+            return <InfoIcon/>
+        } else if (this.props.id === 'DELETE') {
+            return <DeleteIcon/>
+        } else if (this.props.id === 'DOWNLOAD') {
+            return <Download/>
+        } else if (this.props.id === 'SEARCH') {
+            return <SearchIcon/>
+        } else if (this.props.id === 'WORK') {
+            return <Work/>
+        } else if (this.props.id === 'NOTIFICATIONS') {
+            return <Notifications/>
+        } else if (this.props.id === 'HOME') {
+            return <Home/>
+        } else if (this.props.id === 'LIST') {
+            return <List/>
+        } else if (this.props.id === 'UPLOAD') {
+            return <Upload/>
+        } else if (this.props.id === 'ROTATE_LEFT') {
+            return <RotateLeft/>
+        } else if (this.props.id === 'ROTATE_RIGHT') {
+            return <RotateRight/>
+        } else if (this.props.id === 'ZOOM_IN') {
+            return <ZoomIn/>
+        }  else if (this.props.id === 'ZOOM_OUT') {
+            return <ZoomOut/>
+        } else if (this.props.id === 'PERSON') {
+            return <Person/>
+        } else if (this.props.id === 'INITIAL') {
+            return <i className="fas fa-signature" style={{color: this.props.color}}/>
+        } else if (this.props.id === 'FOLDER') {
+            return <Folder/>
+        } else if (this.props.id === 'SIGN') {
+            return <i className="fas fa-pen-nib" style={{color: this.props.color}}/>
+        } else if (this.props.id === 'ERROR') {
+            return <ErrorIcon style={{color: '#f44336'}}/>
+        }
+
+        return null;
+    };
+}
+
+export default Icon;

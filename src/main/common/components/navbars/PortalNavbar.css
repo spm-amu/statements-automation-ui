@@ -1,0 +1,75 @@
+.portal-navbar-container {
+    width: 100vw;
+    background-color: #ffffff;
+    height: 100%;
+    margin-left: 0 !important;
+    text-align: right;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.portal-navbar-logo {
+    margin-top: 4px;
+    width: 31%;
+    text-align: right;
+    height: 48px;
+}
+
+.portal-navbar-toolbar {
+    display: inline-block;
+    text-align: left;
+    width: 56%;
+    height: 48px;
+    padding-left: 72px;
+}
+
+.spacer {
+    width: 320px;
+}
+
+/* Smartphones (landscape); */
+@media only screen and (min-device-width: 361px) and (max-device-width: 480px) {
+    .portal-navbar-logo {
+        margin: 4px;
+        width: 48px;
+    }
+
+    .portal-navbar-toolbar {
+        width: calc(100% - 84px);
+        margin-left: 24px;
+    }
+
+    .spacer {
+        width: 144px;
+    }
+}
+
+/* Smartphones (portrait); */
+@media only screen and (min-device-width: 280px) and (max-device-width: 360px) {
+    .portal-navbar-logo {
+        margin: 4px;
+        width: 48px;
+    }
+
+    .portal-navbar-toolbar {
+        width: calc(100% - 84px);
+        margin-left: 24px;
+    }
+
+    .spacer {
+        width: 144px;
+    }
+}
+
+
+/* iPads (portrait and landscape); */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+
+}
+
+/* iPad 3 */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
+}
+
