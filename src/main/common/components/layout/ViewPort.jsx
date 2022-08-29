@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import {Route, withRouter} from 'react-router-dom';
-import Utils from "../../../common/Utils";
+import './viewport.css'
 
 class ViewPort extends React.PureComponent {
 
@@ -13,7 +13,7 @@ class ViewPort extends React.PureComponent {
 
     render() {
         return (
-            <div style={{height: Utils.isNull(this.props.height) ? 'calc(100vh - 90px)' : this.props.height}}>
+            <div className={'viewport'}>
               VIEWPORT
             </div>
         )

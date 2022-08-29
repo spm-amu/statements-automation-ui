@@ -22,6 +22,7 @@ const BasicBusinessAppDashboard = (props) => {
     const [primaryThemeColor, setPrimaryThemeColor] = React.useState("");
     const [themeTextColor, setThemeTextColor] = React.useState("");
     const [routes, setRoutes] = React.useState([]);
+    const [utilsRoutes, setUtilsRoutes] = React.useState([]);
     const [logo, setLogo] = React.useState("data:image/png;base64," + props.logo);
     const [sidebarOpened, setSidebarOpened] = React.useState(document.documentElement.className.indexOf("nav-open") !== -1);
     const [sidebarMini, setSidebarMini] = React.useState(true);
@@ -53,18 +54,18 @@ const BasicBusinessAppDashboard = (props) => {
 
     React.useEffect(() => {
         if (props.width !== null && typeof props.width !== 'undefined') {
-            alert(props.width);
             setNavDrawerOpen(props.width === LARGE);
         }
     }, [props.width]);
 
     React.useEffect(() => {
+      if(loading) {
         document.body.classList.add("white-content");
 
         if (navigator.platform.indexOf("Win") > -1) {
-            //ps.destroy();
-            //document.documentElement.className.add("perfect-scrollbar-off");
-            //document.documentElement.classList.remove("perfect-scrollbar-on");
+          //ps.destroy();
+          //document.documentElement.className.add("perfect-scrollbar-off");
+          //document.documentElement.classList.remove("perfect-scrollbar-on");
 
         }
 
@@ -76,102 +77,94 @@ const BasicBusinessAppDashboard = (props) => {
         setThemeTextColor('#ffffff');
         //dispatch(actionCreators.setSecondaryThemeColor(props.settings.systemProfileDto.secondCorporateBrandColor));
 
-        //if (!Utils.isNull(props.settings)) {
-            let dashboardMenu = {};
-            dashboardMenu.id = 'dashboard';
-            dashboardMenu.menus = [];
 
-            let myDashboardMenu = {};
-            myDashboardMenu.id = 'myDashboard';
-            myDashboardMenu.items = [];
-            myDashboardMenu.attributes = {};
-            myDashboardMenu.attributes.label = 'My Dashboards';
-            dashboardMenu.menus.push(myDashboardMenu);
+        let newRoutes = [];
+        let newRoute = {};
 
-            /*if (!Utils.isNull(props.settings.userDashboards)) {
-                for (let i = 0; i < props.settings.userDashboards.length; i++) {
-                    let userDashboard = props.settings.userDashboards[i];
-                    let item = {};
-                    item.id = userDashboard.id;
-                    item.attributes = {};
-                    item.attributes.label = userDashboard.parameters.map.dashboardName;
+        newRoute.name = "Calender";
+        newRoute.icon = "CALENDER";
+        newRoute.layout = "/admin";
+        newRoute.level = 0;
+        newRoute.isParent = true;
+        newRoutes.push(newRoute);
 
-                    myDashboardMenu.items.push(item);
+        newRoute = {};
+        newRoute.name = "Chats";
+        newRoute.icon = "CHARTS";
+        newRoute.layout = "/admin";
+        newRoute.level = 0;
+        newRoute.isParent = true;
+        newRoutes.push(newRoute);
+
+        newRoute = {};
+        newRoute.name = "Files";
+        newRoute.icon = "FILES";
+        newRoute.layout = "/admin";
+        newRoute.level = 0;
+        newRoute.isParent = true;
+        newRoutes.push(newRoute);
+
+        newRoute = {};
+        newRoute.name = "Meeting history";
+        newRoute.icon = "MEETINGS";
+        newRoute.layout = "/admin";
+        newRoute.level = 0;
+        newRoute.isParent = true;
+        newRoutes.push(newRoute);
+
+
+        let utilsRoutes = [];
+        newRoute = {};
+        newRoute.name = "Help";
+        newRoute.icon = "HELP";
+        newRoute.layout = "/admin";
+        newRoute.level = 0;
+        newRoute.isParent = true;
+        utilsRoutes.push(newRoute);
+
+        /*console.log(props.settings.systemProfileDto);
+        if (!Utils.isNull(props.settings.systemProfileDto.modules)) {
+            for (let i = 0; i < props.settings.systemProfileDto.modules.length; i++) {
+                let module = props.settings.systemProfileDto.modules[i];
+                let route = {};
+
+                route.name = module.label;
+                route.icon = module.icon;
+                route.layout = "/admin";
+                route.level = 0;
+
+                if (module.menuBar && module.menuBar.menus.length > 0) {
+                    route.collapse = true;
+                    route.state = module.name + "Collapse";
+                    route.views = getViews(module.menuBar.menus, 1);
                 }
-            }*/
 
-            let createNewMenu = {};
-            createNewMenu.id = 'createNew';
-            createNewMenu.items = [];
-            createNewMenu.attributes = {};
-            createNewMenu.attributes.label = 'Create New';
-            dashboardMenu.menus.push(createNewMenu);
+                newRoutes.push(route);
+            }
+        }*/
 
-            /*if (!Utils.isNull(props.settings.systemProfileDto.modules)) {
-                for (let i = 0; i < props.settings.systemProfileDto.modules.length; i++) {
-                    let module = props.settings.systemProfileDto.modules[i];
-                    if (!Utils.isNull(module.dashBoardMenuBar)) {
-                        for (let j = 0; j < module.dashBoardMenuBar.menus.length; j++) {
-                            let menu = module.dashBoardMenuBar.menus[j];
+        /*if(props.settings.settingsMenu) {
+            newRoute = {};
 
-                            // To keep the module classification, replace the line below with createNewMenu.items.push(menu)
-                            createNewMenu.items = createNewMenu.items.concat(menu.items);
-                        }
-                    }
-                }
-            }*/
-
-            let newRoutes = [];
-            let newRoute = {};
-
-            newRoute.name = "Dashboard";
-            newRoute.icon = "fa fa-pie-chart";
+            newRoute.name = "Settings";
+            newRoute.icon = "fa fa-cog";
             newRoute.layout = "/admin";
-            newRoute.level = 0;
             newRoute.isParent = true;
+            newRoute.collapse = true;
+            newRoute.level = 0;
+            newRoute.state = "settingsMenuCollapse";
+            newRoute.views = getViews(props.settings.settingsMenu.menus, 1);
+
             newRoutes.push(newRoute);
+        }*/
 
-            /*console.log(props.settings.systemProfileDto);
-            if (!Utils.isNull(props.settings.systemProfileDto.modules)) {
-                for (let i = 0; i < props.settings.systemProfileDto.modules.length; i++) {
-                    let module = props.settings.systemProfileDto.modules[i];
-                    let route = {};
+        setRoutes(newRoutes);
+        setUtilsRoutes(utilsRoutes);
 
-                    route.name = module.label;
-                    route.icon = module.icon;
-                    route.layout = "/admin";
-                    route.level = 0;
-
-                    if (module.menuBar && module.menuBar.menus.length > 0) {
-                        route.collapse = true;
-                        route.state = module.name + "Collapse";
-                        route.views = getViews(module.menuBar.menus, 1);
-                    }
-
-                    newRoutes.push(route);
-                }
-            }*/
-
-            /*if(props.settings.settingsMenu) {
-                newRoute = {};
-
-                newRoute.name = "Settings";
-                newRoute.icon = "fa fa-cog";
-                newRoute.layout = "/admin";
-                newRoute.isParent = true;
-                newRoute.collapse = true;
-                newRoute.level = 0;
-                newRoute.state = "settingsMenuCollapse";
-                newRoute.views = getViews(props.settings.settingsMenu.menus, 1);
-
-                newRoutes.push(newRoute);
-            }*/
-
-            setRoutes(newRoutes);
-
-            //props.settings.dashboardMenu = createNewMenu.items.length > 0 ? dashboardMenu : null;
-            setLoading(false);
+        //props.settings.dashboardMenu = createNewMenu.items.length > 0 ? dashboardMenu : null;
+        setLoading(false);
         //}
+      }
     });
 
     const getViews = (menus, level) => {
@@ -316,7 +309,7 @@ const BasicBusinessAppDashboard = (props) => {
             <div>Loading...</div>
             :
             <>
-                <div className="wrapper" style={{height: '100%', overflow: 'hidden', border: '8px solid red'}}>
+                <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>
                     <div
                         className="navbar-minimize-fixed"
                         style={{
@@ -336,12 +329,13 @@ const BasicBusinessAppDashboard = (props) => {
                     <Sidebar
                         {...props}
                         routes={routes}
+                        utilsRoutes={utilsRoutes}
                         activeColor={"agility"}
                         secondaryThemeColor={secondaryThemeColor}
                         activeRouteMenu={'Dashboard'}
                         className={"sidebar"}
-                        dashboardLauncher={() => {
-                            launcDashboard();
+                        viewLauncher={(id) => {
+                            alert('LAUNCH : ' + id);
                         }}
                         appLogoPath={props.appLogoPath}
                         logo={{
@@ -353,19 +347,23 @@ const BasicBusinessAppDashboard = (props) => {
                     />{" "}
                     <div className="main-panel" data={activeColor}>
                         <div className="content">
-                          <HomeNavbar
-                            {...props}
-                            color={primaryThemeColor}
-                            themeTextColor={themeTextColor}
-                            handleMiniClick={handleMiniClick}
-                            brandText={getActiveRoute(routes)}
-                            sidebarOpened={sidebarOpened}
-                            avatar={props.avatar}
-                            settingsMenu={null}
-                            toggleSidebar={toggleSidebar}
-                            logoutCallBack={props.logoutCallBack}
-                          />{" "}
-                          <ViewPort settings={props.settings}/>
+                          <div style={{height: '136px'}}>
+                            <HomeNavbar
+                              {...props}
+                              color={"#FFFFFF"}
+                              themeTextColor={"#ADA7A7"}
+                              handleMiniClick={handleMiniClick}
+                              brandText={getActiveRoute(routes)}
+                              sidebarOpened={sidebarOpened}
+                              avatar={props.avatar}
+                              settingsMenu={null}
+                              toggleSidebar={toggleSidebar}
+                              logoutCallBack={props.logoutCallBack}
+                            />{" "}
+                          </div>
+                          <div>
+                            <ViewPort settings={props.settings}/>
+                          </div>
                         </div>
 
                         {/*<HomeFooter fluid /> {" "}*/}
