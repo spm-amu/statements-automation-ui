@@ -33,7 +33,7 @@ class Sidebar extends React.Component {
     super(props);
     this.state = {
       collaspeState: this.getCollapseStates(props.routes),
-      selectedMenuItem: 'Calender'
+      selectedMenuItem: 'calender'
     }
     //actionCreators.setActiveRoute(Utils.isNull(props.activeRouteMenu) ? 'Dashboard' : props.activeRouteMenu);
   }
@@ -83,13 +83,13 @@ class Sidebar extends React.Component {
         st[prop["state"]] = !this.state[prop.state];
         return (
           <li
-            className={this.state.selectedMenuItem === prop.name ? "menu-item-active" : 'menu-item'}
+            className={this.state.selectedMenuItem === prop.path ? "menu-item-active" : 'menu-item'}
             key={key} onClick={(e) => {
-            if (prop.name !== 'Help') {
-              this.state.selectedMenuItem = prop.name;
+            if (prop.path !== 'help') {
+              this.state.selectedMenuItem = prop.path;
             }
 
-            this.props.viewLauncher(prop.name);
+            this.props.viewLauncher(prop.path);
           }}
           >
             <a
@@ -143,7 +143,7 @@ class Sidebar extends React.Component {
 
       return (
         <li className={""} key={key}
-            style={this.activeRoute(prop.name) ?
+            style={this.activeRoute(prop.path) ?
               {
                 backgroundColor: lighten(secondaryThemeColor, .9),
                 borderRadius: '16px',
@@ -160,10 +160,10 @@ class Sidebar extends React.Component {
             autoClick={prop.item && prop.item.defaultItem}
             viewId="menuBar"
             icon={prop.icon}
-            iconColor={this.activeRoute(prop.name) ? secondaryThemeColor : null}
+            iconColor={this.activeRoute(prop.path) ? secondaryThemeColor : null}
             name={prop.name}
             level={prop.level}
-            color={this.activeRoute(prop.name) ? secondaryThemeColor : null}
+            color={this.activeRoute(prop.path) ? secondaryThemeColor : null}
           />
           {" "}
         </li>

@@ -25,7 +25,7 @@ export default function App() {
   return (
     <Router style={{border: '8px solid yello'}}>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="*" element={<Hello />} />
       </Routes>
     </Router>
   );

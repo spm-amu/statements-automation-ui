@@ -11,6 +11,7 @@ import {useDispatch} from "react-redux";
 import {actionCreators} from "../../common/redux/store/DashboardStore";
 import "../../common/assets/scss/black-dashboard-react.scss";
 import "./BasicBusinessAppDashboard.css"
+import { useNavigate } from 'react-router-dom';
 
 let ps;
 
@@ -27,6 +28,7 @@ const BasicBusinessAppDashboard = (props) => {
     const [sidebarOpened, setSidebarOpened] = React.useState(document.documentElement.className.indexOf("nav-open") !== -1);
     const [sidebarMini, setSidebarMini] = React.useState(true);
     const [opacity, setOpacity] = React.useState(0);
+    const navigate = useNavigate();
 
     //const dispatch = useDispatch();
 
@@ -82,6 +84,7 @@ const BasicBusinessAppDashboard = (props) => {
         let newRoute = {};
 
         newRoute.name = "Calender";
+        newRoute.path = "calender";
         newRoute.icon = "CALENDER";
         newRoute.layout = "/admin";
         newRoute.level = 0;
@@ -89,7 +92,8 @@ const BasicBusinessAppDashboard = (props) => {
         newRoutes.push(newRoute);
 
         newRoute = {};
-        newRoute.name = "Chats";
+        newRoute.name = "Charts";
+        newRoute.path = "charts";
         newRoute.icon = "CHARTS";
         newRoute.layout = "/admin";
         newRoute.level = 0;
@@ -98,6 +102,7 @@ const BasicBusinessAppDashboard = (props) => {
 
         newRoute = {};
         newRoute.name = "Files";
+        newRoute.path = "files";
         newRoute.icon = "FILES";
         newRoute.layout = "/admin";
         newRoute.level = 0;
@@ -106,6 +111,7 @@ const BasicBusinessAppDashboard = (props) => {
 
         newRoute = {};
         newRoute.name = "Meeting history";
+        newRoute.path = "meetingHistory";
         newRoute.icon = "MEETINGS";
         newRoute.layout = "/admin";
         newRoute.level = 0;
@@ -116,6 +122,7 @@ const BasicBusinessAppDashboard = (props) => {
         let utilsRoutes = [];
         newRoute = {};
         newRoute.name = "Help";
+        newRoute.path = "help";
         newRoute.icon = "HELP";
         newRoute.layout = "/admin";
         newRoute.level = 0;
@@ -332,10 +339,10 @@ const BasicBusinessAppDashboard = (props) => {
                         utilsRoutes={utilsRoutes}
                         activeColor={"agility"}
                         secondaryThemeColor={secondaryThemeColor}
-                        activeRouteMenu={'Dashboard'}
+                        activeRouteMenu={'calender'}
                         className={"sidebar"}
-                        viewLauncher={(id) => {
-                            alert('LAUNCH : ' + id);
+                        viewLauncher={(path) => {
+                          navigate('/view/' + path);
                         }}
                         appLogoPath={props.appLogoPath}
                         logo={{
