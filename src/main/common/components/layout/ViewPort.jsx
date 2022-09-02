@@ -1,33 +1,19 @@
 ﻿import React from 'react';
-import {Routes, Route, withRouter} from 'react-router-dom';
+import { Route, withRouter } from 'react-router-dom';
 import './viewport.css';
-import '../view/Calendar'
-import '../view/Charts'
-import '../view/Files'
-import '../view/MeetingHistory'
-import ViewContainer from "./ViewContainer";
+import Calender from '../../../desktop/dashboard/views/calender/Calender';
 
 class ViewPort extends React.PureComponent {
+  constructor(props) {
+    super(props);
+  }
 
-    constructor(props) {
-        super(props);
-    }
+  componentDidMount() {}
 
-    componentDidMount() {
-    }
-
-    render() {
-        return (
-            <div className={'viewport'}>
-              <Routes>
-                <Route path='/view/:id' element={<ViewContainer />}/>
-              </Routes>
-            </div>
-        )
-    }
+  render() {
+    return <Calender />;
+  }
 }
 
-
-//export default withRouter(ViewPort)
-export default ViewPort
-
+// export default withRouter(ViewPort)
+export default ViewPort;
