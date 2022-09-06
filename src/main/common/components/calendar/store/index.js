@@ -32,7 +32,7 @@ export const addEvent = createAsyncThunk(
       data: event,
     };
     await axios(options);
-    await dispatch(fetchEvents(getState().calendar.selectedCalendars));
+    await dispatch(fetchEvents('GabrielleRobertson'));
     return event;
   }
 );

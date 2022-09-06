@@ -37,6 +37,8 @@ const CalendarComponent = (props) => {
     }
   }, [calendarApi]);
 
+  console.log('EVENTS: ', store.events);
+
   // ** calendarOptions(Props)
   const calendarOptions = {
     events: store.events.length ? store.events : [],
