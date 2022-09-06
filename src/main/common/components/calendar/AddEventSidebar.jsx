@@ -14,22 +14,22 @@ import { useForm, Controller } from 'react-hook-form';
 // ** Reactstrap Imports
 import { Modal, ModalHeader, ModalBody, Label, Input, Form } from 'reactstrap';
 
-import Button from '../../RegularButton';
-import CustomInput from '../../customInput/CustomInput';
+import Button from '../RegularButton';
+import CustomInput from '../customInput/CustomInput';
 
 // ** Avatar Images
-import img1 from '../../../assets/img/avatars/1-small.png';
-import img2 from '../../../assets/img/avatars/1-small.png';
-import img3 from '../../../assets/img/avatars/1-small.png';
-import img4 from '../../../assets/img/avatars/1-small.png';
-import img5 from '../../../assets/img/avatars/1-small.png';
-import img6 from '../../../assets/img/avatars/1-small.png';
-import Utils from '../../../Utils';
-import Avatar from '../../avatar';
+import img1 from '../../assets/img/avatars/1-small.png';
+import img2 from '../../assets/img/avatars/1-small.png';
+import img3 from '../../assets/img/avatars/1-small.png';
+import img4 from '../../assets/img/avatars/1-small.png';
+import img5 from '../../assets/img/avatars/1-small.png';
+import img6 from '../../assets/img/avatars/1-small.png';
+import Utils from '../../Utils';
+import Avatar from '../avatar';
 
 // ** Styles Imports
-import '../../../assets/scss/react-select/_react-select.scss';
-import '../../../assets/scss/flatpickr/flatpickr.scss';
+import '../../assets/scss/react-select/_react-select.scss';
+import '../../assets/scss/flatpickr/flatpickr.scss';
 
 const AddEventSidebar = (props) => {
   // ** Props
@@ -40,10 +40,8 @@ const AddEventSidebar = (props) => {
     addEvent,
     calendarApi,
     selectEvent,
-    updateEvent,
     removeEvent,
     refetchEvents,
-    calendarsColor,
     handleAddEventSidebar,
   } = props;
 
@@ -68,9 +66,6 @@ const AddEventSidebar = (props) => {
   const [location, setLocation] = useState('');
   const [endPicker, setEndPicker] = useState(new Date());
   const [startPicker, setStartPicker] = useState(new Date());
-  const [calendarLabel, setCalendarLabel] = useState([
-    { value: 'Business', label: 'Business', color: 'primary' },
-  ]);
 
   const guestsOptions = [
     {
@@ -163,16 +158,12 @@ const AddEventSidebar = (props) => {
     setLocation('');
     setDesc('');
     setGuests({});
-    setCalendarLabel([
-      { value: 'Business', label: 'Business', color: 'primary' },
-    ]);
     setStartPicker(new Date());
     setEndPicker(new Date());
   };
 
   // ** Set sidebar fields
   const handleSelectedEvent = () => {
-    console.log('*************** selectedEvent: ', selectedEvent);
     if (!Utils.isObjEmpty(selectedEvent)) {
       setValue('title', selectedEvent.title || getValues('title'));
       setLocation(selectedEvent.extendedProps.location.name || location);
@@ -224,44 +215,7 @@ const AddEventSidebar = (props) => {
 
   // ** Updates Event in Store
   const handleUpdateEvent = () => {
-    if (getValues('title').length) {
-      const eventToUpdate = {
-        id: selectedEvent.id,
-        title: getValues('title'),
-        allDay,
-        start: startPicker,
-        end: endPicker,
-        url,
-        display: allDay === false ? 'block' : undefined,
-        extendedProps: {
-          location,
-          description: desc,
-          guests,
-          calendar: calendarLabel[0].label,
-        },
-      };
 
-      const propsToUpdate = ['id', 'title', 'url'];
-      const extendedPropsToUpdate = [
-        'calendar',
-        'guests',
-        'location',
-        'description',
-      ];
-      dispatch(updateEvent(eventToUpdate));
-      updateEventInCalendar(
-        eventToUpdate,
-        propsToUpdate,
-        extendedPropsToUpdate
-      );
-
-      handleAddEventSidebar();
-      toast.success('Event Updated');
-    } else {
-      setError('title', {
-        type: 'manual',
-      });
-    }
   };
 
   // ** (UI) removeEventInCalendar

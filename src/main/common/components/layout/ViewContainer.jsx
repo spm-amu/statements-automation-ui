@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useParams } from 'react-router-dom';
-import Calendar from '../view/Calendar';
+import Calendar from '../calendar';
 import Charts from '../view/Charts';
 import Files from '../view/Files';
 import MeetingHistory from '../view/MeetingHistory';
