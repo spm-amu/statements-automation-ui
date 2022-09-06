@@ -4,16 +4,26 @@ import { Provider } from 'react-redux';
 import { store } from '../main/common/redux/store/store';
 import icon from '../../assets/armscor_logo.png';
 import './App.css';
+import LoginView from '../main/common/components/view/security/Login';
 import BasicBusinessAppDashboard from '../main/desktop/dashboard/BasicBusinessAppDashboard';
 
 // ** Fake Database
 import '../main/@fake-db';
 
-const Hello = () => {
+const Login = () => {
+  return (
+    <div style={{ width: '100%', height: '100vh', backgroundColor: '#E5E5E5' }}>
+      <div className="Landing" style={{height: '100%', display: 'flex', alignItems: 'center'}}>
+        <LoginView />
+      </div>
+    </div>
+  );
+};
+
+const Dashboard = () => {
   return (
     <div style={{ width: '100%' }}>
-      <div className="Hello">
-        {/* <img width="200px" alt="icon" src={icon} /> */}
+      <div className="Landing">
         <BasicBusinessAppDashboard
           logoutCallBack={() => {
             alert('Logout Firee');
@@ -32,7 +42,7 @@ export default function App() {
     <Provider store={store}>
       <Router style={{ border: '8px solid yello' }}>
         <Routes>
-          <Route path="*" element={<Hello />} />
+          <Route path="*" element={<Dashboard />} />
         </Routes>
       </Router>
     </Provider>

@@ -2,3 +2,23 @@
 .fc-view-harness {
   margin: unset !important;
 }
+
+.fc-header-toolbar button:hover {
+  transform: scale(1);
+}
+
+.fc-header-toolbar .fc-toolbar-chunk:nth-of-type(3) .fc-button-group button {
+  border-color: #01476C !important;
+  color: #01476C !important;
+}
+
+.fc .fc-toolbar .fc-button-group .fc-button-primary:not(.fc-prev-button):not(.fc-next-button).fc-button-active,
+.fc .fc-toolbar .fc-button-group .fc-button-primary:not(.fc-prev-button):not(.fc-next-button):hover {
+  border-color: #01476C !important;
+  color: #01476C !important;
+  background-color: rgba(1, 71, 108, 0.2) !important;
+}
+
+.fc-button:hover {
+}
+

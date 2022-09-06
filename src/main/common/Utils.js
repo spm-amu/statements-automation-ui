@@ -163,21 +163,6 @@
     return defaultStyle;
   };
 
-  static publishSystemErrorMessage = (viewId, component = null) => {
-    const message = {
-      messageType: 'ERROR',
-      message: 'A system error has accured. Please try again later',
-    };
-
-    let event = new Event(applicationContext, viewId, message);
-    eventManager.fireEvent(EventType.MESSAGE_ARRIVED, event);
-
-    if (component !== null) {
-      event = new Event(component, viewId, message);
-      eventManager.fireEvent(EventType.MESSAGE_ARRIVED, event);
-    }
-  };
-
   static selectThemeColors = (theme) => ({
     ...theme,
     colors: {
