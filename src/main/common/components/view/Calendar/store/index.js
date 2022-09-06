@@ -4,10 +4,17 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // ** Axios Imports
 import axios from 'axios';
 
+axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.headers.common = {
+  'Content-Type': 'application/json',
+};
+
 export const fetchEvents = createAsyncThunk(
   'appCalendar/fetchEvents',
-  async (calendars) => {
-    const response = await axios.get('/apps/calendar/events', { calendars });
+  async (identifier) => {
+    const response = await axios.get(
+      `/api/v1/meeting/fetch-meetings/${identifier}`
+    );
     return response.data;
   }
 );
@@ -15,7 +22,16 @@ export const fetchEvents = createAsyncThunk(
 export const addEvent = createAsyncThunk(
   'appCalendar/addEvent',
   async (event, { dispatch, getState }) => {
-    await axios.post('/apps/calendar/add-event', { event });
+    const options = {
+      url: '/api/v1/meeting/create',
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      data: event,
+    };
+    await axios(options);
     await dispatch(fetchEvents(getState().calendar.selectedCalendars));
     return event;
   }

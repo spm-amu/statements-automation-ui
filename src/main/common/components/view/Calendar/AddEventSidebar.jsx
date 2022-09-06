@@ -72,26 +72,43 @@ const AddEventSidebar = (props) => {
     { value: 'Business', label: 'Business', color: 'primary' },
   ]);
 
-  // ** Select Options
-  const options = [
-    { value: 'Business', label: 'Business', color: 'primary' },
-    { value: 'Personal', label: 'Personal', color: 'danger' },
-    { value: 'Family', label: 'Family', color: 'warning' },
-    { value: 'Holiday', label: 'Holiday', color: 'success' },
-    { value: 'ETC', label: 'ETC', color: 'info' },
-  ];
-
   const guestsOptions = [
-    { value: 'Donna Frank', label: 'Donna Frank', avatar: img1 },
-    { value: 'Jane Foster', label: 'Jane Foster', avatar: img2 },
     {
-      value: 'Gabrielle Robertson',
-      label: 'Gabrielle Robertson',
+      identifier: 'GabrielleRobertson',
+      name: 'Donna Frank',
+      optional: false,
+      avatar: img1,
+    },
+    {
+      identifier: 'GabrielleRobertson',
+      name: 'Jane Foster',
+      optional: false,
+      avatar: img2,
+    },
+    {
+      identifier: 'GabrielleRobertson',
+      name: 'Gabrielle Robertson',
+      optional: false,
       avatar: img3,
     },
-    { value: 'Lori Spears', label: 'Lori Spears', avatar: img4 },
-    { value: 'Sandy Vega', label: 'Sandy Vega', avatar: img5 },
-    { value: 'Cheryl May', label: 'Cheryl May', avatar: img6 },
+    {
+      identifier: 'Lori Spears',
+      name: 'Lori Spears',
+      optional: false,
+      avatar: img4,
+    },
+    {
+      identifier: 'Sandy Vega',
+      name: 'Sandy Vega',
+      optional: false,
+      avatar: img5,
+    },
+    {
+      identifier: 'Cheryl May',
+      name: 'Cheryl May',
+      optional: false,
+      avatar: img6,
+    },
   ];
 
   // ** Custom select components
@@ -109,7 +126,7 @@ const AddEventSidebar = (props) => {
       <components.Option {...props}>
         <div className="d-flex flex-wrap align-items-center">
           <Avatar className="my-0 me-1" size="sm" img={data.avatar} />
-          <div>{data.label}</div>
+          <div>{data.name}</div>
         </div>
       </components.Option>
     );
@@ -119,16 +136,16 @@ const AddEventSidebar = (props) => {
   const handleAddEvent = () => {
     const obj = {
       title: getValues('title'),
-      start: startPicker,
-      end: endPicker,
-      allDay,
-      display: 'block',
-      extendedProps: {
-        calendar: calendarLabel[0].label,
-        url: url.length ? url : undefined,
-        guests: guests.length ? guests : undefined,
-        location: location.length ? location : undefined,
-        desc: desc.length ? desc : undefined,
+      description: desc.length ? desc : undefined,
+      schedule: {
+        startDate: Utils.getFormattedDate(startPicker),
+        startTime: startPicker.toLocaleTimeString(),
+        endDate: Utils.getFormattedDate(endPicker),
+        endTime: endPicker.toLocaleTimeString(),
+      },
+      attendees: guests,
+      location: {
+        id: '4fae0a92-6de7-4750-8213-a19e724abd00',
       },
     };
     dispatch(addEvent(obj));
@@ -155,32 +172,14 @@ const AddEventSidebar = (props) => {
 
   // ** Set sidebar fields
   const handleSelectedEvent = () => {
+    console.log('selectedEvent: ', selectedEvent);
     if (!Utils.isObjEmpty(selectedEvent)) {
-      const { calendar } = selectedEvent.extendedProps;
-
-      const resolveLabel = () => {
-        if (calendar.length) {
-          return {
-            label: calendar,
-            value: calendar,
-            color: calendarsColor[calendar],
-          };
-        }
-        return { value: 'Business', label: 'Business', color: 'primary' };
-      };
       setValue('title', selectedEvent.title || getValues('title'));
-      setAllDay(selectedEvent.allDay || allDay);
-      setUrl(selectedEvent.url || url);
-      setLocation(selectedEvent.extendedProps.location || location);
-      setDesc(selectedEvent.extendedProps.description || desc);
-      setGuests(selectedEvent.extendedProps.guests || guests);
+      setLocation(selectedEvent.location.id || location);
+      setDesc(selectedEvent.description || desc);
+      setGuests(selectedEvent.attendees || guests);
       setStartPicker(new Date(selectedEvent.start));
-      setEndPicker(
-        selectedEvent.allDay
-          ? new Date(selectedEvent.start)
-          : new Date(selectedEvent.end)
-      );
-      setCalendarLabel([resolveLabel()]);
+      setEndPicker(new Date(selectedEvent.end));
     }
   };
 
@@ -419,38 +418,9 @@ const AddEventSidebar = (props) => {
               />
             </div>
 
-            <div className="form-switch mb-1">
-              <Input
-                id="allDay"
-                type="switch"
-                className="me-1"
-                checked={allDay}
-                name="customSwitch"
-                onChange={(e) => setAllDay(e.target.checked)}
-              />
-              <Label className="form-label" for="allDay">
-                All Day
-              </Label>
-            </div>
-
-            <div className="mb-1">
-              <CustomInput
-                labelText="Meeting URL"
-                type="url"
-                id="eventURL"
-                formControlProps={{ fullWidth: true }}
-                inputProps={{
-                  value: url,
-                  onChange: (e) => {
-                    setUrl(e.target.value);
-                  },
-                }}
-              />
-            </div>
-
             <div className="mb-1">
               <Label className="form-label" for="guests">
-                Guests
+                Attendees
               </Label>
               <Select
                 isMulti

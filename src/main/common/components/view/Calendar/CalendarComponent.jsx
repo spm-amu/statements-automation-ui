@@ -79,8 +79,7 @@ const CalendarComponent = (props) => {
 
     eventClassNames({ event: calendarEvent }) {
       // eslint-disable-next-line no-underscore-dangle
-      const colorName =
-        calendarsColor[calendarEvent._def.extendedProps.calendar];
+      const colorName = '#945c33';
 
       return [
         // Background Color

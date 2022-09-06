@@ -51,16 +51,25 @@ const Calendar = () => {
 
   // ** Blank Event Object
   const blankEvent = {
+    id: '',
     title: '',
-    start: '',
-    end: '',
-    allDay: false,
-    url: '',
-    extendedProps: {
-      calendar: '',
-      guests: [],
-      location: '',
-      description: '',
+    description: '',
+    schedule: {
+      id: '',
+      startDateTime: '',
+      endDateTime: '',
+    },
+    attendees: [
+      {
+        id: '',
+        identifier: '',
+        name: '',
+        optional: false,
+      },
+    ],
+    location: {
+      id: '',
+      name: '',
     },
   };
 
@@ -73,7 +82,7 @@ const Calendar = () => {
 
   // ** Fetch Events On Mount
   useEffect(() => {
-    dispatch(fetchEvents(store.selectedCalendars));
+    dispatch(fetchEvents('GabrielleRobertson'));
   }, []);
 
   return (

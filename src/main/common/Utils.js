@@ -191,4 +191,8 @@
   });
 
   static isObjEmpty = obj => Object.keys(obj).length === 0;
+
+  static getFormattedDate = (date) => {
+    return date.toLocaleDateString('en-GB').split('/').reverse().join('-');
+  };
 }

@@ -13,113 +13,32 @@ const prevMonth = date.getMonth() === 11 ? new Date(date.getFullYear() - 1, 0, 1
 const data = {
   events: [
     {
-      id: 1,
-      url: '',
-      title: 'Design Review',
-      start: date,
-      end: nextDay,
-      allDay: false,
-      extendedProps: {
-        calendar: 'Business'
-      }
-    },
-    {
-      id: 2,
-      url: '',
-      title: 'Meeting With Client',
-      start: new Date(date.getFullYear(), date.getMonth() + 1, -11),
-      end: new Date(date.getFullYear(), date.getMonth() + 1, -10),
-      allDay: true,
-      extendedProps: {
-        calendar: 'Business'
-      }
-    },
-    {
-      id: 3,
-      url: '',
-      title: 'Family Trip',
-      allDay: true,
-      start: new Date(date.getFullYear(), date.getMonth() + 1, -9),
-      end: new Date(date.getFullYear(), date.getMonth() + 1, -7),
-      extendedProps: {
-        calendar: 'Holiday'
-      }
-    },
-    {
-      id: 4,
-      url: '',
-      title: "Doctor's Appointment",
-      start: new Date(date.getFullYear(), date.getMonth() + 1, -11),
-      end: new Date(date.getFullYear(), date.getMonth() + 1, -10),
-      allDay: true,
-      extendedProps: {
-        calendar: 'Personal'
-      }
-    },
-    {
-      id: 5,
-      url: '',
-      title: 'Dart Game?',
-      start: new Date(date.getFullYear(), date.getMonth() + 1, -13),
-      end: new Date(date.getFullYear(), date.getMonth() + 1, -12),
-      allDay: true,
-      extendedProps: {
-        calendar: 'ETC'
-      }
-    },
-    {
-      id: 6,
-      url: '',
-      title: 'Meditation',
-      start: new Date(date.getFullYear(), date.getMonth() + 1, -13),
-      end: new Date(date.getFullYear(), date.getMonth() + 1, -12),
-      allDay: true,
-      extendedProps: {
-        calendar: 'Personal'
-      }
-    },
-    {
-      id: 7,
-      url: '',
-      title: 'Dinner',
-      start: new Date(date.getFullYear(), date.getMonth() + 1, -13),
-      end: new Date(date.getFullYear(), date.getMonth() + 1, -12),
-      allDay: true,
-      extendedProps: {
-        calendar: 'Family'
-      }
-    },
-    {
-      id: 8,
-      url: '',
-      title: 'Product Review',
-      start: new Date(date.getFullYear(), date.getMonth() + 1, -13),
-      end: new Date(date.getFullYear(), date.getMonth() + 1, -12),
-      allDay: true,
-      extendedProps: {
-        calendar: 'Business'
-      }
-    },
-    {
-      id: 9,
-      url: '',
-      title: 'Monthly Meeting',
-      start: nextMonth,
-      end: nextMonth,
-      allDay: true,
-      extendedProps: {
-        calendar: 'Business'
-      }
-    },
-    {
-      id: 10,
-      url: '',
-      title: 'Monthly Checkup',
-      start: prevMonth,
-      end: prevMonth,
-      allDay: true,
-      extendedProps: {
-        calendar: 'Personal'
+      "id": "3553846c-26ca-4aa9-b346-0d2ab85de97a",
+      "title": "Meeting 5",
+      "start": "2022-09-07T00:00:00",
+      "end": "2022-09-07T00:00:00",
+      "allDay": false,
+      "extendedProps": {
+        "description": "Meeting Description",
+        "attendees": [
+          {
+            "id": "1f94b7f6-1bd1-48ab-9cab-57dd1c9171da",
+            "identifier": "GabrielleRobertson",
+            "name": "Gabrielle Robertson",
+            "optional": false
+          }
+        ],
+        "schedule": {
+          "id": "52bd0fa6-f35f-489d-b8b6-1afd8cb06932",
+          "startDate": "2022-09-07",
+          "endDate": "2022-09-07",
+          "startTime": "00:00:00",
+          "endTime": "00:00:00"
+        },
+        "location": {
+          "id": "4fae0a92-6de7-4750-8213-a19e724abd00",
+          "name": "ROOM 2B"
+        }
       }
     }
   ]
@@ -129,10 +48,7 @@ const data = {
 // GET: Return calendar events
 // ------------------------------------------------
 mock.onGet('/apps/calendar/events').reply(config => {
-  // Get requested calendars as Array
-  const calendars = config.calendars
-
-  return [200, data.events.filter(event => calendars.includes(event.extendedProps.calendar))]
+  return [200, data.events]
 })
 
 // ------------------------------------------------
