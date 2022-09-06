@@ -20,6 +20,7 @@ import {
 
 // ** Styles
 import '../../assets/scss/app-calendar.scss';
+import './index.css'
 
 // ** CalendarColors
 const calendarsColor = {
