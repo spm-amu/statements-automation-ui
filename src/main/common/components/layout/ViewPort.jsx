@@ -1,37 +1,34 @@
 ﻿import React from 'react';
-import {Route, withRouter} from 'react-router-dom';
-import './viewport.css'
-import {Routes, Route, withRouter} from 'react-router-dom';
+import {Routes, Route, withRouter, useNavigate} from 'react-router-dom';
 import './viewport.css';
-import '../view/Calendar'
-import '../view/Charts'
-import '../view/Files'
-import '../view/MeetingHistory'
 import ViewContainer from "./ViewContainer";
 
-class ViewPort extends React.PureComponent {
+const ViewPort = () => {
 
-  constructor(props) {
-    super(props);
-  }
+  const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(true);
 
-  componentDidMount() {
-  }
+  React.useEffect(() => {
+    if(loading) {
+      setLoading(false);
+    }
+  });
 
-  render() {
-    return (
-      <div className={'viewport'}>
-        VIEWPORT
-        <Routes>
-          <Route path='/view/:id' element={<ViewContainer />}/>
-        </Routes>
-      </div>
-    )
-  }
-}
+  React.useEffect(() => {
+    if(!loading) {
+      navigate('/view/calender')
+    }
+  }, [loading]);
+
+  return (
+    <div className={'viewport'}>
+      <Routes>
+        <Route path='/view/:id' element={<ViewContainer/>}/>
+      </Routes>
+    </div>
+  )
+};
 
 
 //export default withRouter(ViewPort)
 export default ViewPort
-
-
