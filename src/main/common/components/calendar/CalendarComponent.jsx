@@ -21,7 +21,6 @@ const CalendarComponent = (props) => {
     store,
     isRtl,
     dispatch,
-    calendarsColor,
     calendarApi,
     setCalendarApi,
     handleAddEventSidebar,

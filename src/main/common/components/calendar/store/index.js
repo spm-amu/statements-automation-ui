@@ -40,8 +40,6 @@ export const addEvent = createAsyncThunk(
 export const updateEvent = createAsyncThunk(
   'appCalendar/updateEvent',
   async (event, { dispatch, getState }) => {
-    await axios.post('/apps/calendar/update-event', { event });
-    await dispatch(fetchEvents(getState().calendar.selectedCalendars));
     return event;
   }
 );
@@ -49,17 +47,6 @@ export const updateEvent = createAsyncThunk(
 export const updateFilter = createAsyncThunk(
   'appCalendar/updateFilter',
   async (filter, { dispatch, getState }) => {
-    if (getState().calendar.selectedCalendars.includes(filter)) {
-      await dispatch(
-        fetchEvents(
-          getState().calendar.selectedCalendars.filter((i) => i !== filter)
-        )
-      );
-    } else {
-      await dispatch(
-        fetchEvents([...getState().calendar.selectedCalendars, filter])
-      );
-    }
     return filter;
   }
 );
@@ -67,13 +54,6 @@ export const updateFilter = createAsyncThunk(
 export const updateAllFilters = createAsyncThunk(
   'appCalendar/updateAllFilters',
   async (value, { dispatch }) => {
-    if (value === true) {
-      await dispatch(
-        fetchEvents(['Personal', 'Business', 'Family', 'Holiday', 'ETC'])
-      );
-    } else {
-      await dispatch(fetchEvents([]));
-    }
     return value;
   }
 );
@@ -81,7 +61,6 @@ export const updateAllFilters = createAsyncThunk(
 export const removeEvent = createAsyncThunk(
   'appCalendar/removeEvent',
   async (id) => {
-    await axios.delete('/apps/calendar/remove-event', { id });
     return id;
   }
 );
@@ -91,7 +70,6 @@ export const appCalendarSlice = createSlice({
   initialState: {
     events: [],
     selectedEvent: {},
-    selectedCalendars: ['Personal', 'Business', 'Family', 'Holiday', 'ETC'],
   },
   reducers: {
     selectEvent: (state, action) => {
@@ -99,30 +77,9 @@ export const appCalendarSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchEvents.fulfilled, (state, action) => {
-        state.events = action.payload;
-      })
-      .addCase(updateFilter.fulfilled, (state, action) => {
-        if (state.selectedCalendars.includes(action.payload)) {
-          state.selectedCalendars.splice(
-            state.selectedCalendars.indexOf(action.payload),
-            1
-          );
-        } else {
-          state.selectedCalendars.push(action.payload);
-        }
-      })
-      .addCase(updateAllFilters.fulfilled, (state, action) => {
-        const value = action.payload;
-        let selected = [];
-        if (value === true) {
-          selected = ['Personal', 'Business', 'Family', 'Holiday', 'ETC'];
-        } else {
-          selected = [];
-        }
-        state.selectedCalendars = selected;
-      });
+    builder.addCase(fetchEvents.fulfilled, (state, action) => {
+      state.events = action.payload;
+    });
   },
 });
 

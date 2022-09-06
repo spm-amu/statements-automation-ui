@@ -1,5 +1,5 @@
 // ** Reducers Imports
-import calendar from '../../components/view/Calendar/store'
+import calendar from '../../components/calendar/store'
 
 const rootReducer = {
   calendar

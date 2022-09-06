@@ -7,7 +7,6 @@ import { Row, Col } from 'reactstrap';
 // ** Calendar App Component Imports
 import { useSelector, useDispatch } from 'react-redux';
 import CalendarComponent from './CalendarComponent';
-import SidebarLeft from './SidebarLeft';
 import AddEventSidebar from './AddEventSidebar';
 
 // ** Store & Actions
@@ -15,14 +14,12 @@ import {
   fetchEvents,
   selectEvent,
   updateEvent,
-  updateFilter,
-  updateAllFilters,
   addEvent,
   removeEvent,
 } from './store';
 
 // ** Styles
-import '../../../assets/scss/app-calendar.scss';
+import '../../assets/scss/app-calendar.scss';
 
 // ** CalendarColors
 const calendarsColor = {
