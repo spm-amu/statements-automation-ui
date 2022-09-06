@@ -20,7 +20,7 @@ import {
 
 // ** Styles
 import '../../assets/scss/app-calendar.scss';
-import './index.css'
+import './index.css';
 
 // ** CalendarColors
 const calendarsColor = {
@@ -51,23 +51,14 @@ const Calendar = () => {
   const blankEvent = {
     id: '',
     title: '',
-    description: '',
-    schedule: {
-      id: '',
-      startDateTime: '',
-      endDateTime: '',
-    },
-    attendees: [
-      {
-        id: '',
-        identifier: '',
-        name: '',
-        optional: false,
-      },
-    ],
-    location: {
-      id: '',
-      name: '',
+    start: '',
+    end: '',
+    allDay: false,
+    extendedProps: {
+      description: '',
+      attendees: [],
+      schedule: {},
+      location: {},
     },
   };
 
