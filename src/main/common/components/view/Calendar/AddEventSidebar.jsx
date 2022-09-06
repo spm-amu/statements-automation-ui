@@ -172,12 +172,12 @@ const AddEventSidebar = (props) => {
 
   // ** Set sidebar fields
   const handleSelectedEvent = () => {
-    console.log('selectedEvent: ', selectedEvent);
+    console.log('*************** selectedEvent: ', selectedEvent);
     if (!Utils.isObjEmpty(selectedEvent)) {
       setValue('title', selectedEvent.title || getValues('title'));
-      setLocation(selectedEvent.location.id || location);
-      setDesc(selectedEvent.description || desc);
-      setGuests(selectedEvent.attendees || guests);
+      setLocation(selectedEvent.extendedProps.location.name || location);
+      setDesc(selectedEvent.extendedProps.description || desc);
+      setGuests(selectedEvent.extendedProps.attendees || guests);
       setStartPicker(new Date(selectedEvent.start));
       setEndPicker(new Date(selectedEvent.end));
     }
@@ -302,11 +302,25 @@ const AddEventSidebar = (props) => {
     }
     return (
       <>
-        <Button className="me-1" color="primary" onClick={handleUpdateEvent}>
-          Update
+        <Button
+          type="submit"
+          color="rose"
+          simple
+          size="lg"
+          block
+          onClick={handleUpdateEvent}
+        >
+          UPDATE
         </Button>
-        <Button color="danger" onClick={handleDeleteEvent} outline>
-          Delete
+
+        <Button
+          color="danger"
+          simple
+          size="lg"
+          block
+          onClick={handleDeleteEvent}
+        >
+          DELETE
         </Button>
       </>
     );
