@@ -41,6 +41,7 @@ const AddEventSidebar = (props) => {
     calendarApi,
     selectEvent,
     removeEvent,
+    updateEvent,
     refetchEvents,
     handleAddEventSidebar,
   } = props;
@@ -208,14 +209,50 @@ const AddEventSidebar = (props) => {
       const propName = extendedPropsToUpdate[index];
       existingEvent.setExtendedProp(
         propName,
-        updatedEventData.extendedProps[propName]
+        updatedEventData[propName]
       );
     }
   };
 
   // ** Updates Event in Store
   const handleUpdateEvent = () => {
+    if (getValues('title').length) {
 
+      console.log('selectedEvent: ', selectedEvent);
+
+      const eventToUpdate = {
+        id: selectedEvent.id,
+        title: getValues('title'),
+        description: desc,
+        schedule: {
+          startDate: Utils.getFormattedDate(startPicker),
+          startTime: startPicker.toLocaleTimeString(),
+          endDate: Utils.getFormattedDate(endPicker),
+          endTime: endPicker.toLocaleTimeString(),
+        },
+        attendees: guests,
+        location: {
+          id: '4fae0a92-6de7-4750-8213-a19e724abd00',
+        },
+      };
+
+      const propsToUpdate = ['id', 'title', 'url'];
+      const extendedPropsToUpdate = [
+        'description',
+        'attendees',
+        'location',
+        'schedule',
+      ];
+      dispatch(updateEvent(eventToUpdate));
+      updateEventInCalendar(eventToUpdate, propsToUpdate, extendedPropsToUpdate);
+
+      handleAddEventSidebar();
+      toast.success('Event Updated');
+    } else {
+      setError('title', {
+        type: 'manual',
+      });
+    }
   };
 
   // ** (UI) removeEventInCalendar

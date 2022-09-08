@@ -56,9 +56,25 @@ const Calendar = () => {
     allDay: false,
     extendedProps: {
       description: '',
-      attendees: [],
-      schedule: {},
-      location: {},
+      attendees: [
+        {
+          id: '',
+          identifier: '',
+          name: '',
+          optional: false,
+        },
+      ],
+      schedule: {
+        id: '',
+        startDate: '',
+        endDate: '',
+        startTime: '',
+        endTime: '',
+      },
+      location: {
+        id: '',
+        name: '',
+      },
     },
   };
 

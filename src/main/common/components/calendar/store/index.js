@@ -40,6 +40,17 @@ export const addEvent = createAsyncThunk(
 export const updateEvent = createAsyncThunk(
   'appCalendar/updateEvent',
   async (event, { dispatch, getState }) => {
+    const options = {
+      url: '/api/v1/meeting/update',
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      data: event,
+    };
+    await axios(options);
+    await dispatch(fetchEvents('GabrielleRobertson'));
     return event;
   }
 );
