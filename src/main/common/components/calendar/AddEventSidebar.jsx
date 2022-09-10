@@ -276,7 +276,7 @@ const AddEventSidebar = (props) => {
       return (
         <>
           <Button type="submit" color="rose" simple size="lg" block>
-            CREATE
+            SAVE
           </Button>
 
           <Button
