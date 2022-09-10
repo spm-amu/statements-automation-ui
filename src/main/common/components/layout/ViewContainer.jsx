@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useParams } from 'react-router-dom';
-import Calendar from '../calendar';
+import Calendar from '../view/Calendar';
 import Charts from '../view/Charts';
 import Files from '../view/Files';
 import MeetingHistory from '../view/MeetingHistory';
@@ -13,7 +13,7 @@ const ViewContainer = (props) => {
     const viewId = params.id;
 
     switch (viewId) {
-      case 'calender':
+      case 'calendar':
         return <Calendar />;
       case 'charts':
         return <Charts />;

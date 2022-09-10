@@ -1,47 +1,66 @@
-import { useEffect, useRef, memo, Fragment } from 'react';
+import {memo, useEffect, useRef, useState} from 'react';
 
-// ** Full Calendar & it's Plugins
 import FullCalendar from '@fullcalendar/react';
 import listPlugin from '@fullcalendar/list';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-
-// ** Third Party Components
 import toast from 'react-hot-toast';
-import { Menu } from 'react-feather';
-import { Card, CardBody } from 'reactstrap';
+import {Menu, X} from 'react-feather';
+import {Card, CardBody, Form, Modal, ModalBody, ModalHeader} from 'reactstrap';
+import '../../assets/scss/app-calendar.scss';
+import "./CalenderComponent.css";
+import '../../assets/scss/react-select/_react-select.scss';
+import '../../assets/scss/flatpickr/flatpickr.scss';
+import Meeting from "../view/Meeting";
+import PerfectScrollbar from 'react-perfect-scrollbar';
+
+const eventTemplate = {
+  id: '',
+  title: '',
+  start: '',
+  end: '',
+  allDay: false,
+  extendedProps: {
+    description: '',
+    attendees: [
+      {
+        id: '',
+        identifier: '',
+        name: '',
+        optional: false,
+      },
+    ],
+    schedule: {
+      id: '',
+      startDate: '',
+      endDate: '',
+      startTime: '',
+      endTime: '',
+    },
+    location: {
+      id: '',
+      name: '',
+    },
+  },
+};
 
 const CalendarComponent = (props) => {
-  // ** Refs
+  const {isRtl} = props;
+  const [calendarApi, setCalendarApi] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const calendarRef = useRef(null);
 
-  // ** Props
-  const {
-    store,
-    isRtl,
-    dispatch,
-    calendarApi,
-    setCalendarApi,
-    handleAddEventSidebar,
-    blankEvent,
-    toggleSidebar,
-    selectEvent,
-    updateEvent,
-  } = props;
-
-  // ** UseEffect checks for CalendarAPI Update
   useEffect(() => {
     if (calendarApi === null) {
       setCalendarApi(calendarRef.current.getApi());
     }
   }, [calendarApi]);
 
-  console.log('EVENTS: ', store.events);
-
-  // ** calendarOptions(Props)
   const calendarOptions = {
-    events: store.events.length ? store.events : [],
+    events: events,
     plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
     initialView: 'dayGridMonth',
     headerToolbar: {
@@ -78,19 +97,16 @@ const CalendarComponent = (props) => {
     */
     navLinks: true,
 
-    eventClassNames({ event: calendarEvent }) {
+    eventClassNames({event: calendarEvent}) {
       // eslint-disable-next-line no-underscore-dangle
       const colorName = '#945c33';
 
       return [
-        // Background Color
         `bg-light-${colorName}`,
       ];
     },
 
-    eventClick({ event: clickedEvent }) {
-      dispatch(selectEvent(clickedEvent));
-      handleAddEventSidebar();
+    eventClick({event: clickedEvent}) {
 
       // * Only grab required field otherwise it goes in infinity loop
       // ! Always grab all fields rendered by form (even if it get `undefined`) otherwise due to Vue3/Composition API you might get: "object is not extensible"
@@ -102,7 +118,7 @@ const CalendarComponent = (props) => {
 
     customButtons: {
       sidebarToggle: {
-        text: <Menu className="d-xl-none d-block" />,
+        text: <Menu className="d-xl-none d-block"/>,
         click() {
           toggleSidebar(true);
         },
@@ -110,11 +126,11 @@ const CalendarComponent = (props) => {
     },
 
     dateClick(info) {
-      const ev = blankEvent;
+      const ev = eventTemplate;
       ev.start = info.date;
       ev.end = info.date;
-      dispatch(selectEvent(ev));
-      handleAddEventSidebar();
+      setSelectedEvent(ev);
+      setModalOpen(true);
     },
 
     /*
@@ -122,7 +138,7 @@ const CalendarComponent = (props) => {
       ? Docs: https://fullcalendar.io/docs/eventDrop
       ? We can use `eventDragStop` but it doesn't return updated event so we have to use `eventDrop` which returns updated event
     */
-    eventDrop({ event: droppedEvent }) {
+    eventDrop({event: droppedEvent}) {
       dispatch(updateEvent(droppedEvent));
       toast.success('Event Updated');
     },
@@ -131,7 +147,7 @@ const CalendarComponent = (props) => {
       Handle event resize
       ? Docs: https://fullcalendar.io/docs/eventResize
     */
-    eventResize({ event: resizedEvent }) {
+    eventResize({event: resizedEvent}) {
       dispatch(updateEvent(resizedEvent));
       toast.success('Event Updated');
     },
@@ -142,12 +158,60 @@ const CalendarComponent = (props) => {
     direction: isRtl ? 'rtl' : 'ltr',
   };
 
+  const handleSelectedEvent = () => {
+
+  };
+
+  const handleResetInputValues = () => {
+
+  };
+
+  const toggleModal = () => {
+    setModalOpen(!modalOpen);
+  };
+
+  const CloseBtn = (
+    <X className="cursor-pointer" size={15} onClick={(e) => toggleModal(e)}/>
+  );
+
   return (
-    <Card className="shadow-none border-0 mb-0 rounded-0">
-      <CardBody className="pb-0">
-        <FullCalendar {...calendarOptions} />{' '}
-      </CardBody>
-    </Card>
+    <>
+      <Card className="shadow-none border-0 mb-0 rounded-0">
+        <CardBody className="pb-0">
+          <FullCalendar {...calendarOptions} />{' '}
+        </CardBody>
+      </Card>
+      <Modal
+        isOpen={modalOpen}
+        className="sidebar-lg"
+        toggle={(e) => toggleModal(e)}
+        onOpened={handleSelectedEvent}
+        onClosed={handleResetInputValues}
+        contentClassName="p-0 overflow-hidden meeting-modal"
+        modalClassName="modal-slide-in event-sidebar"
+        style={{width: '80vw', maxWidth: '80vw'}}
+      >
+        <ModalHeader
+          className="mb-1"
+          toggle={(e) => toggleModal(e)}
+          close={CloseBtn}
+          tag="div"
+        >
+          <h5 className="modal-title">
+            {selectedEvent && selectedEvent.title && selectedEvent.title.length
+              ? 'Update'
+              : 'Add'}{' '}
+            Meeting
+          </h5>
+        </ModalHeader>
+
+        <PerfectScrollbar options={{wheelPropagation: false}}>
+          <ModalBody className="flex-grow-1 pb-sm-0 pb-3">
+            <Meeting />
+          </ModalBody>
+        </PerfectScrollbar>
+      </Modal>
+    </>
   );
 };
 

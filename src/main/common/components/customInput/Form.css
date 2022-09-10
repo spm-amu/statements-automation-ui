@@ -1,0 +1,18 @@
+.input-wrapper {
+  width: 80%;
+}
+
+.text-area-wrapper {
+  width: 100%;
+  min-height: 150px;
+}
+
+.MuiFormHelperText-root.Mui-error {
+  color: #f44336 !important;
+}
+
+@media screen and (max-width: 991px) {
+  .input-wrapper {
+    width: 100%;
+  }
+}

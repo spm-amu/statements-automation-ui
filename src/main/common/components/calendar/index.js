@@ -7,7 +7,7 @@ import { Row, Col } from 'reactstrap';
 // ** Calendar App Component Imports
 import { useSelector, useDispatch } from 'react-redux';
 import CalendarComponent from './CalendarComponent';
-import AddEventSidebar from './AddEventSidebar';
+import Meeting from './Meeting';
 
 // ** Store & Actions
 import {
@@ -20,7 +20,7 @@ import {
 
 // ** Styles
 import '../../assets/scss/app-calendar.scss';
-import './index.css';
+import './CalenderComponent.css';
 
 // ** CalendarColors
 const calendarsColor = {
@@ -117,7 +117,7 @@ const Calendar = () => {
           />
         </Row>
       </div>
-      <AddEventSidebar
+      <Meeting
         store={store}
         dispatch={dispatch}
         addEvent={addEvent}

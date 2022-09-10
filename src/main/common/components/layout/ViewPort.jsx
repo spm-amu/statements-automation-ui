@@ -16,7 +16,7 @@ const ViewPort = () => {
 
   React.useEffect(() => {
     if(!loading) {
-      navigate('/view/calender')
+      navigate('/view/calendar')
     }
   }, [loading]);
 

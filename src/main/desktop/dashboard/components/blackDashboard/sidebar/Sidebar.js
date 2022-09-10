@@ -33,7 +33,7 @@ class Sidebar extends React.Component {
     super(props);
     this.state = {
       collaspeState: this.getCollapseStates(props.routes),
-      selectedMenuItem: 'calender'
+      selectedMenuItem: 'calendar'
     }
     //actionCreators.setActiveRoute(Utils.isNull(props.activeRouteMenu) ? 'Dashboard' : props.activeRouteMenu);
   }

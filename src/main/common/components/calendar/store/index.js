@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // ** Axios Imports
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.baseURL = 'http://localhost:8082';
 axios.defaults.headers.common = {
   'Content-Type': 'application/json',
 };
@@ -22,6 +22,7 @@ export const fetchEvents = createAsyncThunk(
 export const addEvent = createAsyncThunk(
   'appCalendar/addEvent',
   async (event, { dispatch, getState }) => {
+    console.log(JSON.stringify(event));
     const options = {
       url: '/api/v1/meeting/create',
       method: 'POST',

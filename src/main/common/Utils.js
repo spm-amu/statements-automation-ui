@@ -181,3 +181,7 @@
     return date.toLocaleDateString('en-GB').split('/').reverse().join('-');
   };
 }
+
+export const isNull = (value) => {
+  return Utils.isNull(value);
+};

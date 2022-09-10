@@ -22,3 +22,15 @@
 .fc-button:hover {
 }
 
+.modal-title {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 36px;
+  color: #3E435D;
+}
+
+button:focus {
+  outline: none !important;
+}

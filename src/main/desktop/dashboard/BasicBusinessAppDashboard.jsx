@@ -83,8 +83,8 @@ const BasicBusinessAppDashboard = (props) => {
         let newRoutes = [];
         let newRoute = {};
 
-        newRoute.name = "Calender";
-        newRoute.path = "calender";
+        newRoute.name = "Calendar";
+        newRoute.path = "calendar";
         newRoute.icon = "CALENDER";
         newRoute.layout = "/admin";
         newRoute.level = 0;
@@ -339,7 +339,7 @@ const BasicBusinessAppDashboard = (props) => {
                         utilsRoutes={utilsRoutes}
                         activeColor={"agility"}
                         secondaryThemeColor={secondaryThemeColor}
-                        activeRouteMenu={'calender'}
+                        activeRouteMenu={'calendar'}
                         className={"sidebar"}
                         viewLauncher={(path) => {
                           navigate('/view/' + path);
