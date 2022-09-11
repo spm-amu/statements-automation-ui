@@ -15,7 +15,7 @@ const Room = () => {
   const pcsRef = useRef<{ [socketId: string]: RTCPeerConnection }>({});
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef<MediaStream>();
-  const [meetingId, setMeetingId] = useState('')
+  const [meetingId, setMeetingId] = useState('"96efe785-fb4e-4a6a-820c-2688d7c69611"')
   const [users, setUsers] = useState<WebRTCUser[]>([]);
 
   const socket = new WebSocket("ws://54.204.92.217:8080/signal");
