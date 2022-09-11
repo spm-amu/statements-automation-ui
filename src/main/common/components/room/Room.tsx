@@ -122,6 +122,10 @@ const Room = () => {
 
       console.log('####################', message);
 
+      socket.onopen = function() {
+        console.log('WebSocket connection opened to Room: #' + meetingId);
+      };
+
       switch (type) {
         case MessageType.ALL_USERS:
           console.log('@@@@@@@@@@@@@@@@@: ', message);
