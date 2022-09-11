@@ -1,11 +1,8 @@
 import React from 'react';
+import Room from '../room/Room';
 
 const Charts = (props) => {
-  return (
-    <div style={{ width: '400px', height: '400px', border: '10px solid red' }}>
-      Chats
-    </div>
-  );
+  return <Room />;
 };
 
 export default Charts;
