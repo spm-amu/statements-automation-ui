@@ -3,14 +3,15 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Box from '@material-ui/core/Box';
 import {countries} from './countries';
-import host from "../../service/RestService";
+import {host, post} from "../../service/RestService";
 import "./Form.css";
+import Utils from "../../Utils";
 
 const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
 
   const [options, setOptions] = React.useState([]);
   const renderOption = (option) => {
-    if(props.showImages) {
+    if (props.showImages && option.imagePath) {
       return (
         <Box component="li" sx={{'& > img': {mr: 2, flexShrink: 0}}}>
           <img
@@ -26,8 +27,8 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
 
     return (
       <Box component="li" sx={{'& > img': {mr: 2, flexShrink: 0}}}>
-      {option.label}
-    </Box>);
+        {option.label}
+      </Box>);
   };
 
   return (
@@ -35,7 +36,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       className={"input-wrapper"}
       id={props.id}
       sx={{width: 300}}
-      options={countries}
+      options={options}
       autoHighlight
       multiple={true}
       getOptionLabel={(option) => option.label}
@@ -46,7 +47,23 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       }
       onInputChange={
         (e, value) => {
-          console.log("KEY PRESS : ", value)
+          if (!Utils.isNull(value) && !Utils.isStringEmpty(value)) {
+            post(`${host}/api/v1/location/search`, (response) => {
+                setOptions(response.records)
+              }, (e) => {
+
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "name",
+                    "value": value
+                  }
+                ],
+                "pageSize": 2000,
+                "currentPage": 0
+              })
+          }
         }
       }
 

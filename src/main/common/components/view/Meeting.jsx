@@ -126,7 +126,6 @@ const Meeting = (props) => {
 
     setErrors({...errors, [e.target.id]: false});
     value[e.target.id] = inputValue;
-    console.log("\n\n\nVC Event : ", value);
   };
 
   // ** Event Action buttons
@@ -159,25 +158,33 @@ const Meeting = (props) => {
     }
     return (
       <>
+        <div style={{marginRight: '4px'}}>
+          <Button
+            variant={'contained'}
+            size="large"
+            color={'primary'}
+            onClick={(e) => handleUpdate(e)}
+          >
+            SEND UPDATE
+          </Button>
+        </div>
+        <div style={{marginRight: '4px'}}>
+          <Button
+            variant={'text'}
+            size="large"
+            block
+            onClick={(e) => handleDelete(e)}
+          >
+            CANCEL MEETING
+          </Button>
+        </div>
         <Button
-          type="submit"
-          color="rose"
-          simple
-          size="lg"
-          block
+          variant={'contained'}
+          size="large"
+          color={'primary'}
           onClick={(e) => handleUpdate(e)}
         >
-          SEND UPDATE
-        </Button>
-
-        <Button
-          color="danger"
-          simple
-          size="lg"
-          block
-          onClick={(e) => handleDelete(e)}
-        >
-          CANCEL MEETING
+          JOIN
         </Button>
       </>
     );

@@ -1,6 +1,7 @@
 import {trackPromise} from 'react-promise-tracker';
+import Utils from "../Utils";
 
-export const host = "http://localhost:8082";
+export const host = window.location.protocol + "//" + window.location.hostname + "/vc";
 const status = (response: any) => {
   if (response.ok) {
     return Promise.resolve(response);
@@ -16,17 +17,17 @@ const json = (response: any) => {
 
 class RestService {
   fetchWithCustomConfig(url: string, successCallback: any, errorCallback: any, body: any, method: string, track: boolean = true) {
-    const accessToken = sessionStorage.getItem("accessToken");
-    const idToken = sessionStorage.getItem("idToken");
+    //const accessToken = sessionStorage.getItem("accessToken");
+    //const idToken = sessionStorage.getItem("idToken");
 
     let data = body ? JSON.stringify(body) : null;
     let fetchConfig = {
-      method: method ? 'GET' : method,
+      method: !Utils.isNull(method) ? method : 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ' + accessToken,
-        'idToken': idToken
+        //'Authorization': 'Bearer ' + accessToken,
+        //'idToken': idToken
 
       },
       body: data
@@ -46,7 +47,7 @@ class RestService {
       .then(status)
       .then(json)
       .then((data) => {
-        successCallback(data);
+        successCallback(JSON.parse(data));
       }).catch((e) => {
         console.error(e);
         if (e.code === 401 && !url.endsWith("/logout")) {
