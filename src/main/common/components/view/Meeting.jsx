@@ -1,84 +1,35 @@
-// ** React Imports
 import {useState} from 'react';
-// ** Third Party Components
 import {X} from 'react-feather';
-import Flatpickr from 'react-flatpickr';
-import Select, {components} from 'react-select' // eslint-disable-line
-// ** Reactstrap Imports
-import {Form, Label} from 'reactstrap';
-
+import {components} from 'react-select'
+import {Form} from 'reactstrap';
 import Button from '@material-ui/core/Button';
-import CustomInput from '../customInput/CustomInput';
 import TextField from '../customInput/TextField';
 import DatePicker from '../customInput/DatePicker';
 import TimePicker from '../customInput/TimePicker';
 import AutoComplete from '../customInput/AutoComplete';
-// ** Avatar Images
-import img1 from '../../assets/img/avatars/1-small.png';
-import img2 from '../../assets/img/avatars/1-small.png';
-import img3 from '../../assets/img/avatars/1-small.png';
-import img4 from '../../assets/img/avatars/1-small.png';
-import img5 from '../../assets/img/avatars/1-small.png';
-import img6 from '../../assets/img/avatars/1-small.png';
 import Utils from '../../Utils';
 import Avatar from '../avatar';
+import {host, post} from "../../service/RestService";
 
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
 
-// ** Custom Components
+import {host} from "../../service/RestService";
 
 const Meeting = (props) => {
 
+  const now = new Date();
   const [url, setUrl] = useState('');
-  const [desc, setDesc] = useState('');
-  const [guests, setGuests] = useState({});
-  const [allDay, setAllDay] = useState(false);
-  const [location, setLocation] = useState('');
-  const [endPicker, setEndPicker] = useState(new Date());
-  const [startPicker, setStartPicker] = useState(new Date());
   const {selectedEvent: selectedMeeting} = props;
-  const [value] = useState({});
+  const [value] = useState(!Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id) ? props.selectedEvent : {
+    startDate: now,
+    startTime: now,
+    endDate: now,
+    endTime: now,
+    attendees: []
+  });
   const [errors, setErrors] = useState({});
-
-  const guestsOptions = [
-    {
-      identifier: 'GabrielleRobertson',
-      name: 'Donna Frank',
-      optional: false,
-      avatar: img1,
-    },
-    {
-      identifier: 'GabrielleRobertson',
-      name: 'Jane Foster',
-      optional: false,
-      avatar: img2,
-    },
-    {
-      identifier: 'GabrielleRobertson',
-      name: 'Gabrielle Robertson',
-      optional: false,
-      avatar: img3,
-    },
-    {
-      identifier: 'Lori Spears',
-      name: 'Lori Spears',
-      optional: false,
-      avatar: img4,
-    },
-    {
-      identifier: 'Sandy Vega',
-      name: 'Sandy Vega',
-      optional: false,
-      avatar: img5,
-    },
-    {
-      identifier: 'Cheryl May',
-      name: 'Cheryl May',
-      optional: false,
-      avatar: img6,
-    },
-  ];
+  const [edited, setEdited] = useState(false);
 
   // ** Custom select components
   const OptionComponent = ({data, ...props}) => {
@@ -101,44 +52,107 @@ const Meeting = (props) => {
     );
   };
 
-  const handleAdd = () => {
-
-  };
-
-  const handleClose = () => {
-
-  };
-
-  const handleUpdate = () => {
-
-  };
-
-  const formValueChangeHandler = (e) => {
-    let inputValue = e.target.value;
-
-    if (e.target.id === 'title') {
-      if (Utils.isNull(inputValue) || Utils.isStringEmpty(inputValue)) {
-        value[e.target.id] = null;
-        setErrors({...errors, ['title']: true});
-        return;
+  const hasErrors = (errorState) => {
+    let properties = Object.getOwnPropertyNames(errorState);
+    for (let i = 0; i < properties.length; i++) {
+      if (errorState[properties[i]]) {
+        return true;
       }
     }
 
-    setErrors({...errors, [e.target.id]: false});
-    value[e.target.id] = inputValue;
+    return false;
   };
+
+  const createMeetingObject = () => {
+    return {
+      id: value.id,
+      title: value.title,
+      attendees: value.attendees,
+      location: value.location,
+      description: value.description,
+      schedule: {
+        startDate: Utils.getFormattedDate(value.startDate),
+        startTime: value.startTime.toLocaleTimeString(),
+        endDate: Utils.getFormattedDate(value.endDate),
+        endTime: value.endTime.toLocaleTimeString()
+      }
+    }
+  };
+
+  const handleAdd = () => {
+    let errorState = {
+      title: Utils.isNull(value.title),
+      startDate: Utils.isNull(value.startDate),
+      startTime: Utils.isNull(value.startTime),
+      endDate: Utils.isNull(value.endDate),
+      endTime: Utils.isNull(value.endTime)
+    };
+
+    setErrors(errorState);
+    if (!hasErrors(errorState)) {
+      post(`${host}/api/v1/meeting/${Utils.isNull(props.selectedEvent) ? 'create' : 'update'}`, (response) => {
+        props.refreshHandler();
+        handleClose();
+      }, (e) => {
+
+      }, createMeetingObject());
+    }
+  };
+
+  const handleClose = () => {
+    props.closeHandler();
+  };
+
+  const handleUpdate = () => {
+    handleAdd();
+  };
+
+  const handleDelete = (e) => {
+
+  };
+
+  const handleJoin = (e) => {
+    props.joinHandler();
+  };
+
+  const validateField = (fieldId, fieldValue) => {
+    if (Utils.isNull(fieldValue) || (typeof fieldValue === 'string' && Utils.isStringEmpty(fieldValue))) {
+      value[fieldId] = null;
+      setErrors({...errors, [fieldId]: true});
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleFormValueChange = (fieldValue, id, required) => {
+    if (required && !validateField(id, fieldValue)) {
+      return;
+    }
+
+    setErrors({...errors, [id]: false});
+    value[id] = fieldValue;
+
+    if (!Utils.isNull(props.selectedEvent)) {
+      setEdited(true);
+    }
+  };
+
+  const formValueChangeHandler = (e) => {
+    handleFormValueChange(e.target.value, e.target.id, e.target.required);
+  };
+
 
   // ** Event Action buttons
   const EventActions = () => {
     if (
-      Utils.isNull(selectedMeeting) ||
-      (!Utils.isNull(selectedMeeting) && !selectedMeeting.title.length)
+      Utils.isNull(props.selectedEvent) || Utils.isNull(props.selectedEvent.id) || Utils.isStringEmpty(props.selectedEvent.id)
     ) {
       return (
         <div style={{width: '100%', display: 'flex', justifyContent: 'right', margin: '16px 0'}}>
           <div style={{marginRight: '4px'}}>
             <Button
-              onClick={handleAdd()}
+              onClick={(e) => handleAdd()}
               variant={'contained'}
               size="large"
               color={'primary'}>
@@ -148,7 +162,6 @@ const Meeting = (props) => {
           <Button
             variant={'text'}
             size="large"
-            block
             onClick={(e) => handleClose(e)}
           >
             CLOSE
@@ -157,38 +170,52 @@ const Meeting = (props) => {
       );
     }
     return (
-      <>
+      <div style={{width: '100%', display: 'flex', justifyContent: 'right', margin: '16px 0'}}>
         <div style={{marginRight: '4px'}}>
           <Button
             variant={'contained'}
             size="large"
             color={'primary'}
-            onClick={(e) => handleUpdate(e)}
+            onClick={(e) => handleJoin(e)}
           >
-            SEND UPDATE
+            JOIN
           </Button>
         </div>
+        {
+          edited ?
+            <div style={{marginRight: '4px'}}>
+              <Button
+                variant={'contained'}
+                size="large"
+                color={'primary'}
+                onClick={(e) => handleUpdate(e)}
+              >
+                SEND UPDATE
+              </Button>
+            </div>
+            :
+            null
+        }
         <div style={{marginRight: '4px'}}>
           <Button
             variant={'text'}
             size="large"
-            block
             onClick={(e) => handleDelete(e)}
           >
             CANCEL MEETING
           </Button>
         </div>
         <Button
-          variant={'contained'}
+          variant={'text'}
           size="large"
-          color={'primary'}
-          onClick={(e) => handleUpdate(e)}
+          onClick={(e) => handleClose(e)}
         >
-          JOIN
+          CLOSE
         </Button>
-      </>
+      </div>
     );
   };
+
 
   // ** Close BTN
   const CloseBtn = (
@@ -202,6 +229,7 @@ const Meeting = (props) => {
           label="Title"
           id="title"
           hasError={errors.title}
+          value={value.title}
           required={true}
           valueChangeHandler={(e) => formValueChangeHandler(e)}
           errorMessage={'A meeting title is required. Please enter a value'}
@@ -214,9 +242,9 @@ const Meeting = (props) => {
               label="Start date"
               id="startDate"
               hasError={errors.startDate}
-              value={new Date()}
+              value={value.startDate}
               required={true}
-              valueChangeHandler={(e) => formValueChangeHandler(e)}
+              valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
               errorMessage={'A start date is required. Please select a value'}
             />
           </div>
@@ -224,16 +252,15 @@ const Meeting = (props) => {
             <TimePicker
               label="Start time"
               id="startTime"
-              hasError={errors.startDate}
-              value={new Date()}
+              hasError={errors.startTime}
+              value={value.startTime}
               required={true}
-              valueChangeHandler={(e) => formValueChangeHandler(e)}
+              valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
               errorMessage={'A start time is required. Please select a value'}
             />
           </div>
         </div>
       </div>
-
       <div>
         <div className={'row no-margin'}>
           <div className={'col-*-*'}>
@@ -241,9 +268,9 @@ const Meeting = (props) => {
               label="End date"
               id="endDate"
               hasError={errors.endDate}
-              value={new Date()}
+              value={value.endDate}
               required={true}
-              valueChangeHandler={(e) => formValueChangeHandler(e)}
+              valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
               errorMessage={'An end date is required. Please select a value'}
             />
           </div>
@@ -251,10 +278,10 @@ const Meeting = (props) => {
             <TimePicker
               label="End time"
               id="endTime"
-              hasError={errors.startDate}
-              value={new Date()}
+              hasError={errors.endTime}
+              value={value.endTime}
               required={true}
-              valueChangeHandler={(e) => formValueChangeHandler(e)}
+              valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
               errorMessage={'A end time is required. Please select a value'}
             />
           </div>
@@ -262,13 +289,22 @@ const Meeting = (props) => {
       </div>
       <div style={{marginTop: '8px'}}>
         <AutoComplete
+          id="attendees"
           label={'Attendees'}
+          multiple={true}
           showImages={true}
+          searchAttribute={'emailAddress'}
+          valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
+          optionsUrl={`${host}/api/v1/auth/search`}
         />
       </div>
       <div style={{marginTop: '12px'}}>
         <AutoComplete
+          id="location"
           label={'Location'}
+          searchAttribute={'name'}
+          valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
+          optionsUrl={`${host}/api/v1/location/search`}
         />
       </div>
       <div>
@@ -278,7 +314,7 @@ const Meeting = (props) => {
           id="description"
           height={'150px'}
           multiline={true}
-          hasError={errors.title}
+          hasError={errors.description}
           valueChangeHandler={(e) => formValueChangeHandler(e)}
         />
       </div>

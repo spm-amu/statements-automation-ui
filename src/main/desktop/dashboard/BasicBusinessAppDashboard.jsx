@@ -50,6 +50,7 @@ const BasicBusinessAppDashboard = (props) => {
                 ps = new PerfectScrollbar(tables[i]);
             }
         }
+
         window.addEventListener("scroll", showNavbarButton);
     });
 
@@ -62,115 +63,83 @@ const BasicBusinessAppDashboard = (props) => {
 
     React.useEffect(() => {
       if(loading) {
-        document.body.classList.add("white-content");
+        if (Utils.isNull(sessionStorage.getItem("accessToken"))) {
+          navigate('/login');
 
-        if (navigator.platform.indexOf("Win") > -1) {
-          //ps.destroy();
-          //document.documentElement.className.add("perfect-scrollbar-off");
-          //document.documentElement.classList.remove("perfect-scrollbar-on");
+          // TODO : Pull user identity details
+        } else {
+          document.body.classList.add("white-content");
 
+          if (navigator.platform.indexOf("Win") > -1) {
+            //ps.destroy();
+            //document.documentElement.className.add("perfect-scrollbar-off");
+            //document.documentElement.classList.remove("perfect-scrollbar-on");
+
+          }
+
+          window.removeEventListener("scroll", showNavbarButton);
+
+          setActiveColor("agility");
+          setSecondaryThemeColor('#342343');
+          setPrimaryThemeColor('#498899');
+          setThemeTextColor('#ffffff');
+
+          let newRoutes = [];
+          let newRoute = {};
+
+          newRoute.name = "Calendar";
+          newRoute.path = "calendar";
+          newRoute.icon = "CALENDER";
+          newRoute.layout = "/admin";
+          newRoute.level = 0;
+          newRoute.isParent = true;
+          newRoutes.push(newRoute);
+
+          newRoute = {};
+          newRoute.name = "Charts";
+          newRoute.path = "charts";
+          newRoute.icon = "CHARTS";
+          newRoute.layout = "/admin";
+          newRoute.level = 0;
+          newRoute.isParent = true;
+          newRoutes.push(newRoute);
+
+          newRoute = {};
+          newRoute.name = "Files";
+          newRoute.path = "files";
+          newRoute.icon = "FILES";
+          newRoute.layout = "/admin";
+          newRoute.level = 0;
+          newRoute.isParent = true;
+          newRoutes.push(newRoute);
+
+          newRoute = {};
+          newRoute.name = "Meeting history";
+          newRoute.path = "meetingHistory";
+          newRoute.icon = "MEETINGS";
+          newRoute.layout = "/admin";
+          newRoute.level = 0;
+          newRoute.isParent = true;
+          newRoutes.push(newRoute);
+
+
+          let utilsRoutes = [];
+          newRoute = {};
+          newRoute.name = "Help";
+          newRoute.path = "help";
+          newRoute.icon = "HELP";
+          newRoute.layout = "/admin";
+          newRoute.level = 0;
+          newRoute.isParent = true;
+          utilsRoutes.push(newRoute);
+
+          setRoutes(newRoutes);
+          setUtilsRoutes(utilsRoutes);
+
+          //props.settings.dashboardMenu = createNewMenu.items.length > 0 ? dashboardMenu : null;
+          setLoading(false);
+          //}
         }
-
-        window.removeEventListener("scroll", showNavbarButton);
-
-        setActiveColor("agility");
-        setSecondaryThemeColor('#342343');
-        setPrimaryThemeColor('#498899');
-        setThemeTextColor('#ffffff');
-        //dispatch(actionCreators.setSecondaryThemeColor(props.settings.systemProfileDto.secondCorporateBrandColor));
-
-
-        let newRoutes = [];
-        let newRoute = {};
-
-        newRoute.name = "Calendar";
-        newRoute.path = "calendar";
-        newRoute.icon = "CALENDER";
-        newRoute.layout = "/admin";
-        newRoute.level = 0;
-        newRoute.isParent = true;
-        newRoutes.push(newRoute);
-
-        newRoute = {};
-        newRoute.name = "Charts";
-        newRoute.path = "charts";
-        newRoute.icon = "CHARTS";
-        newRoute.layout = "/admin";
-        newRoute.level = 0;
-        newRoute.isParent = true;
-        newRoutes.push(newRoute);
-
-        newRoute = {};
-        newRoute.name = "Files";
-        newRoute.path = "files";
-        newRoute.icon = "FILES";
-        newRoute.layout = "/admin";
-        newRoute.level = 0;
-        newRoute.isParent = true;
-        newRoutes.push(newRoute);
-
-        newRoute = {};
-        newRoute.name = "Meeting history";
-        newRoute.path = "meetingHistory";
-        newRoute.icon = "MEETINGS";
-        newRoute.layout = "/admin";
-        newRoute.level = 0;
-        newRoute.isParent = true;
-        newRoutes.push(newRoute);
-
-
-        let utilsRoutes = [];
-        newRoute = {};
-        newRoute.name = "Help";
-        newRoute.path = "help";
-        newRoute.icon = "HELP";
-        newRoute.layout = "/admin";
-        newRoute.level = 0;
-        newRoute.isParent = true;
-        utilsRoutes.push(newRoute);
-
-        /*console.log(props.settings.systemProfileDto);
-        if (!Utils.isNull(props.settings.systemProfileDto.modules)) {
-            for (let i = 0; i < props.settings.systemProfileDto.modules.length; i++) {
-                let module = props.settings.systemProfileDto.modules[i];
-                let route = {};
-
-                route.name = module.label;
-                route.icon = module.icon;
-                route.layout = "/admin";
-                route.level = 0;
-
-                if (module.menuBar && module.menuBar.menus.length > 0) {
-                    route.collapse = true;
-                    route.state = module.name + "Collapse";
-                    route.views = getViews(module.menuBar.menus, 1);
-                }
-
-                newRoutes.push(route);
-            }
-        }*/
-
-        /*if(props.settings.settingsMenu) {
-            newRoute = {};
-
-            newRoute.name = "Settings";
-            newRoute.icon = "fa fa-cog";
-            newRoute.layout = "/admin";
-            newRoute.isParent = true;
-            newRoute.collapse = true;
-            newRoute.level = 0;
-            newRoute.state = "settingsMenuCollapse";
-            newRoute.views = getViews(props.settings.settingsMenu.menus, 1);
-
-            newRoutes.push(newRoute);
-        }*/
-
-        setRoutes(newRoutes);
-        setUtilsRoutes(utilsRoutes);
-
-        //props.settings.dashboardMenu = createNewMenu.items.length > 0 ? dashboardMenu : null;
-        setLoading(false);
-        //}
       }
     });
 

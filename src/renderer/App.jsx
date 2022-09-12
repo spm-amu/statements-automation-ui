@@ -59,9 +59,11 @@ export default function App() {
   return (
     <MuiThemeProvider muiTheme={ThemeDefault}>
       <ThemeProvider theme={armscorTheme}>
-        <Router style={{border: '8px solid yello'}}>
+        <Router>
           <Routes>
             <Route path="*" element={<Dashboard/>}/>
+            <Route path="/dashboard" element={<Dashboard/>}/>
+            <Route path="/login" element={<Login/>}/>
           </Routes>
         </Router>
       </ThemeProvider>

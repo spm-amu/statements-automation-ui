@@ -14,6 +14,9 @@ import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
 import Meeting from "../view/Meeting";
 import PerfectScrollbar from 'react-perfect-scrollbar';
+import {host, get} from "../../service/RestService";
+import Utils from '../../Utils';
+import MeetingRoom from "../vc/MeetingRoom";
 
 const eventTemplate = {
   id: '',
@@ -49,15 +52,39 @@ const CalendarComponent = (props) => {
   const {isRtl} = props;
   const [calendarApi, setCalendarApi] = useState([]);
   const [events, setEvents] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [mode, setMode] = useState('CALENDAR');
   const calendarRef = useRef(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    loadEvents();
+  });
+
+  const loadEvents = () => {
+    if (loading) {
+      setLoading(true);
+      get(`${host}/api/v1/meeting/fetchMeetings`, (response) => {
+        setEvents(response);
+      }, (e) => {
+
+      })
+    }
+  };
 
   useEffect(() => {
     if (calendarApi === null) {
       setCalendarApi(calendarRef.current.getApi());
     }
   }, [calendarApi]);
+
+  useEffect(() => {
+    if (!Utils.isNull(selectedEvent) && !Utils.isNull(selectedEvent.id) && !Utils.isStringEmpty(selectedEvent.id)) {
+      toggleModal();
+    }
+
+  }, [selectedEvent]);
 
   const calendarOptions = {
     events: events,
@@ -108,6 +135,20 @@ const CalendarComponent = (props) => {
 
     eventClick({event: clickedEvent}) {
 
+      let value = {
+        id: clickedEvent.id,
+        title: clickedEvent.title,
+        location: clickedEvent.extendedProps.location,
+        description: clickedEvent.extendedProps.description,
+        attendees: clickedEvent.extendedProps.attendees,
+        startDate: new Date(clickedEvent.start),
+        startTime: new Date(clickedEvent.start),
+        endDate: new Date(clickedEvent.end),
+        endTime: new Date(clickedEvent.end)
+      };
+
+      setSelectedEvent(value);
+
       // * Only grab required field otherwise it goes in infinity loop
       // ! Always grab all fields rendered by form (even if it get `undefined`) otherwise due to Vue3/Composition API you might get: "object is not extensible"
       // event.value = grabEventDataFromEventApi(clickedEvent)
@@ -130,7 +171,7 @@ const CalendarComponent = (props) => {
       ev.start = info.date;
       ev.end = info.date;
       setSelectedEvent(ev);
-      setModalOpen(true);
+      toggleModal();
     },
 
     /*
@@ -166,8 +207,9 @@ const CalendarComponent = (props) => {
 
   };
 
-  const toggleModal = () => {
+  const toggleModal = (e) => {
     setModalOpen(!modalOpen);
+
   };
 
   const CloseBtn = (
@@ -176,41 +218,50 @@ const CalendarComponent = (props) => {
 
   return (
     <>
-      <Card className="shadow-none border-0 mb-0 rounded-0">
-        <CardBody className="pb-0">
-          <FullCalendar {...calendarOptions} />{' '}
-        </CardBody>
-      </Card>
-      <Modal
-        isOpen={modalOpen}
-        className="sidebar-lg"
-        toggle={(e) => toggleModal(e)}
-        onOpened={handleSelectedEvent}
-        onClosed={handleResetInputValues}
-        contentClassName="p-0 overflow-hidden meeting-modal"
-        modalClassName="modal-slide-in event-sidebar"
-        style={{width: '80vw', maxWidth: '80vw'}}
-      >
-        <ModalHeader
-          className="mb-1"
-          toggle={(e) => toggleModal(e)}
-          close={CloseBtn}
-          tag="div"
-        >
-          <h5 className="modal-title">
-            {selectedEvent && selectedEvent.title && selectedEvent.title.length
-              ? 'Update'
-              : 'Add'}{' '}
-            Meeting
-          </h5>
-        </ModalHeader>
+      {
+        mode === 'CALENDAR' ?
+          <>
+            <Card className="shadow-none border-0 mb-0 rounded-0">
+              <CardBody className="pb-0">
+                <FullCalendar {...calendarOptions} />{' '}
+              </CardBody>
+            </Card>
+            <Modal
+              isOpen={modalOpen}
+              className="sidebar-lg"
+              onOpened={handleSelectedEvent}
+              onClosed={handleResetInputValues}
+              contentClassName="p-0 overflow-hidden meeting-modal"
+              modalClassName="modal-slide-in event-sidebar"
+              style={{width: '80vw', maxWidth: '80vw'}}
+            >
+              <ModalHeader
+                className="mb-1"
+                close={CloseBtn}
+                tag="div"
+              >
+                <h5 className="modal-title">
+                  {selectedEvent && selectedEvent.title && selectedEvent.title.length
+                    ? 'Update'
+                    : 'Add'}{' '}
+                  Meeting
+                </h5>
+              </ModalHeader>
 
-        <PerfectScrollbar options={{wheelPropagation: false}}>
-          <ModalBody className="flex-grow-1 pb-sm-0 pb-3">
-            <Meeting />
-          </ModalBody>
-        </PerfectScrollbar>
-      </Modal>
+              <PerfectScrollbar options={{wheelPropagation: false}}>
+                <ModalBody className="flex-grow-1 pb-sm-0 pb-3">
+                  <Meeting selectedEvent={selectedEvent} closeHandler={(e) => toggleModal(e)}
+                           refreshHandler={() => loadEvents()} joinHandler={() => setMode('MEETING_ROOM')}/>
+                </ModalBody>
+              </PerfectScrollbar>
+            </Modal>
+          </>
+          :
+          <MeetingRoom meeting={selectedEvent} closeHandler={(e) =>  {
+            toggleModal(e);
+            setMode('CALENDAR');
+          }}/>
+      }
     </>
   );
 };

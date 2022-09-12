@@ -11,6 +11,8 @@ import {withRouter} from 'react-router-dom';
 import Alert from "react-bootstrap/Alert";
 import styles from "./LoginStyle";
 import Utils from '../../../Utils';
+import {host, post} from "../../../service/RestService";
+import { useNavigate } from 'react-router-dom';
 
 const Login = (props) => {
   const [errorMessage, setErrorMessage] = React.useState(null);
@@ -20,6 +22,7 @@ const Login = (props) => {
   const [password, setPassword] = React.useState(null);
   const [showPassword, setShowPassword] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const navigate = useNavigate();
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -112,7 +115,17 @@ const Login = (props) => {
                   <Button
                     disabled={isLoading}
                     onClick={() => {
-                      alert('Click fireeee');
+                      post(`${host}/api/v1/auth/login`, (response) => {
+                        sessionStorage.setItem("accessToken", response.session_token);
+                        sessionStorage.setItem("idToken", response.response_token);
+
+                        navigate('/dashboard');
+                      }, (e) => {
+
+                      }, {
+                        username: username,
+                        password: password
+                      })
                     }}
                     variant="contained" color="primary"
                     fullWidth={true}

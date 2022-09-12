@@ -1,8 +1,7 @@
 import React from 'react';
-import Room from '../room/Room';
 
 const Charts = (props) => {
-  return <Room />;
+  return (<>Charts</>);
 };
 
 export default Charts;

@@ -14,7 +14,9 @@ const CustomDatePickerComponent = React.memo(React.forwardRef((props, ref) => {
   const base = props.base;
 
   const handleDateChange = date => {
-
+    if(props.valueChangeHandler) {
+      props.valueChangeHandler(date, props.id);
+    }
   };
 
   const formatNumber = (n) => {

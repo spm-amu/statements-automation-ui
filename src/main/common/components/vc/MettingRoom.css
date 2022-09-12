@@ -1,0 +1,41 @@
+.meeting-container {
+  width: 100%;
+  height: 89vh;
+}
+
+.meeting-container .toolbar,
+.meeting-container .content {
+  width: 100%;
+}
+
+.meeting-container .toolbar {
+  padding: 16px 34px;
+  height: 64px;
+}
+
+.meeting-container .content {
+  height: calc(100% - 64px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lobby-settings {
+  width: 400px;
+  height: 400px;
+  background-color: #202020;
+  border-radius: 4px;
+}
+
+.meeting-container .title {
+  font-size: 28px;
+}
+
+.meeting-container tr td {
+  text-align: center;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+}
+
+

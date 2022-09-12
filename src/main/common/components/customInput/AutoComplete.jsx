@@ -10,6 +10,8 @@ import Utils from "../../Utils";
 const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
 
   const [options, setOptions] = React.useState([]);
+  const [value] = React.useState([]);
+
   const renderOption = (option) => {
     if (props.showImages && option.imagePath) {
       return (
@@ -38,17 +40,20 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       sx={{width: 300}}
       options={options}
       autoHighlight
-      multiple={true}
+      value={props.value}
+      multiple={!Utils.isNull(props.multiple) ? props.multiple : false}
       getOptionLabel={(option) => option.label}
       onChange={
-        (e) => {
-          console.log("\n\nCHANGE FIREEE");
+        (e, newValue, reason) => {
+          if (props.valueChangeHandler) {
+            props.valueChangeHandler(newValue, props.id);
+          }
         }
       }
       onInputChange={
         (e, value) => {
           if (!Utils.isNull(value) && !Utils.isStringEmpty(value)) {
-            post(`${host}/api/v1/location/search`, (response) => {
+            post(`${props.optionsUrl}`, (response) => {
                 setOptions(response.records)
               }, (e) => {
 
@@ -56,7 +61,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
               {
                 "parameters": [
                   {
-                    "name": "name",
+                    "name": `${props.searchAttribute}`,
                     "value": value
                   }
                 ],

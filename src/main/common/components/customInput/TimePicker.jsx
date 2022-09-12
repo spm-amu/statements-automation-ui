@@ -11,8 +11,12 @@ import {withStyles} from "@material-ui/core/styles";
 import {useSelector} from "react-redux";
 
 const CustomTimePickerComponent = React.memo(React.forwardRef((props, ref) => {
-    const handleDateChange = date => {
-    };
+
+  const handleDateChange = date => {
+    if(props.valueChangeHandler) {
+      props.valueChangeHandler(date, props.id);
+    }
+  };
 
     return (
         <MuiPickersUtilsProvider utils={DateFnsUtils}>

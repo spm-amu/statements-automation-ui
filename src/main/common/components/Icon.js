@@ -12,6 +12,10 @@ import RotateLeft from '@material-ui/icons/RotateLeft';
 import RotateRight from '@material-ui/icons/RotateRight';
 import ZoomIn from '@material-ui/icons/ZoomIn';
 import ZoomOut from '@material-ui/icons/ZoomOut';
+import Camera from '@material-ui/icons/Videocam';
+import CameraOff from '@material-ui/icons/VideocamOff';
+import Microphone from '@material-ui/icons/Mic';
+import MicrophoneOff from '@material-ui/icons/MicOff';
 import Work from '@material-ui/icons/Work';
 import Home from '@material-ui/icons/Home';
 import List from '@material-ui/icons/List';
@@ -63,6 +67,14 @@ class Icon extends Component {
       return <img src={require('/assets/armscor_logo.png')} height={'35px'} alt={''}/>
     } else if (this.props.id === 'LIST') {
       return <List/>
+    }  else if (this.props.id === 'MIC') {
+      return <Microphone/>
+    }  else if (this.props.id === 'MIC_OFF') {
+      return <MicrophoneOff/>
+    }  else if (this.props.id === 'CAMERA') {
+      return <Camera/>
+    }  else if (this.props.id === 'CAMERA_OFF') {
+      return <CameraOff/>
     } else if (this.props.id === 'UPLOAD') {
       return <Upload/>
     } else if (this.props.id === 'ROTATE_LEFT') {

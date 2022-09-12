@@ -1,6 +1,9 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import Video from '../video';
-import { MessageType, WebRTCUser, WebsocketMessage } from '../../types';
+import {useCallback, useEffect, useRef, useState} from 'react';
+import {MessageType, WebRTCUser, WebsocketMessage} from '../../types';
+import "./MettingRoom.css";
+import Button from '@material-ui/core/Button';
+import {FormControlLabel, Switch} from "@material-ui/core";
+import Icon from "../Icon";
 
 const pc_config = {
   iceServers: [
@@ -10,20 +13,24 @@ const pc_config = {
   ],
 };
 
-const Room = () => {
+const socket = new WebSocket("ws://54.88.201.156:8080/signal");
+const MeetingRoom = (props) => {
   const socketRef = useRef<WebSocket>();
   const pcsRef = useRef<{ [socketId: string]: RTCPeerConnection }>({});
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef<MediaStream>();
-  const [meetingId, setMeetingId] = useState('"96efe785-fb4e-4a6a-820c-2688d7c69611"')
+  const [meetingId] = useState('"96efe785-fb4e-4a6a-820c-2688d7c69611"');
   const [users, setUsers] = useState<WebRTCUser[]>([]);
-
-  const socket = new WebSocket("ws://54.204.92.217:8080/signal");
-
+  const [lobbySettings] = useState({});
   const sendToServer = (msg: WebsocketMessage) => {
     let msgJSON = JSON.stringify(msg);
     socket.send(msgJSON);
-  }
+  };
+
+  const handleLeaveMeeting = (e) => {
+    // TODO : Do all the leave meeting calls
+    props.closeHandler(e)
+  };
 
   const getLocalStream = useCallback(async () => {
     try {
@@ -64,7 +71,7 @@ const Room = () => {
           type: MessageType.ICE,
           candidate: e.candidate,
           room: meetingId
-        }
+        };
 
         sendToServer(message);
       };
@@ -115,14 +122,14 @@ const Room = () => {
 
     getLocalStream();
 
-    socket.onmessage = async function(msg) {
+    socket.onmessage = async function (msg) {
       let message = JSON.parse(msg.data);
 
-      const { type, from, sdp, usersInTheMeeting, candidate, email } = message;
+      const {type, from, sdp, usersInTheMeeting, candidate, email} = message;
 
       console.log('####################', message);
 
-      socket.onopen = function() {
+      socket.onopen = function () {
         console.log('WebSocket connection opened to Room: #' + meetingId);
       };
 
@@ -133,7 +140,7 @@ const Room = () => {
             if (!localStreamRef.current) continue;
             const pcUser = createPeerConnection(user.id, user.email);
             if (!(pcUser && socketRef.current)) continue;
-            pcsRef.current = { ...pcsRef.current, [user.id]: pcUser };
+            pcsRef.current = {...pcsRef.current, [user.id]: pcUser};
             try {
               const localSdp = await pcUser.createOffer({
                 offerToReceiveAudio: true,
@@ -147,7 +154,7 @@ const Room = () => {
                 type: MessageType.OFFER,
                 sdp: pcUser.localDescription,
                 room: meetingId,
-              }
+              };
 
               sendToServer(message);
             } catch (e) {
@@ -162,7 +169,7 @@ const Room = () => {
           if (!localStreamRef.current) return;
           const pcOffer = createPeerConnection(from, email);
           if (!(pcOffer && socketRef.current)) return;
-          pcsRef.current = { ...pcsRef.current, [from]: pcOffer };
+          pcsRef.current = {...pcsRef.current, [from]: pcOffer};
           try {
             await pcOffer.setRemoteDescription(new RTCSessionDescription(sdp));
             console.log('answer set remote description success');
@@ -227,23 +234,114 @@ const Room = () => {
   }, [createPeerConnection, getLocalStream]);
 
   return (
-    <div>
-      <video
-        style={{
-          width: 240,
-          height: 240,
-          margin: 5,
-          backgroundColor: 'black',
-        }}
-        muted
-        ref={localVideoRef}
-        autoPlay
-      />
-      {users.map((user, index) => (
-        <Video key={index} email={user.email} stream={user.stream} />
-      ))}
+    <div className={'meeting-container'}>
+      <div className="toolbar row">
+        <Button
+          variant={'text'}
+          size="large"
+          onClick={(e) => handleLeaveMeeting(e)}
+          color={'#985F31'}
+          style={{color: '#985F31', border: '1px solid #985F31'}}
+        >
+          CLOSE
+        </Button>
+      </div>
+      <div className={'content row'}>
+        <table>
+          <tr>
+            <td className={'title'} colSpan={3}>
+              {props.meeting.title}
+            </td>
+          </tr>
+          <tr>
+            <td style={{paddingBottom: '16px'}} colSpan={3}>
+              Please select your audio and video settings
+            </td>
+          </tr>
+          <tr>
+            <td className={'lobby-settings'} colSpan={3}>
+              <div style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <video
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'transparent',
+                  }}
+                  muted={true}
+                  ref={localVideoRef}
+                  autoPlay={false}
+                  id={'lobby-video'}
+                />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style={{paddingTop: '8px', textAlign: 'right'}}>
+              {
+                !lobbySettings.enableVideo ?
+                  <Icon id={'CAMERA_OFF'}/>
+                  :
+                  <Icon id={'CAMERA'}/>
+              }
+              <Switch
+                onChange={(e, value) => {
+                  lobbySettings.enableVideo = value;
+
+                  if (!lobbySettings.enableVideo) {
+                    let videoElement = document.getElementById('lobby-video');
+                    if(videoElement) {
+                      videoElement.pause();
+                      videoElement.style.display = 'none'
+                    }
+                  } else {
+                    let videoElement = document.getElementById('lobby-video');
+                    if(videoElement) {
+                      videoElement.play();
+                      videoElement.style.display = 'inherit'
+                    }
+                  }
+                }}
+                value={lobbySettings.enableVideo}
+                color="primary"
+              />
+            </td>
+            <td style={{paddingTop: '8px', textAlign: 'left'}}>
+              {
+                !lobbySettings.enableAudio ?
+                  <Icon id={'MIC_OFF'}/>
+                  :
+                  <Icon id={'MIC'}/>
+              }
+              <Switch
+                onChange={(e, value) => {
+                  lobbySettings.enableAudio = value;
+                }}
+                value={lobbySettings.enableAudio}
+                color="primary"
+              />
+            </td>
+            <td style={{paddingTop: '8px', textAlign: 'right'}}>
+              <Button
+                variant={'contained'}
+                size="large"
+                onClick={(e) => handleLeaveMeeting(e)}
+                color={'primary'}
+              >
+                JOIN
+              </Button>
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
   );
 };
 
-export default Room;
+
+export default MeetingRoom;

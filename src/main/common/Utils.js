@@ -8,6 +8,17 @@
     return value === null || typeof value === 'undefined';
   }
 
+  static isObjectsEqual(obj1, obj2) {
+    let properties = Object.getOwnPropertyNames(obj1);
+    for (let i = 0; i < properties.length; i++) {
+      if(JSON.stringify(obj1[properties[i]]) !== JSON.stringify(obj2[properties[i]])) {
+        return true;
+      }
+    }
+
+    return true;
+  }
+
   static capitalize = (s) => {
     if (typeof s !== 'string') return '';
     return s.charAt(0).toUpperCase() + s.slice(1);
