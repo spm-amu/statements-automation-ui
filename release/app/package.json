@@ -1,7 +1,17 @@
 {
   "name": "armscor_connect",
   "version": "1.0.0",
-  "homepage": "",
+  "description": "Armscor Connect VC",
   "license": "MIT",
-  "main": "./src/main/main.ts"
+  "author": {
+    "name": "Agilemotion",
+    "email": "agilemotion@gmail.com"
+  },
+  "main": "./dist/main/main.js",
+  "scripts": {
+    "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
+    "postinstall": "npm run electron-rebuild && npm run link-modules",
+    "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts"
+  },
+  "dependencies": {}
 }
