@@ -11,6 +11,14 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
 
   const [options, setOptions] = React.useState([]);
   const [value] = React.useState([]);
+  const [open, setOpen] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState("");
+
+  const handleOpen = () => {
+    if (inputValue.length > 0) {
+      setOpen(true);
+    }
+  };
 
   const renderOption = (option) => {
     if (props.showImages && option.imagePath) {
@@ -33,9 +41,54 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       </Box>);
   };
 
+  const validateEmail = (val) => {
+    return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val);
+  };
+
+  const handleInputChange = (event, newInputValue) => {
+    setInputValue(newInputValue);
+    if (newInputValue.length > 0) {
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
+
+    if (!Utils.isNull(newInputValue) && !Utils.isStringEmpty(newInputValue)) {
+      post(`${props.optionsUrl}`, (response) => {
+          if (response.records.length > 0) {
+            setOptions(response.records)
+          } else {
+            if(validateEmail(newInputValue)) {
+              let emptyOptions = [];
+              emptyOptions.push({
+                emailAddress: newInputValue,
+                name: newInputValue,
+                label: newInputValue
+              });
+
+              setOptions(emptyOptions);
+            }
+          }
+        }, (e) => {
+
+        },
+        {
+          "parameters": [
+            {
+              "name": `${props.searchAttribute}`,
+              "value": newInputValue
+            }
+          ],
+          "pageSize": 2000,
+          "currentPage": 0
+        })
+    }
+  };
+
   return (
     <Autocomplete
       className={"input-wrapper"}
+      noOptionsText={props.invalidText}
       id={props.id}
       sx={{width: 300}}
       options={options}
@@ -43,6 +96,11 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       value={props.value}
       multiple={!Utils.isNull(props.multiple) ? props.multiple : false}
       getOptionLabel={(option) => option.label}
+      open={open}
+      onOpen={handleOpen}
+      onClose={() => setOpen(false)}
+      inputValue={inputValue}
+      onInputChange={handleInputChange}
       onChange={
         (e, newValue, reason) => {
           if (props.valueChangeHandler) {
@@ -50,28 +108,6 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
           }
         }
       }
-      onInputChange={
-        (e, value) => {
-          if (!Utils.isNull(value) && !Utils.isStringEmpty(value)) {
-            post(`${props.optionsUrl}`, (response) => {
-                setOptions(response.records)
-              }, (e) => {
-
-              },
-              {
-                "parameters": [
-                  {
-                    "name": `${props.searchAttribute}`,
-                    "value": value
-                  }
-                ],
-                "pageSize": 2000,
-                "currentPage": 0
-              })
-          }
-        }
-      }
-
       renderOption={(option) => (
         renderOption(option)
       )}

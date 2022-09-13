@@ -240,7 +240,6 @@ const MeetingRoom = (props) => {
           variant={'text'}
           size="large"
           onClick={(e) => handleLeaveMeeting(e)}
-          color={'#985F31'}
           style={{color: '#985F31', border: '1px solid #985F31'}}
         >
           CLOSE

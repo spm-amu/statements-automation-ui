@@ -9,12 +9,17 @@ import TimePicker from '../customInput/TimePicker';
 import AutoComplete from '../customInput/AutoComplete';
 import Utils from '../../Utils';
 import Avatar from '../avatar';
-import {host, post} from "../../service/RestService";
+import {host, post, get} from "../../service/RestService";
 
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
 
 import {host} from "../../service/RestService";
+import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Radio from "@material-ui/core/Radio";
 
 const Meeting = (props) => {
 
@@ -26,7 +31,8 @@ const Meeting = (props) => {
     startTime: now,
     endDate: now,
     endTime: now,
-    attendees: []
+    attendees: [],
+    privacyType: 'PRIVATE'
   });
   const [errors, setErrors] = useState({});
   const [edited, setEdited] = useState(false);
@@ -70,6 +76,7 @@ const Meeting = (props) => {
       attendees: value.attendees,
       location: value.location,
       description: value.description,
+      privacyType: value.privacyType,
       schedule: {
         startDate: Utils.getFormattedDate(value.startDate),
         startTime: value.startTime.toLocaleTimeString(),
@@ -90,7 +97,7 @@ const Meeting = (props) => {
 
     setErrors(errorState);
     if (!hasErrors(errorState)) {
-      post(`${host}/api/v1/meeting/${Utils.isNull(props.selectedEvent) ? 'create' : 'update'}`, (response) => {
+      post(`${host}/api/v1/meeting/${!Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id) ? 'update' : 'create'}`, (response) => {
         props.refreshHandler();
         handleClose();
       }, (e) => {
@@ -108,7 +115,10 @@ const Meeting = (props) => {
   };
 
   const handleDelete = (e) => {
-
+    get(`${host}/api/v1/meeting/cancel/${value.id}`, (response) => {
+      props.refreshHandler();
+      handleClose();
+    }, (e) => {})
   };
 
   const handleJoin = (e) => {
@@ -235,6 +245,20 @@ const Meeting = (props) => {
           errorMessage={'A meeting title is required. Please enter a value'}
         />
       </div>
+      <FormControl>
+        <RadioGroup
+          aria-labelledby="demo-radio-buttons-group-label"
+          row
+          defaultValue={value.privacyType}
+          name="radio-buttons-group"
+          onChange={(e, val) => {
+            handleFormValueChange(val, "privacyType", true);
+          }}
+        >
+          <FormControlLabel value="PRIVATE" control={<Radio/>} label="Private"/>
+          <FormControlLabel value="PUBLIC" control={<Radio/>} label="Public"/>
+        </RadioGroup>
+      </FormControl>
       <div>
         <div className={'row no-margin'}>
           <div className={'col-*-*'}>
@@ -291,6 +315,8 @@ const Meeting = (props) => {
         <AutoComplete
           id="attendees"
           label={'Attendees'}
+          invalidText={'invalid attendee'}
+          value={value.attendees}
           multiple={true}
           showImages={true}
           searchAttribute={'emailAddress'}
@@ -302,6 +328,7 @@ const Meeting = (props) => {
         <AutoComplete
           id="location"
           label={'Location'}
+          value={value.location}
           searchAttribute={'name'}
           valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
           optionsUrl={`${host}/api/v1/location/search`}

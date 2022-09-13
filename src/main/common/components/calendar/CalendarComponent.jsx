@@ -59,18 +59,18 @@ const CalendarComponent = (props) => {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    loadEvents();
+    if (loading) {
+      setLoading(false);
+      loadEvents();
+    }
   });
 
   const loadEvents = () => {
-    if (loading) {
-      setLoading(true);
-      get(`${host}/api/v1/meeting/fetchMeetings`, (response) => {
-        setEvents(response);
-      }, (e) => {
+    get(`${host}/api/v1/meeting/fetchMeetings`, (response) => {
+      setEvents(response);
+    }, (e) => {
 
-      })
-    }
+    })
   };
 
   useEffect(() => {
@@ -141,6 +141,7 @@ const CalendarComponent = (props) => {
         location: clickedEvent.extendedProps.location,
         description: clickedEvent.extendedProps.description,
         attendees: clickedEvent.extendedProps.attendees,
+        privacyType: clickedEvent.extendedProps.privacyType,
         startDate: new Date(clickedEvent.start),
         startTime: new Date(clickedEvent.start),
         endDate: new Date(clickedEvent.end),
@@ -257,7 +258,7 @@ const CalendarComponent = (props) => {
             </Modal>
           </>
           :
-          <MeetingRoom meeting={selectedEvent} closeHandler={(e) =>  {
+          <MeetingRoom meeting={selectedEvent} closeHandler={(e) => {
             toggleModal(e);
             setMode('CALENDAR');
           }}/>
