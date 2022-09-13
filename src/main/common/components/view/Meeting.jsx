@@ -33,6 +33,7 @@ const Meeting = (props) => {
     endDate: now,
     endTime: now,
     attendees: [],
+    documents: [],
     privacyType: 'PRIVATE'
   });
   const [errors, setErrors] = useState({});
@@ -75,6 +76,7 @@ const Meeting = (props) => {
       id: value.id,
       title: value.title,
       attendees: value.attendees,
+      documents: value.documents,
       location: value.location,
       description: value.description,
       privacyType: value.privacyType,
@@ -241,7 +243,8 @@ const Meeting = (props) => {
       <div>
         <Files
           readOnly={true}
-          id={'attachments'}
+          id={'documents'}
+          value={value.documents}
           valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
         />
       </div>

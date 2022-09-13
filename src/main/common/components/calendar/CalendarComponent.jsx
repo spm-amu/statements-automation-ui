@@ -142,6 +142,7 @@ const CalendarComponent = (props) => {
         description: clickedEvent.extendedProps.description,
         attendees: clickedEvent.extendedProps.attendees,
         privacyType: clickedEvent.extendedProps.privacyType,
+        documents: clickedEvent.extendedProps.documents,
         startDate: new Date(clickedEvent.start),
         startTime: new Date(clickedEvent.start),
         endDate: new Date(clickedEvent.end),

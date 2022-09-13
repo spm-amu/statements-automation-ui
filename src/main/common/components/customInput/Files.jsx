@@ -6,7 +6,7 @@ import Icon from '../Icon'
 
 const Files = React.memo(React.forwardRef((props, ref) => {
 
-  const [files, setFiles] = React.useState([]);
+  const [files, setFiles] = React.useState(!props.value ? [] : props.value);
 
   const handleChange = () => event => {
     let targetFiles = event.target.files;
@@ -21,7 +21,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
           label: file.name,
           type: file.type,
           size: file.size,
-          base64: reader.result
+          payload: reader.result
         };
 
         allFiles.push(fileInfo);
@@ -72,6 +72,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
               className={'files'}
               valueChangeHandler={(value, id) => {
                 setFiles(value);
+                props.valueChangeHandler(value, id);
               }}
             />
           </div>
