@@ -16,22 +16,23 @@ const json = (response: any) => {
 };
 
 class RestService {
-  fetchWithCustomConfig(url: string, successCallback: any, errorCallback: any, body: any, method: string, track: boolean = true) {
-    //const accessToken = sessionStorage.getItem("accessToken");
-    //const idToken = sessionStorage.getItem("idToken");
+  doFetch(url: string, successCallback: any, errorCallback: any, body: any, method: string, track: boolean = true, secure: boolean = true) {
+    const accessToken = sessionStorage.getItem("accessToken");
 
     let data = body ? JSON.stringify(body) : null;
     let fetchConfig = {
       method: !Utils.isNull(method) ? method : 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        //'Authorization': 'Bearer ' + accessToken,
-        //'idToken': idToken
-
+        'Accept': 'application/json'
       },
       body: data
     };
+
+
+    if(secure) {
+      fetchConfig.headers['Authorization'] = 'Bearer ' + accessToken;
+    }
 
     if (track) {
       trackPromise(
@@ -63,10 +64,10 @@ class RestService {
 }
 
 const rest = new RestService();
-export const post = (url: string, successCallback: any, errorCallback: any, body: any, track: boolean = true) => {
-  return rest.fetchWithCustomConfig(url, successCallback, errorCallback, body, 'POST', track);
+export const post = (url: string, successCallback: any, errorCallback: any, body: any, track: boolean = true, secure: boolean = true) => {
+  return rest.doFetch(url, successCallback, errorCallback, body, 'POST', track, secure);
 };
 
-export const get = (url: string, successCallback: any, errorCallback: any, track: boolean = true) => {
-  return rest.fetchWithCustomConfig(url, successCallback, errorCallback, null, 'GET', track);
+export const get = (url: string, successCallback: any, errorCallback: any, track: boolean = true, secure: boolean = true) => {
+  return rest.doFetch(url, successCallback, errorCallback, null, 'GET', track, secure);
 };

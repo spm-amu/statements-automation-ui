@@ -8,7 +8,7 @@ const videoConstraints = {
   width: window.innerWidth / 2
 };
 
-const socket = new WebSocket("ws://localhost:8090/signal");
+const socket = new WebSocket("ws://ba.agilemotion.co.za/signal");
 
 const Call = () => {
   const [peers, setPeers] = useState([]);
@@ -34,7 +34,7 @@ const Call = () => {
       });
 
       socket.onmessage = function(msg) {
-        console.log('ON MESSAGE: ', msg)
+        console.log('ON MESSAGE: ', msg);
         const message = JSON.parse(msg.data);
 
         switch (message.type) {

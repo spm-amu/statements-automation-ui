@@ -2,7 +2,6 @@
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Box from '@material-ui/core/Box';
-import {countries} from './countries';
 import {host, post} from "../../service/RestService";
 import "./Form.css";
 import Utils from "../../Utils";
@@ -53,7 +52,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       setOpen(false);
     }
 
-    if (!Utils.isNull(newInputValue) && !Utils.isStringEmpty(newInputValue)) {
+    if (!Utils.isNull(newInputValue) && !Utils.isStringEmpty(newInputValue) && !Utils.isNull(props.optionsUrl)) {
       post(`${props.optionsUrl}`, (response) => {
           if (response.records.length > 0) {
             setOptions(response.records)
@@ -87,6 +86,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
 
   return (
     <Autocomplete
+      freeSolo
       className={"input-wrapper"}
       noOptionsText={props.invalidText}
       id={props.id}
@@ -113,9 +113,10 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       )}
       renderInput={(params) => (
         <TextField
+          className={props.className}
           {...params}
           label={props.label}
-          variant="outlined"
+          variant={props.borderless ? 'standard' : 'outlined'}
           inputProps={{
             ...params.inputProps,
             autoComplete: 'new-password',

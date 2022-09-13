@@ -115,8 +115,8 @@ const Login = (props) => {
                   <Button
                     disabled={isLoading}
                     onClick={() => {
-                      post(`http://localhost:8070/vc/api/v1/auth/login`, (response) => {
-                        sessionStorage.setItem("accessToken", response.session_token);
+                      post(`${host}/api/v1/auth/login`, (response) => {
+                        sessionStorage.setItem("accessToken", response.access_token);
                         sessionStorage.setItem("idToken", response.response_token);
                         sessionStorage.setItem("username", username);
 
@@ -126,7 +126,7 @@ const Login = (props) => {
                       }, {
                         username: username,
                         password: password
-                      })
+                      }, true, false)
                     }}
                     variant="contained" color="primary"
                     fullWidth={true}

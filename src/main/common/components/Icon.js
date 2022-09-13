@@ -13,6 +13,7 @@ import RotateRight from '@material-ui/icons/RotateRight';
 import ZoomIn from '@material-ui/icons/ZoomIn';
 import ZoomOut from '@material-ui/icons/ZoomOut';
 import Camera from '@material-ui/icons/Videocam';
+import AttachFile from '@material-ui/icons/AttachFile';
 import CameraOff from '@material-ui/icons/VideocamOff';
 import Microphone from '@material-ui/icons/Mic';
 import MicrophoneOff from '@material-ui/icons/MicOff';
@@ -61,6 +62,8 @@ class Icon extends Component {
       return <SearchIcon/>
     } else if (this.props.id === 'WORK') {
       return <Work/>
+    } else if (this.props.id === 'ATTACH_FILE') {
+      return <AttachFile/>
     } else if (this.props.id === 'NOTIFICATIONS') {
       return <Notifications/>
     } else if (this.props.id === 'HOME') {

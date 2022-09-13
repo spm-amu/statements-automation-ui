@@ -7,6 +7,7 @@ import TextField from '../customInput/TextField';
 import DatePicker from '../customInput/DatePicker';
 import TimePicker from '../customInput/TimePicker';
 import AutoComplete from '../customInput/AutoComplete';
+import Files from '../customInput/Files';
 import Utils from '../../Utils';
 import Avatar from '../avatar';
 import {host, post, get} from "../../service/RestService";
@@ -118,7 +119,8 @@ const Meeting = (props) => {
     get(`${host}/api/v1/meeting/cancel/${value.id}`, (response) => {
       props.refreshHandler();
       handleClose();
-    }, (e) => {})
+    }, (e) => {
+    })
   };
 
   const handleJoin = (e) => {
@@ -146,6 +148,8 @@ const Meeting = (props) => {
     if (!Utils.isNull(props.selectedEvent)) {
       setEdited(true);
     }
+
+    console.log("\n\n\nVAL: ", value);
   };
 
   const formValueChangeHandler = (e) => {
@@ -234,6 +238,13 @@ const Meeting = (props) => {
 
   return (
     <Form>
+      <div>
+        <Files
+          readOnly={true}
+          id={'attachments'}
+          valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
+        />
+      </div>
       <div>
         <TextField
           label="Title"

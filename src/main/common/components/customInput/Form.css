@@ -11,6 +11,11 @@
   color: #f44336 !important;
 }
 
+.files .MuiInput-underline:before,
+.files .MuiInput-underline:after {
+  border-bottom: none !important;
+}
+
 @media screen and (max-width: 991px) {
   .input-wrapper {
     width: 100%;

@@ -141,7 +141,7 @@ const BasicBusinessAppDashboard = (props) => {
           //}
         }
       }
-    });
+    }, []);
 
     const getViews = (menus, level) => {
         let newViews = [];
