@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, systemPreferences } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -87,6 +87,10 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+
+    systemPreferences.askForMediaAccess('microphone');
+    systemPreferences.askForMediaAccess('camera');
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {

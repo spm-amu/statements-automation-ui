@@ -1,7 +1,8 @@
 import React from 'react';
+import Call from '../vc/Call';
 
 const Charts = (props) => {
-  return (<>Charts</>);
+  return <Call />;
 };
 
 export default Charts;

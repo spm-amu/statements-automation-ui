@@ -115,9 +115,10 @@ const Login = (props) => {
                   <Button
                     disabled={isLoading}
                     onClick={() => {
-                      post(`${host}/api/v1/auth/login`, (response) => {
+                      post(`http://localhost:8070/vc/api/v1/auth/login`, (response) => {
                         sessionStorage.setItem("accessToken", response.session_token);
                         sessionStorage.setItem("idToken", response.response_token);
+                        sessionStorage.setItem("username", username);
 
                         navigate('/dashboard');
                       }, (e) => {
