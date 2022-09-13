@@ -1,23 +1,22 @@
 import React from 'react';
-import {LARGE, SMALL} from 'material-ui/utils/withWidth';
+import {LARGE} from 'material-ui/utils/withWidth';
 import PropTypes from 'prop-types';
 import Utils from '../../common/Utils'
 import ViewPort from "../../common/components/layout/ViewPort";
-import {Route} from "react-router-dom";
+import {Route, useNavigate} from "react-router-dom";
 import PerfectScrollbar from "perfect-scrollbar";
 import Sidebar from './components/blackDashboard/sidebar/Sidebar';
 import HomeNavbar from "../../common/components/navbars/HomeNavbar";
-import {useDispatch} from "react-redux";
-import {actionCreators} from "../../common/redux/store/DashboardStore";
 import "../../common/assets/scss/black-dashboard-react.scss";
 import "./BasicBusinessAppDashboard.css"
-import { useNavigate } from 'react-router-dom';
+import {host, get} from "../../common/service/RestService";
 
 let ps;
 
 const BasicBusinessAppDashboard = (props) => {
     const [navDrawerOpen, setNavDrawerOpen] = React.useState(true);
     const [loading, setLoading] = React.useState(true);
+    const [userDetails, setUserDetails] = React.useState(null);
     const [activeColor, setActiveColor] = React.useState("blue");
     const [secondaryThemeColor, setSecondaryThemeColor] = React.useState("");
     const [primaryThemeColor, setPrimaryThemeColor] = React.useState("");
@@ -61,87 +60,95 @@ const BasicBusinessAppDashboard = (props) => {
         }
     }, [props.width]);
 
+    const init = () => {
+
+      document.body.classList.add("white-content");
+
+      if (navigator.platform.indexOf("Win") > -1) {
+        //ps.destroy();
+        //document.documentElement.className.add("perfect-scrollbar-off");
+        //document.documentElement.classList.remove("perfect-scrollbar-on");
+
+      }
+
+      window.removeEventListener("scroll", showNavbarButton);
+
+      setActiveColor("agility");
+      setSecondaryThemeColor('#342343');
+      setPrimaryThemeColor('#498899');
+      setThemeTextColor('#ffffff');
+
+      let newRoutes = [];
+      let newRoute = {};
+
+      newRoute.name = "Calendar";
+      newRoute.path = "calendar";
+      newRoute.icon = "CALENDER";
+      newRoute.layout = "/admin";
+      newRoute.level = 0;
+      newRoute.isParent = true;
+      newRoutes.push(newRoute);
+
+      newRoute = {};
+      newRoute.name = "Charts";
+      newRoute.path = "charts";
+      newRoute.icon = "CHARTS";
+      newRoute.layout = "/admin";
+      newRoute.level = 0;
+      newRoute.isParent = true;
+      newRoutes.push(newRoute);
+
+      newRoute = {};
+      newRoute.name = "Files";
+      newRoute.path = "files";
+      newRoute.icon = "FILES";
+      newRoute.layout = "/admin";
+      newRoute.level = 0;
+      newRoute.isParent = true;
+      newRoutes.push(newRoute);
+
+      newRoute = {};
+      newRoute.name = "Meeting history";
+      newRoute.path = "meetingHistory";
+      newRoute.icon = "MEETINGS";
+      newRoute.layout = "/admin";
+      newRoute.level = 0;
+      newRoute.isParent = true;
+      newRoutes.push(newRoute);
+
+
+      let utilsRoutes = [];
+      newRoute = {};
+      newRoute.name = "Help";
+      newRoute.path = "help";
+      newRoute.icon = "HELP";
+      newRoute.layout = "/admin";
+      newRoute.level = 0;
+      newRoute.isParent = true;
+      utilsRoutes.push(newRoute);
+
+      setRoutes(newRoutes);
+      setUtilsRoutes(utilsRoutes);
+
+      //props.settings.dashboardMenu = createNewMenu.items.length > 0 ? dashboardMenu : null;
+      setLoading(false);
+      //}
+    };
+
     React.useEffect(() => {
       if(loading) {
         if (Utils.isNull(sessionStorage.getItem("accessToken"))) {
           navigate('/login');
-
-          // TODO : Pull user identity details
         } else {
-          document.body.classList.add("white-content");
-
-          if (navigator.platform.indexOf("Win") > -1) {
-            //ps.destroy();
-            //document.documentElement.className.add("perfect-scrollbar-off");
-            //document.documentElement.classList.remove("perfect-scrollbar-on");
-
-          }
-
-          window.removeEventListener("scroll", showNavbarButton);
-
-          setActiveColor("agility");
-          setSecondaryThemeColor('#342343');
-          setPrimaryThemeColor('#498899');
-          setThemeTextColor('#ffffff');
-
-          let newRoutes = [];
-          let newRoute = {};
-
-          newRoute.name = "Calendar";
-          newRoute.path = "calendar";
-          newRoute.icon = "CALENDER";
-          newRoute.layout = "/admin";
-          newRoute.level = 0;
-          newRoute.isParent = true;
-          newRoutes.push(newRoute);
-
-          newRoute = {};
-          newRoute.name = "Charts";
-          newRoute.path = "charts";
-          newRoute.icon = "CHARTS";
-          newRoute.layout = "/admin";
-          newRoute.level = 0;
-          newRoute.isParent = true;
-          newRoutes.push(newRoute);
-
-          newRoute = {};
-          newRoute.name = "Files";
-          newRoute.path = "files";
-          newRoute.icon = "FILES";
-          newRoute.layout = "/admin";
-          newRoute.level = 0;
-          newRoute.isParent = true;
-          newRoutes.push(newRoute);
-
-          newRoute = {};
-          newRoute.name = "Meeting history";
-          newRoute.path = "meetingHistory";
-          newRoute.icon = "MEETINGS";
-          newRoute.layout = "/admin";
-          newRoute.level = 0;
-          newRoute.isParent = true;
-          newRoutes.push(newRoute);
-
-
-          let utilsRoutes = [];
-          newRoute = {};
-          newRoute.name = "Help";
-          newRoute.path = "help";
-          newRoute.icon = "HELP";
-          newRoute.layout = "/admin";
-          newRoute.level = 0;
-          newRoute.isParent = true;
-          utilsRoutes.push(newRoute);
-
-          setRoutes(newRoutes);
-          setUtilsRoutes(utilsRoutes);
-
-          //props.settings.dashboardMenu = createNewMenu.items.length > 0 ? dashboardMenu : null;
-          setLoading(false);
-          //}
+          get(`${host}/api/v1/auth/userInfo`, (response) => {
+            sessionStorage.setItem("userId", response.userId);
+            setUserDetails(response);
+            init();
+          }, (e) => {
+          })
         }
       }
-    }, []);
+    });
 
     const getViews = (menus, level) => {
         let newViews = [];
@@ -281,7 +288,7 @@ const BasicBusinessAppDashboard = (props) => {
     }
 
     return (
-        loading ?
+        loading || !userDetails ?
             <div>Loading...</div>
             :
             <>
@@ -331,6 +338,7 @@ const BasicBusinessAppDashboard = (props) => {
                               handleMiniClick={handleMiniClick}
                               brandText={getActiveRoute(routes)}
                               sidebarOpened={sidebarOpened}
+                              userDetails={userDetails}
                               avatar={props.avatar}
                               settingsMenu={null}
                               toggleSidebar={toggleSidebar}

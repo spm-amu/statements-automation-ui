@@ -109,7 +109,7 @@ class HomeNavbar extends React.Component {
   };
 
   getTodayDate = () => {
-    let today = new Date("01/01/2022");
+    let today = new Date();
     return `${today.toLocaleDateString('en-us', {weekday: 'short'})}, 
             ${this.formatDateNumber(today.toLocaleDateString('en-us', {day: 'numeric'}))} 
             ${this.formatDateNumber(today.toLocaleDateString('en-us', {month: 'long'}))} 
@@ -152,7 +152,7 @@ class HomeNavbar extends React.Component {
                 </div>
                 <div className={'col no-margin .no-padding'}
                      style={{float: 'left'}}>
-                  <div className={'user-label'}>Welcome, A Shandlale</div>
+                  <div className={'user-label'}>Welcome, {this.props.userDetails.name}</div>
                   <div className={'date-label'}>{this.getTodayDate()}</div>
                 </div>
               </div>
@@ -191,13 +191,13 @@ class HomeNavbar extends React.Component {
                           aria-controls="menu-list-grow"
                           style={{
                             borderColor: grey800,
-                            width: '40px',
-                            height: '40px',
+                            width: '64px',
+                            height: '64px',
                             padding: '0'
                           }}
                           aria-haspopup="true"
                         >
-                          <img alt="..." src={this.state.avatar} width={'36px'} height={'36px'}
+                          <img alt="..." src={require('../../../../../assets/icons/noimage-person.png')} width={'64px'} height={'64px'}
                                style={{borderRadius: '50%'}}/>
                         </IconButton>
                         {" "}
@@ -272,7 +272,3 @@ class HomeNavbar extends React.Component {
 }
 
 export default HomeNavbar;
-/*export default withRouter(connect(
-    propHandler,
-    dispatch => bindActionCreators(actionCreators, dispatch)
-)(HomeNavbar))*/
