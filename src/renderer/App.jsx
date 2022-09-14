@@ -43,9 +43,6 @@ const Dashboard = () => {
     <div style={{width: '100%'}}>
       <div className="Landing">
         <BasicBusinessAppDashboard
-          logoutCallBack={() => {
-            alert('Logout Firee');
-          }}
           avatar=""
           logo={icon}
           appLogoPath=""

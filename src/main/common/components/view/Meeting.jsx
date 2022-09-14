@@ -21,11 +21,15 @@ import FormLabel from "@material-ui/core/FormLabel";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
+import React from "react";
 
 const Meeting = (props) => {
 
   const now = new Date();
   const [url, setUrl] = useState('');
+  const [hostAttendee, setHostAttendee] = useState(null);
+  const [attendees, setAttendees] = useState([]);
+  const [readOnly, setReadOnly] = useState(true);
   const {selectedEvent: selectedMeeting} = props;
   const [value] = useState(!Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id) ? props.selectedEvent : {
     startDate: now,
@@ -38,6 +42,27 @@ const Meeting = (props) => {
   });
   const [errors, setErrors] = useState({});
   const [edited, setEdited] = useState(false);
+
+  React.useEffect(() => {
+    let isUpdate = !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id);
+    if (!hostAttendee && isUpdate) {
+      let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+      for (const attendee of props.selectedEvent.attendees) {
+        if (attendee.type === 'HOST') {
+          setHostAttendee(attendee);
+          if(userDetails.userId === attendee.userId) {
+            setReadOnly(false);
+          }
+        } else {
+          attendees.push(attendee);
+        }
+      }
+    }
+
+    if(!isUpdate) {
+      setReadOnly(false);
+    }
+  }, []);
 
   // ** Custom select components
   const OptionComponent = ({data, ...props}) => {
@@ -71,11 +96,17 @@ const Meeting = (props) => {
     return false;
   };
 
-  const createMeetingObject = () => {
+  const createMeetingObject = (hostAttendee) => {
+    let newAttendees = [].concat(value.attendees);
+
+    if (!hostAttendee.id) {
+      newAttendees.push(hostAttendee);
+    }
+
     return {
       id: value.id,
       title: value.title,
-      attendees: value.attendees,
+      attendees: newAttendees, //[hostAttendee].concat(attendees),
       documents: value.documents,
       location: value.location,
       description: value.description,
@@ -100,12 +131,31 @@ const Meeting = (props) => {
 
     setErrors(errorState);
     if (!hasErrors(errorState)) {
-      post(`${host}/api/v1/meeting/${!Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id) ? 'update' : 'create'}`, (response) => {
+      let userDetails = JSON.parse(sessionStorage.getItem("userDetails"));
+      let _hostAttendee;
+
+      let isUpdate = !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id);
+      if (isUpdate) {
+        _hostAttendee = hostAttendee;
+      } else {
+        _hostAttendee = {
+          userId: userDetails.userId,
+          emailAddress: userDetails.emailAddress,
+          name: userDetails.name,
+          phoneNumber: userDetails.phoneNumber,
+          type: 'HOST'
+        };
+      }
+
+      let data = createMeetingObject(_hostAttendee);
+      console.log(JSON.stringify(data));
+      console.log("\n\n\nVAL: ", data);
+      post(`${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`, (response) => {
         props.refreshHandler();
         handleClose();
       }, (e) => {
 
-      }, createMeetingObject());
+      }, data);
     }
   };
 
@@ -150,8 +200,6 @@ const Meeting = (props) => {
     if (!Utils.isNull(props.selectedEvent)) {
       setEdited(true);
     }
-
-    console.log("\n\n\nVAL: ", value);
   };
 
   const formValueChangeHandler = (e) => {
@@ -186,49 +234,70 @@ const Meeting = (props) => {
       );
     }
     return (
-      <div style={{width: '100%', display: 'flex', justifyContent: 'right', margin: '16px 0'}}>
-        <div style={{marginRight: '4px'}}>
-          <Button
-            variant={'contained'}
-            size="large"
-            color={'primary'}
-            onClick={(e) => handleJoin(e)}
-          >
-            JOIN
-          </Button>
+      readOnly ?
+        <div style={{width: '100%', display: 'flex', justifyContent: 'right', margin: '16px 0'}}>
+          <div style={{marginRight: '4px'}}>
+            <Button
+              variant={'contained'}
+              size="large"
+              color={'primary'}
+              onClick={(e) => handleClose(e)}
+            >
+              RESPOND
+            </Button>
+          </div>
+            <Button
+              variant={'text'}
+              size="large"
+              onClick={(e) => handleClose(e)}
+            >
+              CLOSE
+            </Button>
         </div>
-        {
-          edited ?
-            <div style={{marginRight: '4px'}}>
-              <Button
-                variant={'contained'}
-                size="large"
-                color={'primary'}
-                onClick={(e) => handleUpdate(e)}
-              >
-                SEND UPDATE
-              </Button>
-            </div>
-            :
-            null
-        }
-        <div style={{marginRight: '4px'}}>
+        :
+        <div style={{width: '100%', display: 'flex', justifyContent: 'right', margin: '16px 0'}}>
+          <div style={{marginRight: '4px'}}>
+            <Button
+              variant={'contained'}
+              size="large"
+              color={'primary'}
+              onClick={(e) => handleJoin(e)}
+            >
+              JOIN
+            </Button>
+          </div>
+          {
+            edited ?
+              <div style={{marginRight: '4px'}}>
+                <Button
+                  variant={'contained'}
+                  size="large"
+                  color={'primary'}
+                  onClick={(e) => handleUpdate(e)}
+                >
+                  SEND UPDATE
+                </Button>
+              </div>
+              :
+              null
+          }
+          <div style={{marginRight: '4px'}}>
+            <Button
+              variant={'text'}
+              size="large"
+              onClick={(e) => handleDelete(e)}
+            >
+              CANCEL MEETING
+            </Button>
+          </div>
           <Button
             variant={'text'}
             size="large"
-            onClick={(e) => handleDelete(e)}
+            onClick={(e) => handleClose(e)}
           >
-            CANCEL MEETING
+            CLOSE
           </Button>
         </div>
-        <Button
-          variant={'text'}
-          size="large"
-          onClick={(e) => handleClose(e)}
-        >
-          CLOSE
-        </Button>
-      </div>
     );
   };
 
@@ -240,9 +309,15 @@ const Meeting = (props) => {
 
   return (
     <Form>
+      {
+        readOnly && !Utils.isNull(hostAttendee) ?
+          <div>From {hostAttendee.name}</div>
+          :
+          null
+      }
       <div>
         <Files
-          readOnly={true}
+          disabled={readOnly}
           id={'documents'}
           value={value.documents}
           valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
@@ -250,6 +325,7 @@ const Meeting = (props) => {
       </div>
       <div>
         <TextField
+          disabled={readOnly}
           label="Title"
           id="title"
           hasError={errors.title}
@@ -263,14 +339,15 @@ const Meeting = (props) => {
         <RadioGroup
           aria-labelledby="demo-radio-buttons-group-label"
           row
+          disabled={readOnly}
           defaultValue={value.privacyType}
           name="radio-buttons-group"
           onChange={(e, val) => {
             handleFormValueChange(val, "privacyType", true);
           }}
         >
-          <FormControlLabel value="PRIVATE" control={<Radio/>} label="Private"/>
-          <FormControlLabel value="PUBLIC" control={<Radio/>} label="Public"/>
+          <FormControlLabel value="PRIVATE" control={<Radio disabled={readOnly}/>} label="Private"/>
+          <FormControlLabel value="PUBLIC" control={<Radio disabled={readOnly}/>} label="Public"/>
         </RadioGroup>
       </FormControl>
       <div>
@@ -279,6 +356,7 @@ const Meeting = (props) => {
             <DatePicker
               label="Start date"
               id="startDate"
+              disabled={readOnly}
               hasError={errors.startDate}
               value={value.startDate}
               required={true}
@@ -290,6 +368,7 @@ const Meeting = (props) => {
             <TimePicker
               label="Start time"
               id="startTime"
+              disabled={readOnly}
               hasError={errors.startTime}
               value={value.startTime}
               required={true}
@@ -304,6 +383,7 @@ const Meeting = (props) => {
           <div className={'col-*-*'}>
             <DatePicker
               label="End date"
+              disabled={readOnly}
               id="endDate"
               hasError={errors.endDate}
               value={value.endDate}
@@ -315,6 +395,7 @@ const Meeting = (props) => {
           <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
             <TimePicker
               label="End time"
+              disabled={readOnly}
               id="endTime"
               hasError={errors.endTime}
               value={value.endTime}
@@ -329,12 +410,23 @@ const Meeting = (props) => {
         <AutoComplete
           id="attendees"
           label={'Attendees'}
+          disabled={readOnly}
           invalidText={'invalid attendee'}
           value={value.attendees}
           multiple={true}
           showImages={true}
           searchAttribute={'emailAddress'}
-          valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
+          valueChangeHandler={(value, id) => {
+            for (const valueElement of value) {
+              if (!valueElement.type) {
+                valueElement.type = 'REQUIRED';
+              }
+            }
+
+            setAttendees(value);
+            handleFormValueChange(value, id, false)
+          }
+          }
           optionsUrl={`${host}/api/v1/auth/search`}
         />
       </div>
@@ -342,7 +434,9 @@ const Meeting = (props) => {
         <AutoComplete
           id="location"
           label={'Location'}
+          disabled={readOnly}
           value={value.location}
+          multiple={false}
           searchAttribute={'name'}
           valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
           optionsUrl={`${host}/api/v1/location/search`}
@@ -352,12 +446,36 @@ const Meeting = (props) => {
         <TextField
           className={'text-area-wrapper'}
           label="Description"
+          disabled={readOnly}
           id="description"
+          value={value.description}
           height={'150px'}
           multiline={true}
           hasError={errors.description}
           valueChangeHandler={(e) => formValueChangeHandler(e)}
         />
+      </div>
+      <div>
+        {
+          readOnly ?
+            <FormControl>
+              <RadioGroup
+                aria-labelledby="demo-radio-buttons-group-label"
+                row
+                defaultValue={value.privacyType}
+                name="radio-buttons-group"
+                onChange={(e, val) => {
+                  handleFormValueChange(val, "response", true);
+                }}
+              >
+                <FormControlLabel value="YES" control={<Radio/>} label="Yes"/>
+                <FormControlLabel value="NO" control={<Radio/>} label="No"/>
+                <FormControlLabel value="Maybe" control={<Radio/>} label="Maybe"/>
+              </RadioGroup>
+            </FormControl>
+            :
+            null
+        }
       </div>
       <div className="d-flex mb-1">
         <EventActions/>

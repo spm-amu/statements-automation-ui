@@ -234,8 +234,7 @@ const CalendarComponent = (props) => {
               onOpened={handleSelectedEvent}
               onClosed={handleResetInputValues}
               contentClassName="p-0 overflow-hidden meeting-modal"
-              modalClassName="modal-slide-in event-sidebar"
-              style={{width: '80vw', maxWidth: '80vw'}}
+              style={{width: '80vw', maxWidth: '70vw'}}
             >
               <ModalHeader
                 className="mb-1"
@@ -244,7 +243,7 @@ const CalendarComponent = (props) => {
               >
                 <h5 className="modal-title">
                   {selectedEvent && selectedEvent.title && selectedEvent.title.length
-                    ? 'Update'
+                    ? ''
                     : 'Add'}{' '}
                   Meeting
                 </h5>

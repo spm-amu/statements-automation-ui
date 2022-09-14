@@ -141,7 +141,7 @@ const BasicBusinessAppDashboard = (props) => {
           navigate('/login');
         } else {
           get(`${host}/api/v1/auth/userInfo`, (response) => {
-            sessionStorage.setItem("userId", response.userId);
+            sessionStorage.setItem("userDetails", JSON.stringify(response));
             setUserDetails(response);
             init();
           }, (e) => {
@@ -342,7 +342,11 @@ const BasicBusinessAppDashboard = (props) => {
                               avatar={props.avatar}
                               settingsMenu={null}
                               toggleSidebar={toggleSidebar}
-                              logoutCallBack={props.logoutCallBack}
+                              logoutCallBack={(e) => {
+                                sessionStorage.setItem("access_token", null);
+                                sessionStorage.setItem("userDetails", null);
+                                navigate("/login");
+                              }}
                             />{" "}
                           </div>
                           <div>

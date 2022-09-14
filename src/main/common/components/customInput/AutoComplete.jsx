@@ -55,12 +55,15 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
     if (!Utils.isNull(newInputValue) && !Utils.isStringEmpty(newInputValue) && !Utils.isNull(props.optionsUrl)) {
       post(`${props.optionsUrl}`, (response) => {
           if (response.records.length > 0) {
-            setOptions(response.records)
+            let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+            console.log("\n\n\nRECS : ", response.records);
+            setOptions(response.records.filter(option => option.userId !== userDetails.userId))
           } else {
             if(validateEmail(newInputValue)) {
               let emptyOptions = [];
               emptyOptions.push({
                 emailAddress: newInputValue,
+                type: 'REQUIRED',
                 name: newInputValue,
                 label: newInputValue
               });
@@ -98,6 +101,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       getOptionLabel={(option) => option.label}
       open={open}
       onOpen={handleOpen}
+      disabled={props.disabled}
       onClose={() => setOpen(false)}
       inputValue={inputValue}
       onInputChange={handleInputChange}

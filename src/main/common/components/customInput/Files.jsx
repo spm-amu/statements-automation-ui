@@ -65,6 +65,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
             <AutoComplete
               id={props.id}
               label={''}
+              disabled={props.disabled}
               invalidText={''}
               value={files}
               multiple={true}
