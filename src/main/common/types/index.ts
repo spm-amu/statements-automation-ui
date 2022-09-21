@@ -20,7 +20,7 @@ export type WebsocketMessage = {
 };
 
 export enum MessageType {
-  JOIN = "JOIN",
+  JOIN_MEETING = "JOIN_MEETING",
   SENDING_SIGNAL = "SENDING_SIGNAL",
   USER_JOINED = "USER_JOINED",
   RETURNING_SIGNAL = "RETURNING_SIGNAL",
