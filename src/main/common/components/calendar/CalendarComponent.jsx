@@ -6,17 +6,15 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import toast from 'react-hot-toast';
-import {Menu, X} from 'react-feather';
-import {Card, CardBody, Form, Modal, ModalBody, ModalHeader} from 'reactstrap';
+import {Menu} from 'react-feather';
+import {Card, CardBody} from 'reactstrap';
 import '../../assets/scss/app-calendar.scss';
 import "./CalenderComponent.css";
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
-import Meeting from "../view/Meeting";
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import {host, get} from "../../service/RestService";
+import {get, host} from "../../service/RestService";
 import Utils from '../../Utils';
-import MeetingRoom from "../vc/MeetingRoom";
+import {useNavigate} from 'react-router-dom';
 
 const eventTemplate = {
   id: '',
@@ -54,16 +52,15 @@ const CalendarComponent = (props) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [mode, setMode] = useState('CALENDAR');
   const calendarRef = useRef(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (loading) {
       setLoading(false);
       loadEvents();
     }
-  });
+  }, []);
 
   const loadEvents = () => {
     get(`${host}/api/v1/meeting/fetchMeetings`, (response) => {
@@ -81,7 +78,7 @@ const CalendarComponent = (props) => {
 
   useEffect(() => {
     if (!Utils.isNull(selectedEvent) && !Utils.isNull(selectedEvent.id) && !Utils.isStringEmpty(selectedEvent.id)) {
-      toggleModal();
+      navigate("/view/meeting", { state: selectedEvent })
     }
 
   }, [selectedEvent]);
@@ -173,7 +170,9 @@ const CalendarComponent = (props) => {
       ev.start = info.date;
       ev.end = info.date;
       setSelectedEvent(ev);
-      toggleModal();
+      navigate("/view/meeting", { state: selectedEvent })
+
+      // TODO : Navigate
     },
 
     /*
@@ -209,59 +208,16 @@ const CalendarComponent = (props) => {
 
   };
 
-  const toggleModal = (e) => {
-    setModalOpen(!modalOpen);
-
-  };
-
-  const CloseBtn = (
-    <X className="cursor-pointer" size={15} onClick={(e) => toggleModal(e)}/>
-  );
-
   return (
     <>
       {
-        mode === 'CALENDAR' ?
-          <>
-            <Card className="shadow-none border-0 mb-0 rounded-0">
-              <CardBody className="pb-0">
-                <FullCalendar {...calendarOptions} />{' '}
-              </CardBody>
-            </Card>
-            <Modal
-              isOpen={modalOpen}
-              className="sidebar-lg"
-              onOpened={handleSelectedEvent}
-              onClosed={handleResetInputValues}
-              contentClassName="p-0 overflow-hidden meeting-modal"
-              style={{width: '80vw', maxWidth: '70vw'}}
-            >
-              <ModalHeader
-                className="mb-1"
-                close={CloseBtn}
-                tag="div"
-              >
-                <h5 className="modal-title">
-                  {selectedEvent && selectedEvent.title && selectedEvent.title.length
-                    ? ''
-                    : 'Add'}{' '}
-                  Meeting
-                </h5>
-              </ModalHeader>
-
-              <PerfectScrollbar options={{wheelPropagation: false}}>
-                <ModalBody className="flex-grow-1 pb-sm-0 pb-3">
-                  <Meeting selectedEvent={selectedEvent} closeHandler={(e) => toggleModal(e)}
-                           refreshHandler={() => loadEvents()} joinHandler={() => setMode('MEETING_ROOM')}/>
-                </ModalBody>
-              </PerfectScrollbar>
-            </Modal>
-          </>
-          :
-          <MeetingRoom meeting={selectedEvent} closeHandler={(e) => {
-            toggleModal(e);
-            setMode('CALENDAR');
-          }}/>
+        <div>
+          <Card className="shadow-none border-0 mb-0 rounded-0">
+            <CardBody className="pb-0">
+              <FullCalendar {...calendarOptions} />{' '}
+            </CardBody>
+          </Card>
+        </div>
       }
     </>
   );

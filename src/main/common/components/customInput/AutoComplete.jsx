@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, {useEffect} from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Box from '@material-ui/core/Box';
@@ -9,9 +9,21 @@ import Utils from "../../Utils";
 const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
 
   const [options, setOptions] = React.useState([]);
-  const [value] = React.useState([]);
+  const [value, setValue] = React.useState([]);
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
+
+  /*useEffect(() => {
+    if(props.value) {
+      let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+      let filtered = props.value.filter(val => val.userId !== userDetails.userId);
+      console.log("\n\n\nUNCHAINED : ", props.value);
+      console.log("FILTERED : ", filtered);
+
+      setValue(filtered)
+    }
+  }, [props.value]);*/
+
 
   const handleOpen = () => {
     if (inputValue.length > 0) {
@@ -35,7 +47,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
     }
 
     return (
-      <Box component="li" sx={{'& > img': {mr: 2, flexShrink: 0}}}>
+      <Box component="span" sx={{'& > img': {mr: 2, flexShrink: 0}}}>
         {option.label}
       </Box>);
   };
@@ -90,7 +102,10 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
   return (
     <Autocomplete
       freeSolo
-      className={"input-wrapper"}
+      className={"input-" +
+      "" +
+      "" +
+      "wrapper"}
       noOptionsText={props.invalidText}
       id={props.id}
       sx={{width: 300}}

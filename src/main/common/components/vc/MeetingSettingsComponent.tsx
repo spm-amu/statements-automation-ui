@@ -1,18 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import './MettingRoom.css';
+import './MettingSettingsComponent.css';
 import Button from '@material-ui/core/Button';
 import { Switch } from '@material-ui/core';
 import Icon from '../Icon';
+import {useNavigate} from 'react-router-dom';
 
-const MeetingRoom = (props) => {
+const MeetingSettingsComponent = (props) => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const localStreamRef = useRef<MediaStream>();
-  const [lobbySettings] = useState({});
+  const [lobbySettings] = useState({
+    enableAudio: false,
+    enableVideo: false
+  });
 
-  const handleLeaveMeeting = (e) => {
-    // TODO : Do all the leave meeting calls
-    props.closeHandler(e);
-  };
+  const {selectedMeeting} = props;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+  }, []);
 
   const getLocalStream = useCallback(async () => {
     try {
@@ -23,6 +28,7 @@ const MeetingRoom = (props) => {
           height: 240,
         },
       });
+
       localStreamRef.current = localStream;
       if (localVideoRef.current) localVideoRef.current.srcObject = localStream;
     } catch (e) {
@@ -41,7 +47,6 @@ const MeetingRoom = (props) => {
         <Button
           variant={'text'}
           size="large"
-          onClick={(e) => handleLeaveMeeting(e)}
           style={{ color: '#985F31', border: '1px solid #985F31' }}
         >
           CLOSE
@@ -51,7 +56,7 @@ const MeetingRoom = (props) => {
         <table>
           <tr>
             <td className={'title'} colSpan={3}>
-              {props.meeting.title}
+              {selectedMeeting.title}
             </td>
           </tr>
           <tr>
@@ -131,8 +136,13 @@ const MeetingRoom = (props) => {
               <Button
                 variant={'contained'}
                 size="large"
-                onClick={(e) => handleLeaveMeeting(e)}
                 color={'primary'}
+                onClick={(e) => navigate("/view/meetingRoom", {
+                  state: {
+                    selectedMeeting: selectedMeeting,
+                    settings: lobbySettings
+                  }
+                })}
               >
                 JOIN
               </Button>
@@ -144,4 +154,4 @@ const MeetingRoom = (props) => {
   );
 };
 
-export default MeetingRoom;
+export default MeetingSettingsComponent;

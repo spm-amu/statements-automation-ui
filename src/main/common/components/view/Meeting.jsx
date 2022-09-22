@@ -22,6 +22,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import React from "react";
+import {useNavigate} from 'react-router-dom';
 
 const Meeting = (props) => {
 
@@ -42,6 +43,7 @@ const Meeting = (props) => {
   });
   const [errors, setErrors] = useState({});
   const [edited, setEdited] = useState(false);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     let isUpdate = !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id);
@@ -50,7 +52,7 @@ const Meeting = (props) => {
       for (const attendee of props.selectedEvent.attendees) {
         if (attendee.type === 'HOST') {
           setHostAttendee(attendee);
-          if(userDetails.userId === attendee.userId) {
+          if (userDetails.userId === attendee.userId) {
             setReadOnly(false);
           }
         } else {
@@ -59,7 +61,7 @@ const Meeting = (props) => {
       }
     }
 
-    if(!isUpdate) {
+    if (!isUpdate) {
       setReadOnly(false);
     }
   }, []);
@@ -176,8 +178,9 @@ const Meeting = (props) => {
   };
 
   const handleJoin = (e) => {
-    props.joinHandler();
+    navigate("/view/joinMeetingSettings", { state: selectedMeeting })
   };
+
 
   const validateField = (fieldId, fieldValue) => {
     if (Utils.isNull(fieldValue) || (typeof fieldValue === 'string' && Utils.isStringEmpty(fieldValue))) {
@@ -246,13 +249,13 @@ const Meeting = (props) => {
               RESPOND
             </Button>
           </div>
-            <Button
-              variant={'text'}
-              size="large"
-              onClick={(e) => handleClose(e)}
-            >
-              CLOSE
-            </Button>
+          <Button
+            variant={'text'}
+            size="large"
+            onClick={(e) => handleClose(e)}
+          >
+            CLOSE
+          </Button>
         </div>
         :
         <div style={{width: '100%', display: 'flex', justifyContent: 'right', margin: '16px 0'}}>
@@ -308,179 +311,189 @@ const Meeting = (props) => {
   );
 
   return (
-    <Form>
-      {
-        readOnly && !Utils.isNull(hostAttendee) ?
-          <div>From {hostAttendee.name}</div>
-          :
-          null
-      }
-      <div>
-        <Files
-          disabled={readOnly}
-          id={'documents'}
-          value={value.documents}
-          valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
-        />
-      </div>
-      <div>
-        <TextField
-          disabled={readOnly}
-          label="Title"
-          id="title"
-          hasError={errors.title}
-          value={value.title}
-          required={true}
-          valueChangeHandler={(e) => formValueChangeHandler(e)}
-          errorMessage={'A meeting title is required. Please enter a value'}
-        />
-      </div>
-      <FormControl>
-        <RadioGroup
-          aria-labelledby="demo-radio-buttons-group-label"
-          row
-          disabled={readOnly}
-          defaultValue={value.privacyType}
-          name="radio-buttons-group"
-          onChange={(e, val) => {
-            handleFormValueChange(val, "privacyType", true);
-          }}
-        >
-          <FormControlLabel value="PRIVATE" control={<Radio disabled={readOnly}/>} label="Private"/>
-          <FormControlLabel value="PUBLIC" control={<Radio disabled={readOnly}/>} label="Public"/>
-        </RadioGroup>
-      </FormControl>
-      <div>
-        <div className={'row no-margin'}>
-          <div className={'col-*-*'}>
-            <DatePicker
-              label="Start date"
-              id="startDate"
+    <div style={{width: '100%', height: '88vh', padding: '32px', backgroundColor: '#FFFFFF', marginTop: '2px'}}>
+      <h5 className="modal-title">
+        {selectedMeeting && selectedMeeting.title && selectedMeeting.title.length
+          ? ''
+          : 'Add'}{' '}
+        Meeting
+      </h5>
+      <div style={{width: '80%'}}>
+        <Form>
+          {
+            readOnly && !Utils.isNull(hostAttendee) ?
+              <div>From {hostAttendee.name}</div>
+              :
+              null
+          }
+          <div>
+            <Files
               disabled={readOnly}
-              hasError={errors.startDate}
-              value={value.startDate}
-              required={true}
-              valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-              errorMessage={'A start date is required. Please select a value'}
+              id={'documents'}
+              value={value.documents}
+              valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
             />
           </div>
-          <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
-            <TimePicker
-              label="Start time"
-              id="startTime"
+          <div>
+            <TextField
               disabled={readOnly}
-              hasError={errors.startTime}
-              value={value.startTime}
+              label="Title"
+              id="title"
+              hasError={errors.title}
+              value={value.title}
               required={true}
-              valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-              errorMessage={'A start time is required. Please select a value'}
+              valueChangeHandler={(e) => formValueChangeHandler(e)}
+              errorMessage={'A meeting title is required. Please enter a value'}
             />
           </div>
-        </div>
-      </div>
-      <div>
-        <div className={'row no-margin'}>
-          <div className={'col-*-*'}>
-            <DatePicker
-              label="End date"
+          <FormControl>
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              row
               disabled={readOnly}
-              id="endDate"
-              hasError={errors.endDate}
-              value={value.endDate}
-              required={true}
-              valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-              errorMessage={'An end date is required. Please select a value'}
-            />
+              defaultValue={value.privacyType}
+              name="radio-buttons-group"
+              onChange={(e, val) => {
+                handleFormValueChange(val, "privacyType", true);
+              }}
+            >
+              <FormControlLabel value="PRIVATE" control={<Radio disabled={readOnly}/>} label="Private"/>
+              <FormControlLabel value="PUBLIC" control={<Radio disabled={readOnly}/>} label="Public"/>
+            </RadioGroup>
+          </FormControl>
+          <div>
+            <div className={'row no-margin'}>
+              <div className={'col-*-*'}>
+                <DatePicker
+                  label="Start date"
+                  id="startDate"
+                  disabled={readOnly}
+                  hasError={errors.startDate}
+                  value={value.startDate}
+                  required={true}
+                  valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+                  errorMessage={'A start date is required. Please select a value'}
+                />
+              </div>
+              <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
+                <TimePicker
+                  label="Start time"
+                  id="startTime"
+                  disabled={readOnly}
+                  hasError={errors.startTime}
+                  value={value.startTime}
+                  required={true}
+                  valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+                  errorMessage={'A start time is required. Please select a value'}
+                />
+              </div>
+            </div>
           </div>
-          <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
-            <TimePicker
-              label="End time"
+          <div>
+            <div className={'row no-margin'}>
+              <div className={'col-*-*'}>
+                <DatePicker
+                  label="End date"
+                  disabled={readOnly}
+                  id="endDate"
+                  hasError={errors.endDate}
+                  value={value.endDate}
+                  required={true}
+                  valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+                  errorMessage={'An end date is required. Please select a value'}
+                />
+              </div>
+              <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
+                <TimePicker
+                  label="End time"
+                  disabled={readOnly}
+                  id="endTime"
+                  hasError={errors.endTime}
+                  value={value.endTime}
+                  required={true}
+                  valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+                  errorMessage={'A end time is required. Please select a value'}
+                />
+              </div>
+            </div>
+          </div>
+          <div style={{marginTop: '8px'}}>
+            <AutoComplete
+              id="attendees"
+              label={'Attendees'}
               disabled={readOnly}
-              id="endTime"
-              hasError={errors.endTime}
-              value={value.endTime}
-              required={true}
-              valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-              errorMessage={'A end time is required. Please select a value'}
-            />
-          </div>
-        </div>
-      </div>
-      <div style={{marginTop: '8px'}}>
-        <AutoComplete
-          id="attendees"
-          label={'Attendees'}
-          disabled={readOnly}
-          invalidText={'invalid attendee'}
-          value={value.attendees}
-          multiple={true}
-          showImages={true}
-          searchAttribute={'emailAddress'}
-          valueChangeHandler={(value, id) => {
-            for (const valueElement of value) {
-              if (!valueElement.type) {
-                valueElement.type = 'REQUIRED';
-              }
-            }
+              invalidText={'invalid attendee'}
+              value={value.attendees}
+              multiple={true}
+              showImages={true}
+              searchAttribute={'emailAddress'}
+              valueChangeHandler={(value, id) => {
+                for (const valueElement of value) {
+                  if (!valueElement.type) {
+                    valueElement.type = 'REQUIRED';
+                  }
+                }
 
-            setAttendees(value);
-            handleFormValueChange(value, id, false)
-          }
-          }
-          optionsUrl={`${host}/api/v1/auth/search`}
-        />
+                setAttendees(value);
+                handleFormValueChange(value, id, false)
+              }
+              }
+              optionsUrl={`${host}/api/v1/auth/search`}
+            />
+          </div>
+          <div style={{marginTop: '12px'}}>
+            <AutoComplete
+              id="location"
+              label={'Location'}
+              disabled={readOnly}
+              value={value.location}
+              multiple={false}
+              searchAttribute={'name'}
+              valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
+              optionsUrl={`${host}/api/v1/location/search`}
+            />
+          </div>
+          <div>
+            <TextField
+              className={'text-area-wrapper'}
+              label="Description"
+              disabled={readOnly}
+              id="description"
+              value={value.description}
+              height={'150px'}
+              multiline={true}
+              hasError={errors.description}
+              valueChangeHandler={(e) => formValueChangeHandler(e)}
+            />
+          </div>
+          <div>
+            {
+              readOnly ?
+                <FormControl>
+                  <RadioGroup
+                    aria-labelledby="demo-radio-buttons-group-label"
+                    row
+                    defaultValue={value.privacyType}
+                    name="radio-buttons-group"
+                    onChange={(e, val) => {
+                      handleFormValueChange(val, "response", true);
+                    }}
+                  >
+                    <FormControlLabel value="YES" control={<Radio/>} label="Yes"/>
+                    <FormControlLabel value="NO" control={<Radio/>} label="No"/>
+                    <FormControlLabel value="Maybe" control={<Radio/>} label="Maybe"/>
+                  </RadioGroup>
+                </FormControl>
+                :
+                null
+            }
+          </div>
+          <div className="d-flex mb-1">
+            <EventActions/>
+          </div>
+        </Form>
       </div>
-      <div style={{marginTop: '12px'}}>
-        <AutoComplete
-          id="location"
-          label={'Location'}
-          disabled={readOnly}
-          value={value.location}
-          multiple={false}
-          searchAttribute={'name'}
-          valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
-          optionsUrl={`${host}/api/v1/location/search`}
-        />
-      </div>
-      <div>
-        <TextField
-          className={'text-area-wrapper'}
-          label="Description"
-          disabled={readOnly}
-          id="description"
-          value={value.description}
-          height={'150px'}
-          multiline={true}
-          hasError={errors.description}
-          valueChangeHandler={(e) => formValueChangeHandler(e)}
-        />
-      </div>
-      <div>
-        {
-          readOnly ?
-            <FormControl>
-              <RadioGroup
-                aria-labelledby="demo-radio-buttons-group-label"
-                row
-                defaultValue={value.privacyType}
-                name="radio-buttons-group"
-                onChange={(e, val) => {
-                  handleFormValueChange(val, "response", true);
-                }}
-              >
-                <FormControlLabel value="YES" control={<Radio/>} label="Yes"/>
-                <FormControlLabel value="NO" control={<Radio/>} label="No"/>
-                <FormControlLabel value="Maybe" control={<Radio/>} label="Maybe"/>
-              </RadioGroup>
-            </FormControl>
-            :
-            null
-        }
-      </div>
-      <div className="d-flex mb-1">
-        <EventActions/>
-      </div>
-    </Form>
+    </div>
   );
 };
 
