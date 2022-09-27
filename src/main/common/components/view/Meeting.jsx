@@ -115,9 +115,9 @@ const Meeting = (props) => {
       privacyType: value.privacyType,
       schedule: {
         startDate: Utils.getFormattedDate(value.startDate),
-        startTime: value.startTime.toLocaleTimeString(),
+        startTime: value.startTime.toLocaleTimeString('it-IT'),
         endDate: Utils.getFormattedDate(value.endDate),
-        endTime: value.endTime.toLocaleTimeString()
+        endTime: value.endTime.toLocaleTimeString('it-IT')
       }
     }
   };
