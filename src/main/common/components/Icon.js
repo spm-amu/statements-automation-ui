@@ -52,8 +52,8 @@ class Icon extends Component {
       return <Help/>
     } else if (this.props.id === 'CALENDER') {
       return <img src={require('/assets/icons/menu/calendar.svg')} width={'27px'} alt={''}/>
-    } else if (this.props.id === 'CHARTS') {
-      return <img src={require('/assets/icons/menu/charts.svg')} width={'27px'} alt={''}/>
+    } else if (this.props.id === 'CHATS') {
+      return <img src={require('/assets/icons/menu/chats.svg')} width={'27px'} alt={''}/>
     } else if (this.props.id === 'FILES') {
       return <img src={require('/assets/icons/menu/files.svg')} width={'27px'} alt={''}/>
     } else if (this.props.id === 'MEETINGS') {

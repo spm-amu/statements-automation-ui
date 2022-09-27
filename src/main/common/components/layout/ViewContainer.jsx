@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useParams } from 'react-router-dom';
 import Calendar from '../view/Calendar';
-import Charts from '../view/Charts';
+import Chats from '../view/Chats';
 import Files from '../view/Files';
 import MeetingHistory from '../view/MeetingHistory';
 import Meeting from "../view/Meeting";
@@ -20,8 +20,8 @@ const ViewContainer = (props) => {
     switch (viewId) {
       case 'calendar':
         return <Calendar/>;
-      case 'charts':
-        return <Charts />;
+      case 'chats':
+        return <Chats />;
       case 'meetingHistory':
         return <MeetingHistory />;
       case 'files':

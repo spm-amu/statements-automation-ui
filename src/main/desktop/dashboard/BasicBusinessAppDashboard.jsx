@@ -90,9 +90,9 @@ const BasicBusinessAppDashboard = (props) => {
       newRoutes.push(newRoute);
 
       newRoute = {};
-      newRoute.name = "Charts";
-      newRoute.path = "charts";
-      newRoute.icon = "CHARTS";
+      newRoute.name = "Chats";
+      newRoute.path = "chats";
+      newRoute.icon = "CHATS";
       newRoute.layout = "/admin";
       newRoute.level = 0;
       newRoute.isParent = true;
