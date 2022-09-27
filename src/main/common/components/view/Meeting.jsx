@@ -479,9 +479,9 @@ const Meeting = (props) => {
                       handleFormValueChange(val, "response", true);
                     }}
                   >
-                    <FormControlLabel value="YES" control={<Radio/>} label="Yes"/>
-                    <FormControlLabel value="NO" control={<Radio/>} label="No"/>
-                    <FormControlLabel value="Maybe" control={<Radio/>} label="Maybe"/>
+                    <FormControlLabel value="YES" control={<Radio/>} label="Accept"/>
+                    <FormControlLabel value="NO" control={<Radio/>} label="Decline"/>
+                    <FormControlLabel value="Maybe" control={<Radio/>} label="Tentative"/>
                   </RadioGroup>
                 </FormControl>
                 :
