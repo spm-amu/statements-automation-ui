@@ -1,0 +1,10 @@
+.meeting-participant-container {
+  border: 2px solid red;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+
+@media  screen and (max-width:800px) {
+}
