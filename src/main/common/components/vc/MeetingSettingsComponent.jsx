@@ -1,19 +1,20 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './MettingSettingsComponent.css';
 import Button from '@material-ui/core/Button';
 import { Switch } from '@material-ui/core';
 import Icon from '../Icon';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const MeetingSettingsComponent = (props) => {
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const localStreamRef = useRef<MediaStream>();
+  const localVideoRef = useRef();
+  const localStreamRef = useRef();
   const [lobbySettings] = useState({
     enableAudio: false,
     enableVideo: false
   });
 
-  const {selectedMeeting} = props;
+  const { selectedMeeting } = props;
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -137,12 +138,23 @@ const MeetingSettingsComponent = (props) => {
                 variant={'contained'}
                 size="large"
                 color={'primary'}
-                onClick={(e) => navigate("/view/meetingRoom", {
-                  state: {
-                    selectedMeeting: selectedMeeting,
-                    settings: lobbySettings
-                  }
-                })}
+                onClick={(e) => {
+                  let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+                  let isHost = false;
+                  selectedMeeting.attendees.forEach(att => {
+                    if (att.userId === userDetails.userId ) {
+                      isHost = att.type === 'HOST';
+                    }
+                  })
+
+                  navigate("/view/meetingRoom", {
+                    state: {
+                      selectedMeeting: selectedMeeting,
+                      settings: lobbySettings,
+                      isHost
+                    }
+                  })
+                }}
               >
                 JOIN
               </Button>

@@ -250,6 +250,14 @@ const Meeting = (props) => {
             </Button>
           </div>
           <Button
+            variant={'contained'}
+            size="large"
+            color={'primary'}
+            onClick={(e) => handleJoin(e)}
+          >
+            JOIN
+          </Button>
+          <Button
             variant={'text'}
             size="large"
             onClick={(e) => handleClose(e)}

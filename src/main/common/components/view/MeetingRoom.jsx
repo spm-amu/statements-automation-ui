@@ -1,45 +1,115 @@
-import {useState} from 'react';
-import {X} from 'react-feather';
-import {components} from 'react-select'
-import {Form} from 'reactstrap';
-import Button from '@material-ui/core/Button';
-import TextField from '../customInput/TextField';
-import DatePicker from '../customInput/DatePicker';
-import TimePicker from '../customInput/TimePicker';
-import AutoComplete from '../customInput/AutoComplete';
-import Files from '../customInput/Files';
-import Utils from '../../Utils';
-import Avatar from '../avatar';
-import {host, post, get} from "../../service/RestService";
+import React, {useState} from 'react';
+import { useEffect, useRef } from '@types/react';
+import io from 'socket.io-client';
+import { MessageType } from '../../types';
 
-import '../../assets/scss/react-select/_react-select.scss';
-import '../../assets/scss/flatpickr/flatpickr.scss';
-
-import {host} from "../../service/RestService";
-import FormControl from "@material-ui/core/FormControl";
-import FormLabel from "@material-ui/core/FormLabel";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Radio from "@material-ui/core/Radio";
-import React from "react";
-import MeetingSettingsComponent from "../vc/MeetingSettingsComponent";
+import './Calendar.css';
+import Peer from 'simple-peer';
 
 const MeetingRoom = (props) => {
   const {selectedMeeting} = props;
   const {settings} = props;
 
+  const [peers, setPeers] = useState([]);
+  const socketRef = useRef();
+  const userVideo = useRef();
+  const peersRef = useRef([]);
+
+  useEffect(() => {
+    socketRef.current = io.connect('http://localhost:8000');
+    navigator.mediaDevices
+      .getUserMedia({ video: videoConstraints, audio: true })
+      .then((stream) => {
+        userVideo.current.srcObject = stream;
+        socketRef.current.emit(MessageType.JOIN_MEETING, selectedMeeting.id);
+        socketRef.current.on(MessageType.ALL_USERS, (users) => {
+          const peers = [];
+          users.forEach((userID) => {
+            const peer = createPeer(userID, socketRef.current.id, stream);
+            peersRef.current.push({
+              peerID: userID,
+              peer,
+            });
+            peers.push(peer);
+          });
+          setPeers(peers);
+        });
+
+        socketRef.current.on(MessageType.USER_JOINED, (payload) => {
+          const peer = addPeer(payload.signal, payload.callerID, stream);
+          peersRef.current.push({
+            peerID: payload.callerID,
+            peer,
+          });
+
+          setPeers((users) => [...users, peer]);
+        });
+
+        socketRef.current.on(MessageType.RECEIVING_RETURNED_SIGNAL, (payload) => {
+          const item = peersRef.current.find((p) => p.peerID === payload.id);
+          item.peer.signal(payload.signal);
+        });
+      });
+  }, []);
+
+  function createPeer(userToSignal, callerID, stream) {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream,
+    });
+
+    peer.on('signal', (signal) => {
+      socketRef.current.emit(MessageType.SENDING_SIGNAL, {
+        userToSignal,
+        callerID,
+        signal,
+      });
+    });
+
+    return peer;
+  }
+
+  function addPeer(incomingSignal, callerID, stream) {
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream,
+    });
+
+    peer.on('signal', (signal) => {
+      socketRef.current.emit(MessageType.RETURNING_SIGNAL, { signal, callerID });
+    });
+
+    peer.signal(incomingSignal);
+
+    return peer;
+  }
+
+  const Video = (props) => {
+    const ref = useRef();
+
+    useEffect(() => {
+      props.peer.on('stream', (stream) => {
+        ref.current.srcObject = stream;
+      });
+    }, []);
+
+    return <video className="call-video" playsInline autoPlay ref={ref} />;
+  };
+
   return (
-    <div>
-      JOINING MEETING
-      <br />
-      {
-        JSON.stringify(selectedMeeting)
-      }
-      <br />
-      <br />
-      {
-        JSON.stringify(settings)
-      }
+    <div className="call-container">
+      <video
+        className="call-video"
+        muted
+        ref={userVideo}
+        autoPlay
+        playsInline
+      />
+      {peers.map((peer, index) => {
+        return <Video key={index} peer={peer} />;
+      })}
     </div>
   );
 };
