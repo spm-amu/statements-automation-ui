@@ -5,6 +5,7 @@
 .navbar {
   padding: 0 16px !important;
   width: calc(100% - 144px) !important;
+  background-color: #f9f9f9 !important;
 }
 
 .navbar .navbar-brand {
