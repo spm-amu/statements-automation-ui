@@ -16,13 +16,11 @@ const MeetingParticipantGrid = (props) => {
   }, []);
 
   const createColumn = (index) => {
-    console.log("CREATE COL : " + index);
     let col = [];
     for (let i = index; i < participants.length && col.length < MAX_ROWS; i++) {
       col.push(participants[i]);
     }
 
-    console.log("LEN : " + col.length);
     return col;
   };
 
@@ -32,7 +30,6 @@ const MeetingParticipantGrid = (props) => {
 
     let maxGridSize = MAX_COLS * MAX_ROWS;
     let numCols = participants.length < MAX_COLS ? participants.length : MAX_COLS;
-    //let gridSize = participants.length <= maxGridSize ? maxGridSize : participants.length;
 
     for (let i = 0; i < numCols; i++) {
       itemGrid.push([]);
@@ -46,17 +43,14 @@ const MeetingParticipantGrid = (props) => {
       }
     }
 
-    console.log("GRID SIZE : " + itemGrid.length);
-    console.log(itemGrid);
-
     return itemGrid;
   };
 
   const renderColumn = (col, index) => {
     return (
-      <div className={'col item'}>
+      <div className={'col item'} key={index}>
         {col.map((participant, index) => {
-          return <div style={{height: 100 / col.length + '%'}}>
+          return <div style={{height: (100 / col.length) + '%', margin: '0 8px 8px 0'}}>
             <MeetingParticipant data={participant} key={index}/>
           </div>
         })}
@@ -66,7 +60,7 @@ const MeetingParticipantGrid = (props) => {
 
   return (
     grid !== null ?
-      <div className={'row grid'}>
+      <div className={'row grid'} style={{height: 'calc(100% - 16px)'}}>
         {grid.map((col, index) => {
           return <>
             {
@@ -78,10 +72,6 @@ const MeetingParticipantGrid = (props) => {
       :
       null
   )
-
 };
 
 export default MeetingParticipantGrid;
-
-
-//{/*<MeetingParticipant data={participant} key={index}/>*/}

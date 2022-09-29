@@ -39,6 +39,16 @@ const MeetingRoom = (props) => {
       peer: null,
       name: 'Peter Ngulz',
       avatar: require('../../../desktop/dashboard/images/noimage-person.png')
+    },
+    {
+      peer: null,
+      name: 'Peter Ngulz',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png')
+    },
+    {
+      peer: null,
+      name: 'Peter Ngulz',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png')
     }
   ]);
 

@@ -318,6 +318,7 @@ const Meeting = (props) => {
     <X className="cursor-pointer" size={15} onClick={(e) => handleClose(e)}/>
   );
 
+
   return (
     <div style={{width: '100%', height: '88vh', padding: '32px', backgroundColor: '#FFFFFF', marginTop: '2px'}}>
       <h5 className="modal-title">

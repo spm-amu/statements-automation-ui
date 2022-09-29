@@ -14,17 +14,17 @@ const MeetingParticipant = (props) => {
 
   return (
     <div className={'col-*-* meeting-participant-container'}>
-      <div style={{width: '100%', height: 'calc(100% - 72px)'}}>
+      <div style={{width: '100%', height: 'calc(100% - 32px)'}}>
         {
           props.data.showVideo ?
             <video controls playsinline autoPlay ref={videoRef}/>
             :
             <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-              <img src={props.data.avatar} style={{width: '280px', height: '280px', borderRadius: '50%'}}/>
+              <img src={props.data.avatar} style={{width: '280px', height: '280px', borderRadius: '50%', backgroundColor: '#FFFFFF'}}/>
             </div>
         }
       </div>
-      <div style={{width: '100%', height: '72px'}}>
+      <div style={{width: '100%', height: '32px'}}>
         {
           props.data.name
         }
