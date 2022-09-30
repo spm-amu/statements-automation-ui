@@ -162,7 +162,7 @@ const Meeting = (props) => {
   };
 
   const handleClose = () => {
-    props.closeHandler();
+    navigate("/view/calendar")
   };
 
   const handleUpdate = () => {

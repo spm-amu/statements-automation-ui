@@ -96,6 +96,8 @@ const CalendarComponent = (props) => {
       ? Docs: https://fullcalendar.io/docs/editable
     */
     editable: true,
+    height: '100%',
+    stickyHeaderDates: true,
 
     /*
       Enable resizing event from start
@@ -208,12 +210,13 @@ const CalendarComponent = (props) => {
 
   };
 
+
   return (
     <>
       {
-        <div>
-          <Card className="shadow-none border-0 mb-0 rounded-0">
-            <CardBody className="pb-0">
+        <div className={'h-100'}>
+          <Card className={'h-100'}>
+            <CardBody className={'h-100'}>
               <FullCalendar {...calendarOptions} />{' '}
             </CardBody>
           </Card>
