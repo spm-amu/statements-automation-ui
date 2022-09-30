@@ -67,3 +67,12 @@ a:hover {
   justify-content: center
 }
 
+.no-side-margin {
+  margin-left: unset !important;
+  margin-right: unset !important;
+}
+
+.no-side-padding {
+  margin-left: unset !important;
+  margin-right: unset !important;
+}

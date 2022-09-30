@@ -16,5 +16,22 @@
   padding: 16px 16px 16px 8px;
 }
 
+.grid-side-bar {
+  width: 280px;
+  margin: 4px 12px !important;
+  height: 98%;
+  max-height: 98%;
+  overflow: auto;
+}
+
+.side-grid-item {
+  height: 200px;
+  border-bottom: 16px solid #000000;
+}
+
+.grid-side-bar .side-grid-item:last-child {
+  border-bottom: unset;
+}
+
 @media  screen and (max-width:800px) {
 }

@@ -30,9 +30,49 @@ const MeetingRoom = (props) => {
     },
     {
       peer: null,
+      name: 'Nsovo Ngobz',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+    },
+    {
+      peer: null,
       name: 'Peter Ngulz',
       avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
     },
+    {
+      peer: null,
+      name: 'Peter Ngulz',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+    },
+    {
+      peer: null,
+      name: 'Peter Ngulz',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+    },
+    {
+      peer: null,
+      name: 'Ada lovz',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+    },
+    {
+      peer: null,
+      name: 'Charles B',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+    },
+    {
+      peer: null,
+      name: 'Bill Gates',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+    },
+    {
+      peer: null,
+      name: 'Mark Zucker',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+    },
+    {
+      peer: null,
+      name: 'Tesler',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+    }
   ]);
 
   const [popUp, setPopUp] = useState('');
@@ -406,7 +446,7 @@ const MeetingRoom = (props) => {
               }}
             >
               <div className={'footer-toolbar'}>
-                <div className={'row'} style={{ padding: '5px' }}>
+                <div className={'row centered-flex-box'}>
                   {!screenShared && (
                     <IconButton
                       onClick={() => {
@@ -417,6 +457,8 @@ const MeetingRoom = (props) => {
                       }}
                       style={{
                         backgroundColor: videoMuted ? "#eb3f21" : "#404239",
+                        color: 'white',
+                        marginRight: '4px'
                       }}
                     >
                       { videoMuted ? (
@@ -436,6 +478,8 @@ const MeetingRoom = (props) => {
                     }}
                     style={{
                       backgroundColor: audioMuted ? "#eb3f21" : "#404239",
+                      color: 'white',
+                      marginRight: '4px'
                     }}
                   >
                     {audioMuted ? (
@@ -444,7 +488,7 @@ const MeetingRoom = (props) => {
                       <Icon id={'MIC'} />
                     )}
                   </IconButton>
-
+                  {" "}
                   <IconButton
                     onClick={() => {
                       // wait for stream to load first
@@ -455,6 +499,8 @@ const MeetingRoom = (props) => {
                     }}
                     style={{
                       backgroundColor: screenShared ? '#8eb2f5' : '#404239',
+                      color: 'white',
+                      marginRight: '4px'
                     }}
                   >
                     {screenShared ? (
@@ -467,6 +513,8 @@ const MeetingRoom = (props) => {
                   <IconButton
                     style={{
                       backgroundColor: '#404239',
+                      color: 'white',
+                      marginRight: '4px'
                     }}
                   >
                     <Icon id={'CHAT_BUBBLE'} />
@@ -476,6 +524,8 @@ const MeetingRoom = (props) => {
                     onClick={endCall}
                     style={{
                       backgroundColor: '#eb3f21',
+                      color: 'white',
+                      marginRight: '4px'
                     }}
                   >
                     <Icon id={'CALL_END'} />
@@ -484,6 +534,8 @@ const MeetingRoom = (props) => {
                   <IconButton
                     style={{
                       backgroundColor: '#404239',
+                      color: 'white',
+                      marginRight: '4px'
                     }}
                   >
                     <Icon id={'PEOPLE'} />
