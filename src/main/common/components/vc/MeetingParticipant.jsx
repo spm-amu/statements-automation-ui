@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {useEffect, useRef, forwardRef} from "react";
+import {forwardRef, useEffect, useRef} from "react";
 import './MeetingParticipant.css'
 
 const MeetingParticipant = forwardRef((props, ref) => {
   const videoRef = ref ? ref : useRef();
-  const showVideo = false;
+  const showVideo = true;
 
   useEffect(() => {
-    if(!ref) {
+    if (!ref) {
       //props.data.peer.on("stream", (stream) => {
       //  videoRef.current.srcObject = stream;
       //});
@@ -15,24 +15,35 @@ const MeetingParticipant = forwardRef((props, ref) => {
   }, []);
 
   return (
-    <div className={'col-*-* meeting-participant-container'} style={props.showName ? {padding: props.padding ? props.padding : '4px 4px 12px 12px'} : null}>
+    <div className={'col-*-* meeting-participant-container'}
+         style={props.showName ? {padding: props.padding ? props.padding : '4px 4px 12px 12px'} : null}>
       <div style={{width: '100%', height: '100%'}}>
         {
           showVideo ?
-            <div style={{width: '100%', height: '100%', backgroundColor: '#aaaaaa'}}>
+            <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
               <video muted playsInline autoPlay ref={videoRef}
                      style={{width: '100%', height: '100%'}}/>
               <div className={'name-label'}> {props.showName ? props.data.name : 'You'}</div>
             </div>
             :
-            <div
-              style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgb(40, 40, 43)'}}>
-              <div className={'h-100 w-100'}>˚
-                <div className={'w-100'} style={{height: 'calc(100% - 72px)'}}>
+            <div className={'h-100'} style={{backgroundColor: 'rgb(40, 40, 43)'}}>
+              <div style={{width: '100%', height: '100%'}}>
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
                   <img src={props.data.avatar}
                        style={{width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#FFFFFF'}}/>
                 </div>
-                <div> {props.showName ? props.data.name : 'You'}</div>
+              </div>
+              <div className={'name-label'}>
+                {
+                  props.showName ? props.data.name : 'You'
+                }
               </div>
             </div>
         }
