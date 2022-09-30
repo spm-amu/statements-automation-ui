@@ -27,8 +27,6 @@ const MeetingRoomSession = (props) => {
 
   const { selectedMeeting, isHost } = props;
 
-  console.log('isHost: ', isHost)
-
   const {settings} = props;
 
   const [peers, setPeers] = useState([]);
@@ -75,7 +73,6 @@ const MeetingRoomSession = (props) => {
         });
 
         socketRef.current.on(MessageType.PERMIT, ( payload ) => {
-          console.log('********** MessageType.PERMIT');
           const userAlias = payload.userAlias;
           joiningSocket.current = payload.id;
           setPopUp(`1 ${userAlias}`);
@@ -83,8 +80,6 @@ const MeetingRoomSession = (props) => {
         });
 
         socketRef.current.on(MessageType.ALL_USERS, (users) => {
-          console.log('********** MessageType.ALL_USERS: ', users);
-
           const peers = [];
           users.forEach((userID) => {
             const peer = createPeer(userID, socketRef.current.id, myStream);
@@ -98,8 +93,6 @@ const MeetingRoomSession = (props) => {
         });
 
         socketRef.current.on(MessageType.USER_JOINED, (payload) => {
-          console.log('********** MessageType.USER_JOINED');
-
           const peer = addPeer(payload.signal, payload.callerID, myStream);
           peersRef.current.push({
             peerID: payload.callerID,
@@ -135,14 +128,10 @@ const MeetingRoomSession = (props) => {
       });
 
       socketRef.current.on(MessageType.NO_PERMIT_REQUIRED, () => {
-        console.log('********** MessageType.NO_PERMIT_REQUIRED');
-
         joinPersonIn();
       });
 
       socketRef.current.on(MessageType.ALLOWED, ( chatId ) => {
-        console.log('********** MessageType.ALLOWED');
-
         joinPersonIn();
       });
 

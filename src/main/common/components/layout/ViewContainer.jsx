@@ -34,7 +34,7 @@ const ViewContainer = (props) => {
       //case 'meetingRoom':
       //  return <MeetingRoomSession selectedMeeting={location.state.selectedMeeting} settings={location.state.settings} isHost={location.state.isHost} />;
       case 'meetingRoom':
-        return <MeetingRoom selectedMeeting={location.state.selectedMeeting} settings={location.state.settings}/>;
+        return <MeetingRoom selectedMeeting={location.state.selectedMeeting} settings={location.state.settings} isHost={location.state.isHost}/>;
     }
 
     return null;

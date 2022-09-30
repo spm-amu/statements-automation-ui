@@ -4,5 +4,123 @@
   padding: 16px;
 }
 
+.call {
+  height: 100%;
+  position: relative;
+}
+
+.call--background {
+  height: 100%;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  background-color: #ced1d4;
+}
+
+.call--background--media {
+  object-fit: cover;
+  height: 100%;
+  object-position: center;
+  width: 100%;
+}
+
+.call--overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(
+    0deg,
+    rgba(2, 0, 36, 0.8029586834733894) 0%,
+    rgba(0, 0, 0, 0) 24%,
+    rgba(0, 0, 0, 0) 75%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr;
+  justify-content: space-between;
+}
+
+.call--overlay--footer {
+  display: grid;
+  grid-template-rows: auto auto;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.call--overlay--footer--button {
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
+}
+
+.call--overlay--footer--button--hang-up {
+  background-color: #e73b39;
+}
+
+.call--overlay--footer--actions {
+  display: grid;
+  justify-content: center;
+  grid-auto-flow: column;
+  gap: 20px;
+}
+
+.call--overlay--footer--yourself {
+  width: 130px;
+  height: 180px;
+  justify-self: end;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-right: 10px;
+  box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
+}
+
+.call--overlay--footer--yourself--media {
+  object-fit: cover;
+  height: 100%;
+  object-position: center;
+  width: 100%;
+}
+
+.call--overlay--header {
+  padding: 30px;
+}
+
+.call--overlay--header--status {
+  color: white;
+  font-size: 1.4rem;
+}
+
+.call--overlay--footer--button--answer {
+  background-color: #1ac462;
+}
+
+.call--background--contact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: white;
+  margin-bottom: 40px;
+}
+
+.call--background--contact--image {
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
+}
+
+
 @media  screen and (max-width:800px) {
 }

@@ -4,20 +4,22 @@ import './MeetingParticipant.css'
 
 const MeetingParticipant = (props) => {
   const videoRef = useRef();
+  const showVideo = true;
 
   useEffect(() => {
-    // on receiving remote user's stream attach it to this video element using ref
-    //props.peer.on("stream", (stream) => {
-    //	videoRef.current.srcObject = stream;
-    //});
+    console.log('MeetingParticipant props: ', props)
+
+    props.data.peer.on("stream", (stream) => {
+      videoRef.current.srcObject = stream;
+    });
   }, []);
 
   return (
     <div className={'col-*-* meeting-participant-container'}>
       <div style={{width: '100%', height: 'calc(100% - 32px)'}}>
         {
-          props.data.showVideo ?
-            <video controls playsinline autoPlay ref={videoRef}/>
+          showVideo ?
+            <video controls playsInline autoPlay ref={videoRef}/>
             :
             <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
               <img src={props.data.avatar} style={{width: '280px', height: '280px', borderRadius: '50%', backgroundColor: '#FFFFFF'}}/>
