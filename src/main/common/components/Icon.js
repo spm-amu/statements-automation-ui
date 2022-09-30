@@ -25,6 +25,7 @@ import Notifications from '@material-ui/icons/Notifications';
 import Person from '@material-ui/icons/Person';
 import Folder from '@material-ui/icons/Folder';
 import Help from '@material-ui/icons/Help';
+import Close from '@material-ui/icons/Close';
 import React, {Component} from "react";
 import {
   CallEnd,
@@ -47,6 +48,8 @@ class Icon extends Component {
       return <AddIcon/>
     } else if (this.props.id === 'EDIT') {
       return <EditIcon/>
+    }else if (this.props.id === 'CLOSE') {
+      return <Close/>
     } else if (this.props.id === 'REMOVE') {
       return <RemoveIcon/>
     } else if (this.props.id === 'SAVE') {

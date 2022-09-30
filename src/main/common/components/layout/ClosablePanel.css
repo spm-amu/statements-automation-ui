@@ -1,0 +1,14 @@
+.closable-panel-header {
+  height: 72px;
+  border-bottom: 1px solid #a1a1a1;
+  text-align: right;
+  padding: 8px 16px;
+  display: inline-block;
+  width: 100%;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.closable-panel-content {
+  height: calc(100% - 48px);
+}

@@ -125,5 +125,11 @@
   height: 64px;
 }
 
+.side-bar-container{
+  width: 18%;
+  box-shadow: 0 2px 22px 0 rgba(0,0,0,.1), 0 4px 20px 0 rgba(0,0,0,.15);
+  border-radius: 8px;
+}
+
 @media  screen and (max-width:800px) {
 }

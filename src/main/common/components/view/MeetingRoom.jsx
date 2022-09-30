@@ -11,6 +11,7 @@ import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
 import MeetingParticipant from '../vc/MeetingParticipant';
 import Icon from '../Icon';
 import IconButton from '@material-ui/core/IconButton';
+import ClosablePanel from '../layout/ClosablePanel'
 
 const MeetingRoom = (props) => {
   const { selectedMeeting, isHost } = props;
@@ -79,6 +80,7 @@ const MeetingRoom = (props) => {
   //const [participants, setParticipants] = useState([]);
   const [videoMuted, setVideoMuted] = useState(true);
   const [audioMuted, setAudioMuted] = useState(true);
+  const [sideBarOpen, setSideBarOpen] = useState(true);
   const [screenShared, setScreenShared] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -345,7 +347,7 @@ const MeetingRoom = (props) => {
   };
 
   return (
-    <div className={'grid-container'}>
+    <div className={'grid-container row'}>
       {popUp[0] === '1' && (
         <AlertDialog
           title="Join request!"
@@ -380,7 +382,7 @@ const MeetingRoom = (props) => {
         />
       )}
 
-      <div style={{ height: '100%', width: '100%' }}>
+      <div style={{ height: '100%', width: sideBarOpen ? '80%' : '100%' }} className={'col'}>
         {loading && popUp === 'Waiting' ? (
           <div
             className={'centered-flex-box'}
@@ -516,6 +518,7 @@ const MeetingRoom = (props) => {
                       color: 'white',
                       marginRight: '4px'
                     }}
+                    onClick={(e) => setSideBarOpen(true)}
                   >
                     <Icon id={'CHAT_BUBBLE'} />
                   </IconButton>
@@ -532,6 +535,7 @@ const MeetingRoom = (props) => {
                   </IconButton>
 
                   <IconButton
+                    onClick={(e) => setSideBarOpen(true)}
                     style={{
                       backgroundColor: '#404239',
                       color: 'white',
@@ -551,7 +555,6 @@ const MeetingRoom = (props) => {
                 <MeetingParticipant
                   data={{
                     peer: null,
-                    name: 'Amukelani Shandli',
                     avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
                   }}
                   displayName={false}
@@ -562,6 +565,14 @@ const MeetingRoom = (props) => {
           </div>
         </footer>
       </div>
+      {
+        sideBarOpen &&
+          <div className={"side-bar-container"}>
+            <ClosablePanel closeHandler={(e) => {
+              setSideBarOpen(false);
+            }}/>
+          </div>
+      }
     </div>
   );
 };
