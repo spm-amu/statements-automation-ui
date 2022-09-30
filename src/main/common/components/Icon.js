@@ -26,6 +26,7 @@ import Person from '@material-ui/icons/Person';
 import Folder from '@material-ui/icons/Folder';
 import Help from '@material-ui/icons/Help';
 import React, {Component} from "react";
+import { CallEnd, CancelPresentation, People, PresentToAll, Videocam, VideocamOff } from '@material-ui/icons';
 
 class Icon extends Component {
 
@@ -78,6 +79,18 @@ class Icon extends Component {
       return <Camera/>
     }  else if (this.props.id === 'CAMERA_OFF') {
       return <CameraOff/>
+    } else if (this.props.id === 'VIDEOCAM_OFF') {
+      return <VideocamOff/>
+    } else if (this.props.id === 'VIDEOCAM') {
+      return <Videocam/>
+    } else if (this.props.id === 'CANCEL_PRESENTATION') {
+      return <CancelPresentation/>
+    } else if (this.props.id === 'PRESENT_TO_ALL') {
+      return <PresentToAll/>
+    } else if (this.props.id === 'CALL_END') {
+      return <CallEnd/>
+    } else if (this.props.id === 'PEOPLE') {
+      return <People/>
     } else if (this.props.id === 'UPLOAD') {
       return <Upload/>
     } else if (this.props.id === 'ROTATE_LEFT') {

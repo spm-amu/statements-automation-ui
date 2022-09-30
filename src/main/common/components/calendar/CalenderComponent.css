@@ -45,3 +45,12 @@ button:focus {
 .fc-daygrid-day-events a:hover {
   border: 8px solid green;
 }
+
+.fc-daygrid-body table {
+  border-bottom: 1px solid #ebe9f1 !important;
+}
+
+.fc-view-harness,
+.fc-view-harness-active {
+  min-height: unset !important;
+}

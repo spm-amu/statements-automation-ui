@@ -1,4 +1,7 @@
 .viewport {
-  background-color: #E5E5E5;
-  height: calc(100vh - 136px);
+  max-height: calc(99vh - 136px);
+  height: calc(99vh - 136px);
+  overflow-y: hidden;
+  overflow-x: hidden;
+  background-color: #FFFFFF;
 }

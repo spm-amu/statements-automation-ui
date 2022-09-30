@@ -162,7 +162,7 @@ const Meeting = (props) => {
   };
 
   const handleClose = () => {
-    props.closeHandler();
+    navigate("/view/calendar")
   };
 
   const handleUpdate = () => {
@@ -250,6 +250,14 @@ const Meeting = (props) => {
             </Button>
           </div>
           <Button
+            variant={'contained'}
+            size="large"
+            color={'primary'}
+            onClick={(e) => handleJoin(e)}
+          >
+            JOIN
+          </Button>
+          <Button
             variant={'text'}
             size="large"
             onClick={(e) => handleClose(e)}
@@ -309,6 +317,7 @@ const Meeting = (props) => {
   const CloseBtn = (
     <X className="cursor-pointer" size={15} onClick={(e) => handleClose(e)}/>
   );
+
 
   return (
     <div style={{width: '100%', height: '88vh', padding: '32px', backgroundColor: '#FFFFFF', marginTop: '2px'}}>

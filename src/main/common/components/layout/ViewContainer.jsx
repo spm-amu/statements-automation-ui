@@ -9,6 +9,7 @@ import Meeting from "../view/Meeting";
 import {useLocation} from 'react-router-dom';
 import JoinMeetingSettings from "../view/JoinMeetingSettings";
 import MeetingRoom from "../view/MeetingRoom";
+import MeetingRoomSession from '../view/MeetingRoomSession';
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -30,8 +31,10 @@ const ViewContainer = (props) => {
         return <Meeting selectedEvent={location.state}/>;
       case 'joinMeetingSettings':
         return <JoinMeetingSettings selectedMeeting={location.state}/>;
+      //case 'meetingRoom':
+      //  return <MeetingRoomSession selectedMeeting={location.state.selectedMeeting} settings={location.state.settings} isHost={location.state.isHost} />;
       case 'meetingRoom':
-        return <MeetingRoom selectedMeeting={location.state.selectedMeeting} settings={location.state.settings}/>;
+        return <MeetingRoom selectedMeeting={location.state.selectedMeeting} settings={location.state.settings} isHost={location.state.isHost}/>;
     }
 
     return null;

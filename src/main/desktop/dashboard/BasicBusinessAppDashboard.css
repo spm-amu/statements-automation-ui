@@ -1,2 +1,6 @@
+.navbar.navbar-absolute {
+  z-index: 0 !important;
+}
+
 @media screen and (max-width: 991px) {
 }

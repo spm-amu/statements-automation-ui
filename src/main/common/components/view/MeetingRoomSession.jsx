@@ -3,7 +3,6 @@ import io from 'socket.io-client';
 import { MessageType } from '../../types';
 
 import './Calendar.css';
-import './MeetingRoom.css';
 import AlertDialog from '../AlertDialog';
 import CircularProgress from "@material-ui/core/CircularProgress";
 
@@ -19,45 +18,18 @@ import useWindowDimensions from '../../hooks/useWindowDimensions';
 import MyToolTip from '../MyToolTip';
 import Icon from '../Icon';
 import Peer from 'simple-peer';
-import MeetingParticipant from "../vc/MeetingParticipant";
-import MeetingParticipantGrid from "../vc/MeetingParticipantGrid";
 
-const MeetingRoom = (props) => {
+const MeetingRoomSession = (props) => {
+
+  const { width } = useWindowDimensions(); // dynamic width of webpage
+
+  const [popUp, setPopUp] = useState("");
 
   const { selectedMeeting, isHost } = props;
 
   const {settings} = props;
 
-  // const [participantsDemo, setParticipantsDemo] = useState([
-  //   {
-  //     peer: null,
-  //     name: 'Amukelani Shandli',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   },
-  //   {
-  //     peer: null,
-  //     name: 'Nsovo Ngobz',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   },
-  //   {
-  //     peer: null,
-  //     name: 'Peter Ngulz',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   },
-  //   {
-  //     peer: null,
-  //     name: 'Peter Ngulz',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   },
-  //   {
-  //     peer: null,
-  //     name: 'Peter Ngulz',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   }
-  // ]);
-
-  const [popUp, setPopUp] = useState("");
-  const [participants, setParticipants] = useState([]);
+  const [peers, setPeers] = useState([]);
   const [videoMuted, setVideoMuted] = useState(false);
   const [audioMuted, setAudioMuted] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
@@ -89,16 +61,13 @@ const MeetingRoom = (props) => {
         userStream.current = myStream;
         videoTrack.current = userStream.current.getTracks()[1];
         audioTrack.current = userStream.current.getTracks()[0];
-
-        userVideo.current.srcObject = myStream
+        userVideo.current.srcObject = myStream;
 
         let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
         socketRef.current.emit(MessageType.JOIN_MEETING, {
           room: selectedMeeting.id,
           userIdentity: userDetails.userId,
-          name: userDetails.name,
-          avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
           email: userDetails.emailAddress,
           isHost
         });
@@ -110,23 +79,17 @@ const MeetingRoom = (props) => {
           // identify popup using popup[0] = 1
         });
 
-        socketRef.current.on(MessageType.ALL_USERS, ( users ) => {
+        socketRef.current.on(MessageType.ALL_USERS, (users) => {
           const peers = [];
-          users.forEach((user) => {
-            const peer = createPeer(user.id, socketRef.current.id, myStream);
+          users.forEach((userID) => {
+            const peer = createPeer(userID, socketRef.current.id, myStream);
             peersRef.current.push({
-              peerID: user.id,
+              peerID: userID,
               peer,
             });
-
-            peers.push({
-              peer: peer,
-              name: user.name,
-              avatar: user.avatar
-            });
+            peers.push(peer);
           });
-
-          setParticipants(peers);
+          setPeers(peers);
         });
 
         socketRef.current.on(MessageType.USER_JOINED, (payload) => {
@@ -136,13 +99,7 @@ const MeetingRoom = (props) => {
             peer,
           });
 
-          const user = {
-            peer: peer,
-            name: payload.name,
-            avatar: payload.avatar
-          }
-
-          setParticipants((users) => [...users, user]);
+          setPeers((users) => [...users, peer]);
         });
 
         socketRef.current.on(MessageType.RECEIVING_RETURNED_SIGNAL, (payload) => {
@@ -153,8 +110,6 @@ const MeetingRoom = (props) => {
   };
 
   useEffect(() => {
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-
     socketRef.current = io.connect('http://localhost:8000');
 
     setLoading(true);
@@ -162,7 +117,7 @@ const MeetingRoom = (props) => {
     if (!isHost) {
       setPopUp("Waiting");
 
-      console.log('userDetails: ', userDetails)
+      let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
       const userAlias = userDetails.userId;
 
@@ -219,8 +174,6 @@ const MeetingRoom = (props) => {
   };
 
   function createPeer(userToSignal, callerID, stream) {
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -232,8 +185,6 @@ const MeetingRoom = (props) => {
         userToSignal,
         callerID,
         signal,
-        name: userDetails.name,
-        avatar: require('../../../desktop/dashboard/images/noimage-person.png')
       });
     });
 
@@ -305,7 +256,7 @@ const MeetingRoom = (props) => {
   };
 
   return (
-    <div className={'grid-container'}>
+    <div id="room">
       {popUp[0] === "1" && (
         <AlertDialog
           title="Join request!"
@@ -352,25 +303,211 @@ const MeetingRoom = (props) => {
         />
       )}
 
-      {
-        participants.length > 0 && <MeetingParticipantGrid participants={participants} />
-      }
+      <div id="grid-root">
+        <GridList cellHeight="90px" id="grid-list" cols={2} spacing={20}>
+          <ImageListItem
+            key="1"
+            cols={peers.length === 0 || screenShared ? 2 : 1}
+            rows={2}
+          >
+            <video
+              id="mine"
+              muted
+              controls
+              ref={userVideo}
+              autoPlay
+              playsInline
+            />
+            <style jsx="true">
+              {`
+                #mine {
+                  transform: ${screenShared
+                ? "rotateY(0deg)"
+                : "rotateY(180deg)"};
+                }
 
-      <footer className="call--overlay--footer">
-        <section className="call--overlay--footer--yourself">
-          <video
-            ref={userVideo}
-            className="call--overlay--footer--yourself--media"
-            autoPlay
-            playsInline
-            controls
-            muted={true}
-          />
-        </section>
-      </footer>
+                #mine::-webkit-media-controls-panel {
+                  transform: ${screenShared
+                ? "rotateY(0deg)"
+                : "rotateY(180deg)"};
+                }
+              `}
+            </style>
+            <ImageListItemBar title="You" position="top" />
+          </ImageListItem>
 
+          { peers.map((peer, index) => {
+            return (
+              <ImageListItem key={index} cols={1} rows={2}>
+                <PartnerVideo
+                  key={index}
+                  peer={peer}
+                />
+                <ImageListItemBar
+                  title="Remote"
+                  position="top"
+                  actionPosition="right"
+                />
+              </ImageListItem>
+            );
+          })}
+        </GridList>
+        <nav id="video-controls">
+          { width > 500 && (
+            <h3
+              style={{
+                position: "absolute",
+                left: `${width < 600 ? 7 : 20}px`,
+                fontSize: "auto",
+              }}
+            >
+              { new Date().toLocaleString("en-US", {
+                hour12: true,
+                hour: "numeric",
+                minute: "numeric",
+              })}
+            </h3>
+          )}
+
+          <div
+            style={{
+              position: "absolute",
+              left: `${
+                width < 700
+                  ? width < 500
+                    ? 14
+                    : (width * 20) / 100
+                  : (width * 38) / 100
+              }px`,
+            }}
+          >
+            {!screenShared && (
+              <MyToolTip
+                title={
+                  userStream.current
+                    ? videoMuted
+                      ? "Turn on Camera"
+                      : "Turn off Camera"
+                    : "Loading..."
+                }
+              >
+                <IconButton
+                  onClick={() => {
+                    // if video stream exists
+                    if (userStream.current) {
+                      muteVideo();
+                    }
+                  }}
+                  style={{
+                    backgroundColor: videoMuted ? "#eb3f21" : "#404239",
+                    margin: `${width < 600 ? 2 : 4}px`,
+                  }}
+                >
+                  {videoMuted ? (
+                      <Icon id={'VIDEOCAM_OFF'} />
+                  ) : (
+                    <Icon id={'VIDEOCAM'} />
+                  )}
+                </IconButton>
+              </MyToolTip>
+            )}
+
+            <MyToolTip
+              title={
+                userStream.current
+                  ? audioMuted
+                    ? "Turn on Microphone"
+                    : "Turn off Microphone"
+                  : "Loading..."
+              }
+            >
+              <IconButton
+                onClick={() => {
+                  // if audio stream exists
+                  if (userStream.current) {
+                    muteAudio();
+                  }
+                }}
+                style={{
+                  backgroundColor: audioMuted ? "#eb3f21" : "#404239",
+                  margin: `${width < 600 ? 2 : 4}px`,
+                }}
+              >
+                {audioMuted ? (
+                  <Icon id={'MIC_OFF'} />
+                ) : (
+                  <Icon id={'MIC'} />
+                )}
+              </IconButton>
+            </MyToolTip>
+
+            <MyToolTip
+              title={
+                userStream.current
+                  ? screenShared
+                    ? "Stop Presenting"
+                    : "Present Now"
+                  : "Loading..."
+              }
+            >
+              <IconButton
+                onClick={() => {
+                  // wait for stream to load first
+                  if (userStream.current) {
+                    if (screenShared) stopShareScreen();
+                    else shareScreen();
+                  }
+                }}
+                style={{
+                  backgroundColor: screenShared ? "#8eb2f5" : "#404239",
+                  margin: `${width < 600 ? 2 : 4}px`,
+                }}
+              >
+                {screenShared ? (
+                  <Icon id={'CANCEL_PRESENTATION'} />
+                ) : (
+                  <Icon id={'PRESENT_TO_ALL'} />
+                )}
+              </IconButton>
+            </MyToolTip>
+
+            <MyToolTip title="Hang Up">
+              <IconButton
+                onClick={endCall}
+                style={{
+                  backgroundColor: "#eb3f21",
+                  margin: `${width < 600 ? 2 : 4}px`,
+                }}
+              >
+                <Icon id={'CALL_END'} />
+              </IconButton>
+            </MyToolTip>
+          </div>
+
+          <div
+            style={{ position: "absolute", right: `${width < 500 ? 20 : 10}px` }}
+          >
+            <MyToolTip
+              title={`${peers.length + 1} participant${
+                peers.length > 0 ? "s" : ""
+              }`}
+            >
+              <IconButton
+                onClick={() => { }}
+                style={{
+                  backgroundColor: "#404239",
+                  margin: `${width < 600 ? 2 : 4}px`,
+                }}
+              >
+                <Icon id={'PEOPLE'} />
+              </IconButton>
+            </MyToolTip>
+          </div>
+
+        </nav>
+      </div>
     </div>
   );
 };
 
-export default MeetingRoom;
+export default MeetingRoomSession;
