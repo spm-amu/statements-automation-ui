@@ -1,63 +1,41 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import io from 'socket.io-client';
-import { MessageType } from '../../types';
+import {MessageType} from '../../types';
 
 import './Calendar.css';
 import './MeetingRoom.css';
 import AlertDialog from '../AlertDialog';
 import CircularProgress from "@material-ui/core/CircularProgress";
-
-import {
-  GridList,
-  ImageListItem,
-  ImageListItemBar,
-  IconButton,
-} from "@material-ui/core";
-
-import PartnerVideo from '../PartnerVideo';
-import useWindowDimensions from '../../hooks/useWindowDimensions';
-import MyToolTip from '../MyToolTip';
-import Icon from '../Icon';
 import Peer from 'simple-peer';
-import MeetingParticipant from "../vc/MeetingParticipant";
 import MeetingParticipantGrid from "../vc/MeetingParticipantGrid";
+import MeetingParticipant from "../vc/MeetingParticipant";
 
 const MeetingRoom = (props) => {
 
-  const { selectedMeeting, isHost } = props;
+  const {selectedMeeting, isHost} = props;
 
   const {settings} = props;
 
-  // const [participantsDemo, setParticipantsDemo] = useState([
-  //   {
-  //     peer: null,
-  //     name: 'Amukelani Shandli',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   },
-  //   {
-  //     peer: null,
-  //     name: 'Nsovo Ngobz',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   },
-  //   {
-  //     peer: null,
-  //     name: 'Peter Ngulz',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   },
-  //   {
-  //     peer: null,
-  //     name: 'Peter Ngulz',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   },
-  //   {
-  //     peer: null,
-  //     name: 'Peter Ngulz',
-  //     avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-  //   }
-  // ]);
+  const [participantsDemo, setParticipantsDemo] = useState([
+    {
+      peer: null,
+      name: 'Amukelani Shandli',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png')
+    },
+    {
+      peer: null,
+      name: 'Nsovo Ngobz',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png')
+    },
+    {
+      peer: null,
+      name: 'Peter Ngulz',
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png')
+    }
+  ]);
 
   const [popUp, setPopUp] = useState("");
-  const [participants, setParticipants] = useState([]);
+  //const [participants, setParticipants] = useState([]);
   const [videoMuted, setVideoMuted] = useState(false);
   const [audioMuted, setAudioMuted] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
@@ -72,6 +50,7 @@ const MeetingRoom = (props) => {
   const tmpTrack = useRef();
   const screenTrack = useRef();
   const peersRef = useRef([]);
+  const [currentUserStream, setCurrentUserStream] = useState(null);
 
   window.onpopstate = () => {
     if (userStream.current)
@@ -80,9 +59,22 @@ const MeetingRoom = (props) => {
     window.location.reload();
   };
 
+
+  useEffect(() => {
+    if (userVideo.current) {
+      userVideo.current.srcObject = currentUserStream;
+    }
+  }, [currentUserStream]);
+
+  useEffect(() => {
+    if (userVideo.current) {
+      userVideo.current.srcObject = currentUserStream;
+    }
+  }, [userVideo.current]);
+
   const joinPersonIn = () => {
     navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
+      .getUserMedia({video: true, audio: true})
       .then((myStream) => {
         setLoading(false);
 
@@ -90,7 +82,8 @@ const MeetingRoom = (props) => {
         videoTrack.current = userStream.current.getTracks()[1];
         audioTrack.current = userStream.current.getTracks()[0];
 
-        userVideo.current.srcObject = myStream
+        setCurrentUserStream(myStream);
+        //userVideo.current.srcObject = myStream;
 
         let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
@@ -103,14 +96,14 @@ const MeetingRoom = (props) => {
           isHost
         });
 
-        socketRef.current.on(MessageType.PERMIT, ( payload ) => {
+        socketRef.current.on(MessageType.PERMIT, (payload) => {
           const userAlias = payload.userAlias;
           joiningSocket.current = payload.id;
           setPopUp(`1 ${userAlias}`);
           // identify popup using popup[0] = 1
         });
 
-        socketRef.current.on(MessageType.ALL_USERS, ( users ) => {
+        socketRef.current.on(MessageType.ALL_USERS, (users) => {
           const peers = [];
           users.forEach((user) => {
             const peer = createPeer(user.id, socketRef.current.id, myStream);
@@ -140,7 +133,7 @@ const MeetingRoom = (props) => {
             peer: peer,
             name: payload.name,
             avatar: payload.avatar
-          }
+          };
 
           setParticipants((users) => [...users, user]);
         });
@@ -162,7 +155,7 @@ const MeetingRoom = (props) => {
     if (!isHost) {
       setPopUp("Waiting");
 
-      console.log('userDetails: ', userDetails)
+      console.log('userDetails: ', userDetails);
 
       const userAlias = userDetails.userId;
 
@@ -176,7 +169,7 @@ const MeetingRoom = (props) => {
         joinPersonIn();
       });
 
-      socketRef.current.on(MessageType.ALLOWED, ( chatId ) => {
+      socketRef.current.on(MessageType.ALLOWED, (chatId) => {
         joinPersonIn();
       });
 
@@ -248,7 +241,7 @@ const MeetingRoom = (props) => {
     });
 
     peer.on('signal', (signal) => {
-      socketRef.current.emit(MessageType.RETURNING_SIGNAL, { signal, callerID });
+      socketRef.current.emit(MessageType.RETURNING_SIGNAL, {signal, callerID});
     });
 
     peer.signal(incomingSignal);
@@ -257,7 +250,7 @@ const MeetingRoom = (props) => {
   }
 
   const shareScreen = () => {
-    navigator.mediaDevices.getDisplayMedia({ cursor: true }).then((stream) => {
+    navigator.mediaDevices.getDisplayMedia({cursor: true}).then((stream) => {
       setScreenShared(true);
 
       // store the video track i.e. our web cam stream into tmpTrack
@@ -285,7 +278,8 @@ const MeetingRoom = (props) => {
   const stopShareScreen = () => {
     setScreenShared(false);
 
-    // restore the videoTrack which was stored earlier in tmpTrack when screensharing was turned on
+    // restore the videoTra
+    // ck which was stored earlier in tmpTrack when screensharing was turned on
     videoTrack.current = tmpTrack.current;
 
     // stop the screentrack
@@ -340,35 +334,58 @@ const MeetingRoom = (props) => {
         />
       )}
 
-      { loading && popUp === "Waiting" && (
-        <AlertDialog
-          title={ <CircularProgress color="secondary" /> }
-          message="Waiting for the meeting host to let you in."
-          showLeft={false}
-          showRight={false}
-          auto={false}
-          keepOpen={true}
-          onClose={() => { }}
-        />
-      )}
-
-      {
-        participants.length > 0 && <MeetingParticipantGrid participants={participants} />
-      }
-
-      <footer className="call--overlay--footer">
-        <section className="call--overlay--footer--yourself">
-          <video
-            ref={userVideo}
-            className="call--overlay--footer--yourself--media"
-            autoPlay
-            playsInline
-            controls
-            muted={true}
-          />
-        </section>
-      </footer>
-
+      <div style={{height: '100%', width: '100%'}}>
+        {
+          loading && popUp === "Waiting" ?
+            <div className={'centered-flex-box'}
+                 style={{height: 'calc(100% - 180px)', width: '100%', fontSize: '32px'}}>
+              <div style={{display: 'inline-block', textAlign: 'center', margin: 'auto'}}>
+                <div>
+                  Waiting for the meeting host to let you in
+                </div>
+                <div className={'centered-flex-box'}>
+                  <CircularProgress color="secondary"/>
+                </div>
+              </div>
+            </div>
+            :
+            <>
+              <div className={'centered-flex-box'}
+                   style={{
+                     height: 'calc(100% - 180px)',
+                     maxHeight: 'calc(100% - 180px)',
+                     width: '100%',
+                     overflow: 'hidden'
+                   }}>
+                {
+                  participantsDemo.length > 0 && <MeetingParticipantGrid participants={participantsDemo}/>
+                }
+              </div>
+            </>
+        }
+        <footer className="call-overlay-footer" style={{height: '180px'}}>
+          <div className={'row'}>
+            <div className={'col'}>
+            </div>
+            <div className={'col'} style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: '80%'}}>
+              <div className={'footer-toolbar'}>
+              </div>
+            </div>
+            <div className={'col'} style={{display: 'flex', justifyContent: 'flex-end'}}>
+              <section className="call-overlay-footer-yourself">
+                <MeetingParticipant data={{
+                  peer: null,
+                  name: 'Amukelani Shandli',
+                  avatar: require('../../../desktop/dashboard/images/noimage-person.png')
+                }}
+                                    displayName={false}
+                                    ref={userVideo}
+                />
+              </section>
+            </div>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };

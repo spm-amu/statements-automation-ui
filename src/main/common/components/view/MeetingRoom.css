@@ -9,7 +9,7 @@
   position: relative;
 }
 
-.call--background {
+.call-background {
   height: 100%;
   display: grid;
   align-items: center;
@@ -17,14 +17,14 @@
   background-color: #ced1d4;
 }
 
-.call--background--media {
+.call-background-media {
   object-fit: cover;
   height: 100%;
   object-position: center;
   width: 100%;
 }
 
-.call--overlay {
+.call-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -43,14 +43,14 @@
   justify-content: space-between;
 }
 
-.call--overlay--footer {
+.call-overlay-footer {
   display: grid;
   grid-template-rows: auto auto;
-  margin-bottom: 30px;
   gap: 20px;
+  padding: 16px 0;
 }
 
-.call--overlay--footer--button {
+.call-overlay-footer-button {
   background-color: rgba(0, 0, 0, 0.2);
   width: 60px;
   height: 60px;
@@ -62,48 +62,46 @@
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
 }
 
-.call--overlay--footer--button--hang-up {
+.call-overlay-footer-button-hang-up {
   background-color: #e73b39;
 }
 
-.call--overlay--footer--actions {
+.call-overlay-footer-actions {
   display: grid;
   justify-content: center;
   grid-auto-flow: column;
   gap: 20px;
 }
 
-.call--overlay--footer--yourself {
-  width: 130px;
-  height: 180px;
+.call-overlay-footer-yourself {
+  width: 240px;
+  height: 140px;
   justify-self: end;
-  border-radius: 10px;
   overflow: hidden;
-  margin-right: 10px;
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
 }
 
-.call--overlay--footer--yourself--media {
+.call-overlay-footer-yourself-media {
   object-fit: cover;
   height: 100%;
   object-position: center;
   width: 100%;
 }
 
-.call--overlay--header {
+.call-overlay-header {
   padding: 30px;
 }
 
-.call--overlay--header--status {
+.call-overlay-header-status {
   color: white;
   font-size: 1.4rem;
 }
 
-.call--overlay--footer--button--answer {
+.call-overlay-footer-button-answer {
   background-color: #1ac462;
 }
 
-.call--background--contact {
+.call-background-contact {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -113,7 +111,7 @@
   margin-bottom: 40px;
 }
 
-.call--background--contact--image {
+.call-background-contact-image {
   width: 80px;
   height: 80px;
   overflow: hidden;
@@ -121,6 +119,12 @@
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
 }
 
+.footer-toolbar {
+  min-width: 320px;
+  width: 100%;
+  height: 64px;
+  border: 1px solid red;
+}
 
 @media  screen and (max-width:800px) {
 }

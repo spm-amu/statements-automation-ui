@@ -60,3 +60,10 @@ a:hover {
   margin: 20px 0;
   width: 100%;
 }
+
+.centered-flex-box {
+  display: flex;
+  align-Items: center;
+  justify-content: center
+}
+

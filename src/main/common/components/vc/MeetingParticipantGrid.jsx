@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Fragment, useEffect, useRef } from 'react';
+import React, {useEffect, useRef} from "react";
 import './MeetingParticipantGrid.css';
 import MeetingParticipant from "./MeetingParticipant";
 
@@ -8,10 +8,8 @@ const MAX_ROWS = 3;
 
 const MeetingParticipantGrid = (props) => {
   const videoRef = useRef();
-  const { participants } = props;
+  const {participants} = props;
   const [grid, setGrid] = React.useState(null);
-
-  console.log('\n\n\nMeetingParticipantGrid: ', participants)
 
   useEffect(() => {
     setGrid(createGrid());
@@ -31,9 +29,6 @@ const MeetingParticipantGrid = (props) => {
     let pos = 0;
 
     let maxGridSize = MAX_COLS * MAX_ROWS;
-
-    console.log('createGrid participants: ', participants)
-
     let numCols = participants.length < MAX_COLS ? participants.length : MAX_COLS;
 
     for (let i = 0; i < numCols; i++) {
@@ -48,18 +43,15 @@ const MeetingParticipantGrid = (props) => {
       }
     }
 
-    console.log('itemGrid: ', itemGrid);
-
     return itemGrid;
   };
 
   const renderColumn = (col, index) => {
-    console.log('COLLL: ', col)
     return (
       <div className={'col item'} key={index}>
         {col.map((participant, index) => {
-          return <div key={index} style={{height: (100 / col.length) + '%', margin: '0 8px 8px 0'}}>
-            <MeetingParticipant data={participant} key={index}/>
+          return <div style={{height: ((100 / col.length)) + '%'}} key={index}>
+            <MeetingParticipant data={participant} showName={true}/>
           </div>
         })}
       </div>
@@ -70,11 +62,11 @@ const MeetingParticipantGrid = (props) => {
     grid !== null ?
       <div className={'row grid'} style={{height: 'calc(100% - 16px)'}}>
         {grid.map((col, index) => {
-          return <Fragment key={index}>
+          return <>
             {
               renderColumn(col, index)
             }
-          </Fragment>
+          </>
         })}
       </div>
       :
