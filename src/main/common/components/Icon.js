@@ -26,7 +26,15 @@ import Person from '@material-ui/icons/Person';
 import Folder from '@material-ui/icons/Folder';
 import Help from '@material-ui/icons/Help';
 import React, {Component} from "react";
-import { CallEnd, CancelPresentation, People, PresentToAll, Videocam, VideocamOff } from '@material-ui/icons';
+import {
+  CallEnd,
+  CancelPresentation,
+  ChatBubble,
+  People,
+  PresentToAll,
+  Videocam,
+  VideocamOff
+} from '@material-ui/icons';
 
 class Icon extends Component {
 
@@ -87,6 +95,8 @@ class Icon extends Component {
       return <CancelPresentation/>
     } else if (this.props.id === 'PRESENT_TO_ALL') {
       return <PresentToAll/>
+    } else if (this.props.id === 'CHAT_BUBBLE') {
+      return <ChatBubble/>
     } else if (this.props.id === 'CALL_END') {
       return <CallEnd/>
     } else if (this.props.id === 'PEOPLE') {

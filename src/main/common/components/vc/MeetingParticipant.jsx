@@ -20,7 +20,7 @@ const MeetingParticipant = forwardRef((props, ref) => {
         {
           showVideo ?
             <div style={{width: '100%', height: '100%', backgroundColor: '#aaaaaa'}}>
-              <video playsInline autoPlay ref={videoRef}
+              <video muted playsInline autoPlay ref={videoRef}
                      style={{width: '100%', height: '100%'}}/>
             </div>
             :

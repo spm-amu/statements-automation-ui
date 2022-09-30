@@ -1,43 +1,44 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
-import {MessageType} from '../../types';
+import { MessageType } from '../../types';
 
 import './Calendar.css';
 import './MeetingRoom.css';
 import AlertDialog from '../AlertDialog';
-import CircularProgress from "@material-ui/core/CircularProgress";
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Peer from 'simple-peer';
-import MeetingParticipantGrid from "../vc/MeetingParticipantGrid";
-import MeetingParticipant from "../vc/MeetingParticipant";
+import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
+import MeetingParticipant from '../vc/MeetingParticipant';
+import Icon from '../Icon';
+import IconButton from '@material-ui/core/IconButton';
 
 const MeetingRoom = (props) => {
+  const { selectedMeeting, isHost } = props;
 
-  const {selectedMeeting, isHost} = props;
-
-  const {settings} = props;
+  const { settings } = props;
 
   const [participantsDemo, setParticipantsDemo] = useState([
     {
       peer: null,
       name: 'Amukelani Shandli',
-      avatar: require('../../../desktop/dashboard/images/noimage-person.png')
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
     },
     {
       peer: null,
       name: 'Nsovo Ngobz',
-      avatar: require('../../../desktop/dashboard/images/noimage-person.png')
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
     },
     {
       peer: null,
       name: 'Peter Ngulz',
-      avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-    }
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+    },
   ]);
 
-  const [popUp, setPopUp] = useState("");
+  const [popUp, setPopUp] = useState('');
   //const [participants, setParticipants] = useState([]);
-  const [videoMuted, setVideoMuted] = useState(false);
-  const [audioMuted, setAudioMuted] = useState(false);
+  const [videoMuted, setVideoMuted] = useState(true);
+  const [audioMuted, setAudioMuted] = useState(true);
   const [screenShared, setScreenShared] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -59,7 +60,6 @@ const MeetingRoom = (props) => {
     window.location.reload();
   };
 
-
   useEffect(() => {
     if (userVideo.current) {
       userVideo.current.srcObject = currentUserStream;
@@ -74,7 +74,7 @@ const MeetingRoom = (props) => {
 
   const joinPersonIn = () => {
     navigator.mediaDevices
-      .getUserMedia({video: true, audio: true})
+      .getUserMedia({ video: true, audio: true })
       .then((myStream) => {
         setLoading(false);
 
@@ -93,7 +93,7 @@ const MeetingRoom = (props) => {
           name: userDetails.name,
           avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
           email: userDetails.emailAddress,
-          isHost
+          isHost,
         });
 
         socketRef.current.on(MessageType.PERMIT, (payload) => {
@@ -115,7 +115,7 @@ const MeetingRoom = (props) => {
             peers.push({
               peer: peer,
               name: user.name,
-              avatar: user.avatar
+              avatar: user.avatar,
             });
           });
 
@@ -132,16 +132,19 @@ const MeetingRoom = (props) => {
           const user = {
             peer: peer,
             name: payload.name,
-            avatar: payload.avatar
+            avatar: payload.avatar,
           };
 
           setParticipants((users) => [...users, user]);
         });
 
-        socketRef.current.on(MessageType.RECEIVING_RETURNED_SIGNAL, (payload) => {
-          const item = peersRef.current.find((p) => p.peerID === payload.id);
-          item.peer.signal(payload.signal);
-        });
+        socketRef.current.on(
+          MessageType.RECEIVING_RETURNED_SIGNAL,
+          (payload) => {
+            const item = peersRef.current.find((p) => p.peerID === payload.id);
+            item.peer.signal(payload.signal);
+          }
+        );
       });
   };
 
@@ -153,7 +156,7 @@ const MeetingRoom = (props) => {
     setLoading(true);
 
     if (!isHost) {
-      setPopUp("Waiting");
+      setPopUp('Waiting');
 
       console.log('userDetails: ', userDetails);
 
@@ -176,7 +179,7 @@ const MeetingRoom = (props) => {
       socketRef.current.on(MessageType.DENIED, () => {
         setTimeout(() => {
           // errorAudio.play();
-          setPopUp("denied to join");
+          setPopUp('denied to join');
         }, 1000);
       });
     } else {
@@ -226,7 +229,7 @@ const MeetingRoom = (props) => {
         callerID,
         signal,
         name: userDetails.name,
-        avatar: require('../../../desktop/dashboard/images/noimage-person.png')
+        avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
       });
     });
 
@@ -241,7 +244,10 @@ const MeetingRoom = (props) => {
     });
 
     peer.on('signal', (signal) => {
-      socketRef.current.emit(MessageType.RETURNING_SIGNAL, {signal, callerID});
+      socketRef.current.emit(MessageType.RETURNING_SIGNAL, {
+        signal,
+        callerID,
+      });
     });
 
     peer.signal(incomingSignal);
@@ -250,7 +256,7 @@ const MeetingRoom = (props) => {
   }
 
   const shareScreen = () => {
-    navigator.mediaDevices.getDisplayMedia({cursor: true}).then((stream) => {
+    navigator.mediaDevices.getDisplayMedia({ cursor: true }).then((stream) => {
       setScreenShared(true);
 
       // store the video track i.e. our web cam stream into tmpTrack
@@ -300,86 +306,204 @@ const MeetingRoom = (props) => {
 
   return (
     <div className={'grid-container'}>
-      {popUp[0] === "1" && (
+      {popUp[0] === '1' && (
         <AlertDialog
           title="Join request!"
           message={`${popUp.substr(2)} is requesting to join the call.`}
           showLeft={true}
           showRight={true}
           auto={false}
-          btnTextLeft={"Deny Entry"}
-          btnTextRight={"Admit"}
+          btnTextLeft={'Deny Entry'}
+          btnTextRight={'Admit'}
           // onClose equivalent to deny
           onClose={() => {
             socketRef.current.emit(MessageType.PERMIT_STATUS, {
               allowed: false,
               id: joiningSocket.current,
             });
-            setPopUp("");
+            setPopUp('');
           }}
           onLeft={() => {
             socketRef.current.emit(MessageType.PERMIT_STATUS, {
               allowed: false,
               id: joiningSocket.current,
             });
-            setPopUp("");
+            setPopUp('');
           }}
           onRight={() => {
             socketRef.current.emit(MessageType.PERMIT_STATUS, {
               allowed: true,
               id: joiningSocket.current,
             });
-            setPopUp("");
+            setPopUp('');
           }}
         />
       )}
 
-      <div style={{height: '100%', width: '100%'}}>
-        {
-          loading && popUp === "Waiting" ?
-            <div className={'centered-flex-box'}
-                 style={{height: 'calc(100% - 180px)', width: '100%', fontSize: '32px'}}>
-              <div style={{display: 'inline-block', textAlign: 'center', margin: 'auto'}}>
-                <div>
-                  Waiting for the meeting host to let you in
-                </div>
-                <div className={'centered-flex-box'}>
-                  <CircularProgress color="secondary"/>
-                </div>
+      <div style={{ height: '100%', width: '100%' }}>
+        {loading && popUp === 'Waiting' ? (
+          <div
+            className={'centered-flex-box'}
+            style={{
+              height: 'calc(100% - 180px)',
+              width: '100%',
+              fontSize: '32px',
+            }}
+          >
+            <div
+              style={{
+                display: 'inline-block',
+                textAlign: 'center',
+                margin: 'auto',
+              }}
+            >
+              <div>Waiting for the meeting host to let you in</div>
+              <div className={'centered-flex-box'}>
+                <CircularProgress color="secondary" />
               </div>
             </div>
-            :
-            <>
-              <div className={'centered-flex-box'}
-                   style={{
-                     height: 'calc(100% - 180px)',
-                     maxHeight: 'calc(100% - 180px)',
-                     width: '100%',
-                     overflow: 'hidden'
-                   }}>
-                {
-                  participantsDemo.length > 0 && <MeetingParticipantGrid participants={participantsDemo}/>
-                }
-              </div>
-            </>
-        }
-        <footer className="call-overlay-footer" style={{height: '180px'}}>
+          </div>
+        ) : (
+          <>
+            <div
+              className={'centered-flex-box'}
+              style={{
+                height: 'calc(100% - 180px)',
+                maxHeight: 'calc(100% - 180px)',
+                width: '100%',
+                overflow: 'hidden',
+              }}
+            >
+              {participantsDemo.length > 0 && (
+                <MeetingParticipantGrid participants={participantsDemo} />
+              )}
+            </div>
+          </>
+        )}
+        <footer className="call-overlay-footer" style={{ height: '180px' }}>
           <div className={'row'}>
             <div className={'col'}>
+              <h3
+                style={{
+                  position: 'absolute',
+                  fontSize: 'auto',
+                }}
+              >
+                {new Date().toLocaleString('en-US', {
+                  hour12: true,
+                  hour: 'numeric',
+                  minute: 'numeric',
+                })}
+              </h3>
             </div>
-            <div className={'col'} style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: '80%'}}>
+            <div
+              className={'col'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                width: '80%',
+              }}
+            >
               <div className={'footer-toolbar'}>
+                <div className={'row'} style={{ padding: '5px' }}>
+                  {!screenShared && (
+                    <IconButton
+                      onClick={() => {
+                        // if video stream exists
+                        if (userStream.current) {
+                          muteVideo();
+                        }
+                      }}
+                      style={{
+                        backgroundColor: videoMuted ? "#eb3f21" : "#404239",
+                      }}
+                    >
+                      { videoMuted ? (
+                        <Icon id={'VIDEOCAM_OFF'} />
+                      ) : (
+                        <Icon id={'VIDEOCAM'} />
+                      )}
+                    </IconButton>
+                  )}
+
+                  <IconButton
+                    onClick={() => {
+                      // if audio stream exists
+                      if (userStream.current) {
+                        muteAudio();
+                      }
+                    }}
+                    style={{
+                      backgroundColor: audioMuted ? "#eb3f21" : "#404239",
+                    }}
+                  >
+                    {audioMuted ? (
+                      <Icon id={'MIC_OFF'} />
+                    ) : (
+                      <Icon id={'MIC'} />
+                    )}
+                  </IconButton>
+
+                  <IconButton
+                    onClick={() => {
+                      // wait for stream to load first
+                      if (userStream.current) {
+                        if (screenShared) stopShareScreen();
+                        else shareScreen();
+                      }
+                    }}
+                    style={{
+                      backgroundColor: screenShared ? '#8eb2f5' : '#404239',
+                    }}
+                  >
+                    {screenShared ? (
+                      <Icon id={'CANCEL_PRESENTATION'} />
+                    ) : (
+                      <Icon id={'PRESENT_TO_ALL'} />
+                    )}
+                  </IconButton>
+
+                  <IconButton
+                    style={{
+                      backgroundColor: '#404239',
+                    }}
+                  >
+                    <Icon id={'CHAT_BUBBLE'} />
+                  </IconButton>
+
+                  <IconButton
+                    onClick={endCall}
+                    style={{
+                      backgroundColor: '#eb3f21',
+                    }}
+                  >
+                    <Icon id={'CALL_END'} />
+                  </IconButton>
+
+                  <IconButton
+                    style={{
+                      backgroundColor: '#404239',
+                    }}
+                  >
+                    <Icon id={'PEOPLE'} />
+                  </IconButton>
+                </div>
               </div>
             </div>
-            <div className={'col'} style={{display: 'flex', justifyContent: 'flex-end'}}>
+            <div
+              className={'col'}
+              style={{ display: 'flex', justifyContent: 'flex-end' }}
+            >
               <section className="call-overlay-footer-yourself">
-                <MeetingParticipant data={{
-                  peer: null,
-                  name: 'Amukelani Shandli',
-                  avatar: require('../../../desktop/dashboard/images/noimage-person.png')
-                }}
-                                    displayName={false}
-                                    ref={userVideo}
+                <MeetingParticipant
+                  data={{
+                    peer: null,
+                    name: 'Amukelani Shandli',
+                    avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+                  }}
+                  displayName={false}
+                  ref={userVideo}
                 />
               </section>
             </div>

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useRef} from "react";
+import React, { Fragment, useEffect, useRef } from 'react';
 import './MeetingParticipantGrid.css';
 import MeetingParticipant from "./MeetingParticipant";
 
@@ -62,11 +62,11 @@ const MeetingParticipantGrid = (props) => {
     grid !== null ?
       <div className={'row grid'} style={{height: 'calc(100% - 16px)'}}>
         {grid.map((col, index) => {
-          return <>
+          return <Fragment key={index}>
             {
               renderColumn(col, index)
             }
-          </>
+          </Fragment>
         })}
       </div>
       :
