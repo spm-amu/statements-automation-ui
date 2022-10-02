@@ -5,11 +5,10 @@ import Calendar from '../view/Calendar';
 import Chats from '../view/Chats';
 import Files from '../view/Files';
 import MeetingHistory from '../view/MeetingHistory';
-import Meeting from "../view/Meeting";
-import {useLocation} from 'react-router-dom';
-import JoinMeetingSettings from "../view/JoinMeetingSettings";
-import MeetingRoom from "../view/MeetingRoom";
-import MeetingRoomSession from '../view/MeetingRoomSession';
+import Meeting from '../view/Meeting';
+import { useLocation } from 'react-router-dom';
+import JoinMeetingSettings from '../view/JoinMeetingSettings';
+import MeetingRoom from '../view/MeetingRoom';
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -20,7 +19,7 @@ const ViewContainer = (props) => {
 
     switch (viewId) {
       case 'calendar':
-        return <Calendar/>;
+        return <Calendar />;
       case 'chats':
         return <Chats />;
       case 'meetingHistory':
@@ -28,13 +27,18 @@ const ViewContainer = (props) => {
       case 'files':
         return <Files />;
       case 'meeting':
-        return <Meeting selectedEvent={location.state}/>;
+        return <Meeting selectedEvent={location.state} />;
       case 'joinMeetingSettings':
-        return <JoinMeetingSettings selectedMeeting={location.state}/>;
-      //case 'meetingRoom':
-      //  return <MeetingRoomSession selectedMeeting={location.state.selectedMeeting} settings={location.state.settings} isHost={location.state.isHost} />;
+        return <JoinMeetingSettings selectedMeeting={location.state} />;
       case 'meetingRoom':
-        return <MeetingRoom selectedMeeting={location.state.selectedMeeting} settings={location.state.settings} isHost={location.state.isHost}/>;
+        return (
+          <MeetingRoom
+            selectedMeeting={location.state.selectedMeeting}
+            videoMuted={location.state.videoMuted}
+            audioMuted={location.state.audioMuted}
+            isHost={location.state.isHost}
+          />
+        );
     }
 
     return null;

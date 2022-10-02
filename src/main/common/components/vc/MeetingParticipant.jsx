@@ -1,16 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {forwardRef, useEffect, useRef} from "react";
 import './MeetingParticipant.css'
+import Utils from '../../Utils';
 
 const MeetingParticipant = forwardRef((props, ref) => {
   const videoRef = ref ? ref : useRef();
   const showVideo = true;
 
   useEffect(() => {
-    if (!ref) {
-      //props.data.peer.on("stream", (stream) => {
-      //  videoRef.current.srcObject = stream;
-      //});
+    if (props.data.peer) {
+      props.data.peer.on("stream", (stream) => {
+       videoRef.current.srcObject = stream;
+      });
     }
   }, []);
 
@@ -21,8 +22,18 @@ const MeetingParticipant = forwardRef((props, ref) => {
         {
           showVideo ?
             <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
-              <video muted playsInline autoPlay ref={videoRef}
-                     style={{width: '100%', height: '100%'}}/>
+              {
+                props.videoMuted &&
+                  <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
+                    <div className={'avatar'} data-label={Utils.getInitials(props.data.name)} />
+                  </div>
+              }
+
+              <video
+                hidden={props.videoMuted}
+                muted playsInline autoPlay ref={videoRef}
+                style={{width: '100%', height: '100%'}}
+              />
               <div className={'name-label'}> {props.showName ? props.data.name : 'You'}</div>
             </div>
             :

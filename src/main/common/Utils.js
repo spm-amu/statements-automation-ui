@@ -19,6 +19,17 @@
     return true;
   }
 
+  static getInitials (name) {
+    const parts = name.split(' ');
+    let initials = '';
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i].length > 0 && parts[i] !== '') {
+        initials += parts[i][0]
+      }
+    }
+    return initials
+  }
+
   static capitalize = (s) => {
     if (typeof s !== 'string') return '';
     return s.charAt(0).toUpperCase() + s.slice(1);

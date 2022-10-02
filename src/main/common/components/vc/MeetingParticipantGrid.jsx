@@ -63,7 +63,7 @@ const MeetingParticipantGrid = (props) => {
       <div className={'col item'} key={index}>
         {col.map((participant, index) => {
           return <div style={{height: ((100 / col.length)) + '%'}} key={index}>
-            <MeetingParticipant data={participant} showName={true}/>
+            <MeetingParticipant data={participant} showName={true} videoMuted={props.videoMuted} />
           </div>
         })}
       </div>
@@ -89,7 +89,7 @@ const MeetingParticipantGrid = (props) => {
           <div className={'no-side-margin no-side-padding grid-side-bar'} style={{backgroundColor: 'transparent'}}>
             {sideGrid.map((participant, index) => {
               return <div key={index} className={'side-grid-item'}>
-                <MeetingParticipant data={participant} showName={true} padding={'0'}/>
+                <MeetingParticipant data={participant} videoMuted={props.videoMuted} showName={true} padding={'0'}/>
               </div>
             })}
           </div>

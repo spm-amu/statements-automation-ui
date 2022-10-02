@@ -53,6 +53,7 @@ const Dashboard = () => {
 };
 
 export default function App() {
+
   return (
     <MuiThemeProvider muiTheme={ThemeDefault}>
       <ThemeProvider theme={armscorTheme}>

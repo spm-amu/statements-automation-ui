@@ -30,7 +30,7 @@ import React, {Component} from "react";
 import {
   CallEnd,
   CancelPresentation,
-  ChatBubble,
+  ChatBubble, Done,
   People,
   PresentToAll,
   Videocam,
@@ -48,8 +48,10 @@ class Icon extends Component {
       return <AddIcon/>
     } else if (this.props.id === 'EDIT') {
       return <EditIcon/>
-    }else if (this.props.id === 'CLOSE') {
+    } else if (this.props.id === 'CLOSE') {
       return <Close/>
+    } else if (this.props.id === 'DONE') {
+      return <Done/>
     } else if (this.props.id === 'REMOVE') {
       return <RemoveIcon/>
     } else if (this.props.id === 'SAVE') {

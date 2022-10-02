@@ -4,10 +4,19 @@ import Button from '@material-ui/core/Button';
 import {Switch} from '@material-ui/core';
 import Icon from '../Icon';
 import {useNavigate} from 'react-router-dom';
+import Utils from '../../Utils';
 
 const MeetingSettingsComponent = (props) => {
-  const localVideoRef = useRef();
-  const localStreamRef = useRef();
+  const userStream = useRef();
+  const userVideo = useRef();
+  const audioTrack = useRef();
+  const videoTrack = useRef();
+
+  const [videoMuted, setVideoMuted] = useState(false);
+  const [audioMuted, setAudioMuted] = useState(false);
+  const [currentUserStream, setCurrentUserStream] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState('');
+
   const [lobbySettings] = useState({
     enableAudio: false,
     enableVideo: false
@@ -17,35 +26,89 @@ const MeetingSettingsComponent = (props) => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-  }, []);
-
-  const getLocalStream = useCallback(async () => {
-    try {
-      const localStream = await navigator.mediaDevices.getUserMedia({
+  const localVideoStream = () => {
+    navigator.mediaDevices
+      .getUserMedia({
         audio: true,
         video: {
           width: 240,
           height: 240,
         },
-      });
+      })
+      .then((myStream) => {
+        userStream.current = myStream;
+        videoTrack.current = userStream.current.getTracks()[1];
+        audioTrack.current = userStream.current.getTracks()[0];
 
-      localStreamRef.current = localStream;
-      if (localVideoRef.current) localVideoRef.current.srcObject = localStream;
-    } catch (e) {
-      console.log(`getUserMedia error: ${e}`);
-    }
-  }, []);
+        setCurrentUserStream(myStream);
+        userVideo.current.srcObject = myStream;
+      });
+  }
 
   useEffect(() => {
-    getLocalStream();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (userVideo.current) {
+      userVideo.current.srcObject = currentUserStream;
+    }
+  }, [currentUserStream]);
+
+  useEffect(() => {
+    if (userVideo.current) {
+      userVideo.current.srcObject = currentUserStream;
+    }
+  }, [userVideo.current]);
+
+  useEffect(() => {
+    localVideoStream();
+
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
+    setLoggedInUser(userDetails.name)
   }, []);
+
+  const muteVideo = () => {
+    if (userVideo.current.srcObject) {
+      videoTrack.current.enabled = !videoTrack.current.enabled;
+    }
+    setVideoMuted((prevStatus) => !prevStatus);
+  };
+
+  const muteAudio = () => {
+    if (userVideo.current.srcObject) {
+      audioTrack.current.enabled = !audioTrack.current.enabled;
+    }
+    setAudioMuted((prevStatus) => !prevStatus);
+  };
+
+  const close = () => {
+
+    // stop all tracks - audio and video
+    if (userStream.current) {
+      userStream.current
+        .getTracks()
+        .forEach((track) => {
+          track.enabled = false;
+          track.stop()
+        });
+    }
+
+    if (videoTrack.current) {
+      videoTrack.enabled = false;
+      videoTrack.current.stop();
+    }
+
+    if (audioTrack.current) {
+      audioTrack.current.enabled = false;
+      audioTrack.current.stop();
+    }
+
+    navigate("/view/calendar");
+  };
 
   return (
     <div className={'meeting-container'}>
       <div className="toolbar row">
         <Button
+          onClick={close}
           variant={'text'}
           size="large"
           style={{color: '#985F31', border: '1px solid #985F31'}}
@@ -53,7 +116,7 @@ const MeetingSettingsComponent = (props) => {
           CLOSE
         </Button>
       </div>
-      <div className={'content row'}>
+      <div className={'row centered-flex-box'}>
         <table>
           <tbody>
           <tr>
@@ -72,62 +135,52 @@ const MeetingSettingsComponent = (props) => {
                 style={{
                   width: '100%',
                   height: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
                 }}
               >
+                {
+                  videoMuted &&
+                    <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
+                      <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)} />
+                    </div>
+                }
                 <video
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'transparent',
-                    display: 'none'
-                  }}
-                  muted={true}
-                  ref={localVideoRef}
-                  autoPlay={true}
-                  id={'lobby-video'}
+                  hidden={videoMuted}
+                  muted playsInline autoPlay ref={userVideo}
+                  style={{width: '100%', height: '100%'}}
                 />
               </div>
             </td>
           </tr>
           <tr>
             <td style={{paddingTop: '8px', textAlign: 'right'}}>
-              {!lobbySettings.enableVideo ? (
+              {videoMuted ? (
                 <Icon id={'CAMERA_OFF'}/>
               ) : (
                 <Icon id={'CAMERA'}/>
               )}
               <Switch
                 onChange={(e, value) => {
-                  lobbySettings.enableVideo = value;
-                  let video = document.getElementById('lobby-video');
-                  if (video) {
-                    if (!lobbySettings.enableVideo) {
-                      video.pause();
-                      video.style.display = 'none';
-                    } else {
-                      video.style.display = 'inherit';
-                      video.play();
-                    }
+                  if (userStream.current) {
+                    muteVideo();
                   }
                 }}
-                value={lobbySettings.enableVideo}
+                value={!videoMuted}
                 color="primary"
               />
             </td>
             <td style={{paddingTop: '8px', textAlign: 'left'}}>
-              {!lobbySettings.enableAudio ? (
+              {audioMuted ? (
                 <Icon id={'MIC_OFF'}/>
               ) : (
                 <Icon id={'MIC'}/>
               )}
               <Switch
                 onChange={(e, value) => {
-                  lobbySettings.enableAudio = value;
+                  if (userStream.current) {
+                    muteAudio();
+                  }
                 }}
-                value={lobbySettings.enableAudio}
+                value={!audioMuted}
                 color="primary"
               />
             </td>
@@ -145,10 +198,13 @@ const MeetingSettingsComponent = (props) => {
                     }
                   });
 
+                  close();
+
                   navigate("/view/meetingRoom", {
                     state: {
                       selectedMeeting: selectedMeeting,
-                      settings: lobbySettings,
+                      videoMuted: videoMuted,
+                      audioMuted: audioMuted,
                       isHost
                     }
                   })

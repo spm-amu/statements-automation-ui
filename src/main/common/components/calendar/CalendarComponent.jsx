@@ -99,6 +99,12 @@ const CalendarComponent = (props) => {
     height: '100%',
     stickyHeaderDates: true,
 
+    eventTimeFormat: { // like '14:30:00'
+      hour: '2-digit',
+      minute: '2-digit',
+      meridiem: false
+    },
+
     /*
       Enable resizing event from start
       ? Docs: https://fullcalendar.io/docs/eventResizableFromStart

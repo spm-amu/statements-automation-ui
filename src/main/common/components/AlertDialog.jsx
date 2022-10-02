@@ -7,6 +7,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
+import LottieIcon from './LottieIcon';
+import Icon from './Icon';
+import IconButton from '@material-ui/core/IconButton';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
 	return <Slide direction="down" ref={ref} {...props} />;
@@ -51,37 +54,76 @@ export default function AlertDialog(props) {
 	};
 
 	return (
-		<Dialog
-			open={open}
-			onClose={handleClose}
-			TransitionComponent={Transition}
-			keepMounted
-			aria-labelledby="alert-dialog-title"
-			aria-describedby="alert-dialog-description"
-		>
-			<DialogTitle id="alert-dialog-title">{props.title}</DialogTitle>
-			<DialogContent>
-				<DialogContentText id="alert-dialog-description">
-					{props.message}
-				</DialogContentText>
-			</DialogContent>
-			<DialogActions>
-				{props.showLeft && (
-					<Button onClick={handleLeftButton} color="primary">
-						{props.btnTextLeft}
-					</Button>
-				)}
-				{props.showRight && (
-					<Button
-						onClick={handleRightButton}
-						color="primary"
-						autoFocus
-						style={{ display: props.showRight ? "block" : "none" }}
-					>
-						{props.btnTextRight}
-					</Button>
-				)}
-			</DialogActions>
-		</Dialog>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      TransitionComponent={Transition}
+      keepMounted
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      fullWidth
+    >
+      <DialogTitle id="alert-dialog-title" style={{ borderBottom: '1px solid #404239' }}>
+        {props.title}
+      </DialogTitle>
+      <DialogContent className={'row alert-dialog-container'}>
+        <LottieIcon id={'loading'} />
+        <DialogContentText id="alert-dialog-description" >
+          {props.message}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        {props.showLeft && (
+          <Button onClick={handleLeftButton} color="primary">
+            {props.btnTextLeft}
+          </Button>
+        )}
+        {props.showRight && (
+          <Button
+            onClick={handleRightButton}
+            color="primary"
+            autoFocus
+            style={{ display: props.showRight ? "block" : "none" }}
+          >
+            {props.btnTextRight}
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
+
+
+
+		// <Dialog
+		// 	open={open}
+		// 	onClose={handleClose}
+		// 	TransitionComponent={Transition}
+		// 	keepMounted
+		// 	aria-labelledby="alert-dialog-title"
+		// 	aria-describedby="alert-dialog-description"
+		// >
+		// 	<DialogTitle id="alert-dialog-title">{props.title}</DialogTitle>
+		// 	<DialogContent>
+		// 		<DialogContentText id="alert-dialog-description">
+		// 			{props.message}
+		// 		</DialogContentText>
+		// 	</DialogContent>
+		// 	<DialogActions>
+		// 		{props.showLeft && (
+		// 			<Button onClick={handleLeftButton} color="primary">
+		// 				{props.btnTextLeft}
+		// 			</Button>
+		// 		)}
+		// 		{props.showRight && (
+		// 			<Button
+		// 				onClick={handleRightButton}
+		// 				color="primary"
+		// 				autoFocus
+		// 				style={{ display: props.showRight ? "block" : "none" }}
+		// 			>
+		// 				{props.btnTextRight}
+		// 			</Button>
+		// 		)}
+		// 	</DialogActions>
+		// </Dialog>
 	);
 }

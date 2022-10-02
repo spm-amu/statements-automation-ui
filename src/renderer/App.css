@@ -76,3 +76,10 @@ a:hover {
   margin-left: unset !important;
   margin-right: unset !important;
 }
+
+.alert-dialog-container {
+  justify-content: flex-start;
+  display: flex;
+  align-items: center;
+  overflow-y: hidden !important;
+}
