@@ -153,7 +153,6 @@ const Meeting = (props) => {
       console.log(JSON.stringify(data));
       console.log("\n\n\nVAL: ", data);
       post(`${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`, (response) => {
-        props.refreshHandler();
         handleClose();
       }, (e) => {
 
@@ -171,7 +170,6 @@ const Meeting = (props) => {
 
   const handleDelete = (e) => {
     get(`${host}/api/v1/meeting/cancel/${value.id}`, (response) => {
-      props.refreshHandler();
       handleClose();
     }, (e) => {
     })
