@@ -33,9 +33,9 @@ const Meeting = (props) => {
   const [readOnly, setReadOnly] = useState(true);
   const {selectedEvent: selectedMeeting} = props;
   const [value] = useState(!Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id) ? props.selectedEvent : {
-    startDate: now,
+    startDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.startDate) ? props.selectedEvent.startDate : now,
     startTime: now,
-    endDate: now,
+    endDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.endDate) ? props.selectedEvent.endDate : now,
     endTime: now,
     attendees: [],
     documents: [],

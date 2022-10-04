@@ -174,10 +174,12 @@ const CalendarComponent = (props) => {
     },
 
     dateClick(info) {
-      const ev = eventTemplate;
-      ev.start = info.date;
-      ev.end = info.date;
-      setSelectedEvent(ev);
+
+      const selectedEvent = eventTemplate;
+      selectedEvent.startDate = new Date(info.dateStr);
+      selectedEvent.endDate = new Date(info.dateStr);
+      setSelectedEvent(selectedEvent);
+
       navigate("/view/meeting", { state: selectedEvent })
 
       // TODO : Navigate
