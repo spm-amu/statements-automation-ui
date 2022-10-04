@@ -17,11 +17,6 @@ const MeetingSettingsComponent = (props) => {
   const [currentUserStream, setCurrentUserStream] = useState(null);
   const [loggedInUser, setLoggedInUser] = useState('');
 
-  const [lobbySettings] = useState({
-    enableAudio: false,
-    enableVideo: false
-  });
-
   const {selectedMeeting} = props;
 
   const navigate = useNavigate();
@@ -164,7 +159,8 @@ const MeetingSettingsComponent = (props) => {
                     muteVideo();
                   }
                 }}
-                value={!videoMuted}
+                value={videoMuted}
+                defaultChecked={!videoMuted}
                 color="primary"
               />
             </td>
@@ -180,7 +176,8 @@ const MeetingSettingsComponent = (props) => {
                     muteAudio();
                   }
                 }}
-                value={!audioMuted}
+                value={audioMuted}
+                defaultChecked={!audioMuted}
                 color="primary"
               />
             </td>

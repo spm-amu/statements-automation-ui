@@ -321,11 +321,13 @@ const MeetingRoom = (props) => {
   };
 
   const muteVideo = () => {
+    console.log('&&&&&&&&')
     if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
       if (!screenShared) {
         videoTrack.current.enabled = !videoTrack.current.enabled;
       }
     }
+    console.log('##############')
     setVideoMuted((prevStatus) => !prevStatus);
   };
 
