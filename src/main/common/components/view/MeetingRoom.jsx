@@ -238,7 +238,7 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
-    socketRef.current = io.connect('http://localhost:8000');
+    socketRef.current = io.connect('http://svn.agilemotion.co.za');
 
     setLoading(true);
 
