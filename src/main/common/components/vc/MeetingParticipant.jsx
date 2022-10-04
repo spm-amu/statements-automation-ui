@@ -33,13 +33,13 @@ const MeetingParticipant = forwardRef((props, ref) => {
                 props.audioMuted ?
                   <video
                     hidden={props.videoMuted}
-                    muted playsinline autoPlay ref={videoRef}
+                    muted playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
                   />
                   :
                   <video
                     hidden={props.videoMuted}
-                    playsinline autoPlay ref={videoRef}
+                    playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
                   />
               }

@@ -13,6 +13,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ClosablePanel from '../layout/ClosablePanel'
 import Lobby from '../Lobby';
 import {useNavigate} from 'react-router-dom';
+import Utils from '../../Utils';
 
 const MeetingRoom = (props) => {
   const navigate = useNavigate();
@@ -224,11 +225,9 @@ const MeetingRoom = (props) => {
           //   // peerObj.peer.destroy(); // remove all the connections and event handlers associated with this peer
           // }
 
-          alert(participants.size);
            // removing this userId from peers
           peersRef.current = peersRef.current.filter((p) => p.peerID !== userId); // update peersRef
           const newParticipants =  participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
-          alert(newParticipants.size);
 
           setParticipants(newParticipants);
 
@@ -244,7 +243,7 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
-    socketRef.current = io.connect('http://svn.agilemotion.co.za');
+    socketRef.current = io.connect('http://localhost:8000');
 
     setLoading(true);
 
