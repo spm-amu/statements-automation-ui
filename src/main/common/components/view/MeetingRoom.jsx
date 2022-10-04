@@ -477,7 +477,7 @@ const MeetingRoom = (props) => {
               }}
             >
               { participants.length > 0 ? (
-                  <MeetingParticipantGrid participants={participants} videoMuted={videoMuted} />
+                  <MeetingParticipantGrid participants={participants} videoMuted={videoMuted} audioMuted={audioMuted} />
               ) :
                 <Lobby message={'Waiting for others to join'} />
               }
@@ -617,7 +617,7 @@ const MeetingRoom = (props) => {
                 <MeetingParticipant
                   data={{
                     peer: null,
-                    name: 'Joe Doe',
+                    name: JSON.parse(sessionStorage.getItem('userDetails')).name,
                     avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
                   }}
                   videoMuted={videoMuted}
