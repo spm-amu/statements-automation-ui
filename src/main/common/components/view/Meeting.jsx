@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {X} from 'react-feather';
 import {components} from 'react-select'
 import {Form} from 'reactstrap';
@@ -10,18 +10,14 @@ import AutoComplete from '../customInput/AutoComplete';
 import Files from '../customInput/Files';
 import Utils from '../../Utils';
 import Avatar from '../avatar';
-import {host, post, get} from "../../service/RestService";
+import {get, host, post} from "../../service/RestService";
 
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
-
-import {host} from "../../service/RestService";
 import FormControl from "@material-ui/core/FormControl";
-import FormLabel from "@material-ui/core/FormLabel";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
-import React from "react";
 import {useNavigate} from 'react-router-dom';
 
 const Meeting = (props) => {
@@ -32,18 +28,45 @@ const Meeting = (props) => {
   const [attendees, setAttendees] = useState([]);
   const [readOnly, setReadOnly] = useState(true);
   const {selectedEvent: selectedMeeting} = props;
-  const [value] = useState(!Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id) ? props.selectedEvent : {
-    startDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.startDate) ? props.selectedEvent.startDate : now,
-    startTime: now,
-    endDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.endDate) ? props.selectedEvent.endDate : now,
-    endTime: now,
-    attendees: [],
-    documents: [],
-    privacyType: 'PRIVATE'
-  });
+  const [value, setValue] = useState(null);
   const [errors, setErrors] = useState({});
   const [edited, setEdited] = useState(false);
   const navigate = useNavigate();
+
+  const getInitialValue = (propsValue) => {
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let host = null;
+    for (const attendee of props.selectedEvent.attendees) {
+      if (attendee.type === 'HOST') {
+        if (userDetails.userId === attendee.userId) {
+          host = attendee;
+          break
+        }
+      }
+    }
+
+    return !Utils.isNull(host) ? {...props.selectedEvent, ["attendees"] :
+        props.selectedEvent.attendees.filter((item) => item.userId !== host.userId)}
+    : props.selectedEvent;
+  };
+
+
+  React.useEffect(() => {
+    if(!Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id)) {
+      setValue(getInitialValue(props.selectedEvent));
+    } else {
+      setValue({
+        startDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.startDate) ? props.selectedEvent.startDate : now,
+        startTime: now,
+        endDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.endDate) ? props.selectedEvent.endDate : now,
+        endTime: now,
+        attendees: [],
+        locations: [],
+        documents: [],
+        privacyType: 'PRIVATE'
+      })
+    }
+  }, []);
 
   React.useEffect(() => {
     let isUpdate = !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.id) && !Utils.isStringEmpty(props.selectedEvent.id);
@@ -100,10 +123,7 @@ const Meeting = (props) => {
 
   const createMeetingObject = (hostAttendee) => {
     let newAttendees = [].concat(value.attendees);
-
-    if (!hostAttendee.id) {
-      newAttendees.push(hostAttendee);
-    }
+    newAttendees.push(hostAttendee);
 
     return {
       id: value.id,
@@ -150,8 +170,6 @@ const Meeting = (props) => {
       }
 
       let data = createMeetingObject(_hostAttendee);
-      console.log(JSON.stringify(data));
-      console.log("\n\n\nVAL: ", data);
       post(`${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`, (response) => {
         handleClose();
       }, (e) => {
@@ -176,7 +194,7 @@ const Meeting = (props) => {
   };
 
   const handleJoin = (e) => {
-    navigate("/view/joinMeetingSettings", { state: selectedMeeting })
+    navigate("/view/joinMeetingSettings", {state: selectedMeeting})
   };
 
 
@@ -318,6 +336,7 @@ const Meeting = (props) => {
 
 
   return (
+    value &&
     <div style={{width: '100%', height: '88vh', padding: '32px', backgroundColor: '#FFFFFF', marginTop: '2px'}}>
       <h5 className="modal-title">
         {selectedMeeting && selectedMeeting.title && selectedMeeting.title.length
@@ -434,6 +453,7 @@ const Meeting = (props) => {
               multiple={true}
               showImages={true}
               searchAttribute={'emailAddress'}
+              validationRegex={/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/}
               valueChangeHandler={(value, id) => {
                 for (const valueElement of value) {
                   if (!valueElement.type) {
@@ -450,11 +470,12 @@ const Meeting = (props) => {
           </div>
           <div style={{marginTop: '12px'}}>
             <AutoComplete
-              id="location"
-              label={'Location'}
+              id="locations"
+              label={'Locations'}
               disabled={readOnly}
-              value={value.location}
-              multiple={false}
+              value={value.locations}
+              multiple={true}
+              validationRegex={/^[a-zA-Z0-9 ]*$/}
               searchAttribute={'name'}
               valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}
               optionsUrl={`${host}/api/v1/location/search`}

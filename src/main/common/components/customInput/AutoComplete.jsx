@@ -52,8 +52,8 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       </Box>);
   };
 
-  const validateEmail = (val) => {
-    return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(val);
+  const validateInput = (val) => {
+    return props.validationRegex.test(val);
   };
 
   const handleInputChange = (event, newInputValue) => {
@@ -68,10 +68,9 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       post(`${props.optionsUrl}`, (response) => {
           if (response.records.length > 0) {
             let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-            console.log("\n\n\nRECS : ", response.records);
             setOptions(response.records.filter(option => option.userId !== userDetails.userId))
           } else {
-            if(validateEmail(newInputValue)) {
+            if(validateInput(newInputValue)) {
               let emptyOptions = [];
               emptyOptions.push({
                 emailAddress: newInputValue,
@@ -102,10 +101,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
   return (
     <Autocomplete
       freeSolo
-      className={"input-" +
-      "" +
-      "" +
-      "wrapper"}
+      className={props.disabled ? "input-wrapper auto-complete-disabled" : "input-wrapper"}
       noOptionsText={props.invalidText}
       id={props.id}
       sx={{width: 300}}

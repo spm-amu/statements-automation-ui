@@ -1,20 +1,16 @@
 ﻿﻿import React from 'react';
 import 'date-fns';
-import Utils from '../../Utils';
 import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
 import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker,
 } from '@material-ui/pickers';
-import {withStyles} from "@material-ui/core/styles";
-import {useSelector} from "react-redux";
 
 const CustomTimePickerComponent = React.memo(React.forwardRef((props, ref) => {
 
   const handleDateChange = date => {
     if(props.valueChangeHandler) {
-      alert(date);
       props.valueChangeHandler(date, props.id);
     }
   };

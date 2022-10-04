@@ -39,10 +39,12 @@ const eventTemplate = {
       startTime: '',
       endTime: '',
     },
-    location: {
-      id: '',
-      name: '',
-    },
+    locations: [
+      {
+        id: '',
+        name: '',
+      },
+    ]
   },
 };
 
@@ -78,7 +80,7 @@ const CalendarComponent = (props) => {
 
   useEffect(() => {
     if (!Utils.isNull(selectedEvent) && !Utils.isNull(selectedEvent.id) && !Utils.isStringEmpty(selectedEvent.id)) {
-      navigate("/view/meeting", { state: selectedEvent })
+      navigate("/view/meeting", {state: selectedEvent})
     }
 
   }, [selectedEvent]);
@@ -175,14 +177,14 @@ const CalendarComponent = (props) => {
 
     dateClick(info) {
 
-      const selectedEvent = eventTemplate;
-      selectedEvent.startDate = new Date(info.dateStr);
-      selectedEvent.endDate = new Date(info.dateStr);
-      setSelectedEvent(selectedEvent);
+      const event = {
+        ...eventTemplate,
+        "startDate": new Date(info.dateStr),
+        "endDate": new Date(info.dateStr)
+      };
 
-      navigate("/view/meeting", { state: selectedEvent })
-
-      // TODO : Navigate
+      setSelectedEvent(event);
+      navigate("/view/meeting", {state: event});
     },
 
     /*
@@ -223,7 +225,7 @@ const CalendarComponent = (props) => {
     <>
       {
         <div className={'h-100'}>
-          <Card className={'h-100'}>
+          <Card className={'h-100'} style={{zIndex: 0}}>
             <CardBody className={'h-100'}>
               <FullCalendar {...calendarOptions} />{' '}
             </CardBody>

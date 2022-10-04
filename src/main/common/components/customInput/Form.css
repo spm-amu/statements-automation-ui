@@ -2,6 +2,10 @@
   width: 80%;
 }
 
+.auto-complete-disabled svg {
+  display: none !important;
+}
+
 .text-area-wrapper {
   width: 100%;
   min-height: 150px;
