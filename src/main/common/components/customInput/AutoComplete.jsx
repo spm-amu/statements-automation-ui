@@ -107,7 +107,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       sx={{width: 300}}
       options={options}
       autoHighlight
-      value={props.value}
+      value={props.value ? props.value : []}
       multiple={!Utils.isNull(props.multiple) ? props.multiple : false}
       getOptionLabel={(option) => option.label}
       open={open}

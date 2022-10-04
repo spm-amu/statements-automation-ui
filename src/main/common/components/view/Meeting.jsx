@@ -130,7 +130,7 @@ const Meeting = (props) => {
       title: value.title,
       attendees: newAttendees, //[hostAttendee].concat(attendees),
       documents: value.documents,
-      location: value.location,
+      locations: value.locations,
       description: value.description,
       privacyType: value.privacyType,
       schedule: {

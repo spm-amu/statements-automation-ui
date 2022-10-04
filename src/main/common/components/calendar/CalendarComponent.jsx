@@ -145,7 +145,7 @@ const CalendarComponent = (props) => {
       let value = {
         id: clickedEvent.id,
         title: clickedEvent.title,
-        location: clickedEvent.extendedProps.location,
+        locations: clickedEvent.extendedProps.locations,
         description: clickedEvent.extendedProps.description,
         attendees: clickedEvent.extendedProps.attendees,
         privacyType: clickedEvent.extendedProps.privacyType,
