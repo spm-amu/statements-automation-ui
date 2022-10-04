@@ -29,11 +29,20 @@ const MeetingParticipant = forwardRef((props, ref) => {
                   </div>
               }
 
-              <video
-                hidden={props.videoMuted}
-                muted playsInline autoPlay ref={videoRef}
-                style={{width: '100%', height: '100%'}}
-              />
+              {
+                props.audioMuted ?
+                  <video
+                    hidden={props.videoMuted}
+                    muted playsinline autoPlay ref={videoRef}
+                    style={{width: '100%', height: '100%'}}
+                  />
+                  :
+                  <video
+                    hidden={props.videoMuted}
+                    playsinline autoPlay ref={videoRef}
+                    style={{width: '100%', height: '100%'}}
+                  />
+              }
               <div className={'name-label'}> {props.showName ? props.data.name : 'You'}</div>
             </div>
             :

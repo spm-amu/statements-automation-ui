@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import io from 'socket.io-client';
-import { MessageType } from '../../types';
+import {MessageType} from '../../types';
 
 import './Calendar.css';
 import './MeetingRoom.css';
 import AlertDialog from '../AlertDialog';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Peer from 'simple-peer';
 import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
 import MeetingParticipant from '../vc/MeetingParticipant';
@@ -117,6 +116,12 @@ const MeetingRoom = (props) => {
   };
 
   useEffect(() => {
+    return () => {
+      endCall();
+    };
+  }, []);
+
+  useEffect(() => {
     if (userVideo.current) {
       userVideo.current.srcObject = currentUserStream;
     }
@@ -166,6 +171,7 @@ const MeetingRoom = (props) => {
 
         socketRef.current.on(MessageType.ALL_USERS, (users) => {
           const peers = [];
+          console.log("\n\n\nUSERS : ", users);
           users.forEach((user) => {
             const peer = createPeer(user.id, socketRef.current.id, myStream);
             peersRef.current.push({
@@ -218,11 +224,11 @@ const MeetingRoom = (props) => {
           //   // peerObj.peer.destroy(); // remove all the connections and event handlers associated with this peer
           // }
 
-          const peers = peersRef.current.filter((p) => p.peerID !== userId); // removing this userId from peers
-
-          peersRef.current = peers; // update peersRef
-
-          const newParticipants =  participants.filter((p) => p.peerID !== userId);
+          alert(participants.size);
+           // removing this userId from peers
+          peersRef.current = peersRef.current.filter((p) => p.peerID !== userId); // update peersRef
+          const newParticipants =  participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
+          alert(newParticipants.size);
 
           setParticipants(newParticipants);
 
@@ -316,7 +322,7 @@ const MeetingRoom = (props) => {
   };
 
   const muteVideo = () => {
-    if (userVideo.current.srcObject) {
+    if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
       if (!screenShared) {
         videoTrack.current.enabled = !videoTrack.current.enabled;
       }
@@ -325,7 +331,7 @@ const MeetingRoom = (props) => {
   };
 
   const muteAudio = () => {
-    if (userVideo.current.srcObject) {
+    if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
       audioTrack.current.enabled = !audioTrack.current.enabled;
     }
     setAudioMuted((prevStatus) => !prevStatus);
@@ -616,6 +622,7 @@ const MeetingRoom = (props) => {
                     avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
                   }}
                   videoMuted={videoMuted}
+                  audioMuted={audioMuted}
                   displayName={false}
                   ref={userVideo}
                 />
