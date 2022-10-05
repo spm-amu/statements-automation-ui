@@ -38,7 +38,7 @@ const MeetingSettingsComponent = (props) => {
         setCurrentUserStream(myStream);
         userVideo.current.srcObject = myStream;
       });
-  }
+  };
 
   useEffect(() => {
     if (userVideo.current) {
@@ -160,7 +160,7 @@ const MeetingSettingsComponent = (props) => {
                   }
                 }}
                 value={videoMuted}
-                defaultChecked={!videoMuted}
+                defaultChecked
                 color="primary"
               />
             </td>
@@ -177,7 +177,7 @@ const MeetingSettingsComponent = (props) => {
                   }
                 }}
                 value={audioMuted}
-                defaultChecked={!audioMuted}
+                defaultChecked
                 color="primary"
               />
             </td>

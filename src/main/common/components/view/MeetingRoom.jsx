@@ -13,7 +13,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ClosablePanel from '../layout/ClosablePanel'
 import Lobby from '../Lobby';
 import {useNavigate} from 'react-router-dom';
-import Utils from '../../Utils';
+import Utils from "../../Utils";
 
 const MeetingRoom = (props) => {
   const navigate = useNavigate();
@@ -91,8 +91,8 @@ const MeetingRoom = (props) => {
 
   const [popUp, setPopUp] = useState('');
   const [participants, setParticipants] = useState([]);
-  const [videoMuted, setVideoMuted] = useState(props.videoMuted);
-  const [audioMuted, setAudioMuted] = useState(props.audioMuted);
+  const [videoMuted, setVideoMuted] = useState(false);
+  const [audioMuted, setAudioMuted] = useState(false);
   const [sideBarOpen, setSideBarOpen] = useState(true);
   const [screenShared, setScreenShared] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -172,7 +172,6 @@ const MeetingRoom = (props) => {
 
         socketRef.current.on(MessageType.ALL_USERS, (users) => {
           const peers = [];
-          console.log("\n\n\nUSERS : ", users);
           users.forEach((user) => {
             const peer = createPeer(user.id, socketRef.current.id, myStream);
             peersRef.current.push({
@@ -225,9 +224,11 @@ const MeetingRoom = (props) => {
           //   // peerObj.peer.destroy(); // remove all the connections and event handlers associated with this peer
           // }
 
+          alert(participants.size);
            // removing this userId from peers
           peersRef.current = peersRef.current.filter((p) => p.peerID !== userId); // update peersRef
           const newParticipants =  participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
+          alert(newParticipants.size);
 
           setParticipants(newParticipants);
 
@@ -321,13 +322,13 @@ const MeetingRoom = (props) => {
   };
 
   const muteVideo = () => {
-    console.log('&&&&&&&&')
+    console.log('&&&&&&&&');
     if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
       if (!screenShared) {
         videoTrack.current.enabled = !videoTrack.current.enabled;
       }
     }
-    console.log('##############')
+    console.log('##############');
     setVideoMuted((prevStatus) => !prevStatus);
   };
 
@@ -479,7 +480,7 @@ const MeetingRoom = (props) => {
               }}
             >
               { participants.length > 0 ? (
-                  <MeetingParticipantGrid participants={participants} videoMuted={videoMuted} audioMuted={audioMuted} />
+                  <MeetingParticipantGrid participants={participants} videoMuted={videoMuted} />
               ) :
                 <Lobby message={'Waiting for others to join'} />
               }
@@ -619,7 +620,7 @@ const MeetingRoom = (props) => {
                 <MeetingParticipant
                   data={{
                     peer: null,
-                    name: JSON.parse(sessionStorage.getItem('userDetails')).name,
+                    name: 'Joe Doe',
                     avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
                   }}
                   videoMuted={videoMuted}
