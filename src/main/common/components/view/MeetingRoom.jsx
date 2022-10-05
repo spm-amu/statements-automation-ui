@@ -145,7 +145,10 @@ const MeetingRoom = (props) => {
         audioTrack.current = userStream.current.getTracks()[0];
 
         setCurrentUserStream(myStream);
-        userVideo.current.srcObject = myStream;
+
+        if(!Utils.isNull(userVideo.current)) {
+          userVideo.current.srcObject = myStream;
+        }
 
         joinInAudio.play();
         setLoading(false);
@@ -620,7 +623,7 @@ const MeetingRoom = (props) => {
                 <MeetingParticipant
                   data={{
                     peer: null,
-                    name: 'Joe Doe',
+                    name: JSON.parse(sessionStorage.getItem('userDetails')).name,
                     avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
                   }}
                   videoMuted={videoMuted}
