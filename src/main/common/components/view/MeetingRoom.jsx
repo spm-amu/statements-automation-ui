@@ -227,11 +227,9 @@ const MeetingRoom = (props) => {
           //   // peerObj.peer.destroy(); // remove all the connections and event handlers associated with this peer
           // }
 
-          alert(participants.size);
            // removing this userId from peers
           peersRef.current = peersRef.current.filter((p) => p.peerID !== userId); // update peersRef
           const newParticipants =  participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
-          alert(newParticipants.size);
 
           setParticipants(newParticipants);
 
