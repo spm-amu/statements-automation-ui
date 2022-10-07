@@ -1,7 +1,8 @@
 ﻿import React from 'react';
-import {Routes, Route, withRouter, useNavigate} from 'react-router-dom';
+import {Route, Routes, useNavigate, withRouter} from 'react-router-dom';
 import './viewport.css';
 import ViewContainer from "./ViewContainer";
+import TestContainer from "./TestContainer";
 
 const ViewPort = () => {
 
@@ -9,13 +10,13 @@ const ViewPort = () => {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    if(loading) {
+    if (loading) {
       setLoading(false);
     }
   });
 
   React.useEffect(() => {
-    if(!loading) {
+    if (!loading) {
       navigate('/view/calendar')
     }
   }, [loading]);
@@ -23,7 +24,7 @@ const ViewPort = () => {
   return (
     <div className={'viewport'}>
       <Routes>
-        <Route path='/view/:id' element={<ViewContainer/>}/>
+        <Route path='/view/:id' element={<ViewContainer/>} />
       </Routes>
     </div>
   )

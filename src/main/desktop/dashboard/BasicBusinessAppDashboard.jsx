@@ -318,7 +318,11 @@ const BasicBusinessAppDashboard = (props) => {
                         activeRouteMenu={'calendar'}
                         className={"sidebar"}
                         viewLauncher={(path) => {
-                          navigate('/view/' + path);
+                          if(path === 'chats') {
+                            navigate('/view/DNE');
+                          } else {
+                            navigate('/view/' + path);
+                          }
                         }}
                         appLogoPath={props.appLogoPath}
                         logo={{

@@ -1,8 +1,7 @@
 import React from 'react';
-import Call from '../vc/Call';
 
 const Chats = (props) => {
-  return <Call />;
+  return <>Chats</>;
 };
 
 export default Chats;

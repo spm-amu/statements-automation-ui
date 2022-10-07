@@ -13,8 +13,15 @@ import IconButton from '@material-ui/core/IconButton';
 import ClosablePanel from '../layout/ClosablePanel'
 import Lobby from '../Lobby';
 import {useNavigate} from 'react-router-dom';
+import Dialog from "@material-ui/core/Dialog";
 import Utils from "../../Utils";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogActions from "@material-ui/core/DialogActions";
+import withStyles from "@material-ui/core/styles/withStyles";
 
+const StyledDialog = withStyles({ root: { pointerEvents: "none", }, paper: { pointerEvents: "auto" } })(props => <Dialog hideBackdrop {...props} />);
 const MeetingRoom = (props) => {
   const navigate = useNavigate();
 
@@ -431,217 +438,28 @@ const MeetingRoom = (props) => {
   };
 
   return (
-    <div className={'grid-container row'}>
-      {popUp[0] === '1' && (
-        <AlertDialog
-          title="Join request!"
-          message={`${popUp.substr(2)} is requesting to join the call.`}
-          showLeft={true}
-          showRight={true}
-          auto={false}
-          btnTextLeft={'Decline'}
-          btnTextRight={'Accept'}
-          // onClose equivalent to deny
-          onClose={() => {
-            socketRef.current.emit(MessageType.PERMIT_STATUS, {
-              allowed: false,
-              id: joiningSocket.current,
-            });
-            setPopUp('');
-          }}
-          onLeft={() => {
-            socketRef.current.emit(MessageType.PERMIT_STATUS, {
-              allowed: false,
-              id: joiningSocket.current,
-            });
-            setPopUp('');
-          }}
-          onRight={() => {
-            socketRef.current.emit(MessageType.PERMIT_STATUS, {
-              allowed: true,
-              id: joiningSocket.current,
-            });
-            setPopUp('');
-          }}
-        />
-      )}
 
-      <div style={{ height: '100%', width: sideBarOpen ? '80%' : '100%' }} className={'col'}>
-        {loading && popUp === 'Waiting' ? (
-          <Lobby message={'Waiting for the meeting host to let you in'} />
-        ) : (
-          <>
-            <div
-              className={'centered-flex-box'}
-              style={{
-                height: 'calc(100% - 180px)',
-                maxHeight: 'calc(100% - 180px)',
-                width: '100%',
-                overflow: 'hidden',
-              }}
-            >
-              { participants.length > 0 ? (
-                  <MeetingParticipantGrid participants={participants} videoMuted={videoMuted} />
-              ) :
-                <Lobby message={'Waiting for others to join'} />
-              }
-            </div>
-          </>
-        )}
-        <footer className="call-overlay-footer" style={{ height: '180px' }}>
-          <div className={'row'}>
-            <div className={'col'}>
-              <h3
-                style={{
-                  position: 'absolute',
-                  fontSize: 'auto',
-                }}
-              >
-                {new Date().toLocaleString('en-US', {
-                  hour12: true,
-                  hour: 'numeric',
-                  minute: 'numeric',
-                })}
-              </h3>
-            </div>
-            <div
-              className={'col'}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                width: '80%',
-              }}
-            >
-              <div className={'footer-toolbar'}>
-                <div className={'row centered-flex-box'}>
-                  {!screenShared && (
-                    <IconButton
-                      onClick={() => {
-                        // if video stream exists
-                        if (userStream.current) {
-                          muteVideo();
-                        }
-                      }}
-                      style={{
-                        backgroundColor: videoMuted ? "#eb3f21" : "#404239",
-                        color: 'white',
-                        marginRight: '4px'
-                      }}
-                    >
-                      { videoMuted ? (
-                        <Icon id={'VIDEOCAM_OFF'} />
-                      ) : (
-                        <Icon id={'VIDEOCAM'} />
-                      )}
-                    </IconButton>
-                  )}
-
-                  <IconButton
-                    onClick={() => {
-                      // if audio stream exists
-                      if (userStream.current) {
-                        muteAudio();
-                      }
-                    }}
-                    style={{
-                      backgroundColor: audioMuted ? "#eb3f21" : "#404239",
-                      color: 'white',
-                      marginRight: '4px'
-                    }}
-                  >
-                    {audioMuted ? (
-                      <Icon id={'MIC_OFF'} />
-                    ) : (
-                      <Icon id={'MIC'} />
-                    )}
-                  </IconButton>
-                  {" "}
-                  <IconButton
-                    onClick={() => {
-                      // wait for stream to load first
-                      if (userStream.current) {
-                        if (screenShared) stopShareScreen();
-                        else shareScreen();
-                      }
-                    }}
-                    style={{
-                      backgroundColor: screenShared ? '#8eb2f5' : '#404239',
-                      color: 'white',
-                      marginRight: '4px'
-                    }}
-                  >
-                    {screenShared ? (
-                      <Icon id={'CANCEL_PRESENTATION'} />
-                    ) : (
-                      <Icon id={'PRESENT_TO_ALL'} />
-                    )}
-                  </IconButton>
-
-                  <IconButton
-                    style={{
-                      backgroundColor: '#404239',
-                      color: 'white',
-                      marginRight: '4px'
-                    }}
-                    onClick={(e) => setSideBarOpen(true)}
-                  >
-                    <Icon id={'CHAT_BUBBLE'} />
-                  </IconButton>
-
-                  <IconButton
-                    onClick={endCall}
-                    style={{
-                      backgroundColor: '#eb3f21',
-                      color: 'white',
-                      marginRight: '4px'
-                    }}
-                  >
-                    <Icon id={'CALL_END'} />
-                  </IconButton>
-
-                  <IconButton
-                    onClick={(e) => setSideBarOpen(true)}
-                    style={{
-                      backgroundColor: '#404239',
-                      color: 'white',
-                      marginRight: '4px'
-                    }}
-                  >
-                    <Icon id={'PEOPLE'} />
-                  </IconButton>
-                </div>
-              </div>
-            </div>
-            <div
-              className={'col'}
-              style={{ display: 'flex', justifyContent: 'flex-end' }}
-            >
-              <section className="call-overlay-footer-yourself">
-                <MeetingParticipant
-                  data={{
-                    peer: null,
-                    name: JSON.parse(sessionStorage.getItem('userDetails')).name,
-                    avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
-                  }}
-                  videoMuted={videoMuted}
-                  audioMuted={audioMuted}
-                  displayName={false}
-                  ref={userVideo}
-                />
-              </section>
-            </div>
-          </div>
-        </footer>
-      </div>
-      {
-        sideBarOpen &&
-          <div className={"side-bar-container"}>
-            <ClosablePanel closeHandler={(e) => {
-              setSideBarOpen(false);
-            }}/>
-          </div>
-      }
+    <div style={{width: '100%', height: '100%'}}>
+      <StyledDialog
+        open={true}
+        onClose={(e) => {}}
+        keepMounted
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{ style: { pointerEvents: 'auto' } }}
+        style={{width: '100%', height: '100%'}}
+      >
+        <DialogTitle id="alert-dialog-title" style={{ borderBottom: '1px solid #404239' }}>
+          {'Test'}
+        </DialogTitle>
+        <DialogContent className={'row alert-dialog-container'}>
+          <DialogContentText id="alert-dialog-description" >
+            {'Test'}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+        </DialogActions>
+      </StyledDialog>
     </div>
   );
 };

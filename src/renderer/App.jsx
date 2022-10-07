@@ -1,7 +1,7 @@
 import React from 'react';
 import icon from '../../assets/armscor_logo.png';
 import './App.css';
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import LoginView from '../main/common/components/view/security/Login';
 import BasicBusinessAppDashboard from '../main/desktop/dashboard/BasicBusinessAppDashboard';

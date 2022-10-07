@@ -54,3 +54,26 @@ button:focus {
 .fc-view-harness-active {
   min-height: unset !important;
 }
+
+.fc .fc-daygrid-event-harness .fc-event {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: #945c33 !important;
+}
+
+
+.fc-daygrid-day-events a:hover,
+.fc-daygrid-day-events a:focus {
+  color: #01476C !important;
+  border-color: #01476C !important;
+}
+
+.fc-daygrid-event-dot {
+  border-color: #FFFFFF;
+}
+
+.fc-daygrid-day-events a:hover .fc-daygrid-event-dot {
+  border-color: #01476C !important;
+}
