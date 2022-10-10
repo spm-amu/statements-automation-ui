@@ -15,14 +15,16 @@ const ViewContainer = (props) => {
   const currentView = useRef(null);
   const ref = useRef();
   const activeMeetingDetails = useRef(null);
-  const viewSwitch = useRef();
+  const minimizeMaximizeViewSwitch = useRef(0);
 
   const renderView = () => {
     let viewId = params.id;
     let element;
 
-    if(viewId !== currentView) {
-      viewSwitch.current = !viewSwitch.current;
+    console.log("\n\n\nRENDER : " + viewId);
+
+    if (viewId !== currentView) {
+      minimizeMaximizeViewSwitch.current++;
     }
 
     if (viewId === 'meetingRoom' && currentView.current !== 'joinMeetingSettings') {
@@ -32,6 +34,7 @@ const ViewContainer = (props) => {
       if (viewId !== 'meetingRoom') {
         currentView.current = viewId;
       } else {
+        minimizeMaximizeViewSwitch.current = 0;
         activeMeetingDetails.current = location.state;
       }
     }
@@ -60,23 +63,26 @@ const ViewContainer = (props) => {
         break;
     }
 
-
     return <>
       {
         element
       }
-      <div style={{visibility: 'hidden', width: '100%', height: '100%', border: '4px solid blue'}} ref={ref}>
-        {
-          activeMeetingDetails.current &&
+      {
+        activeMeetingDetails.current &&
+        <div style={{visibility: 'hidden', width: '100%', height: '100%'}} ref={ref}>
           <MeetingRoom
-            viewSwitch={viewSwitch.current}
+            closeHandler={() => {
+              activeMeetingDetails.current = null;
+              minimizeMaximizeViewSwitch.current = 0;
+            }}
+            viewSwitch={minimizeMaximizeViewSwitch.current}
             selectedMeeting={activeMeetingDetails.current.selectedMeeting}
             videoMuted={activeMeetingDetails.current.videoMuted}
             audioMuted={activeMeetingDetails.current.audioMuted}
             isHost={activeMeetingDetails.current.isHost}
           />
-        }
-      </div>
+        </div>
+      }
     </>
   };
 

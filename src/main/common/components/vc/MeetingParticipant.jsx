@@ -28,9 +28,8 @@ const MeetingParticipant = forwardRef((props, ref) => {
                     <div className={'avatar'} data-label={Utils.getInitials(props.data.name)} />
                   </div>
               }
-
               {
-                props.audioMuted ?
+                props.audioMuted || props.data.peer === null ?
                   <video
                     hidden={props.videoMuted}
                     muted playsInline autoPlay ref={videoRef}

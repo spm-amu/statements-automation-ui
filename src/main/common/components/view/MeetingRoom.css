@@ -43,13 +43,6 @@
   justify-content: space-between;
 }
 
-.call-overlay-footer {
-  display: grid;
-  grid-template-rows: auto auto;
-  gap: 20px;
-  padding: 16px 0;
-}
-
 .call-overlay-footer-button {
   background-color: rgba(0, 0, 0, 0.2);
   width: 60px;
@@ -119,12 +112,6 @@
   box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
 }
 
-.footer-toolbar {
-  min-width: 320px;
-  width: 100%;
-  height: 64px;
-}
-
 .side-bar-container{
   width: 18%;
   box-shadow: 0 2px 22px 0 rgba(0,0,0,.1), 0 4px 20px 0 rgba(0,0,0,.15);
@@ -135,6 +122,10 @@
   width: 100%;
   text-align: right;
   margin: 0 16px 0 0;
+}
+
+#meeting-window-description {
+  height: 100%;
 }
 
 #meeting-window-title {

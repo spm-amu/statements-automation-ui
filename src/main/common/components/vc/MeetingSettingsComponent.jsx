@@ -22,22 +22,26 @@ const MeetingSettingsComponent = (props) => {
   const navigate = useNavigate();
 
   const localVideoStream = () => {
-    navigator.mediaDevices
+    let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: true,
         video: {
           width: 240,
           height: 240,
         },
-      })
-      .then((myStream) => {
-        userStream.current = myStream;
-        videoTrack.current = userStream.current.getTracks()[1];
-        audioTrack.current = userStream.current.getTracks()[0];
-
-        setCurrentUserStream(myStream);
-        userVideo.current.srcObject = myStream;
       });
+
+    if(userMedia && userVideo.current && userStream.current) {
+      userMedia
+        .then((myStream) => {
+          userStream.current = myStream;
+          videoTrack.current = userStream.current.getTracks()[1];
+          audioTrack.current = userStream.current.getTracks()[0];
+
+          setCurrentUserStream(myStream);
+          userVideo.current.srcObject = myStream;
+        });
+    }
   };
 
   useEffect(() => {
@@ -64,6 +68,7 @@ const MeetingSettingsComponent = (props) => {
     if (userVideo.current.srcObject) {
       videoTrack.current.enabled = !videoTrack.current.enabled;
     }
+
     setVideoMuted((prevStatus) => !prevStatus);
   };
 
@@ -71,6 +76,7 @@ const MeetingSettingsComponent = (props) => {
     if (userVideo.current.srcObject) {
       audioTrack.current.enabled = !audioTrack.current.enabled;
     }
+
     setAudioMuted((prevStatus) => !prevStatus);
   };
 
