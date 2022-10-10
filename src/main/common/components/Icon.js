@@ -17,6 +17,8 @@ import AttachFile from '@material-ui/icons/AttachFile';
 import CameraOff from '@material-ui/icons/VideocamOff';
 import Microphone from '@material-ui/icons/Mic';
 import MicrophoneOff from '@material-ui/icons/MicOff';
+import Minimize from '@material-ui/icons/Minimize';
+import Maximize from '@material-ui/icons/Maximize';
 import Work from '@material-ui/icons/Work';
 import Home from '@material-ui/icons/Home';
 import List from '@material-ui/icons/List';
@@ -50,6 +52,10 @@ class Icon extends Component {
       return <EditIcon/>
     } else if (this.props.id === 'CLOSE') {
       return <Close/>
+    } else if (this.props.id === 'MINIMIZE') {
+      return <Minimize/>
+    } else if (this.props.id === 'MAXIMIZE') {
+      return <Maximize/>
     } else if (this.props.id === 'DONE') {
       return <Done/>
     } else if (this.props.id === 'REMOVE') {

@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef} from 'react';
 
 import {useLocation, useParams} from 'react-router-dom';
 import Calendar from '../view/Calendar';
@@ -13,18 +13,23 @@ const ViewContainer = (props) => {
   const params = useParams();
   const location = useLocation();
   const currentView = useRef(null);
+  const ref = useRef();
   const activeMeetingDetails = useRef(null);
+  const viewSwitch = useRef();
 
   const renderView = () => {
     let viewId = params.id;
     let element;
 
+    if(viewId !== currentView) {
+      viewSwitch.current = !viewSwitch.current;
+    }
 
     if (viewId === 'meetingRoom' && currentView.current !== 'joinMeetingSettings') {
       // Do not navigate
       viewId = currentView.current;
     } else {
-      if(viewId !== 'meetingRoom') {
+      if (viewId !== 'meetingRoom') {
         currentView.current = viewId;
       } else {
         activeMeetingDetails.current = location.state;
@@ -41,7 +46,8 @@ const ViewContainer = (props) => {
       case 'meetingHistory':
         element = <MeetingHistory/>;
         break;
-      case 'files':element = <Files/>;
+      case 'files':
+        element = <Files/>;
         break;
       case 'meeting':
         element = <Meeting selectedEvent={location.state}/>;
@@ -50,16 +56,8 @@ const ViewContainer = (props) => {
         element = <JoinMeetingSettings selectedMeeting={location.state}/>;
         break;
       case 'meetingRoom':
-        element = <div/>;
+        element = <Calendar/>;
         break;
-        /*return (
-          {<MeetingRoom
-            selectedMeeting={location.state.selectedMeeting}
-            videoMuted={location.state.videoMuted}
-            audioMuted={location.state.audioMuted}
-            isHost={location.state.isHost}
-          />}
-        );*/
     }
 
 
@@ -67,10 +65,11 @@ const ViewContainer = (props) => {
       {
         element
       }
-      <div style={{visibility: 'hidden', width: '100%', height: '100%', border: '4px solid blue'}}>
+      <div style={{visibility: 'hidden', width: '100%', height: '100%', border: '4px solid blue'}} ref={ref}>
         {
           activeMeetingDetails.current &&
           <MeetingRoom
+            viewSwitch={viewSwitch.current}
             selectedMeeting={activeMeetingDetails.current.selectedMeeting}
             videoMuted={activeMeetingDetails.current.videoMuted}
             audioMuted={activeMeetingDetails.current.audioMuted}
@@ -83,6 +82,5 @@ const ViewContainer = (props) => {
 
   return renderView();
 };
-
 
 export default ViewContainer;

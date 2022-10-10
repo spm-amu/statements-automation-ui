@@ -4,14 +4,7 @@ import {MessageType} from '../../types';
 
 import './Calendar.css';
 import './MeetingRoom.css';
-import AlertDialog from '../AlertDialog';
 import Peer from 'simple-peer';
-import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
-import MeetingParticipant from '../vc/MeetingParticipant';
-import Icon from '../Icon';
-import IconButton from '@material-ui/core/IconButton';
-import ClosablePanel from '../layout/ClosablePanel'
-import Lobby from '../Lobby';
 import {useNavigate} from 'react-router-dom';
 import Dialog from "@material-ui/core/Dialog";
 import Utils from "../../Utils";
@@ -20,8 +13,42 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import withStyles from "@material-ui/core/styles/withStyles";
+import Icon from '../Icon';
+import Paper from "@material-ui/core/Paper";
+import IconButton from '@material-ui/core/IconButton';
+import Draggable from "react-draggable";
 
-const StyledDialog = withStyles({ root: { pointerEvents: "none", }, paper: { pointerEvents: "auto" } })(props => <Dialog hideBackdrop {...props} />);
+const StyledDialog = withStyles({
+  root: {pointerEvents: "none"},
+  paper: {
+    pointerEvents: 'auto',
+    width: '100%',
+    height: '100%',
+    maxWidth: 'calc(100% - 144px)',
+    maxHeight: 'calc(100% - 136px)',
+    margin: '136px 0 0 144px',
+    padding: '0',
+    overflow: 'hidden',
+    boxShadow: 'none !important',
+    backgroundColor: '#a1a1a1',
+    ['@media (max-width:800px)']: {
+      margin: '136px 0 0 0',
+      maxWidth: '100%'
+    }
+  }
+})(props => <Dialog hideBackdrop {...props} />);
+
+
+const PaperComponent = (props) => (
+  <Draggable
+    disabled={props.disabled}
+    handle="#meeting-window-title"
+    cancel={'[class*="MuiDialogContent-root"]'}
+  >
+    <Paper {...props} />
+  </Draggable>
+);
+
 const MeetingRoom = (props) => {
   const navigate = useNavigate();
 
@@ -30,7 +57,7 @@ const MeetingRoom = (props) => {
     isHost,
   } = props;
 
-  const { settings } = props;
+  const {settings} = props;
 
   // const [participantsDemo, setParticipantsDemo] = useState([
   //   {
@@ -103,6 +130,8 @@ const MeetingRoom = (props) => {
   const [sideBarOpen, setSideBarOpen] = useState(true);
   const [screenShared, setScreenShared] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [windowTransformValue, setWindowTransformValue] = useState(null);
+  const [displayState, setDisplayState] = useState('MAXIMIZED');
   const [timer, setTimer] = useState(0);
 
   const userStream = useRef();
@@ -126,8 +155,13 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     return () => {
       endCall();
+      document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
     };
   }, []);
+
+  useEffect(() => {
+    minimizeView(null);
+  }, [props.viewSwitch]);
 
   useEffect(() => {
     if (userVideo.current) {
@@ -141,9 +175,17 @@ const MeetingRoom = (props) => {
     }
   }, [userVideo.current]);
 
+  const handleSidebarToggle = (e) => {
+    if (e.detail.open) {
+      document.getElementById('meetingDialogPaper').style.margin = '136px 0 0 144px';
+    } else {
+      document.getElementById('meetingDialogPaper').style.margin = '136px 0 0 0';
+    }
+  };
+
   const joinPersonIn = () => {
     navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
+      .getUserMedia({video: true, audio: true})
       .then((myStream) => {
         setLoading(false);
 
@@ -153,7 +195,7 @@ const MeetingRoom = (props) => {
 
         setCurrentUserStream(myStream);
 
-        if(!Utils.isNull(userVideo.current)) {
+        if (!Utils.isNull(userVideo.current)) {
           userVideo.current.srcObject = myStream;
         }
 
@@ -234,9 +276,9 @@ const MeetingRoom = (props) => {
           //   // peerObj.peer.destroy(); // remove all the connections and event handlers associated with this peer
           // }
 
-           // removing this userId from peers
+          // removing this userId from peers
           peersRef.current = peersRef.current.filter((p) => p.peerID !== userId); // update peersRef
-          const newParticipants =  participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
+          const newParticipants = participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
 
           setParticipants(newParticipants);
 
@@ -250,8 +292,8 @@ const MeetingRoom = (props) => {
   };
 
   useEffect(() => {
+    document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-
     socketRef.current = io.connect('http://svn.agilemotion.co.za');
 
     setLoading(true);
@@ -330,13 +372,12 @@ const MeetingRoom = (props) => {
   };
 
   const muteVideo = () => {
-    console.log('&&&&&&&&');
     if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
       if (!screenShared) {
         videoTrack.current.enabled = !videoTrack.current.enabled;
       }
     }
-    console.log('##############');
+
     setVideoMuted((prevStatus) => !prevStatus);
   };
 
@@ -389,7 +430,7 @@ const MeetingRoom = (props) => {
   }
 
   const shareScreen = () => {
-    navigator.mediaDevices.getDisplayMedia({ cursor: true }).then((stream) => {
+    navigator.mediaDevices.getDisplayMedia({cursor: true}).then((stream) => {
       setScreenShared(true);
 
       // store the video track i.e. our web cam stream into tmpTrack
@@ -437,23 +478,92 @@ const MeetingRoom = (props) => {
     });
   };
 
-  return (
+  const minimizeView = (e) => {
+    let paper = document.getElementById('meetingDialogPaper');
 
+    if(paper) {
+      paper.parentElement.style.display = 'flex';
+      paper.parentElement.style.alignItems = 'flex-end';
+      paper.parentElement.style.justifyContent = 'flex-end';
+
+      if(windowTransformValue) {
+        paper.style.transform = windowTransformValue;
+      }
+
+      paper.style.width = '700px';
+      paper.style.height = '350px';
+      paper.style.margin = '0 16px 16px 16px';
+
+      document.getElementById('meeting-window-title').style.cursor = 'move';
+
+      setDisplayState('MINIMIZED');
+    }
+  };
+
+  const maximizeView = (e) => {
+    let paper = document.getElementById('meetingDialogPaper');
+
+    if(paper) {
+      let sidebar = document.getElementsByClassName('sidebar')[0];
+      let sidebarTransform = window.getComputedStyle(sidebar, null).transform;
+      let isSidebarHidden = sidebarTransform && sidebarTransform.includes('-144');
+
+      setWindowTransformValue(paper.style.transform);
+      paper.style.transform = 'translate(0, 0)';
+
+      paper.style.width = '100%';
+      paper.style.height = '100%';
+      paper.style.margin = isSidebarHidden ? '136px 0 0 0' : '136px 0 0 144px';
+
+      document.getElementById('meeting-window-title').style.cursor = 'default';
+
+      setDisplayState('MAXIMIZED');
+    }
+  };
+
+  return (
     <div style={{width: '100%', height: '100%'}}>
       <StyledDialog
         open={true}
-        onClose={(e) => {}}
+        onClose={(e) => {
+        }}
         keepMounted
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        PaperProps={{ style: { pointerEvents: 'auto' } }}
-        style={{width: '100%', height: '100%'}}
+        hideBackdrop={true}
+        aria-labelledby="meeting-window-title"
+        aria-describedby="meeting-window-description"
+        PaperComponent={PaperComponent}
+        PaperProps={{id: 'meetingDialogPaper', disabled: displayState === 'MAXIMIZED'}}
       >
-        <DialogTitle id="alert-dialog-title" style={{ borderBottom: '1px solid #404239' }}>
-          {'Test'}
+        <DialogTitle id="meeting-window-title">
+          <div className={'dialogHeader'}>
+            {
+              displayState === 'MAXIMIZED' ?
+                <IconButton
+                  onClick={(e) => {
+                    minimizeView(e)
+                  }}
+                  style={{
+                    marginRight: '4px'
+                  }}
+                >
+                  <Icon id={'MINIMIZE'}/>
+                </IconButton>
+                :
+                <IconButton
+                  onClick={(e) => {
+                    maximizeView(e)
+                  }}
+                  style={{
+                    marginRight: '4px'
+                  }}
+                >
+                  <Icon id={'MAXIMIZE'}/>
+                </IconButton>
+            }
+          </div>
         </DialogTitle>
-        <DialogContent className={'row alert-dialog-container'}>
-          <DialogContentText id="alert-dialog-description" >
+        <DialogContent className={'row meeting-window-container'}>
+          <DialogContentText id="meeting-window-description">
             {'Test'}
           </DialogContentText>
         </DialogContent>

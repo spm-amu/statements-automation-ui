@@ -77,3 +77,7 @@ button:focus {
 .fc-daygrid-day-events a:hover .fc-daygrid-event-dot {
   border-color: #01476C !important;
 }
+
+.fc-sidebarToggle-button{
+  display: none !important;
+}
