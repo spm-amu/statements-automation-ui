@@ -84,8 +84,9 @@ const MeetingRoom = (props) => {
     };
   }, []);
 
+
   useEffect(() => {
-    if(currentUserStream) {
+    if (currentUserStream) {
       socketManager.init(
         {
           stream: currentUserStream,
@@ -144,25 +145,31 @@ const MeetingRoom = (props) => {
               }
             },
             onUsersArrived: (userPeerMap) => {
-              if(!isHost) {
               let participants = [];
               for (const mapItem of userPeerMap) {
-                participants.push({
+                let user = {
                   peer: mapItem.peer,
                   name: mapItem.user.name,
                   avatar: mapItem.user.avatar,
-                })
-              }
+                };
 
-              if(!isHost) {
-                setParticipants(participants);
-                if (userPeerMap.length > 0) {
-                  if (step === Steps.LOBBY) {
-                    setStep(Steps.SESSION);
+                mapItem.peer.on('stream', (stream) => {
+                  user.stream = stream;
+                  participants.push(user);
+
+                  if(participants.length === userPeerMap.length) {
+                    if (!isHost) {
+                      setParticipants(participants);
+                      if (userPeerMap.length > 0) {
+                        if (step === Steps.LOBBY) {
+                          setStep(Steps.SESSION);
+                        }
+                      }
+                    } else {
+                      setLobbyWaitingList(participants);
+                    }
                   }
-                }
-              } else {
-                setLobbyWaitingList(participants);}
+                });
               }
             }
           }
