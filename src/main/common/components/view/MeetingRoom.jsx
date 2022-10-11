@@ -88,6 +88,7 @@ const MeetingRoom = (props) => {
     if(currentUserStream) {
       setCurrentUserSocket(socketManager.init(
         {
+          stream: currentUserStream,
           meetingId: selectedMeeting.id,
           isHost,
           eventHandler: {
