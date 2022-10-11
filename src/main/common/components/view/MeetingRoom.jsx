@@ -17,6 +17,7 @@ import Footer from "../vc/Footer";
 import {instance as socketManager} from "../vc/SocketManager";
 import {MessageType} from "../../types";
 import Utils from "../../Utils";
+import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -341,7 +342,7 @@ const MeetingRoom = (props) => {
                          }}
                 />
                 :
-                <div>SESSION - {participants.length}</div>
+                <MeetingParticipantGrid participants={participants} videoMuted={videoMuted} />
             }
             {
               currentUserStream &&
