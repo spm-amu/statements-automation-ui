@@ -107,8 +107,16 @@ const MeetingRoom = (props) => {
 
             setLobbyWaitingList(lobbyWaitingList.concat([item]));
           },
-          onUserJoin: (user) => {
+          onUserJoin: (userPeerItem) => {
             joinInAudio.play();
+
+            let user = {
+              peerID: userPeerItem.user.callerID,
+              peer: userPeerItem.peer,
+              name: userPeerItem.user.name,
+              avatar: userPeerItem.user.avatar
+            };
+
             setParticipants((participants) => [...participants, user]);
 
             if(step === Steps.LOBBY) {
@@ -135,12 +143,20 @@ const MeetingRoom = (props) => {
               navigate("/view/calendar");
             }
           },
-          onPeersArrived: (peers) => {
-            setParticipants(peers);
-          },
-          onSignalReceived: (data) => {
-            const item = participants.find((p) => p.peerID === data.id);
-            item.peer.signal(data.signal);
+          onUsersArrived: (userPeerMap) => {
+            let participants = [];
+            for (const mapItem of userPeerMap) {
+                participants.push({
+                  peer: mapItem.peer,
+                  name: mapItem.user.name,
+                  avatar: mapItem.user.avatar,
+                })
+            }
+
+            setParticipants(participants);
+            if(step === Steps.LOBBY) {
+              setStep(Steps.SESSION);
+            }
           }
         }
       }
@@ -323,7 +339,7 @@ const MeetingRoom = (props) => {
                          }}
                 />
                 :
-                <div>SESSION</div>
+                <div>SESSION - {participants.length}</div>
             }
             {
               currentUserStream &&

@@ -1,15 +1,20 @@
 import {MessageType} from "../../types";
 import io from "socket.io-client";
-import Utils from "../../Utils";
 import Peer from "simple-peer";
 
 class SockerManager {
+
+  constructor() {
+    this.userPeerMap = [];
+  }
+
   joinCurrentUserIn = (args, socket) => {
     navigator.mediaDevices
       .getUserMedia({video: true, audio: true})
       .then((myStream) => {
 
         let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
         socket.emit(MessageType.JOIN_MEETING, {
           room: args.meetingId,
           userIdentity: userDetails.userId,
@@ -24,41 +29,42 @@ class SockerManager {
         });
 
         socket.on(MessageType.ALL_USERS, (users) => {
-          const peers = [];
+          this.userPeerMap.splice(0, this.userPeerMap.length);
           users.forEach((user) => {
-            const peer = this.createPeer(user.id, socket.id, myStream);
+            const peer = this.createPeer(user.id, socket.id, myStream, socket);
 
-            peers.push({
-              peerID: user.id,
+            let item = {
               peer: peer,
-              name: user.name,
-              avatar: user.avatar,
-            });
+              user: user,
+            };
+
+            this.userPeerMap.push(item);
           });
 
-          args.eventHandler.onPeersArrived(peers);
+          args.eventHandler.onUsersArrived(this.userPeerMap);
         });
 
         socket.on(MessageType.USER_JOINED, (payload) => {
           const peer = this.addPeer(payload.signal, payload.callerID, myStream, socket);
-          const user = {
-            peerID: payload.callerID,
+          let item = {
             peer: peer,
-            name: payload.name,
-            avatar: payload.avatar,
+            user: user,
           };
 
-          args.eventHandler.onUserJoin(user);
+          this.userPeerMap.push(item);
+          args.eventHandler.onUserJoin(item);
         });
 
         socket.on(
           MessageType.RECEIVING_RETURNED_SIGNAL,
           (payload) => {
-            args.eventHandler.onSignalReceived(payload);
+            const item = this.userPeerMap.find((p) => p.user.id === payload.id);
+            item.peer.signal(payload.signal);
           }
         );
 
         socket.on(MessageType.USER_LEFT, (payload) => {
+          this.userPeerMap = this.userPeerMap.filter((item) => item.user.id !== payload.id);
           args.eventHandler.onUserLeave(payload);
         });
 
