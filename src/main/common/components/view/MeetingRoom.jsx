@@ -154,8 +154,10 @@ const MeetingRoom = (props) => {
             }
 
             setParticipants(participants);
-            if(step === Steps.LOBBY) {
-              setStep(Steps.SESSION);
+            if(userPeerMap.length > 0) {
+              if (step === Steps.LOBBY) {
+                setStep(Steps.SESSION);
+              }
             }
           }
         }

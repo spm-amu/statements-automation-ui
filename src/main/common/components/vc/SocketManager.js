@@ -48,7 +48,7 @@ class SockerManager {
           const peer = this.addPeer(payload.signal, payload.callerID, myStream, socket);
           let item = {
             peer: peer,
-            user: user,
+            user: payload,
           };
 
           this.userPeerMap.push(item);
