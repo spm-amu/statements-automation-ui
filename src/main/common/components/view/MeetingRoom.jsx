@@ -86,7 +86,7 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if(currentUserStream) {
-      setCurrentUserSocket(socketManager.init(
+      socketManager.init(
         {
           stream: currentUserStream,
           meetingId: selectedMeeting.id,
@@ -160,7 +160,7 @@ const MeetingRoom = (props) => {
             }
           }
         }
-      ));
+      );
     }
   }, [currentUserStream]);
 
@@ -171,6 +171,7 @@ const MeetingRoom = (props) => {
     navigator.mediaDevices
       .getUserMedia({video: true, audio: true})
       .then((myStream) => {
+        console.log("MEDIA : ", myStream);
         setCurrentUserStream(myStream);
       });
   }, []);

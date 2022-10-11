@@ -9,6 +9,7 @@ class SockerManager {
   }
 
   joinCurrentUserIn = (args, socket) => {
+    console.log("\n\n\nINIT : ", args.stream);
     let stream = args.stream;
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
