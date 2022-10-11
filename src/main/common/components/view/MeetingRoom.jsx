@@ -84,86 +84,94 @@ const MeetingRoom = (props) => {
     };
   }, []);
 
-  const {settings} = props;
-
   useEffect(() => {
-    document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
-    setCurrentUserSocket(socketManager.init(
-      {
-        meetingId: selectedMeeting.id,
-        isHost,
-        eventHandler: {
-          onInit: (args) => {
-            setCurrentUserSocket(args.socket);
-            setCurrentUserStream(args.stream);
+    if(currentUserStream) {
+      setCurrentUserSocket(socketManager.init(
+        {
+          meetingId: selectedMeeting.id,
+          isHost,
+          eventHandler: {
+            onInit: (socket) => {
+              setCurrentUserSocket(socket);
+              joinInAudio.play();
+            },
+            onAskForPermision: (data) => {
+              permitAudio.play();
+              let item = {
+                user: data.userAlias,
+                socketId: data.id
+              };
 
-            joinInAudio.play();
-          },
-          onAskForPermision: (data) => {
-            permitAudio.play();
-            let item = {
-              user: data.userAlias,
-              socketId: data.id
-            };
+              setLobbyWaitingList(lobbyWaitingList.concat([item]));
+            },
+            onUserJoin: (userPeerItem) => {
+              joinInAudio.play();
 
-            setLobbyWaitingList(lobbyWaitingList.concat([item]));
-          },
-          onUserJoin: (userPeerItem) => {
-            joinInAudio.play();
+              let user = {
+                peerID: userPeerItem.user.callerID,
+                peer: userPeerItem.peer,
+                name: userPeerItem.user.name,
+                avatar: userPeerItem.user.avatar
+              };
 
-            let user = {
-              peerID: userPeerItem.user.callerID,
-              peer: userPeerItem.peer,
-              name: userPeerItem.user.name,
-              avatar: userPeerItem.user.avatar
-            };
+              setParticipants((participants) => [...participants, user]);
 
-            setParticipants((participants) => [...participants, user]);
+              if (step === Steps.LOBBY) {
+                setStep(Steps.SESSION);
+              }
+            },
+            onUserLeave: (user) => {
 
-            if(step === Steps.LOBBY) {
-              setStep(Steps.SESSION);
-            }
-          },
-          onUserLeave: (user) => {
+              const userId = user.id;
+              const alias = user.alias;
+              const peerObj = participants.find((p) => p.peerID === userId);
 
-            const userId = user.id;
-            const alias = user.alias;
-            const peerObj = participants.find((p) => p.peerID === userId);
+              // if (peerObj) {
+              //   // peerObj.peer.destroy(); // remove all the connections and event handlers associated with this peer
+              // }
 
-            // if (peerObj) {
-            //   // peerObj.peer.destroy(); // remove all the connections and event handlers associated with this peer
-            // }
+              // removing this userId from peers
+              const newParticipants = participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
 
-            // removing this userId from peers
-            const newParticipants = participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
-
-            setParticipants(newParticipants);
-            if (participants.length === 0) {
-              endCall();
-              props.closeHandler();
-              navigate("/view/calendar");
-            }
-          },
-          onUsersArrived: (userPeerMap) => {
-            let participants = [];
-            for (const mapItem of userPeerMap) {
+              setParticipants(newParticipants);
+              if (participants.length === 0) {
+                endCall();
+                props.closeHandler();
+                navigate("/view/calendar");
+              }
+            },
+            onUsersArrived: (userPeerMap) => {
+              let participants = [];
+              for (const mapItem of userPeerMap) {
                 participants.push({
                   peer: mapItem.peer,
                   name: mapItem.user.name,
                   avatar: mapItem.user.avatar,
                 })
-            }
+              }
 
-            setParticipants(participants);
-            if(userPeerMap.length > 0) {
-              if (step === Steps.LOBBY) {
-                setStep(Steps.SESSION);
+              setParticipants(participants);
+              if (userPeerMap.length > 0) {
+                if (step === Steps.LOBBY) {
+                  setStep(Steps.SESSION);
+                }
               }
             }
           }
         }
-      }
-    ));
+      ));
+    }
+  }, [currentUserStream]);
+
+  const {settings} = props;
+
+  useEffect(() => {
+    document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
+    navigator.mediaDevices
+      .getUserMedia({video: true, audio: true})
+      .then((myStream) => {
+        setCurrentUserStream(myStream);
+      });
   }, []);
 
   useEffect(() => {
@@ -342,7 +350,7 @@ const MeetingRoom = (props) => {
                          }}
                 />
                 :
-                <MeetingParticipantGrid participants={participants} videoMuted={videoMuted} />
+                <MeetingParticipantGrid participants={participants} videoMuted={videoMuted}/>
             }
             {
               currentUserStream &&

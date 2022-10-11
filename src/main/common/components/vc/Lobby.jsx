@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import LottieIcon from "../LottieIcon";
-import './MeetingSession.css'
 import LobbyWaitingList from "./LobbyWaitingList";
 
 const HOST_WAITING_MESSAGE = 'Waiting for others to join';

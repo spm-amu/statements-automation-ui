@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
-import './MeetingSession.css'
 import Button from "@material-ui/core/Button";
 
 const HOST_WAITING_MESSAGE = 'Waiting for others to join';
