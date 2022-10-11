@@ -115,11 +115,13 @@ const MeetingRoom = (props) => {
                 avatar: userPeerItem.user.avatar
               };
 
-              setParticipants((participants) => [...participants, user]);
-
-              if (step === Steps.LOBBY) {
-                setStep(Steps.SESSION);
-              }
+              userPeerItem.peer.on('stream', (stream) => {
+                user.stream = stream;
+                setParticipants((participants) => [...participants, user]);
+                if (step === Steps.LOBBY) {
+                  setStep(Steps.SESSION);
+                }
+              });
             },
             onUserLeave: (user) => {
 
@@ -142,6 +144,7 @@ const MeetingRoom = (props) => {
               }
             },
             onUsersArrived: (userPeerMap) => {
+              if(!isHost) {
               let participants = [];
               for (const mapItem of userPeerMap) {
                 participants.push({
@@ -151,11 +154,15 @@ const MeetingRoom = (props) => {
                 })
               }
 
-              setParticipants(participants);
-              if (userPeerMap.length > 0) {
-                if (step === Steps.LOBBY) {
-                  setStep(Steps.SESSION);
+              if(!isHost) {
+                setParticipants(participants);
+                if (userPeerMap.length > 0) {
+                  if (step === Steps.LOBBY) {
+                    setStep(Steps.SESSION);
+                  }
                 }
+              } else {
+                setLobbyWaitingList(participants);}
               }
             }
           }
@@ -171,7 +178,6 @@ const MeetingRoom = (props) => {
     navigator.mediaDevices
       .getUserMedia({video: true, audio: true})
       .then((myStream) => {
-        console.log("MEDIA : ", myStream);
         setCurrentUserStream(myStream);
       });
   }, []);

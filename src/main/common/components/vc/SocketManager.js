@@ -9,7 +9,6 @@ class SockerManager {
   }
 
   joinCurrentUserIn = (args, socket) => {
-    console.log("\n\n\nINIT : ", args.stream);
     let stream = args.stream;
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
@@ -44,6 +43,7 @@ class SockerManager {
 
     socket.on(MessageType.USER_JOINED, (payload) => {
       const peer = this.addPeer(payload.signal, payload.callerID, stream, socket);
+
       let item = {
         peer: peer,
         user: payload,
@@ -51,6 +51,7 @@ class SockerManager {
 
       this.userPeerMap.push(item);
       args.eventHandler.onUserJoin(item);
+      peer.signal(payload.signal);
     });
 
     socket.on(
@@ -69,6 +70,7 @@ class SockerManager {
     args.eventHandler.onInit(socket);
   };
 
+
   addPeer(incomingSignal, callerID, stream, socket) {
     const peer = new Peer({
       initiator: false,
@@ -83,7 +85,6 @@ class SockerManager {
       });
     });
 
-    peer.signal(incomingSignal);
     return peer;
   }
 

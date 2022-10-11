@@ -9,9 +9,7 @@ const MeetingParticipant = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (props.data.peer) {
-      props.data.peer.on("stream", (stream) => {
-       videoRef.current.srcObject = stream;
-      });
+      videoRef.current.srcObject = props.data.stream;
     }
   }, []);
 
