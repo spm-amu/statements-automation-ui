@@ -84,7 +84,6 @@ const MeetingRoom = (props) => {
     };
   }, []);
 
-
   useEffect(() => {
     if (currentUserStream) {
       socketManager.init(
