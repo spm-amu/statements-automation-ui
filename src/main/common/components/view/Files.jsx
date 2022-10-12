@@ -3,6 +3,7 @@ import {get, host} from "../../service/RestService";
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
 import Download from "@material-ui/icons/CloudDownload";
+const { ipcRenderer } = window.require('electron');
 
 const Files = (props) => {
 
@@ -20,8 +21,24 @@ const Files = (props) => {
   const downloadDocument = documentId => {
 
      // window.open(`${host}/api/v1/document/download/${documentId}`, '_blank', 'noopener,noreferrer');
-     window.open(`${host}/api/v1/document/download/${documentId}`);
+     // window.open(`${host}/api/v1/document/download/${documentId}`);
+
+    get(`${host}/api/v1/document/download/${documentId}`, () => {
+
+    }, (e) => {
+
+    })
+
   };
+
+
+  const onDownload = (documentId) => {
+    ipcRenderer.send('downloadFile', {
+      payload: {
+        fileURL: `${host}/api/v1/document/download/${documentId}`
+      }
+    })
+  }
 
 
   useEffect(() => {
@@ -35,7 +52,7 @@ const Files = (props) => {
         <lh><h3>Files</h3></lh>
         {userDocuments.map((data) => (
           <li key={data.documentId}>
-            <Download onClick={() => downloadDocument(`${data.documentId}`)} />
+            <Download onClick={() => onDownload(`${data.documentId}`)} />
             &nbsp;{data.documentName}
           </li>
         ))}
