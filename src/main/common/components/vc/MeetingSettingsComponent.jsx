@@ -11,14 +11,10 @@ const MeetingSettingsComponent = (props) => {
   const userVideo = useRef();
   const audioTrack = useRef();
   const videoTrack = useRef();
-
   const [videoMuted, setVideoMuted] = useState(false);
   const [audioMuted, setAudioMuted] = useState(false);
-  const [currentUserStream, setCurrentUserStream] = useState(null);
   const [loggedInUser, setLoggedInUser] = useState('');
-
   const {selectedMeeting} = props;
-
   const navigate = useNavigate();
 
   const localVideoStream = () => {
@@ -31,36 +27,35 @@ const MeetingSettingsComponent = (props) => {
         },
       });
 
-    if(userMedia && userVideo.current && userStream.current) {
+    if(userMedia && userVideo.current) {
       userMedia
         .then((myStream) => {
           userStream.current = myStream;
           videoTrack.current = userStream.current.getTracks()[1];
           audioTrack.current = userStream.current.getTracks()[0];
 
-          setCurrentUserStream(myStream);
-          userVideo.current.srcObject = myStream;
+          if(userVideo.current) {
+            userVideo.current.srcObject = myStream;
+          }
         });
     }
   };
 
   useEffect(() => {
     if (userVideo.current) {
-      userVideo.current.srcObject = currentUserStream;
+      userVideo.current.srcObject = userStream.current;
     }
-  }, [currentUserStream]);
+  }, [userStream.current]);
 
   useEffect(() => {
     if (userVideo.current) {
-      userVideo.current.srcObject = currentUserStream;
+      userVideo.current.srcObject = userStream.current;
     }
   }, [userVideo.current]);
 
   useEffect(() => {
     localVideoStream();
-
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-
     setLoggedInUser(userDetails.name)
   }, []);
 

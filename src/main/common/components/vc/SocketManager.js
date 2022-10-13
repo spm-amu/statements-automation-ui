@@ -133,6 +133,14 @@ class SockerManager {
 
       currentUserSocket.on(MessageType.DENIED, () => {
       });
+
+      currentUserSocket.on("connect_error", () => {
+        console.log("CONNECT ERROR : ");
+      });
+
+      currentUserSocket.on("connect", () => {
+        console.log("RE-CONNECTED : ");
+      });
     } else {
       this.joinCurrentUserIn(args, currentUserSocket);
     }

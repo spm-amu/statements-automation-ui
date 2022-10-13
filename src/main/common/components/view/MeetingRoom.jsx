@@ -14,7 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Draggable from "react-draggable";
 import Lobby from "../vc/Lobby";
 import Footer from "../vc/Footer";
-import {instance as socketManager} from "../vc/SocketManager";
+import socketManager from "../../service/SocketManager";
 import {MessageType} from "../../types";
 import Utils from "../../Utils";
 import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
@@ -73,6 +73,138 @@ const MeetingRoom = (props) => {
   const navigate = useNavigate();
   const currentUserSocket = useRef();
 
+  const handler = () => {
+    return {
+      on: (eventType, be) => {
+        switch (eventType) {
+          case MessageType.ALLOWED:
+            join();
+            break;
+          case MessageType.PERMIT:
+            addUserToLobby(be.payload);
+            break;
+          case MessageType.ALL_USERS:
+            createParticipants(be.payload);
+            break;
+          case MessageType.USER_JOINED:
+            addUser(be.payload);
+            break;
+          case MessageType.RECEIVING_RETURNED_SIGNAL:
+            socketManager.signal(be.payload);
+            break;
+          case MessageType.USER_LEFT:
+            removeUser(be.payload);
+            break;
+        }
+      }
+    }
+  };
+
+  const removeUser = (user) => {
+    socketManager.removeFromUserToPeerMap(user.id);
+
+    const userId = user.id;
+    const alias = user.alias;
+    const peerObj = participants.find((p) => p.peerID === userId);
+    const newParticipants = participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
+
+    setParticipants(newParticipants);
+    if (participants.length === 0) {
+      endCall();
+      props.closeHandler();
+    }
+  };
+
+  const addUser = (payload) => {
+    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED);
+    joinInAudio.play();
+
+    let user = {
+      peerID: userPeerItem.user.callerID,
+      peer: userPeerItem.peer,
+      name: userPeerItem.user.name,
+      avatar: userPeerItem.user.avatar
+    };
+
+    userPeerItem.peer.on('stream', (stream) => {
+      user.stream = stream;
+      setParticipants((participants) => [...participants, user]);
+      if (step === Steps.LOBBY) {
+        setStep(Steps.SESSION);
+      }
+    });
+
+    userToPeerItem.peer.signal(payload.signal);
+  };
+
+  const createParticipants = (users, socket) => {
+    socketManager.clearUserToPeerMap();
+
+    let userPeerMap = [];
+    users.forEach((user) => {
+      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS))
+    });
+
+    let participants = [];
+    for (const mapItem of userPeerMap) {
+      let user = {
+        peer: mapItem.peer,
+        name: mapItem.user.name,
+        avatar: mapItem.user.avatar,
+      };
+
+      mapItem.peer.on('stream', (stream) => {
+        user.stream = stream;
+        participants.push(user);
+
+        if (participants.length === userPeerMap.length) {
+          if (!isHost) {
+            setParticipants(participants);
+            if (userPeerMap.length > 0) {
+              if (step === Steps.LOBBY) {
+                setStep(Steps.SESSION);
+              }
+            }
+          } else {
+            setLobbyWaitingList(participants);
+          }
+        }
+      });
+    }
+  };
+
+  const addUserToLobby = (data) => {
+    permitAudio.play();
+    let item = {
+      user: data.userAlias,
+      socketId: data.id
+    };
+
+    setLobbyWaitingList(lobbyWaitingList.concat([item]));
+  };
+
+  const askForPermission = () => {
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    const userAlias = userDetails.userId;
+    socketManager.emitEvent(MessageType.PERMISSION, {
+      user: userAlias,
+      room: selectedMeeting.id,
+      email: userDetails.emailAddress,
+    });
+  };
+
+  const join = () => {
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    socketManager.emitEvent(MessageType.JOIN_MEETING, {
+      room: selectedMeeting.id,
+      userIdentity: userDetails.userId,
+      name: userDetails.name,
+      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+      email: userDetails.emailAddress,
+      isHost: isHost
+    });
+  };
+
   const {
     selectedMeeting,
     isHost,
@@ -87,95 +219,15 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (currentUserStream) {
-      socketManager.init(
-        {
-          stream: currentUserStream,
-          meetingId: selectedMeeting.id,
-          isHost,
-          eventHandler: {
-            onInit: (socket) => {
-              //setCurrentUserSocket(socket);
-              currentUserSocket.current = socket;
-              joinInAudio.play();
-            },
-            onAskForPermision: (data) => {
-              permitAudio.play();
-              let item = {
-                user: data.userAlias,
-                socketId: data.id
-              };
+      let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+      socketManager.addSubscriptions(handler(), MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
+        MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL);
 
-              setLobbyWaitingList(lobbyWaitingList.concat([item]));
-            },
-            onUserJoin: (userPeerItem) => {
-              joinInAudio.play();
-
-              let user = {
-                peerID: userPeerItem.user.callerID,
-                peer: userPeerItem.peer,
-                name: userPeerItem.user.name,
-                avatar: userPeerItem.user.avatar
-              };
-
-              userPeerItem.peer.on('stream', (stream) => {
-                user.stream = stream;
-                setParticipants((participants) => [...participants, user]);
-                if (step === Steps.LOBBY) {
-                  setStep(Steps.SESSION);
-                }
-              });
-            },
-            onUserLeave: (user) => {
-
-              const userId = user.id;
-              const alias = user.alias;
-              const peerObj = participants.find((p) => p.peerID === userId);
-
-              // if (peerObj) {
-              //   // peerObj.peer.destroy(); // remove all the connections and event handlers associated with this peer
-              // }
-
-              // removing this userId from peers
-              const newParticipants = participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
-
-              setParticipants(newParticipants);
-              if (participants.length === 0) {
-                endCall();
-                props.closeHandler();
-                //navigate("/view/calendar");
-              }
-            },
-            onUsersArrived: (userPeerMap) => {
-              let participants = [];
-              for (const mapItem of userPeerMap) {
-                let user = {
-                  peer: mapItem.peer,
-                  name: mapItem.user.name,
-                  avatar: mapItem.user.avatar,
-                };
-
-                mapItem.peer.on('stream', (stream) => {
-                  user.stream = stream;
-                  participants.push(user);
-
-                  if(participants.length === userPeerMap.length) {
-                    if (!isHost) {
-                      setParticipants(participants);
-                      if (userPeerMap.length > 0) {
-                        if (step === Steps.LOBBY) {
-                          setStep(Steps.SESSION);
-                        }
-                      }
-                    } else {
-                      setLobbyWaitingList(participants);
-                    }
-                  }
-                });
-              }
-            }
-          }
-        }
-      );
+      if (isHost) {
+        join();
+      } else {
+        askForPermission();
+      }
     }
   }, [currentUserStream]);
 
@@ -200,7 +252,6 @@ const MeetingRoom = (props) => {
     if (step === Steps.SESSION) {
       minimizeView(null);
     } else if (props.viewSwitch > 0) {
-      alert('D');
       endCall();
     }
   }, [props.viewSwitch]);

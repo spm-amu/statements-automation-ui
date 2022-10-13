@@ -22,8 +22,6 @@ const ViewContainer = (props) => {
     let viewId = params.id;
     let element;
 
-    console.log("\n\n\nRENDER : " + viewId);
-
     if (viewId !== currentView) {
       minimizeMaximizeViewSwitch.current++;
     }
