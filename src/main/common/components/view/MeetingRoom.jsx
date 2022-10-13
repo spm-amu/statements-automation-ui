@@ -66,12 +66,13 @@ const MeetingRoom = (props) => {
   const [participants, setParticipants] = useState([]);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
-  const [currentUserSocket, setCurrentUserSocket] = useState(null);
   const [currentUserStream, setCurrentUserStream] = useState(null);
   const [videoMuted, setVideoMuted] = useState(false);
   const [audioMuted, setAudioMuted] = useState(false);
   const userVideo = useRef();
   const navigate = useNavigate();
+  const currentUserSocket = useRef();
+
   const {
     selectedMeeting,
     isHost,
@@ -93,7 +94,8 @@ const MeetingRoom = (props) => {
           isHost,
           eventHandler: {
             onInit: (socket) => {
-              setCurrentUserSocket(socket);
+              //setCurrentUserSocket(socket);
+              currentUserSocket.current = socket;
               joinInAudio.play();
             },
             onAskForPermision: (data) => {
@@ -138,7 +140,7 @@ const MeetingRoom = (props) => {
 
               setParticipants(newParticipants);
               if (participants.length === 0) {
-                alert(currentUserSocket);
+                alert(currentUserSocket.current);
                 endCall();
                 props.closeHandler();
                 //navigate("/view/calendar");
@@ -231,8 +233,8 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].stop();
     }
 
-    if (currentUserSocket) {
-      currentUserSocket.disconnect();
+    if (currentUserSocket.current) {
+      currentUserSocket.current.disconnect();
     }
 
     props.closeHandler();
@@ -286,8 +288,8 @@ const MeetingRoom = (props) => {
   };
 
   const acceptUser = (item) => {
-    if (currentUserSocket) {
-      currentUserSocket.emit(MessageType.PERMIT_STATUS, {
+    if (currentUserSocket.current) {
+      currentUserSocket.current.emit(MessageType.PERMIT_STATUS, {
         allowed: true,
         id: item.socketId
       });
@@ -297,8 +299,8 @@ const MeetingRoom = (props) => {
   };
 
   const rejectUser = (item) => {
-    if (currentUserSocket) {
-      currentUserSocket.emit(MessageType.PERMIT_STATUS, {
+    if (currentUserSocket.current) {
+      currentUserSocket.current.emit(MessageType.PERMIT_STATUS, {
         allowed: false,
         id: item.socketId
       });
