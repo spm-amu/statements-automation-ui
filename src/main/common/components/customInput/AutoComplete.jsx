@@ -48,7 +48,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
 
     return (
       <Box component="span" sx={{'& > img': {mr: 2, flexShrink: 0}}}>
-        {option.label}
+        2223333
       </Box>);
   };
 
@@ -109,7 +109,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       autoHighlight
       value={props.value ? props.value : []}
       multiple={!Utils.isNull(props.multiple) ? props.multiple : false}
-      getOptionLabel={(option) => option.label}
+      getOptionLabel={(option) => props.labelClickHandler ? <span className={'option-label'} onClick={(e) => props.labelClickHandler(e)}>{option.label}</span> : option.label}
       open={open}
       onOpen={handleOpen}
       disabled={props.disabled}

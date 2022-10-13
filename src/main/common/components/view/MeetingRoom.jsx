@@ -138,9 +138,10 @@ const MeetingRoom = (props) => {
 
               setParticipants(newParticipants);
               if (participants.length === 0) {
+                alert(currentUserSocket);
                 endCall();
                 props.closeHandler();
-                navigate("/view/calendar");
+                //navigate("/view/calendar");
               }
             },
             onUsersArrived: (userPeerMap) => {
@@ -198,6 +199,7 @@ const MeetingRoom = (props) => {
     if (step === Steps.SESSION) {
       minimizeView(null);
     } else if (props.viewSwitch > 0) {
+      alert('D');
       endCall();
     }
   }, [props.viewSwitch]);

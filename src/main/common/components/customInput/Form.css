@@ -20,6 +20,11 @@
   border-bottom: none !important;
 }
 
+.option-label {
+  cursor: pointer;
+  color: blue;
+}
+
 @media screen and (max-width: 991px) {
   .input-wrapper {
     width: 100%;

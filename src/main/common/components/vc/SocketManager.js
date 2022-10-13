@@ -111,7 +111,8 @@ class SockerManager {
   };
 
   init = (args) => {
-    let currentUserSocket = io.connect('http://svn.agilemotion.co.za');
+    //let currentUserSocket = io.connect('http://svn.agilemotion.co.za');
+    let currentUserSocket = io.connect('http://102.65.78.76:8000');
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     if (!args.isHost) {
