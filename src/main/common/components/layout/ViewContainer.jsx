@@ -8,6 +8,7 @@ import MeetingHistory from '../view/MeetingHistory';
 import Meeting from '../view/Meeting';
 import JoinMeetingSettings from '../view/JoinMeetingSettings';
 import MeetingRoom from '../view/MeetingRoom';
+import People from "../view/People";
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -60,6 +61,9 @@ const ViewContainer = (props) => {
         break;
       case 'meetingRoom':
         element = <Calendar/>;
+        break;
+      case 'people':
+        element = <People/>;
         break;
     }
 

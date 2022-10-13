@@ -140,7 +140,6 @@ const MeetingRoom = (props) => {
 
               setParticipants(newParticipants);
               if (participants.length === 0) {
-                alert(currentUserSocket.current);
                 endCall();
                 props.closeHandler();
                 //navigate("/view/calendar");

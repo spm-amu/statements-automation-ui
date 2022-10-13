@@ -32,7 +32,7 @@ import React, {Component} from "react";
 import {
   CallEnd,
   CancelPresentation,
-  ChatBubble, Done,
+  ChatBubbleOutline, Done,
   People,
   PresentToAll,
   Videocam,
@@ -107,7 +107,7 @@ class Icon extends Component {
     } else if (this.props.id === 'PRESENT_TO_ALL') {
       return <PresentToAll/>
     } else if (this.props.id === 'CHAT_BUBBLE') {
-      return <ChatBubble/>
+      return <ChatBubbleOutline/>
     } else if (this.props.id === 'CALL_END') {
       return <CallEnd/>
     } else if (this.props.id === 'PEOPLE') {

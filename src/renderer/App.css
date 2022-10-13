@@ -83,3 +83,20 @@ a:hover {
   align-items: center;
   overflow-y: hidden !important;
 }
+
+.avatar {
+  font-size: 36px;
+  width: 3em;
+  height: 3em;
+  border-radius: 50%;
+  background: #00476a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar::after {
+  content: attr(data-label);
+  font-family: 'Readex Pro', sans-serif;
+  color: #FFFFFF;
+}
