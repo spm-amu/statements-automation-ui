@@ -31,6 +31,11 @@ ipcMain.on('ipc-armscor', async (event, arg) => {
   event.reply('ipc-armscor', msgTemplate('pong'));
 });
 
+ipcMain.on('downloadFile', async (event, { payload }) => {
+  console.log('PAYLOAD: ', payload);
+  mainWindow?.webContents.downloadURL(payload.fileURL)
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
@@ -75,6 +80,8 @@ const createWindow = async () => {
     height: 870,
     icon: getAssetPath('icon.png'),
     webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
