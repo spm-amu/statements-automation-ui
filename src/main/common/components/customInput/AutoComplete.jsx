@@ -48,7 +48,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
 
     return (
       <Box component="span" sx={{'& > img': {mr: 2, flexShrink: 0}}}>
-        2223333
+        {option.label}
       </Box>);
   };
 

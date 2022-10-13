@@ -8,7 +8,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
     <div className="person-card">
       <div className="row" style={{borderBottom: '1px solid #e1e1e1', paddingBottom: '8px'}}>
         <div>
-          <img src={props.data.avatar} alt={""}  style={{borderRadius: '50%'}}/>
+          <img src={props.data.avatar ? props.data.avatar : require('../../desktop/dashboard/images/noimage-person.png')} alt={""}  style={{borderRadius: '50%'}}/>
         </div>
         <div className={"user-details"}>
           {

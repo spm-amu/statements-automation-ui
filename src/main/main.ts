@@ -31,7 +31,7 @@ ipcMain.on('ipc-armscor', async (event, arg) => {
   event.reply('ipc-armscor', msgTemplate('pong'));
 });
 
-ipcMain.on('downloadFile', async (event, { payload }) => {
+ipcMain.on('downloadFile', async (_event, { payload }) => {
   console.log('PAYLOAD: ', payload);
   mainWindow?.webContents.downloadURL(payload.fileURL)
 });
