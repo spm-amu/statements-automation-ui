@@ -119,7 +119,21 @@ class SocketManager {
     return peer;
   };
 
+  destroyPeer = (id) => {
+    let filtered = this.userPeerMap.filter((item) => item.user.id === id);
+
+    if(filtered.length > 0) {
+      for (const filteredElement of filtered) {
+        let peerObj = filteredElement.peer;
+        if (peerObj) {
+          peerObj.destroy();
+        }
+      }
+    }
+  };
+
   removeFromUserToPeerMap = (id) => {
+    this.destroyPeer(id);
     let filtered = this.userPeerMap.filter((item) => item.user.id !== id);
     this.userPeerMap.splice(0, this.userPeerMap.length);
 
@@ -129,15 +143,26 @@ class SocketManager {
   };
 
   clearUserToPeerMap = () => {
+    for (const userPeerMapElement of this.userPeerMap) {
+      this.destroyPeer(userPeerMapElement.user.id);
+    }
+
     this.userPeerMap.splice(0, this.userPeerMap.length);
+  };
+
+  refreshConnection = () => {
+    this.socket.disconnect();
+    this.init();
   };
 
   signal = (payload) => {
     const item = this.userPeerMap.find((p) => p.user.id === payload.id);
+    console.log("\n\n\nITEM : ", item);
     item.peer.signal(payload.signal);
   };
 
   mapUserToPeer = (payload, stream, eventType) => {
+    console.log("SUBS : ", this.subscriptions);
     const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.id, stream) :
       this.addPeer(payload.callerID, stream);
 
@@ -148,10 +173,21 @@ class SocketManager {
 
     this.userPeerMap.push(item);
     return item;
+  };
+
+  endCall = () => {
+    this.clearAllEventListeners();
+
+    this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
+    this.socket.disconnect();
+    delete this.socket;
+    this.init();
+
+    alert('DISTROYED');
   }
 }
 
 const instance = new SocketManager();
-Object.freeze(instance);
+//Object.freeze(instance);
 
 export default instance;

@@ -115,6 +115,7 @@ const MeetingRoom = (props) => {
   };
 
   const addUser = (payload) => {
+    console.log("\n\n\nADD USER : ", payload);
     let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED);
     joinInAudio.play();
 
@@ -137,6 +138,7 @@ const MeetingRoom = (props) => {
   };
 
   const createParticipants = (users, socket) => {
+    console.log("\n\n\nALL USERS FIREE : ", users);
     socketManager.clearUserToPeerMap();
 
     let userPeerMap = [];
@@ -281,8 +283,7 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].stop();
     }
 
-    socketManager.emitEvent(MessageType.END_CALL, {});
-
+    socketManager.endCall();
     props.closeHandler();
     navigate("/view/calendar");
   };
