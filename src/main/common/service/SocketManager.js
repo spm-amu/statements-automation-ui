@@ -34,14 +34,14 @@ class SocketManager {
 
     for (const value of Object.keys(MessageType)) {
       socket.on(value, (payload) => {
-        if (value !== MessageType.SOCKET_CONNECTED || value !== MessageType.USERS_ONLINE
+        if (value !== MessageType.USERS_ONLINE
           || value !== MessageType.USER_ONLINE || value !== MessageType.USER_OFFLINE) {
           this.fireEvent(value, {socket: this.socket, payload: payload});
         }
       });
     }
 
-    socket.on(MessageType.SOCKET_CONNECTED, (payload) => {
+    socket.on("connect", () => {
       this.socket.emit(MessageType.REGISTER_ONLINE, {id: userDetails.userId})
     });
 
