@@ -5,11 +5,33 @@
   max-width: 100%;
 }
 
-.person-card .actions {
-  display: flex;
-  justify-content: flex-end;
+.person-card .bottom-strip {
   width: 100%;
   padding-top: 8px;
+}
+
+.person-card .bottom-strip .buttons{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.person-card .bottom-strip .indicator {
+
+}
+
+.person-card .bottom-strip .indicator .online,
+.person-card .bottom-strip .indicator .offline{
+  width: 16px;
+  height: 16px;
+  margin: 20px 0 0 28px;
+}
+
+.person-card .bottom-strip .indicator .offline{
+  background-color: red;
+}
+
+.person-card .bottom-strip .indicator .online{
+  background-color: green;
 }
 
 .person-card .user-details {

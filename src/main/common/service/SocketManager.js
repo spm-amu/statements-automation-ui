@@ -7,6 +7,7 @@ class SocketManager {
     if (!SocketManager.instance) {
       this.subscriptions = [];
       this.userPeerMap = [];
+      this.usersOnline = [];
       SocketManager.instance = this;
       this.init();
     }
@@ -22,15 +23,55 @@ class SocketManager {
     this.socket.disconnect();
   };
 
+  isUserOnline = () => {
+
+  };
+
   init = () => {
     //let currentUserSocket = io.connect('http://svn.agilemotion.co.za');
-    let socket = io.connect('http://100.72.97.76:8000');
+    let socket = io.connect('http://100.72.121.126:8000');
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     for (const value of Object.keys(MessageType)) {
       socket.on(value, (payload) => {
-        this.fireEvent(value, {socket: this.socket, payload: payload});
+        if (value !== MessageType.SOCKET_CONNECTED || value !== MessageType.USERS_ONLINE
+          || value !== MessageType.USER_ONLINE || value !== MessageType.USER_OFFLINE) {
+          this.fireEvent(value, {socket: this.socket, payload: payload});
+        }
       });
     }
+
+    socket.on(MessageType.SOCKET_CONNECTED, (payload) => {
+      this.socket.emit(MessageType.REGISTER_ONLINE, {id: userDetails.userId})
+    });
+
+    socket.on(MessageType.USERS_ONLINE, (payload) => {
+      this.usersOnline.splice(0, this.usersOnline.length);
+      for (const payloadElement of payload) {
+        this.usersOnline.push(payloadElement);
+      }
+
+      console.log("\n\n\nUSERS ONLINE : ", payload);
+      this.fireEvent(MessageType.USERS_ONLINE, {socket: this.socket, payload: payload});
+    });
+
+    socket.on(MessageType.USER_ONLINE, (payload) => {
+      console.log("\n\n\nNEW USER ONLINE : ", payload);
+      this.usersOnline.push(payload);
+      this.fireEvent(MessageType.USER_ONLINE, {socket: this.socket, payload: payload});
+    });
+
+    socket.on(MessageType.USER_OFFLINE, (payload) => {
+      console.log("\n\n\nUSER OFFLINE : ", payload);
+      this.usersOnline.push(payload);
+      for (let i = 0; i < this.usersOnline.length; i++) {
+        if(this.usersOnline[i].userId === payload.userId) {
+          this.usersOnline.splice(i, 1);
+        }
+      }
+
+      this.fireEvent(MessageType.USER_OFFLINE, {socket: this.socket, payload: payload});
+    });
 
     this.socket = socket;
   };
@@ -122,7 +163,7 @@ class SocketManager {
   destroyPeer = (id) => {
     let filtered = this.userPeerMap.filter((item) => item.user.id === id);
 
-    if(filtered.length > 0) {
+    if (filtered.length > 0) {
       for (const filteredElement of filtered) {
         let peerObj = filteredElement.peer;
         if (peerObj) {
@@ -157,12 +198,10 @@ class SocketManager {
 
   signal = (payload) => {
     const item = this.userPeerMap.find((p) => p.user.id === payload.id);
-    console.log("\n\n\nITEM : ", item);
     item.peer.signal(payload.signal);
   };
 
   mapUserToPeer = (payload, stream, eventType) => {
-    console.log("SUBS : ", this.subscriptions);
     const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.id, stream) :
       this.addPeer(payload.callerID, stream);
 
@@ -177,12 +216,11 @@ class SocketManager {
 
   endCall = () => {
     this.clearAllEventListeners();
-
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
   }
 }
 
 const instance = new SocketManager();
-//Object.freeze(instance);
+Object.freeze(instance);
 
 export default instance;

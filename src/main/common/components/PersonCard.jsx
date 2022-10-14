@@ -16,8 +16,12 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
           }
         </div>
       </div>
-      <div className={"actions row"}>
-        <div style={{marginRight: '4px'}} className={'col-*-*'}>
+      <div className={"bottom-strip row"}>
+        <div className={'indicator col'}>
+          <div className={'online'}>
+          </div>
+        </div>
+        <div style={{marginRight: '4px'}} className={'buttons'}>
           <IconButton
             onClick={(e) => {
               props.onSearch(searchValue);
