@@ -185,7 +185,7 @@ const SignIn = (props) => {
                           onMouseDown={handleMouseDownPassword}
                           edge="end"
                         >
-                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                          {showPassword ? <Visibility style={styles.inputAdornmentIcon} /> : <VisibilityOff style={styles.inputAdornmentIcon} />}
                         </IconButton>
                       </InputAdornment>
                     ),
