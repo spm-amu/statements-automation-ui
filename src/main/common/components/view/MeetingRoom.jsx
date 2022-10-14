@@ -119,13 +119,13 @@ const MeetingRoom = (props) => {
     joinInAudio.play();
 
     let user = {
-      peerID: userPeerItem.user.callerID,
-      peer: userPeerItem.peer,
-      name: userPeerItem.user.name,
-      avatar: userPeerItem.user.avatar
+      peerID: userToPeerItem.user.callerID,
+      peer: userToPeerItem.peer,
+      name: userToPeerItem.user.name,
+      avatar: userToPeerItem.user.avatar
     };
 
-    userPeerItem.peer.on('stream', (stream) => {
+    userToPeerItem.peer.on('stream', (stream) => {
       user.stream = stream;
       setParticipants((participants) => [...participants, user]);
       if (step === Steps.LOBBY) {
@@ -281,7 +281,7 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].stop();
     }
 
-    socketManager.disconnectSocket();
+    socketManager.emitEvent(MessageType.END_CALL, {});
 
     props.closeHandler();
     navigate("/view/calendar");

@@ -24,7 +24,7 @@ class SocketManager {
 
   init = () => {
     //let currentUserSocket = io.connect('http://svn.agilemotion.co.za');
-    let socket = io.connect('http://102.65.78.76:8000');
+    let socket = io.connect('http://100.72.97.76:8000');
 
     for (const value of Object.keys(MessageType)) {
       socket.on(value, (payload) => {
