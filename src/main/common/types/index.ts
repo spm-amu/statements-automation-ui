@@ -8,7 +8,6 @@ export type PeerSignal = {
   incomingSignal?: any;
   signal: any;
   callerId: string;
-
 };
 
 export type WebsocketMessage = {

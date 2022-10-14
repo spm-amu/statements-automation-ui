@@ -179,11 +179,6 @@ class SocketManager {
     this.clearAllEventListeners();
 
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
-    this.socket.disconnect();
-    delete this.socket;
-    this.init();
-
-    alert('DISTROYED');
   }
 }
 
