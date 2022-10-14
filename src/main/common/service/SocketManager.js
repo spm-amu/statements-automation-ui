@@ -18,6 +18,10 @@ class SocketManager {
     this.socket.emit(eventType, data);
   };
 
+  disconnectSocket = () => {
+    this.socket.disconnect();
+  };
+
   init = () => {
     //let currentUserSocket = io.connect('http://svn.agilemotion.co.za');
     let socket = io.connect('http://102.65.78.76:8000');
@@ -134,7 +138,7 @@ class SocketManager {
 
     let item = {
       peer: peer,
-      user: user,
+      user: payload,
     };
 
     this.userPeerMap.push(item);

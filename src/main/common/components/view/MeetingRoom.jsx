@@ -71,7 +71,6 @@ const MeetingRoom = (props) => {
   const [audioMuted, setAudioMuted] = useState(false);
   const userVideo = useRef();
   const navigate = useNavigate();
-  const currentUserSocket = useRef();
 
   const handler = () => {
     return {
@@ -219,7 +218,6 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (currentUserStream) {
-      let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
       socketManager.addSubscriptions(handler(), MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL);
 
@@ -283,9 +281,7 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].stop();
     }
 
-    if (currentUserSocket.current) {
-      currentUserSocket.current.disconnect();
-    }
+    socketManager.disconnectSocket();
 
     props.closeHandler();
     navigate("/view/calendar");
@@ -338,23 +334,19 @@ const MeetingRoom = (props) => {
   };
 
   const acceptUser = (item) => {
-    if (currentUserSocket.current) {
-      currentUserSocket.current.emit(MessageType.PERMIT_STATUS, {
-        allowed: true,
-        id: item.socketId
-      });
-    }
+    socketManager.emitEvent(MessageType.PERMIT_STATUS, {
+      allowed: true,
+      id: item.socketId
+    });
 
     removeFromLobbyWaiting(item);
   };
 
   const rejectUser = (item) => {
-    if (currentUserSocket.current) {
-      currentUserSocket.current.emit(MessageType.PERMIT_STATUS, {
-        allowed: false,
-        id: item.socketId
-      });
-    }
+    socketManager.emitEvent(MessageType.PERMIT_STATUS, {
+      allowed: false,
+      id: item.socketId
+    });
 
     removeFromLobbyWaiting(item);
   };
