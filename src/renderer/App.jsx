@@ -12,6 +12,7 @@ import ThemeProvider from "@material-ui/styles/ThemeProvider";
 
 // ** Fake Database
 import '../main/@fake-db';
+import SignIn from '../main/common/components/view/security/SignIn';
 
 const armscorTheme = createTheme({
     palette: {
@@ -31,9 +32,10 @@ const armscorTheme = createTheme({
 const Login = () => {
   return (
     <div style={{width: '100%', height: '100vh', backgroundColor: '#E5E5E5'}}>
-      <div className="Landing" style={{height: '100%', display: 'flex', alignItems: 'center'}}>
-        <LoginView/>
-      </div>
+      <SignIn />
+      {/*<div className="Landing" style={{height: '100%', display: 'flex', alignItems: 'center'}}>*/}
+      {/*  <LoginView/>*/}
+      {/*</div>*/}
     </div>
   );
 };

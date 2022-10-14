@@ -13,6 +13,12 @@ const styles = {
     padding: '16px',
     height: 'auto'
   },
+  textCenter: {
+    textAlign: "center"
+  },
+  inputAdornmentIcon: {
+    color: '#AAAAAA'
+  },
   paper: {
     padding: 20,
     overflow: 'auto'
