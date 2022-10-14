@@ -120,7 +120,12 @@ class SocketManager {
   };
 
   removeFromUserToPeerMap = (id) => {
-    this.userPeerMap = this.userPeerMap.filter((item) => item.user.id !== id);
+    let filtered = this.userPeerMap.filter((item) => item.user.id !== id);
+    this.userPeerMap.splice(0, this.userPeerMap.length);
+
+    for (const filteredElement of filtered) {
+      this.userPeerMap.push(filteredElement);
+    }
   };
 
   clearUserToPeerMap = () => {
