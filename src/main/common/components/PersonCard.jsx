@@ -36,7 +36,6 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
   const socketEventHandler = handler();
 
   useEffect(() => {
-    console.log("SUB : ", socketEventHandler);
     setOnline(socketManager.isUserOnline(props.data));
     socketManager.addSubscriptions(socketEventHandler, MessageType.USER_ONLINE, MessageType.USERS_ONLINE, MessageType.USER_OFFLINE)
   }, []);
@@ -69,8 +68,9 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
         <div style={{marginRight: '4px'}} className={'buttons'}>
           <IconButton
             onClick={(e) => {
-              props.onSearch(searchValue);
+
             }}
+            disabled={!online}
             style={{
               marginRight: '4px'
             }}
@@ -81,8 +81,9 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
         <div className={'col-*-*'}>
           <IconButton
             onClick={(e) => {
-              props.onSearch(searchValue);
+
             }}
+            disabled={online}
             style={{
               marginRight: '4px'
             }}
