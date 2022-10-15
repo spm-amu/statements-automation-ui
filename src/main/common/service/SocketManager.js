@@ -9,7 +9,6 @@ class SocketManager {
       this.userPeerMap = [];
       this.usersOnline = [];
       SocketManager.instance = this;
-      this.init();
     }
 
     return SocketManager.instance;
@@ -20,7 +19,10 @@ class SocketManager {
   };
 
   disconnectSocket = () => {
-    this.socket.disconnect();
+    alert("DISCONNECT");
+    if(this.socket) {
+      this.socket.disconnect();
+    }
   };
 
   isUserOnline = () => {
@@ -29,7 +31,7 @@ class SocketManager {
 
   init = () => {
     //let currentUserSocket = io.connect('http://svn.agilemotion.co.za');
-    let socket = io.connect('http://100.72.121.126:8000');
+    let socket = io.connect('http://localhost:8000');
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     for (const value of Object.keys(MessageType)) {
@@ -42,7 +44,8 @@ class SocketManager {
     }
 
     socket.on("connect", () => {
-      this.socket.emit(MessageType.REGISTER_ONLINE, {id: userDetails.userId})
+      alert("CONNECT FIREEEE");
+      socket.emit(MessageType.REGISTER_ONLINE, {id: userDetails.userId});
     });
 
     socket.on(MessageType.USERS_ONLINE, (payload) => {
@@ -191,11 +194,6 @@ class SocketManager {
     this.userPeerMap.splice(0, this.userPeerMap.length);
   };
 
-  refreshConnection = () => {
-    this.socket.disconnect();
-    this.init();
-  };
-
   signal = (payload) => {
     const item = this.userPeerMap.find((p) => p.user.id === payload.id);
     item.peer.signal(payload.signal);
@@ -221,6 +219,6 @@ class SocketManager {
 }
 
 const instance = new SocketManager();
-Object.freeze(instance);
+//Object.freeze(instance);
 
 export default instance;

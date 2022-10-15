@@ -10,6 +10,7 @@ import HomeNavbar from "../../common/components/navbars/HomeNavbar";
 import "../../common/assets/scss/black-dashboard-react.scss";
 import "./BasicBusinessAppDashboard.css"
 import {get, host} from "../../common/service/RestService";
+import socketManager from "../../common/service/SocketManager";
 
 let ps;
 
@@ -40,7 +41,6 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   React.useEffect(() => {
-
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.classList.add("perfect-scrollbar-on");
       document.documentElement.classList.remove("perfect-scrollbar-off");
@@ -153,11 +153,18 @@ const BasicBusinessAppDashboard = (props) => {
           sessionStorage.setItem("userDetails", JSON.stringify(response));
           setUserDetails(response);
           init();
+          socketManager.init();
         }, (e) => {
         })
       }
     }
-  });
+  }, []);
+
+  React.useEffect(() => {
+    return () => {
+      socketManager.disconnectSocket();
+    };
+  }, []);
 
   const getViews = (menus, level) => {
     let newViews = [];
