@@ -19,14 +19,21 @@ class SocketManager {
   };
 
   disconnectSocket = () => {
-    alert("DISCONNECT");
     if(this.socket) {
       this.socket.disconnect();
     }
   };
 
-  isUserOnline = () => {
+  isUserOnline = (user) => {
+    console.log("\n\nUSERS ONLINE : ", this.usersOnline);
+    console.log("USER : ", user);
+    for (const usersOnlineElement of this.usersOnline) {
+      if(usersOnlineElement.userId === user.userId) {
+        return true;
+      }
+    }
 
+    return false;
   };
 
   init = () => {
@@ -65,10 +72,12 @@ class SocketManager {
 
     socket.on(MessageType.USER_OFFLINE, (payload) => {
       console.log("\n\n\nUSER OFFLINE : ", payload);
-      this.usersOnline.push(payload);
       for (let i = 0; i < this.usersOnline.length; i++) {
+        console.log(this.usersOnline[i].userId + " === " + payload.userId);
         if(this.usersOnline[i].userId === payload.userId) {
+          console.log("SPLICE : ", this.usersOnline);
           this.usersOnline.splice(i, 1);
+          console.log("SPLICED : ", this.usersOnline);
         }
       }
 
@@ -77,13 +86,6 @@ class SocketManager {
 
     this.socket = socket;
   };
-
-  /**
-   * Adds a subscription bound by the given event type.
-   *
-   * @param subscription the subscription to be added
-   */
-  addSubscription = (subscription) => this.subscriptions.push(subscription);
 
   /**
    * Adds a subscription bound by the given event type.
@@ -114,6 +116,10 @@ class SocketManager {
       }
     }
   }
+
+  removeSubscriptions = (handler) => {
+    this.subscriptions = this.subscriptions.filter((sub) => sub.handler.id !== handler.id);
+  };
 
   /**
    * Clears all event subscriptions

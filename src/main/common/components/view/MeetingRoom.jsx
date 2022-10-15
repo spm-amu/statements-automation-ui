@@ -74,6 +74,9 @@ const MeetingRoom = (props) => {
 
   const handler = () => {
     return {
+      get id() {
+        return 'meeting-room-' + selectedMeeting.id;
+      },
       on: (eventType, be) => {
         switch (eventType) {
           case MessageType.ALLOWED:
