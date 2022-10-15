@@ -44,7 +44,6 @@ class SocketManager {
     }
 
     socket.on("connect", () => {
-      alert("CONNECT FIREEEE");
       socket.emit(MessageType.REGISTER_ONLINE, {id: userDetails.userId});
     });
 
