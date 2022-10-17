@@ -112,7 +112,7 @@ const MeetingSettingsComponent = (props) => {
           CLOSE
         </Button>
       </div>
-      <div className={'row centered-flex-box'}>
+      <div className={'row centered-flex-box'} style={{maxHeight: '80%', overflow: 'auto'}}>
         <table>
           <tbody>
           <tr>
