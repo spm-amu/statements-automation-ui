@@ -48,6 +48,35 @@ class SocketManager {
       });
     }
 
+    socket.on("connect", () => {
+      socket.emit(MessageType.REGISTER_ONLINE, {id: userDetails.userId});
+    });
+
+    socket.on(MessageType.USERS_ONLINE, (payload) => {
+      this.usersOnline.splice(0, this.usersOnline.length);
+      for (const payloadElement of payload) {
+        this.usersOnline.push(payloadElement);
+      }
+
+      this.fireEvent(MessageType.USERS_ONLINE, {socket: this.socket, payload: payload});
+    });
+
+    socket.on(MessageType.USER_ONLINE, (payload) => {
+      this.usersOnline.push(payload);
+      this.fireEvent(MessageType.USER_ONLINE, {socket: this.socket, payload: payload});
+    });
+
+    socket.on(MessageType.USER_OFFLINE, (payload) => {
+      for (let i = 0; i < this.usersOnline.length; i++) {
+        console.log(this.usersOnline[i].userId + " === " + payload.userId);
+        if(this.usersOnline[i].userId === payload.userId) {
+          this.usersOnline.splice(i, 1);
+        }
+      }
+
+      this.fireEvent(MessageType.USER_OFFLINE, {socket: this.socket, payload: payload});
+    });
+
     this.socket = socket;
   };
 
@@ -175,7 +204,7 @@ class SocketManager {
   };
 
   removeFromUserToPeerMap = (id) => {
-    //this.destroyPeer(id);
+    this.destroyPeer(id);
     let filtered = this.userPeerMap.filter((item) => item.user.id !== id);
     this.userPeerMap.splice(0, this.userPeerMap.length);
 
@@ -186,7 +215,7 @@ class SocketManager {
 
   clearUserToPeerMap = () => {
     for (const userPeerMapElement of this.userPeerMap) {
-      //this.destroyPeer(userPeerMapElement.user.id);
+      this.destroyPeer(userPeerMapElement.user.id);
     }
 
     this.userPeerMap.splice(0, this.userPeerMap.length);

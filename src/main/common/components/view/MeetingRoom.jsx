@@ -212,8 +212,6 @@ const MeetingRoom = (props) => {
 
   const join = () => {
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-    console.log("\n\n\nJOIN : ", eventHandler.userPeerMap);
-    socketManager.init();
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
       userIdentity: userDetails.userId,
@@ -304,6 +302,8 @@ const MeetingRoom = (props) => {
     socketManager.removeSubscriptions(eventHandler);
     socketManager.clearUserToPeerMap();
     socketManager.disconnectSocket();
+    socketManager.init();
+
     props.closeHandler();
     navigate("/view/calendar");
   };
