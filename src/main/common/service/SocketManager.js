@@ -196,7 +196,7 @@ class SocketManager {
   };
 
   removeFromUserToPeerMap = (id) => {
-    //this.destroyPeer(id);
+    this.destroyPeer(id);
     let filtered = this.userPeerMap.filter((item) => item.user.id !== id);
     this.userPeerMap.splice(0, this.userPeerMap.length);
 
@@ -232,10 +232,12 @@ class SocketManager {
   };
 
   endCall = () => {
+    this.clearUserToPeerMap();
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
   };
 
   endDirectCall = (callerSocketId) => {
+    this.clearUserToPeerMap();
     this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId});
   }
 }

@@ -68,6 +68,7 @@ const MeetingRoom = (props) => {
         return 'meeting-room-' + selectedMeeting.id;
       },
       on: (eventType, be) => {
+        console.log("========== EVENT: ===========", eventType);
         switch (eventType) {
           case MessageType.ALLOWED:
             join();
@@ -292,9 +293,8 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].stop();
     }
 
-    //alert(publish);
     if(publish) {
-      //socketManager.endCall();
+      socketManager.endCall();
     }
 
     props.closeHandler();
