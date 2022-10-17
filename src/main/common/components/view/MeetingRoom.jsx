@@ -88,7 +88,6 @@ const MeetingRoom = (props) => {
             removeUser(be.payload);
             break;
           case MessageType.CALL_ENDED:
-            alert("end call fireeee");
             navigate('/view/people');
             break;
         }

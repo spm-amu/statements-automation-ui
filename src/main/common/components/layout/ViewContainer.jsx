@@ -61,7 +61,6 @@ const ViewContainer = (props) => {
         element = <Calendar/>;
         break;
       case 'people':
-        alert('PIP NAV');
         element = <People/>;
         break;
     }
