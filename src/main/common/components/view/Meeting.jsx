@@ -412,6 +412,7 @@ const Meeting = (props) => {
           <div>
             <Files
               disabled={readOnly}
+              enableFile={true}
               id={'documents'}
               value={value.documents}
               valueChangeHandler={(value, id) => handleFormValueChange(value, id, false)}

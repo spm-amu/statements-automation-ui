@@ -112,7 +112,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       getOptionLabel={(option) => props.labelClickHandler ? <span className={'option-label'} onClick={(e) => props.labelClickHandler(e)}>{option.label}</span> : option.label}
       open={open}
       onOpen={handleOpen}
-      disabled={props.disabled}
+      disabled={props.enableFile ? false : props.disabled}
       onClose={() => setOpen(false)}
       inputValue={inputValue}
       onInputChange={handleInputChange}
