@@ -447,6 +447,7 @@ const MeetingRoom = (props) => {
                             if (isDirectCall && participants.length === 0) {
                               console.log("USER TO CALL : ", userToCall);
                               socketManager.emitEvent(MessageType.CANCEL_CALL, {userId: userToCall.userId});
+                              onCallEnded();
                             } else {
                               endCall();
                             }

@@ -208,11 +208,11 @@ ipcMain.on("declineCall", async (_event, args) => {
 });
 
 ipcMain.on("cancelCall", async (_event, args) => {
-  if (!mainWindow) {
+  if (!dialWindow) {
     throw new Error('"mainWindow" is not defined');
   }
 
-  mainWindow.webContents.send('cancelCall', args);
+  dialWindow.webContents.send('cancelCall', args);
 
   dialWindow?.hide();
 });
