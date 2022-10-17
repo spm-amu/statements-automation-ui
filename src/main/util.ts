@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === 'development') {
     return 'http://localhost:1212/#/dialingPreview';
   };
 } else {
-  resolveHtmlPath = (htmlFileName: string) => {
+  resolveWindowHtmlPath = (htmlFileName: string) => {
     return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
   };
 }
