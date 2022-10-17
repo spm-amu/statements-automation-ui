@@ -19,6 +19,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import {useNavigate} from 'react-router-dom';
+import ModalComponent from "../customInput/Modal";
 
 const Meeting = (props) => {
 
@@ -252,6 +253,31 @@ const Meeting = (props) => {
         </div>
       );
     }
+
+    const setRecurrentBody = (
+
+      <div className={'row no-margin'}>
+        <div className={'col-*-*'}>
+          <DatePicker
+            label="Start date"
+            id="startDate"
+            disabled={readOnly}
+            hasError={errors.startDate}
+            // value={value.startDate}
+            required={true}
+            valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+            errorMessage={'A start date is required. Please select a value'}
+          />
+        </div>
+        <div>
+          <div className={'col-*-*'}>
+            {/*<Dropdow options={options} value={defaultOption} placeholder="Select an option" />;*/}
+          </div>
+        </div>
+      </div>
+    );
+
+
     return (
       readOnly ?
         <div style={{width: '100%', display: 'flex', justifyContent: 'right', margin: '16px 0'}}>
@@ -334,6 +360,29 @@ const Meeting = (props) => {
     <X className="cursor-pointer" size={15} onClick={(e) => handleClose(e)}/>
   );
 
+  const setRecurrentBody = (
+
+    <div className={'row no-margin'}>
+      <div className={'col-*-*'}>
+        <DatePicker
+          label="Start date"
+          id="startDate"
+          disabled={readOnly}
+          hasError={errors.startDate}
+          // value={value.startDate}
+          required={true}
+          valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+          errorMessage={'A start date is required. Please select a value'}
+        />
+      </div>
+      <div>
+        <div className={'col-*-*'}>
+          {/*<Dropdown options={options} value={defaultOption} placeholder="Select an option"  children={}/>;*/}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     value &&
     <div style={{width: '100%', height: '88vh', padding: '32px', backgroundColor: '#FFFFFF', marginTop: '2px'}}>
@@ -343,6 +392,15 @@ const Meeting = (props) => {
           : 'Add'}{' '}
         Meeting
       </h5>
+
+      {/*TODO: being used for testing until event recurrence is done. So please don't delete :-)*/}
+      {/*<div>*/}
+      {/*  <h2 className="text-center">*/}
+      {/*    <ModalComponent body={setRecurrentBody} openLabel={"Set recurrence"} modalHeader={"Set recurrence"}/>*/}
+      {/*  </h2>*/}
+      {/*</div>*/}
+
+
       <div style={{width: '80%'}}>
         <Form>
           {

@@ -1,0 +1,16 @@
+.modal-content {
+  -webkit-box-shadow: -1px 1px 5px 9px #333;
+  -moz-box-shadow: -1px 1px 5px 9px #333;
+  box-shadow: -1px 1px 50px 1px #333;
+}
+
+/*.modal-header,*/
+/*.modal-body,*/
+/*.modal-footer {*/
+/*  background: #002849 !important;*/
+/*}*/
+
+.modal-body img {
+  width: auto;
+  height: 150px;
+}
