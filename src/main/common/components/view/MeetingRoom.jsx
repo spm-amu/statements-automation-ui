@@ -406,7 +406,7 @@ const MeetingRoom = (props) => {
           }
         </DialogTitle>
         <DialogContent className={'row-*-* meeting-window-container'}>
-          <div style={{height: '100%'}}>
+          <div style={{height: 'calc(100% - 144px)'}}>
             {
               step === Steps.LOBBY ?
                 <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}

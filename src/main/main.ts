@@ -26,6 +26,7 @@ class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 let dialWindow: BrowserWindow | null = null;
 let screenWidth: number;
+let screenHeight: number;
 
 ipcMain.on('ipc-armscor', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -68,9 +69,9 @@ const createDialWindow = () => {
   dialWindow = new BrowserWindow({
     title: "Armscor",
     width: 550,
-    height: 550,
+    height: 300,
     maxWidth: 550,
-    maxHeight: 550,
+    maxHeight: 300,
     resizable: false,
     minimizable: false,
     maximizable: false,
@@ -78,7 +79,7 @@ const createDialWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 600,
-    y: 0,
+    y: screenHeight - 300,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -109,7 +110,7 @@ const createDialWindow = () => {
 
   // dialingWindow.loadFile(resolveHtmlPath('index.html'));
   dialWindow.loadURL('http://localhost:1212/#/dialingPreview');
-}
+};
 
 const createWindow = async () => {
   if (isDebug) {
@@ -155,6 +156,7 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+    dialWindow = null;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
@@ -218,8 +220,9 @@ app
   .whenReady()
   .then(() => {
     const primaryDisplay = screen.getPrimaryDisplay();
-    const { width } = primaryDisplay.workAreaSize;
+    const { width, height } = primaryDisplay.workAreaSize;
     screenWidth = width;
+    screenHeight = height;
 
 
     createWindow();

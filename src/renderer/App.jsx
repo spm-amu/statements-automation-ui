@@ -43,7 +43,7 @@ const Login = () => {
 
 const Dialing = () => {
   return (
-    <div style={{width: '100%', height: '100vh', backgroundColor: '#E5E5E5'}}>
+    <div style={{width: '99vw', height: '100vh', backgroundColor: '#E5E5E5', overflow: 'hidden'}}>
       <DialingPreview />
     </div>
   );
