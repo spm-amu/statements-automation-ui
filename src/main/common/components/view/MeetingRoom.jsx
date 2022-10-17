@@ -12,6 +12,7 @@ import Icon from '../Icon';
 import Paper from "@material-ui/core/Paper";
 import IconButton from '@material-ui/core/IconButton';
 import Draggable from "react-draggable";
+import uuid from 'react-uuid';
 import Lobby from "../vc/Lobby";
 import Footer from "../vc/Footer";
 import socketManager from "../../service/SocketManager";
@@ -71,6 +72,13 @@ const MeetingRoom = (props) => {
   const [audioMuted, setAudioMuted] = useState(false);
   const userVideo = useRef();
   const navigate = useNavigate();
+
+  const {
+    selectedMeeting,
+    isHost,
+    userToCall,
+    isDirectCall
+  } = props;
 
   const handler = () => {
     return {
@@ -209,11 +217,6 @@ const MeetingRoom = (props) => {
     });
   };
 
-  const {
-    selectedMeeting,
-    isHost,
-  } = props;
-
   useEffect(() => {
     return () => {
       endCall();
@@ -226,7 +229,7 @@ const MeetingRoom = (props) => {
       socketManager.addSubscriptions(handler(), MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL);
 
-      if (isHost) {
+      if (isHost || isDirectCall) {
         join();
       } else {
         askForPermission();
@@ -403,7 +406,7 @@ const MeetingRoom = (props) => {
           <div style={{height: '100%'}}>
             {
               step === Steps.LOBBY ?
-                <Lobby isHost={isHost} waitingList={lobbyWaitingList}
+                <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
                        acceptUserHandler={
                          (item) => {
                            acceptUser(item);

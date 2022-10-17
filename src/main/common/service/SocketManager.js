@@ -144,6 +144,27 @@ class SocketManager {
     return peer;
   };
 
+  callUser = (userToSignal, stream) => {
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream
+    });
+
+    peer.on("signal", (signal) => {
+      this.socket.emit("callUser", {
+        userToCall: userToSignal,
+        signalData: signal,
+        callerId: this.socket.id,
+        name: userDetails.name,
+      });
+    });
+
+    return  peer;
+  };
+
   addPeer(callerId, stream) {
     const peer = new Peer({
       initiator: false,

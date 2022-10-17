@@ -1,7 +1,7 @@
 import React from 'react';
 import icon from '../../assets/armscor_logo.png';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import LoginView from '../main/common/components/view/security/Login';
 import BasicBusinessAppDashboard from '../main/desktop/dashboard/BasicBusinessAppDashboard';
@@ -13,6 +13,10 @@ import ThemeProvider from "@material-ui/styles/ThemeProvider";
 // ** Fake Database
 import '../main/@fake-db';
 import SignIn from '../main/common/components/view/security/SignIn';
+import LottieIcon from '../main/common/components/LottieIcon';
+import IconButton from '@material-ui/core/IconButton';
+import Icon from '../main/common/components/Icon';
+import DialingPreview from '../main/common/components/vc/DialingPreview';
 
 const armscorTheme = createTheme({
     palette: {
@@ -33,9 +37,14 @@ const Login = () => {
   return (
     <div style={{width: '100%', height: '100vh', backgroundColor: '#E5E5E5'}}>
       <SignIn />
-      {/*<div className="Landing" style={{height: '100%', display: 'flex', alignItems: 'center'}}>*/}
-      {/*  <LoginView/>*/}
-      {/*</div>*/}
+    </div>
+  );
+};
+
+const Dialing = () => {
+  return (
+    <div style={{width: '100%', height: '100vh', backgroundColor: '#E5E5E5'}}>
+      <DialingPreview />
     </div>
   );
 };
@@ -64,6 +73,7 @@ export default function App() {
             <Route path="*" element={<Dashboard/>}/>
             <Route path="/dashboard/*" element={<Dashboard/>}/>
             <Route path="/login" element={<Login/>}/>
+            <Route path="/dialingPreview" element={<Dialing />}/>
           </Routes>
         </Router>
       </ThemeProvider>

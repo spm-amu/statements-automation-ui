@@ -11,6 +11,8 @@ import "../../common/assets/scss/black-dashboard-react.scss";
 import "./BasicBusinessAppDashboard.css"
 import {get, host} from "../../common/service/RestService";
 import socketManager from "../../common/service/SocketManager";
+import { MessageType } from '../../common/types';
+const { electron } = window;
 
 let ps;
 
@@ -144,6 +146,48 @@ const BasicBusinessAppDashboard = (props) => {
     //}
   };
 
+  const handler = () => {
+    return {
+      get id() {
+        return 'global-1223';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case MessageType.RECEIVING_CALL:
+            receiveCall(be.payload);
+            break;
+        }
+      }
+    }
+  };
+
+  const receiveCall = (payload) => {
+    electron.ipcRenderer.sendMessage('receivingCall', {
+      payload: payload
+    });
+  };
+
+  const onAnswerCall = () => {
+    electron.ipcRenderer.on('answerCall', args => {
+      navigate("/view/meetingRoom", {
+        state: {
+          selectedMeeting: {
+            id: args.payload.roomId
+          },
+          videoMuted: true,
+          audioMuted: false,
+          isDirectCall: true
+        }
+      })
+    });
+  };
+
+  const onDeclineCall = () => {
+    electron.ipcRenderer.on('declineCall', args => {
+      socketManager.endCall();
+    });
+  };
+
   React.useEffect(() => {
     if (loading) {
       if (Utils.isNull(sessionStorage.getItem("accessToken"))) {
@@ -154,6 +198,9 @@ const BasicBusinessAppDashboard = (props) => {
           setUserDetails(response);
           init();
           socketManager.init();
+          socketManager.addSubscriptions(handler(), MessageType.RECEIVING_CALL);
+          onAnswerCall();
+          onDeclineCall();
         }, (e) => {
         })
       }
@@ -162,6 +209,7 @@ const BasicBusinessAppDashboard = (props) => {
 
   React.useEffect(() => {
     return () => {
+      socketManager.clearAllEventListeners();
       socketManager.disconnectSocket();
     };
   }, []);

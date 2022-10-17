@@ -4,8 +4,12 @@ import Icon from "./Icon";
 import IconButton from "@material-ui/core/IconButton";
 import socketManager from "../../common/service/SocketManager";
 import {MessageType} from "../types";
+import { useNavigate } from 'react-router-dom';
 
 const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
+
+  const navigate = useNavigate();
+
   const handler = () => {
     return {
       get id() {
@@ -68,7 +72,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
         <div style={{marginRight: '4px'}} className={'buttons'}>
           <IconButton
             onClick={(e) => {
-
+              props.onAudioCallHandler(props.data)
             }}
             disabled={!online}
             style={{
@@ -76,6 +80,19 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
             }}
           >
             <Icon id={'CALL_END'}/>
+          </IconButton>
+        </div>
+        <div className={'col-*-*'}>
+          <IconButton
+            onClick={(e) => {
+
+            }}
+            disabled={online}
+            style={{
+              marginRight: '4px'
+            }}
+          >
+            <Icon id={'CAMERA'}/>
           </IconButton>
         </div>
         <div className={'col-*-*'}>

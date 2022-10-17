@@ -30,6 +30,7 @@ import Help from '@material-ui/icons/Help';
 import Close from '@material-ui/icons/Close';
 import React, {Component} from "react";
 import {
+  Call,
   CallEnd,
   CancelPresentation,
   ChatBubbleOutline, Done,
@@ -108,6 +109,8 @@ class Icon extends Component {
       return <PresentToAll/>
     } else if (this.props.id === 'CHAT_BUBBLE') {
       return <ChatBubbleOutline/>
+    } else if (this.props.id === 'CALL') {
+      return <Call/>
     } else if (this.props.id === 'CALL_END') {
       return <CallEnd/>
     } else if (this.props.id === 'PEOPLE') {

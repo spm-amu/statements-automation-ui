@@ -3,6 +3,7 @@ import React, { } from "react";
 import Lottie from 'react-lottie';
 import waitingData from '../assets/lotties/waiting';
 import loadingData from '../assets/lotties/loading';
+import callingData from '../assets/lotties/calling2';
 
 const LottieIcon = (props) => {
 
@@ -39,6 +40,25 @@ const LottieIcon = (props) => {
           }}
           height={100}
           width={100}
+        />
+      </div>
+    );
+  }
+
+  if (props.id === 'calling') {
+    return (
+      <div>
+        <Lottie
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: callingData,
+            rendererSettings: {
+              preserveAspectRatio: "xMidYMid slice"
+            }
+          }}
+          height={300}
+          width={300}
         />
       </div>
     );

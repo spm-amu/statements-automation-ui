@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, systemPreferences } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, systemPreferences, screen, globalShortcut } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -24,6 +24,9 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let dialingWindow: BrowserWindow | null = null;
+let dialWindow: BrowserWindow | null = null;
+let screenWidth: number;
 
 ipcMain.on('ipc-armscor', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
@@ -60,6 +63,86 @@ const installExtensions = async () => {
     )
     .catch(console.log);
 };
+
+const createDialWindow = () => {
+  // Create the browser window.
+  dialWindow = new BrowserWindow({
+    title: "Armscor",
+    width: 550,
+    height: 550,
+    x: screenWidth - 600,
+    y: 0,
+    webPreferences: {
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
+    },
+    frame: false,
+    autoHideMenuBar: true,
+    transparent: true,
+    skipTaskbar: true,
+    hasShadow: false,
+    // Don't show the window until the user is in a call.
+    show: false,
+  });
+
+  // preventRefresh(dialWindow);
+
+  const dev = app.commandLine.hasSwitch("dev");
+  if (!dev) {
+    let level = "normal";
+    // Mac OS requires a different level for our drag/drop and overlay
+    // functionality to work as expected.
+    if (process.platform === "darwin") {
+      level = "floating";
+    }
+
+    dialWindow.setAlwaysOnTop(true, level);
+  }
+
+  // dialingWindow.loadFile(resolveHtmlPath('index.html'));
+  dialWindow.loadURL('http://localhost:1212/#/dialingPreview');
+}
+
+const createDialingWindow = () => {
+  dialingWindow = new BrowserWindow({
+    width: 500,
+    height: 450,
+    x: 0,
+    y: screenWidth - 520,
+    show: false,
+    webPreferences: {
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
+    },
+  });
+
+  dialingWindow.removeMenu();
+  // dialingWindow.loadFile(resolveHtmlPath('index.html'));
+  dialingWindow.loadURL('http://localhost:1212/#/dialingPreview');
+
+  dialingWindow.once("ready-to-show", () => {
+    if (!dialingWindow) {
+      throw new Error('"dialingWindow" is not defined');
+    }
+
+    dialingWindow.show();
+  });
+}
+
+// Redirect any refresh shortcuts, since we don't want the user to
+// accidentally drop out of the call.
+const preventRefresh = (window) => {
+  window.on("focus", () => {
+    globalShortcut.register("CommandOrControl+R", () => {});
+    globalShortcut.register("CommandOrControl+Shift+R", () => {});
+    globalShortcut.register("F5", () => {});
+  });
+  window.on("blur", () => {
+    globalShortcut.unregisterAll(window);
+  });
+}
 
 const createWindow = async () => {
   if (isDebug) {
@@ -125,6 +208,39 @@ const createWindow = async () => {
  * Add event listeners...
  */
 
+ipcMain.on("receivingCall", async (_event, args) => {
+  console.log('** MAIN: ', args);
+
+  if (!dialWindow) {
+    throw new Error('"dialingWindow" is not defined');
+  }
+
+  dialWindow.webContents.send('dialingViewContent', args);
+
+  dialWindow.show();
+  dialWindow.focus();
+});
+
+ipcMain.on("answerCall", async (_event, args) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  mainWindow.webContents.send('answerCall', args);
+
+  dialWindow?.hide();
+});
+
+ipcMain.on("declineCall", async (_event, args) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  mainWindow.webContents.send('declineCall', args);
+
+  dialWindow?.hide();
+});
+
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
@@ -137,6 +253,12 @@ app
   .whenReady()
   .then(() => {
     createWindow();
+    createDialWindow();
+
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width } = primaryDisplay.workAreaSize;
+    screenWidth = width;
+
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

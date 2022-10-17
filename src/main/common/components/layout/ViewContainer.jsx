@@ -26,7 +26,7 @@ const ViewContainer = (props) => {
       minimizeMaximizeViewSwitch.current++;
     }
 
-    if (viewId === 'meetingRoom' && currentView.current !== 'joinMeetingSettings') {
+    if (viewId === 'meetingRoom' && currentView.current === 'joinMeetingSettings') {
       // Do not navigate
       viewId = currentView.current;
     } else {
@@ -82,6 +82,8 @@ const ViewContainer = (props) => {
             videoMuted={activeMeetingDetails.current.videoMuted}
             audioMuted={activeMeetingDetails.current.audioMuted}
             isHost={activeMeetingDetails.current.isHost}
+            isDirectCall={activeMeetingDetails.current.isDirectCall}
+            userToCall={activeMeetingDetails.current.userToCall}
           />
         </div>
       }
