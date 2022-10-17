@@ -213,6 +213,7 @@ const MeetingRoom = (props) => {
   const join = () => {
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
     console.log("\n\n\nJOIN : ", eventHandler.userPeerMap);
+    socketManager.init();
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
       userIdentity: userDetails.userId,
@@ -300,10 +301,11 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].stop();
     }
 
-    socketManager.clearUserToPeerMap();
     socketManager.removeSubscriptions(eventHandler);
-    //props.closeHandler();
-    //navigate("/view/calendar");
+    socketManager.clearUserToPeerMap();
+    socketManager.disconnectSocket();
+    props.closeHandler();
+    navigate("/view/calendar");
   };
 
   const minimizeView = (e) => {
