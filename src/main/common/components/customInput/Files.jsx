@@ -71,7 +71,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
               multiple={true}
               borderless={true}
               className={'files'}
-              labelClickHandler={(e) => alert("Download Fireeeee")}
+              labelClickHandler={(e) => {}}
               valueChangeHandler={(value, id) => {
                 setFiles(value);
                 props.valueChangeHandler(value, id);
