@@ -3,6 +3,9 @@ import "./Form.css";
 import AutoComplete from "./AutoComplete";
 import IconButton from '@material-ui/core/IconButton';
 import Icon from '../Icon'
+import {host} from "../../service/RestService";
+//const { ipcRenderer } = window.require('electron');
+// import {ipcRenderer } from 'electron';
 
 const Files = React.memo(React.forwardRef((props, ref) => {
 
@@ -37,6 +40,14 @@ const Files = React.memo(React.forwardRef((props, ref) => {
     }
   };
 
+  const onDownload = (documentId) => {
+    ipcRenderer.send('downloadFile', {
+      payload: {
+        fileURL: `${host}/api/v1/document/download/${documentId}`
+      }
+    })
+  }
+
   return <>
     <div className={'row'}>
       <div className={'col-*-*'} style={{marginLeft: '12px', width: '48px'}}>
@@ -66,12 +77,13 @@ const Files = React.memo(React.forwardRef((props, ref) => {
               id={props.id}
               label={''}
               disabled={props.disabled}
+              enableFile={props.enableFile}
               invalidText={''}
               value={files}
               multiple={true}
               borderless={true}
               className={'files'}
-              labelClickHandler={(e) => {}}
+              labelClickHandler={(option) => onDownload(option.id)}
               valueChangeHandler={(value, id) => {
                 setFiles(value);
                 props.valueChangeHandler(value, id);
@@ -86,7 +98,3 @@ const Files = React.memo(React.forwardRef((props, ref) => {
 }));
 
 export default Files;
-
-
-
-
