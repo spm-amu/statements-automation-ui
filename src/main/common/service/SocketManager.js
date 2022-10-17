@@ -141,6 +141,10 @@ class SocketManager {
       });
     });
 
+    peer.on('close', () => {
+      alert("PEER CLOSED");
+    });
+
     return peer;
   };
 
@@ -179,6 +183,10 @@ class SocketManager {
       });
     });
 
+    peer.on('close', () => {
+      alert("PEER CLOSED");
+    });
+
     return peer;
   };
 
@@ -188,7 +196,7 @@ class SocketManager {
     if (filtered.length > 0) {
       for (const filteredElement of filtered) {
         let peerObj = filteredElement.peer;
-        if (peerObj) {
+        if (peerObj && peerObj.connected) {
           peerObj.destroy();
         }
       }
@@ -232,12 +240,11 @@ class SocketManager {
   };
 
   endCall = () => {
-    this.clearUserToPeerMap();
+    console.log("ENDING CALL FOR : " + this.socket.id);
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
   };
 
   endDirectCall = (callerSocketId) => {
-    this.clearUserToPeerMap();
     this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId});
   }
 }

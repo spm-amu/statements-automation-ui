@@ -89,7 +89,8 @@ const MeetingRoom = (props) => {
             removeUser(be.payload);
             break;
           case MessageType.CALL_ENDED:
-            navigate('/view/people');
+            console.log("\n\n\nCALL ENDED : ", socketManager.userPeerMap);
+            onCallEnded();
             break;
         }
       }
@@ -126,7 +127,7 @@ const MeetingRoom = (props) => {
 
     setParticipants(newParticipants);
     if (newParticipants.length === 0) {
-      endCall(false);
+      onCallEnded();
       props.closeHandler();
     }
   };
@@ -211,6 +212,7 @@ const MeetingRoom = (props) => {
 
   const join = () => {
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    console.log("\n\n\nJOIN : ", eventHandler.userPeerMap);
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
       userIdentity: userDetails.userId,
@@ -223,7 +225,7 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     return () => {
-      endCall(false);
+      endCall();
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
     };
   }, []);
@@ -275,10 +277,15 @@ const MeetingRoom = (props) => {
     }
   };
 
-  const endCall = (publish = true) => {
-    hangUpAudio.play();
-
+  const endCall = () => {
     if (currentUserStream) {
+      socketManager.endCall();
+    }
+  };
+
+  const onCallEnded = () => {
+    if (currentUserStream) {
+      hangUpAudio.play();
       currentUserStream
         .getTracks()
         .forEach((track) => {
@@ -293,12 +300,10 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].stop();
     }
 
-    if(publish) {
-      socketManager.endCall();
-    }
-
-    props.closeHandler();
-    navigate("/view/calendar");
+    socketManager.clearUserToPeerMap();
+    socketManager.removeSubscriptions(eventHandler);
+    //props.closeHandler();
+    //navigate("/view/calendar");
   };
 
   const minimizeView = (e) => {
@@ -441,7 +446,6 @@ const MeetingRoom = (props) => {
                           },
                           endCall: () => {
                             endCall();
-                            socketManager.removeSubscriptions(eventHandler);
                           },
                           shareScreen: () => {
                           },
