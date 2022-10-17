@@ -4,8 +4,7 @@ import AutoComplete from "./AutoComplete";
 import IconButton from '@material-ui/core/IconButton';
 import Icon from '../Icon'
 import {host} from "../../service/RestService";
-//const { ipcRenderer } = window.require('electron');
-// import {ipcRenderer } from 'electron';
+const { electron } = window;
 
 const Files = React.memo(React.forwardRef((props, ref) => {
 
@@ -41,7 +40,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
   };
 
   const onDownload = (documentId) => {
-    ipcRenderer.send('downloadFile', {
+    electron.ipcRenderer.sendMessage('downloadFile', {
       payload: {
         fileURL: `${host}/api/v1/document/download/${documentId}`
       }
