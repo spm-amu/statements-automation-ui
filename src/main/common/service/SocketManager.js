@@ -25,8 +25,6 @@ class SocketManager {
   };
 
   isUserOnline = (user) => {
-    console.log("\n\nUSERS ONLINE : ", this.usersOnline);
-    console.log("USER : ", user);
     for (const usersOnlineElement of this.usersOnline) {
       if(usersOnlineElement.userId === user.userId) {
         return true;
@@ -38,7 +36,7 @@ class SocketManager {
 
   init = () => {
     //let currentUserSocket = io.connect('http://svn.agilemotion.co.za');
-    let socket = io.connect('http://localhost:8000');
+    let socket = io.connect('http://100.72.122.19:8000');
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     for (const value of Object.keys(MessageType)) {
@@ -60,24 +58,19 @@ class SocketManager {
         this.usersOnline.push(payloadElement);
       }
 
-      console.log("\n\n\nUSERS ONLINE : ", payload);
       this.fireEvent(MessageType.USERS_ONLINE, {socket: this.socket, payload: payload});
     });
 
     socket.on(MessageType.USER_ONLINE, (payload) => {
-      console.log("\n\n\nNEW USER ONLINE : ", payload);
       this.usersOnline.push(payload);
       this.fireEvent(MessageType.USER_ONLINE, {socket: this.socket, payload: payload});
     });
 
     socket.on(MessageType.USER_OFFLINE, (payload) => {
-      console.log("\n\n\nUSER OFFLINE : ", payload);
       for (let i = 0; i < this.usersOnline.length; i++) {
         console.log(this.usersOnline[i].userId + " === " + payload.userId);
         if(this.usersOnline[i].userId === payload.userId) {
-          console.log("SPLICE : ", this.usersOnline);
           this.usersOnline.splice(i, 1);
-          console.log("SPLICED : ", this.usersOnline);
         }
       }
 
@@ -148,7 +141,32 @@ class SocketManager {
       });
     });
 
+    peer.on('close', () => {
+      alert("PEER CLOSED");
+    });
+
     return peer;
+  };
+
+  callUser = (userToSignal, stream) => {
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream
+    });
+
+    peer.on("signal", (signal) => {
+      this.socket.emit("callUser", {
+        userToCall: userToSignal,
+        signalData: signal,
+        callerId: this.socket.id,
+        name: userDetails.name,
+      });
+    });
+
+    return  peer;
   };
 
   addPeer(callerId, stream) {
@@ -165,6 +183,10 @@ class SocketManager {
       });
     });
 
+    peer.on('close', () => {
+      alert("PEER CLOSED");
+    });
+
     return peer;
   };
 
@@ -174,7 +196,7 @@ class SocketManager {
     if (filtered.length > 0) {
       for (const filteredElement of filtered) {
         let peerObj = filteredElement.peer;
-        if (peerObj) {
+        if (peerObj && peerObj.connected) {
           peerObj.destroy();
         }
       }
@@ -218,8 +240,12 @@ class SocketManager {
   };
 
   endCall = () => {
-    this.clearAllEventListeners();
+    console.log("ENDING CALL FOR : " + this.socket.id);
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
+  };
+
+  endDirectCall = (callerSocketId) => {
+    this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId});
   }
 }
 

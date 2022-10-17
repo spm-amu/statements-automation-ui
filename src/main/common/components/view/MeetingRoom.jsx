@@ -12,6 +12,7 @@ import Icon from '../Icon';
 import Paper from "@material-ui/core/Paper";
 import IconButton from '@material-ui/core/IconButton';
 import Draggable from "react-draggable";
+import uuid from 'react-uuid';
 import Lobby from "../vc/Lobby";
 import Footer from "../vc/Footer";
 import socketManager from "../../service/SocketManager";
@@ -60,17 +61,6 @@ const errorAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/error
 const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
 
 const MeetingRoom = (props) => {
-  const [sideBarOpen, setSideBarOpen] = useState(false);
-  const [windowTransformValue, setWindowTransformValue] = useState(null);
-  const [displayState, setDisplayState] = useState('MAXIMIZED');
-  const [participants, setParticipants] = useState([]);
-  const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
-  const [step, setStep] = useState('LOBBY');
-  const [currentUserStream, setCurrentUserStream] = useState(null);
-  const [videoMuted, setVideoMuted] = useState(false);
-  const [audioMuted, setAudioMuted] = useState(false);
-  const userVideo = useRef();
-  const navigate = useNavigate();
 
   const handler = () => {
     return {
@@ -78,6 +68,7 @@ const MeetingRoom = (props) => {
         return 'meeting-room-' + selectedMeeting.id;
       },
       on: (eventType, be) => {
+        console.log("========== EVENT: ===========", eventType);
         switch (eventType) {
           case MessageType.ALLOWED:
             join();
@@ -97,10 +88,34 @@ const MeetingRoom = (props) => {
           case MessageType.USER_LEFT:
             removeUser(be.payload);
             break;
+          case MessageType.CALL_ENDED:
+            console.log("\n\n\nCALL ENDED : ", socketManager.userPeerMap);
+            onCallEnded();
+            break;
         }
       }
     }
   };
+
+  const [sideBarOpen, setSideBarOpen] = useState(false);
+  const [windowTransformValue, setWindowTransformValue] = useState(null);
+  const [displayState, setDisplayState] = useState('MAXIMIZED');
+  const [participants, setParticipants] = useState([]);
+  const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
+  const [step, setStep] = useState('LOBBY');
+  const [currentUserStream, setCurrentUserStream] = useState(null);
+  const [videoMuted, setVideoMuted] = useState(false);
+  const [audioMuted, setAudioMuted] = useState(false);
+  const userVideo = useRef();
+  const navigate = useNavigate();
+  const eventHandler = handler();
+
+  const {
+    selectedMeeting,
+    isHost,
+    userToCall,
+    isDirectCall
+  } = props;
 
   const removeUser = (user) => {
     socketManager.removeFromUserToPeerMap(user.id);
@@ -111,14 +126,13 @@ const MeetingRoom = (props) => {
     const newParticipants = participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
 
     setParticipants(newParticipants);
-    if (participants.length === 0) {
-      endCall();
+    if (newParticipants.length === 0) {
+      onCallEnded();
       props.closeHandler();
     }
   };
 
   const addUser = (payload) => {
-    console.log("\n\n\nADD USER : ", payload);
     let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED);
     joinInAudio.play();
 
@@ -141,7 +155,6 @@ const MeetingRoom = (props) => {
   };
 
   const createParticipants = (users, socket) => {
-    console.log("\n\n\nALL USERS FIREE : ", users);
     socketManager.clearUserToPeerMap();
 
     let userPeerMap = [];
@@ -209,11 +222,6 @@ const MeetingRoom = (props) => {
     });
   };
 
-  const {
-    selectedMeeting,
-    isHost,
-  } = props;
-
   useEffect(() => {
     return () => {
       endCall();
@@ -223,10 +231,10 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (currentUserStream) {
-      socketManager.addSubscriptions(handler(), MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
-        MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL);
+      socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
+        MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED);
 
-      if (isHost) {
+      if (isHost || isDirectCall) {
         join();
       } else {
         askForPermission();
@@ -269,9 +277,14 @@ const MeetingRoom = (props) => {
   };
 
   const endCall = () => {
-    hangUpAudio.play();
-
     if (currentUserStream) {
+      socketManager.endCall();
+    }
+  };
+
+  const onCallEnded = () => {
+    if (currentUserStream) {
+      hangUpAudio.play();
       currentUserStream
         .getTracks()
         .forEach((track) => {
@@ -286,11 +299,13 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].stop();
     }
 
-    socketManager.endCall();
+    socketManager.removeSubscriptions(eventHandler);
+    socketManager.clearUserToPeerMap();
+    socketManager.disconnectSocket();
+    socketManager.init();
     props.closeHandler();
     navigate("/view/calendar");
   };
-
 
   const minimizeView = (e) => {
     let paper = document.getElementById('meetingDialogPaper');
@@ -400,10 +415,10 @@ const MeetingRoom = (props) => {
           }
         </DialogTitle>
         <DialogContent className={'row-*-* meeting-window-container'}>
-          <div style={{height: '100%'}}>
+          <div style={{height: 'calc(100% - 144px)'}}>
             {
               step === Steps.LOBBY ?
-                <Lobby isHost={isHost} waitingList={lobbyWaitingList}
+                <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
                        acceptUserHandler={
                          (item) => {
                            acceptUser(item);
@@ -455,3 +470,4 @@ const MeetingRoom = (props) => {
 };
 
 export default MeetingRoom;
+
