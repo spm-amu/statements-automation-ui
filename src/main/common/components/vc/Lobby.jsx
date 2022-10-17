@@ -14,52 +14,52 @@ const Lobby = (props) => {
   } = props;
 
   return (
-    <div
-      className={'centered-flex-box'}
-      style={{
-        height: '100%',
-        width: '100%',
-        fontSize: '32px'
-      }}
-    >
       <div
+        className={'centered-flex-box'}
         style={{
-          display: 'inline-block',
-          textAlign: 'center',
-          margin: 'auto',
+          height: 'calc(100% - 32px)',
+          width: '100%',
+          fontSize: '32px',
+          overflow: 'hidden'
         }}
       >
-        { !Utils.isNull(props.userToCall) ?
-          <>
-            <div>
-              <div className={'centered-flex-box'}>
-                <LottieIcon id={'calling'} />
-              </div>
-              <div>
-                { 'Calling ' + props.userToCall.name }
-              </div>
+        {!Utils.isNull(props.userToCall) ?
+          <div>
+            <div className={'centered-flex-box'}>
+              <LottieIcon id={'calling'}/>
             </div>
-          </>
+            <div>
+              {'Calling ' + props.userToCall.name}
+            </div>
+          </div>
           :
           <>
-            <div>
+            <div
+              style={{
+                display: 'inline-block',
+                textAlign: 'center',
+                margin: 'auto',
+                overflow: 'hidden'
+              }}
+            >
               <div className={'centered-flex-box'}>
-                <LottieIcon id={'waiting'} />
+                <LottieIcon id={'waiting'}/>
               </div>
               <div>
-                {props.isHost ?
-                  HOST_WAITING_MESSAGE
-                  :
-                  ATTENDEE_WAITING_MESSAGE}
+                {
+                  props.isHost ?
+                    HOST_WAITING_MESSAGE
+                    :
+                    ATTENDEE_WAITING_MESSAGE
+                }
               </div>
             </div>
             <LobbyWaitingList waitingList={waitingList}
                               rejectUserHandler={props.rejectUserHandler}
-                              acceptUserHandler={props.acceptUserHandler} />
+                              acceptUserHandler={props.acceptUserHandler}/>
           </>
         }
       </div>
-    </div>
   );
 };
 
