@@ -6,12 +6,15 @@ import IconButton from "@material-ui/core/IconButton";
 import Utils from '../../Utils';
 const { electron } = window;
 
+const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
+
 const DialingPreview = (props) => {
   const [caller, setCaller] = useState(null);
   const [initials, setInitials] = useState('');
 
   useEffect(() => {
     electron.ipcRenderer.on('dialingViewContent', args => {
+      waitingAudio.play();
       setCaller(args.payload);
     });
   }, []);
@@ -23,12 +26,16 @@ const DialingPreview = (props) => {
   }, [caller]);
 
   const onAnswerCall = () => {
+    waitingAudio.pause();
+
     electron.ipcRenderer.sendMessage('answerCall', {
       payload: caller
     });
   }
 
   const onDeclineCall = () => {
+    waitingAudio.pause();
+
     electron.ipcRenderer.sendMessage('declineCall', {
       payload: {
         callerId: caller.callerUser.socketId
