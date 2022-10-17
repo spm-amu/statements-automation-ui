@@ -61,24 +61,6 @@ const errorAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/error
 const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
 
 const MeetingRoom = (props) => {
-  const [sideBarOpen, setSideBarOpen] = useState(false);
-  const [windowTransformValue, setWindowTransformValue] = useState(null);
-  const [displayState, setDisplayState] = useState('MAXIMIZED');
-  const [participants, setParticipants] = useState([]);
-  const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
-  const [step, setStep] = useState('LOBBY');
-  const [currentUserStream, setCurrentUserStream] = useState(null);
-  const [videoMuted, setVideoMuted] = useState(false);
-  const [audioMuted, setAudioMuted] = useState(false);
-  const userVideo = useRef();
-  const navigate = useNavigate();
-
-  const {
-    selectedMeeting,
-    isHost,
-    userToCall,
-    isDirectCall
-  } = props;
 
   const handler = () => {
     return {
@@ -105,10 +87,34 @@ const MeetingRoom = (props) => {
           case MessageType.USER_LEFT:
             removeUser(be.payload);
             break;
+          case MessageType.CALL_ENDED:
+            alert("end call fireeee");
+            navigate('/view/people');
+            break;
         }
       }
     }
   };
+
+  const [sideBarOpen, setSideBarOpen] = useState(false);
+  const [windowTransformValue, setWindowTransformValue] = useState(null);
+  const [displayState, setDisplayState] = useState('MAXIMIZED');
+  const [participants, setParticipants] = useState([]);
+  const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
+  const [step, setStep] = useState('LOBBY');
+  const [currentUserStream, setCurrentUserStream] = useState(null);
+  const [videoMuted, setVideoMuted] = useState(false);
+  const [audioMuted, setAudioMuted] = useState(false);
+  const userVideo = useRef();
+  const navigate = useNavigate();
+  const eventHandler = handler();
+
+  const {
+    selectedMeeting,
+    isHost,
+    userToCall,
+    isDirectCall
+  } = props;
 
   const removeUser = (user) => {
     socketManager.removeFromUserToPeerMap(user.id);
@@ -126,7 +132,6 @@ const MeetingRoom = (props) => {
   };
 
   const addUser = (payload) => {
-    console.log("\n\n\nADD USER : ", payload);
     let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED);
     joinInAudio.play();
 
@@ -149,7 +154,6 @@ const MeetingRoom = (props) => {
   };
 
   const createParticipants = (users, socket) => {
-    console.log("\n\n\nALL USERS FIREE : ", users);
     socketManager.clearUserToPeerMap();
 
     let userPeerMap = [];
@@ -226,8 +230,8 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (currentUserStream) {
-      socketManager.addSubscriptions(handler(), MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
-        MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL);
+      socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
+        MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED);
 
       if (isHost || isDirectCall) {
         join();
@@ -435,6 +439,7 @@ const MeetingRoom = (props) => {
                           },
                           endCall: () => {
                             endCall();
+                            socketManager.removeSubscriptions(eventHandler);
                           },
                           shareScreen: () => {
                           },

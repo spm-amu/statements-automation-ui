@@ -232,12 +232,10 @@ class SocketManager {
   };
 
   endCall = () => {
-    this.clearAllEventListeners();
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
-  }
+  };
 
   endDirectCall = (callerSocketId) => {
-    this.clearAllEventListeners();
     this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId});
   }
 }

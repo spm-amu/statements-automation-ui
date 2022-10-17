@@ -162,6 +162,7 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   const receiveCall = (payload) => {
+    alert(1234444);
     electron.ipcRenderer.sendMessage('receivingCall', {
       payload: payload
     });
