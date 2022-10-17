@@ -232,12 +232,10 @@ class SocketManager {
   };
 
   endCall = () => {
-    this.clearUserToPeerMap();
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
   };
 
   endDirectCall = (callerSocketId) => {
-    this.clearUserToPeerMap();
     this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId});
   }
 }

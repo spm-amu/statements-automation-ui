@@ -124,7 +124,7 @@ const MeetingRoom = (props) => {
     const newParticipants = participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
 
     setParticipants(newParticipants);
-    if (participants.length === 0) {
+    if (newParticipants.length === 0) {
       endCall();
       props.closeHandler();
     }
@@ -296,7 +296,6 @@ const MeetingRoom = (props) => {
     props.closeHandler();
     navigate("/view/calendar");
   };
-
 
   const minimizeView = (e) => {
     let paper = document.getElementById('meetingDialogPaper');
