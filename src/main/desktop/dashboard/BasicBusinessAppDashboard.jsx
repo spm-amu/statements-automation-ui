@@ -184,7 +184,7 @@ const BasicBusinessAppDashboard = (props) => {
 
   const onDeclineCall = () => {
     electron.ipcRenderer.on('declineCall', args => {
-      socketManager.endCall();
+      socketManager.endDirectCall(args.payload.callerId);
     });
   };
 

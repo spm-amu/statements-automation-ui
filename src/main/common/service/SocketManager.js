@@ -36,7 +36,7 @@ class SocketManager {
 
   init = () => {
     //let currentUserSocket = io.connect('http://svn.agilemotion.co.za');
-    let socket = io.connect('http://localhost:8000');
+    let socket = io.connect('http://100.72.122.19:8000');
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     for (const value of Object.keys(MessageType)) {
@@ -234,6 +234,11 @@ class SocketManager {
   endCall = () => {
     this.clearAllEventListeners();
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
+  }
+
+  endDirectCall = (callerSocketId) => {
+    this.clearAllEventListeners();
+    this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId});
   }
 }
 
