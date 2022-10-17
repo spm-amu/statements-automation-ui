@@ -152,12 +152,13 @@ const BasicBusinessAppDashboard = (props) => {
         return 'global-1223';
       },
       on: (eventType, be) => {
+        console.log("======= DASHBOARD EVENT =======", eventType);
         switch (eventType) {
           case MessageType.RECEIVING_CALL:
             receiveCall(be.payload);
             break;
           case MessageType.CANCEL_CALL:
-            receiveCall(be.payload);
+            cancelCall(be.payload);
             break;
         }
       }
