@@ -238,6 +238,8 @@ class SocketManager {
   };
 
   endDirectCall = (callerSocketId) => {
+    this.disconnectSocket();
+    this.init();
     this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId});
   }
 }
