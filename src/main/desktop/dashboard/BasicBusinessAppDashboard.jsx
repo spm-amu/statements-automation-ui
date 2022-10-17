@@ -171,6 +171,7 @@ const BasicBusinessAppDashboard = (props) => {
     electron.ipcRenderer.on('answerCall', args => {
       navigate("/view/meetingRoom", {
         state: {
+          displayMode: 'window',
           selectedMeeting: {
             id: args.payload.roomId
           },

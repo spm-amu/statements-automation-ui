@@ -17,7 +17,7 @@ const Lobby = (props) => {
     <div
       className={'centered-flex-box'}
       style={{
-        height: 'calc(100% - 180px)',
+        height: '100%',
         width: '100%',
         fontSize: '32px'
       }}

@@ -21,12 +21,19 @@ const ViewContainer = (props) => {
   const renderView = () => {
     let viewId = params.id;
     let element;
+    let data = location.state;
+    let displayMode = null;
+
+    if(data) {
+      displayMode = data.displayMode;
+    }
 
     if (viewId !== currentView) {
       minimizeMaximizeViewSwitch.current++;
     }
 
-    if (viewId === 'meetingRoom' && currentView.current === 'joinMeetingSettings') {
+    if (viewId === 'meetingRoom'
+      && displayMode !== 'window') {
       // Do not navigate
       viewId = currentView.current;
     } else {
@@ -34,7 +41,7 @@ const ViewContainer = (props) => {
         currentView.current = viewId;
       } else {
         minimizeMaximizeViewSwitch.current = 0;
-        activeMeetingDetails.current = location.state;
+        activeMeetingDetails.current = data;
       }
     }
 

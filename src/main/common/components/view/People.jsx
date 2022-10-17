@@ -38,13 +38,13 @@ const People = (props) => {
         records: []
       });
     }
-  }
+  };
 
   const onAudioCallHandler = ( userToCall ) => {
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
     const directCallRoom = {
       id: uuid()
-    }
+    };
 
     socketManager.emitEvent(MessageType.CALL_USER, {
       room: directCallRoom.id,
@@ -55,6 +55,7 @@ const People = (props) => {
 
     navigate("/view/meetingRoom", {
       state: {
+        displayMode: 'window',
         selectedMeeting: directCallRoom,
         videoMuted: true,
         audioMuted: false,
@@ -62,7 +63,7 @@ const People = (props) => {
         userToCall
       }
     })
-  }
+  };
 
   return (
     <div className={'w-100 h-100 people-container'}>

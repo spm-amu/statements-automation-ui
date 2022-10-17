@@ -200,6 +200,7 @@ const MeetingSettingsComponent = (props) => {
 
                   navigate("/view/meetingRoom", {
                     state: {
+                      displayMode: 'window',
                       selectedMeeting: selectedMeeting,
                       videoMuted: videoMuted,
                       audioMuted: audioMuted,
