@@ -125,7 +125,7 @@ const MeetingRoom = (props) => {
 
     setParticipants(newParticipants);
     if (newParticipants.length === 0) {
-      endCall();
+      endCall(false);
       props.closeHandler();
     }
   };
@@ -222,7 +222,7 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     return () => {
-      endCall();
+      endCall(false);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
     };
   }, []);
@@ -274,7 +274,7 @@ const MeetingRoom = (props) => {
     }
   };
 
-  const endCall = () => {
+  const endCall = (publish = true) => {
     hangUpAudio.play();
 
     if (currentUserStream) {
@@ -292,7 +292,11 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].stop();
     }
 
-    socketManager.endCall();
+    //alert(publish);
+    if(publish) {
+      //socketManager.endCall();
+    }
+
     props.closeHandler();
     navigate("/view/calendar");
   };

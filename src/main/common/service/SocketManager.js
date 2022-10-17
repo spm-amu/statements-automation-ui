@@ -196,7 +196,7 @@ class SocketManager {
   };
 
   removeFromUserToPeerMap = (id) => {
-    this.destroyPeer(id);
+    //this.destroyPeer(id);
     let filtered = this.userPeerMap.filter((item) => item.user.id !== id);
     this.userPeerMap.splice(0, this.userPeerMap.length);
 
