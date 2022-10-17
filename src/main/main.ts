@@ -143,8 +143,10 @@ const createWindow = async () => {
       throw new Error('"mainWindow" is not defined');
     }
 
-    systemPreferences.askForMediaAccess('microphone');
-    systemPreferences.askForMediaAccess('camera');
+    if (process.platform === "darwin") {
+      systemPreferences.askForMediaAccess('microphone');
+      systemPreferences.askForMediaAccess('camera');
+    }
 
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
