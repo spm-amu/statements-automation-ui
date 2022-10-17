@@ -232,6 +232,8 @@ class SocketManager {
   };
 
   endCall = () => {
+    this.disconnectSocket();
+    this.init();
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
   };
 
