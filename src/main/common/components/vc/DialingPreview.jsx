@@ -17,10 +17,14 @@ const DialingPreview = (props) => {
   useEffect(() => {
     electron.ipcRenderer.on('dialingViewContent', args => {
       soundInterval.current = setInterval(() => {
-        console.log("PLAYING....");
         waitingAudio.play();
       }, 100);
       setCaller(args.payload);
+    });
+
+    electron.ipcRenderer.on('cancelCall', args => {
+      waitingAudio.pause();
+      clearInterval(soundInterval.current);
     });
   }, []);
 

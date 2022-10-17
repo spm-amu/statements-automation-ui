@@ -12,7 +12,6 @@ import Icon from '../Icon';
 import Paper from "@material-ui/core/Paper";
 import IconButton from '@material-ui/core/IconButton';
 import Draggable from "react-draggable";
-import uuid from 'react-uuid';
 import Lobby from "../vc/Lobby";
 import Footer from "../vc/Footer";
 import socketManager from "../../service/SocketManager";
@@ -68,7 +67,6 @@ const MeetingRoom = (props) => {
         return 'meeting-room-' + selectedMeeting.id;
       },
       on: (eventType, be) => {
-        console.log("========== EVENT: ===========", eventType);
         switch (eventType) {
           case MessageType.ALLOWED:
             join();
@@ -446,7 +444,11 @@ const MeetingRoom = (props) => {
                             setAudioMuted(muted);
                           },
                           endCall: () => {
-                            endCall();
+                            if (isDirectCall && participants.length === 0) {
+                              socketManager.emitEvent(MessageType.CANCEL_CALL, {socketId: userToCall.socketId});
+                            } else {
+                              endCall();
+                            }
                           },
                           shareScreen: () => {
                           },

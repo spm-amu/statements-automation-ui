@@ -5,19 +5,30 @@ import path from 'path';
 export let resolveHtmlPath: (htmlFileName: string) => string;
 
 if (process.env.NODE_ENV === 'development') {
-  console.log('DEV PAAATH: ')
+  console.log('DEV PAAATH: ');
   const port = process.env.PORT || 1212;
   resolveHtmlPath = (htmlFileName: string) => {
     let url = new URL(`http://localhost:${port}`);
-
     url.pathname = htmlFileName;
 
-    console.log('PAAATH: ', url.href)
+    console.log('PAAATH: ', url.href);
 
     return url.href;
   };
 } else {
-  console.log('PROD PAAATH: ')
+  console.log('PROD PAAATH: ');
+  resolveHtmlPath = (htmlFileName: string) => {
+    return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
+  };
+}
+
+export let resolveWindowHtmlPath: (htmlFileName: string) => string;
+
+if (process.env.NODE_ENV === 'development') {
+  resolveWindowHtmlPath = () => {
+    return 'http://localhost:1212/#/dialingPreview';
+  };
+} else {
   resolveHtmlPath = (htmlFileName: string) => {
     return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
   };

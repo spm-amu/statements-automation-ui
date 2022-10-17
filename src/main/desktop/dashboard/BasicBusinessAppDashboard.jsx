@@ -156,9 +156,16 @@ const BasicBusinessAppDashboard = (props) => {
           case MessageType.RECEIVING_CALL:
             receiveCall(be.payload);
             break;
+          case MessageType.CANCEL_CALL:
+            receiveCall(be.payload);
+            break;
         }
       }
     }
+  };
+
+  const cancelCall = (payload) => {
+    electron.ipcRenderer.sendMessage('cancelCall', {});
   };
 
   const receiveCall = (payload) => {
@@ -199,7 +206,7 @@ const BasicBusinessAppDashboard = (props) => {
           setUserDetails(response);
           init();
           socketManager.init();
-          socketManager.addSubscriptions(handler(), MessageType.RECEIVING_CALL);
+          socketManager.addSubscriptions(handler(), MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL);
           onAnswerCall();
           onDeclineCall();
         }, (e) => {

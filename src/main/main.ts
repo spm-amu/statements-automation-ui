@@ -13,7 +13,7 @@ import { app, BrowserWindow, shell, ipcMain, systemPreferences, screen, globalSh
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import {resolveHtmlPath, resolveWindowHtmlPath} from './util';
 
 class AppUpdater {
   constructor() {
@@ -108,8 +108,7 @@ const createDialWindow = () => {
     dialWindow.setAlwaysOnTop(true, level);
   }
 
-  // dialingWindow.loadFile(resolveHtmlPath('index.html'));
-  dialWindow.loadURL('http://localhost:1212/#/dialingPreview');
+  dialWindow.loadURL(resolveWindowHtmlPath('index.html#/dialingPreview'));
 };
 
 const createWindow = async () => {
@@ -204,6 +203,16 @@ ipcMain.on("declineCall", async (_event, args) => {
   }
 
   mainWindow.webContents.send('declineCall', args);
+
+  dialWindow?.hide();
+});
+
+ipcMain.on("cancelCall", async (_event, args) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  mainWindow.webContents.send('cancelCall', args);
 
   dialWindow?.hide();
 });

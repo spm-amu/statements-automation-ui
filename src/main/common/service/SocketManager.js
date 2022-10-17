@@ -15,7 +15,9 @@ class SocketManager {
   }
 
   emitEvent = (eventType, data) => {
-    this.socket.emit(eventType, data);
+    if(this.socket) {
+      this.socket.emit(eventType, data);
+    }
   };
 
   disconnectSocket = () => {
@@ -240,7 +242,6 @@ class SocketManager {
   };
 
   endCall = () => {
-    console.log("ENDING CALL FOR : " + this.socket.id);
     this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
   };
 
