@@ -50,6 +50,7 @@ const Files = (props) => {
   const [userDocuments, setUserDocuments] = useState([]);
   const [criteriaParams, setCriteriaParams] = useState({});
   const onDownload = (documentId) => {
+
     electron.ipcRenderer.sendMessage('downloadFile', {
       payload: {
         fileURL: `${host}/api/v1/document/download/${documentId}`,
