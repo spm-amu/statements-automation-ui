@@ -20,6 +20,7 @@ const Files = (props) => {
   };
 
   const onDownload = (documentId) => {
+
     electron.ipcRenderer.sendMessage('downloadFile', {
       payload: {
         fileURL: `${host}/api/v1/document/download/${documentId}`,

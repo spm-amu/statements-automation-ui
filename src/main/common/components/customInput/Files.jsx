@@ -40,11 +40,12 @@ const Files = React.memo(React.forwardRef((props, ref) => {
   };
 
   const onDownload = (documentId) => {
+
     electron.ipcRenderer.sendMessage('downloadFile', {
       payload: {
-        fileURL: `${host}/api/v1/document/download/${documentId}`
-      }
-    })
+        fileURL: `${host}/api/v1/document/download/${documentId}`,
+      },
+    });
   }
 
   return <>
@@ -82,7 +83,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
               multiple={true}
               borderless={true}
               className={'files'}
-              labelClickHandler={(option) => onDownload(option.id)}
+              labelClickHandler={(option) => onDownload(option)}
               valueChangeHandler={(value, id) => {
                 setFiles(value);
                 props.valueChangeHandler(value, id);
