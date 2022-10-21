@@ -20,6 +20,9 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import {useNavigate} from 'react-router-dom';
 import ModalComponent from "../customInput/Modal";
+import {Select, InputLabel, MenuItem} from "@material-ui/core";
+import Box from "@material-ui/core/Box";
+
 
 const Meeting = (props) => {
 
@@ -32,6 +35,8 @@ const Meeting = (props) => {
   const [value, setValue] = useState(null);
   const [errors, setErrors] = useState({});
   const [edited, setEdited] = useState(false);
+  const [eventRecurrence, setEventRecurrence] = React.useState('NONE');
+  const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
 
   const getInitialValue = (propsValue) => {
@@ -226,6 +231,18 @@ const Meeting = (props) => {
     handleFormValueChange(e.target.value, e.target.id, e.target.required);
   };
 
+  const handleEventRecurringClose = () => {
+    setOpen(false);
+  };
+
+  const handleEventRecurring = (e) => {
+
+    setEventRecurrence(e.target.value);
+    if(e.target.value !== 'NONE') {
+      setOpen(true);
+    }
+  };
+
 
   // ** Event Action buttons
   const EventActions = () => {
@@ -393,13 +410,11 @@ const Meeting = (props) => {
         Meeting
       </h5>
 
-      {/*TODO: being used for testing until event recurrence is done. So please don't delete :-)*/}
-      {/*<div>*/}
-      {/*  <h2 className="text-center">*/}
-      {/*    <ModalComponent body={setRecurrentBody} openLabel={"Set recurrence"} modalHeader={"Set recurrence"}/>*/}
-      {/*  </h2>*/}
-      {/*</div>*/}
-
+      <div>
+        <h2 className="text-center">
+          <ModalComponent open={open} onClose={handleEventRecurringClose} body={setRecurrentBody} openLabel={"Set recurrence"} modalHeader={"Set recurrence"}/>
+        </h2>
+      </div>
 
       <div style={{width: '80%'}}>
         <Form>
@@ -501,6 +516,24 @@ const Meeting = (props) => {
               </div>
             </div>
           </div>
+          <FormControl>
+            <InputLabel id="setEventRecurrenceLabel">Set Recurrence</InputLabel>
+            <Select
+              style={{width:"100%"}}
+              labelId="event-recurrence-label"
+              id="setEventRecurrenceSelect"
+              value={eventRecurrence}
+              label="Set Recurrence"
+              onChange={handleEventRecurring}
+            >
+              <MenuItem value={"NONE"}>Not repeating</MenuItem>
+              <MenuItem value={"DAILY"}>Daily</MenuItem>
+              <MenuItem value={"WEEKLY"}>Weekly</MenuItem>
+              <MenuItem value={"MONTHLY"}>Monthly</MenuItem>
+            </Select>
+          </FormControl>
+
+
           <div style={{marginTop: '8px'}}>
             <AutoComplete
               id="attendees"

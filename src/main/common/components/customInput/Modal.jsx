@@ -8,24 +8,14 @@ import Button from "@material-ui/core/Button";
 
 const ModalComponent = React.memo(React.forwardRef((props, ref) => {
 
-  const [open, setOpen] = React.useState(false);
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const dynamicModalClass = () => (open ? { display: 'block' } : '');
+  const dynamicModalClass = () => (props.open ? { display: 'block' } : '');
 
   return (
     <div>
-      <button type="button" onClick={handleOpen}>
-        {props.openLabel}
-      </button>
-      <Modal open={open} onClose={handleClose}>
+      {/*<button type="button" onClick={handleOpen}>*/}
+      {/*  {props.openLabel}*/}
+      {/*</button>*/}
+      <Modal open={props.open} onClose={props.onClose}>
         <div className="modal" style={dynamicModalClass()} id="channelModal">
           <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
@@ -62,7 +52,7 @@ const ModalComponent = React.memo(React.forwardRef((props, ref) => {
                   <Button
                     variant={'text'}
                     size="large"
-                    onClick={() => handleClose()}
+                    onClick={props.onClose}
                   >
                     CANCEL
                   </Button>
