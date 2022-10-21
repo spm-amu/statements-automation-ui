@@ -202,6 +202,14 @@
   static getFormattedDate = (date) => {
     return date.toLocaleDateString('en-GB').split('/').reverse().join('-');
   };
+
+  static getComponentAttribute(field, attribute, defaultValue) {
+    if(this.isNull(field.attributes)) {
+      return defaultValue;
+    }
+
+    return this.isNull(field.attributes[attribute]) ? defaultValue : field.attributes[attribute];
+  }
 }
 
 export const isNull = (value) => {

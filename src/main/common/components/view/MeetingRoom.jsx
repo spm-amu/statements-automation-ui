@@ -415,7 +415,7 @@ const MeetingRoom = (props) => {
         <DialogContent className={'row-*-* meeting-window-container'}>
           <div style={{height: 'calc(100% - 144px)'}}>
             {
-              step === Steps.LOBBY ?
+              step === Steps.LOBBY || (lobbyWaitingList && lobbyWaitingList.length > 0) ?
                 <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
                        acceptUserHandler={
                          (item) => {
