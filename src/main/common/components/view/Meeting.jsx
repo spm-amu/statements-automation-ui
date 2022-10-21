@@ -524,6 +524,7 @@ const Meeting = (props) => {
               id="setEventRecurrenceSelect"
               value={eventRecurrence}
               label="Set Recurrence"
+              disabled={readOnly}
               onChange={handleEventRecurring}
             >
               <MenuItem value={"NONE"}>Not repeating</MenuItem>
