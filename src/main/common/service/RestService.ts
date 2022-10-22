@@ -1,8 +1,8 @@
 import {trackPromise} from 'react-promise-tracker';
 import Utils from "../Utils";
 
-//export const host = window.location.protocol + "//" + window.location.hostname + "/vc";
-export const host = "http://svn.agilemotion.co.za/vc";
+export const host = window.location.protocol + "//" + window.location.hostname + "/vc";
+//export const host = "http://svn.agilemotion.co.za/vc";
 const status = (response: any) => {
   if (response.ok) {
     return Promise.resolve(response);

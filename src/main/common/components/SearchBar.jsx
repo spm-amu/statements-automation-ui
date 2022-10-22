@@ -17,11 +17,12 @@ const SearchBarComponent = React.memo(React.forwardRef((props, ref) => {
         <TextField
           style={{width: '100%'}}
           value={searchValue}
-          label="Title"
           id="title"
           valueChangeHandler={(e) => {
             setSearchValue(e.target.value);
-            props.valueChangeHandler(e.target.value);
+            if(props.valueChangeHandler) {
+              props.valueChangeHandler(e.target.value);
+            }
           }}
           errorMessage={'A meeting title is required. Please enter a value'}
         />
