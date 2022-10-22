@@ -608,8 +608,8 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
                         tabIndex={-1}
                         key={row.id}
                         id={'ROW-' + row.id}
-                        selected={isItemSelected}
-                        className={isItemSelected ? classes.tableSelected : classes.tableRow}
+                        selected={props.selectionMode === 'SINGLE' ? isItemSelected : false}
+                        className={props.selectionMode === 'SINGLE' && isItemSelected ? classes.tableSelected : classes.tableRow}
                       >
                         {
                           config.selectionMode === 'MULTIPLE' ?
@@ -655,6 +655,13 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
                                   validator={column.validator}
                                   valueChangeHandler={editorChangeHandler}
                                   columnConfig={column}
+                                  actionHandler={
+                                    (e) => {
+                                      if(props.actionHandler) {
+                                        props.actionHandler(e);
+                                      }
+                                    }
+                                  }
                                   dataBinding={!Utils.isNull(column.dataBinding) ? column.dataBinding : column.id}
                                   row={row}
                                   contentType={column.fieldType}/>

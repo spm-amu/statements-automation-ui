@@ -17,7 +17,7 @@ const grid = {
       "attributes": {
         "filterable": true,
         "filterValueTemplate": "%${value}%",
-        "width": "50.0%",
+        "width": "30.0%",
         "label": "Name",
         "sortable": false
       }
@@ -27,7 +27,7 @@ const grid = {
       "id": "origin",
       "attributes": {
         "filterable": false,
-        "width": "25.0%",
+        "width": "50.0%",
         "label": "Origin",
         "sortable": false
       }
@@ -37,8 +37,17 @@ const grid = {
       "id": "actions",
       "attributes": {
         "filterable": false,
-        "width": "25.0%",
+        "width": "20.0%",
         "label": "",
+        "toolbar": {
+          "items": [
+            {
+              "id": "dowmload",
+              "type": "iconButton",
+              "icon": "DOWNLOAD"
+            }
+          ]
+        },
         "sortable": false
       }
     }
@@ -72,7 +81,13 @@ const Files = (props) => {
               })
             }}/>
           </div>
-          <DataGrid config={grid} criteriaParams={criteriaParams} dataUrl={`${host}/api/v1/document/fetchUserDocuments`}/>
+          <DataGrid config={grid}
+                    criteriaParams={criteriaParams}
+                    dataUrl={`${host}/api/v1/document/fetchUserDocuments`}
+                    actionHandler={(e) => {
+                      onDownload(e.data.documentId);
+                    }}
+          />
         </ul>
       </div>
     </div>
