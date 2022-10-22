@@ -20,9 +20,11 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import {useNavigate} from 'react-router-dom';
 import ModalComponent from "../customInput/Modal";
-import {Select, InputLabel, MenuItem} from "@material-ui/core";
-import Box from "@material-ui/core/Box";
+import {Select, InputLabel, MenuItem, Checkbox} from "@material-ui/core";
+import EventMessageComponent from "../customInput/EventMessage";
 
+
+const options = ['NONE', 'TEST'];
 
 const Meeting = (props) => {
 
@@ -36,7 +38,11 @@ const Meeting = (props) => {
   const [errors, setErrors] = useState({});
   const [edited, setEdited] = useState(false);
   const [eventRecurrence, setEventRecurrence] = React.useState('NONE');
+  const [repeatingEvery, setRepeatingEvery] = React.useState('');
+  const [eventRecurrenceNumber, setEventRecurrenceNumber] = React.useState('');
   const [open, setOpen] = React.useState(false);
+  const [recurrenceChecked, setRecurrenceChecked] = useState(false);
+
   const navigate = useNavigate();
 
   const getInitialValue = (propsValue) => {
@@ -239,7 +245,10 @@ const Meeting = (props) => {
 
     setEventRecurrence(e.target.value);
     if(e.target.value !== 'NONE') {
+      setRepeatingEvery(e.target.value);
       setOpen(true);
+    } else {
+
     }
   };
 
@@ -270,30 +279,6 @@ const Meeting = (props) => {
         </div>
       );
     }
-
-    const setRecurrentBody = (
-
-      <div className={'row no-margin'}>
-        <div className={'col-*-*'}>
-          <DatePicker
-            label="Start date"
-            id="startDate"
-            disabled={readOnly}
-            hasError={errors.startDate}
-            // value={value.startDate}
-            required={true}
-            valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-            errorMessage={'A start date is required. Please select a value'}
-          />
-        </div>
-        <div>
-          <div className={'col-*-*'}>
-            {/*<Dropdow options={options} value={defaultOption} placeholder="Select an option" />;*/}
-          </div>
-        </div>
-      </div>
-    );
-
 
     return (
       readOnly ?
@@ -377,27 +362,37 @@ const Meeting = (props) => {
     <X className="cursor-pointer" size={15} onClick={(e) => handleClose(e)}/>
   );
 
-  const setRecurrentBody = (
+  const onRecurrenceChecked = () => {
+    setEventRecurrence("NONE");
+    setRecurrenceChecked(!recurrenceChecked);
+  };
 
-    <div className={'row no-margin'}>
-      <div className={'col-*-*'}>
-        <DatePicker
-          label="Start date"
-          id="startDate"
-          disabled={readOnly}
-          hasError={errors.startDate}
-          // value={value.startDate}
-          required={true}
-          valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-          errorMessage={'A start date is required. Please select a value'}
-        />
+  const setRecurrentBody = (
+    <div style={{width: '80%'}}>
+      <div className={'row no-margin'}>
+          <FormControl>
+            <InputLabel id="repeatingEveryLabel">Repeating every</InputLabel>
+            <Select
+              style={{width: "100%"}}
+              labelId="repeating-every-label"
+              id="repeatingEveryLabelSelect"
+              value={repeatingEvery}
+              label="Repeating every"
+              disabled={readOnly}
+              onChange={handleEventRecurring}
+            >
+              <MenuItem value={"DAILY"}>Day</MenuItem>
+              <MenuItem value={"WEEKLY"}>Week</MenuItem>
+              <MenuItem value={"MONTHLY"}>Month</MenuItem>
+            </Select>
+          </FormControl>
+     </div>
+
+      <div className={'row no-margin'}>
+        <EventMessageComponent recurringType={eventRecurrence} eventRecurrenceNumber={2} />
       </div>
-      <div>
-        <div className={'col-*-*'}>
-          {/*<Dropdown options={options} value={defaultOption} placeholder="Select an option"  children={}/>;*/}
-        </div>
-      </div>
-    </div>
+
+  </div>
   );
 
   return (
@@ -460,80 +455,98 @@ const Meeting = (props) => {
               <FormControlLabel value="PUBLIC" control={<Radio disabled={readOnly}/>} label="Public"/>
             </RadioGroup>
           </FormControl>
-          <div>
-            <div className={'row no-margin'}>
-              <div className={'col-*-*'}>
-                <DatePicker
-                  label="Start date"
-                  id="startDate"
-                  disabled={readOnly}
-                  hasError={errors.startDate}
-                  value={value.startDate}
-                  required={true}
-                  valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-                  errorMessage={'A start date is required. Please select a value'}
-                />
-              </div>
-              <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
-                <TimePicker
-                  label="Start time"
-                  id="startTime"
-                  disabled={readOnly}
-                  hasError={errors.startTime}
-                  value={value.startTime}
-                  required={true}
-                  valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-                  errorMessage={'A start time is required. Please select a value'}
-                />
-              </div>
-            </div>
-          </div>
-          <div>
-            <div className={'row no-margin'}>
-              <div className={'col-*-*'}>
-                <DatePicker
-                  label="End date"
-                  disabled={readOnly}
-                  id="endDate"
-                  hasError={errors.endDate}
-                  value={value.endDate}
-                  required={true}
-                  valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-                  errorMessage={'An end date is required. Please select a value'}
-                />
-              </div>
-              <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
-                <TimePicker
-                  label="End time"
-                  disabled={readOnly}
-                  id="endTime"
-                  hasError={errors.endTime}
-                  value={value.endTime}
-                  required={true}
-                  valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
-                  errorMessage={'A end time is required. Please select a value'}
-                />
-              </div>
-            </div>
-          </div>
-          <FormControl>
-            <InputLabel id="setEventRecurrenceLabel">Set Recurrence</InputLabel>
-            <Select
-              style={{width:"100%"}}
-              labelId="event-recurrence-label"
-              id="setEventRecurrenceSelect"
-              value={eventRecurrence}
-              label="Set Recurrence"
-              disabled={readOnly}
-              onChange={handleEventRecurring}
-            >
-              <MenuItem value={"NONE"}>Not repeating</MenuItem>
-              <MenuItem value={"DAILY"}>Daily</MenuItem>
-              <MenuItem value={"WEEKLY"}>Weekly</MenuItem>
-              <MenuItem value={"MONTHLY"}>Monthly</MenuItem>
-            </Select>
-          </FormControl>
 
+
+              <FormControl component="fieldset" fullWidth>
+                <FormControlLabel
+                  label="Recurring"
+                  value={recurrenceChecked}
+                  control={
+                    <Checkbox color="primary" checked={recurrenceChecked} onChange={onRecurrenceChecked}/>
+                  }
+                />
+              </FormControl>
+
+          {
+            !recurrenceChecked ?
+              <div>
+                <div>
+                  <div className={'row no-margin'}>
+                    <div className={'col-*-*'}>
+                      <DatePicker
+                        label="Start date"
+                        id="startDate"
+                        disabled={readOnly}
+                        hasError={errors.startDate}
+                        value={value.startDate}
+                        required={true}
+                        valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+                        errorMessage={'A start date is required. Please select a value'}
+                      />
+                    </div>
+                    <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
+                      <TimePicker
+                        label="Start time"
+                        id="startTime"
+                        disabled={readOnly}
+                        hasError={errors.startTime}
+                        value={value.startTime}
+                        required={true}
+                        valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+                        errorMessage={'A start time is required. Please select a value'}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div className={'row no-margin'}>
+                    <div className={'col-*-*'}>
+                      <DatePicker
+                        label="End date"
+                        disabled={readOnly}
+                        id="endDate"
+                        hasError={errors.endDate}
+                        value={value.endDate}
+                        required={true}
+                        valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+                        errorMessage={'An end date is required. Please select a value'}
+                      />
+                    </div>
+                    <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
+                      <TimePicker
+                        label="End time"
+                        disabled={readOnly}
+                        id="endTime"
+                        hasError={errors.endTime}
+                        value={value.endTime}
+                        required={true}
+                        valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+                        errorMessage={'A end time is required. Please select a value'}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              :
+
+              <FormControl>
+                <InputLabel id="setEventRecurrenceLabel">Set Recurrence</InputLabel>
+                <Select
+                  style={{width: "100%"}}
+                  labelId="event-recurrence-label"
+                  id="setEventRecurrenceSelect"
+                  value={eventRecurrence}
+                  label="Set Recurrence"
+                  disabled={readOnly}
+                  onChange={handleEventRecurring}
+                >
+                  <MenuItem value={"NONE"}>Select recurrence</MenuItem>
+                  <MenuItem value={"DAILY"}>Daily</MenuItem>
+                  <MenuItem value={"WEEKLY"}>Weekly</MenuItem>
+                  <MenuItem value={"MONTHLY"}>Monthly</MenuItem>
+                </Select>
+              </FormControl>
+          }
 
           <div style={{marginTop: '8px'}}>
             <AutoComplete
