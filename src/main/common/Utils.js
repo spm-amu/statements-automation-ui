@@ -1,4 +1,6 @@
-﻿export default class Utils {
+﻿import moment from 'moment';
+
+export default class Utils {
   constructor() {}
 
   SYSTEM_ERROR_MESSAGE =
@@ -28,6 +30,10 @@
       }
     }
     return initials
+  }
+
+  static isToday (date) {
+    return !moment(date).isBefore(moment(), "day");
   }
 
   static capitalize = (s) => {

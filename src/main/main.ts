@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, systemPreferences, screen, globalShortcut } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, systemPreferences, screen } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -25,6 +25,7 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 let dialWindow: BrowserWindow | null = null;
+let messageWindow: BrowserWindow | null = null;
 let screenWidth: number;
 let screenHeight: number;
 
@@ -90,7 +91,6 @@ const createDialWindow = () => {
     transparent: true,
     skipTaskbar: true,
     hasShadow: false,
-    // Don't show the window until the user is in a call.
     show: false,
   });
 
@@ -109,6 +109,51 @@ const createDialWindow = () => {
   }
 
   dialWindow.loadURL(resolveWindowHtmlPath('index.html#/dialingPreview'));
+};
+
+const createMessageWindow = () => {
+  messageWindow = new BrowserWindow({
+    title: "Armscor",
+    width: 550,
+    height: 300,
+    maxWidth: 550,
+    maxHeight: 300,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    parent: mainWindow,
+    roundedCorners: false,
+    x: screenWidth - 600,
+    y: screenHeight - 300,
+    webPreferences: {
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
+    },
+    frame: false,
+    autoHideMenuBar: true,
+    transparent: true,
+    skipTaskbar: true,
+    hasShadow: false,
+    show: false,
+  });
+
+  // preventRefresh(dialWindow);
+
+  const dev = app.commandLine.hasSwitch("dev");
+  if (!dev) {
+    let level = "normal";
+    // Mac OS requires a different level for our drag/drop and overlay
+    // functionality to work as expected.
+    if (process.platform === "darwin") {
+      level = "floating";
+    }
+
+    messageWindow.setAlwaysOnTop(true, level);
+  }
+
+  messageWindow.loadURL(resolveWindowHtmlPath('index.html#/messagePreview'));
 };
 
 const createWindow = async () => {
@@ -158,6 +203,7 @@ const createWindow = async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
     dialWindow = null;
+    messageWindow = null;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
@@ -184,9 +230,18 @@ ipcMain.on("receivingCall", async (_event, args) => {
   }
 
   dialWindow.webContents.send('dialingViewContent', args);
-
   dialWindow.show();
   dialWindow.focus();
+});
+
+ipcMain.on("receivingMessage", async (_event, args) => {
+  if (!messageWindow) {
+    throw new Error('"messageWindow" is not defined');
+  }
+
+  messageWindow.webContents.send('messageViewContent', args);
+  messageWindow.show();
+  messageWindow.focus();
 });
 
 ipcMain.on("answerCall", async (_event, args) => {
@@ -219,6 +274,14 @@ ipcMain.on("cancelCall", async (_event, args) => {
   dialWindow?.hide();
 });
 
+ipcMain.on("hideMessagePreview", async (_event, args) => {
+  if (!messageWindow) {
+    throw new Error('"messageWindow" is not defined');
+  }
+
+  messageWindow.hide();
+});
+
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
@@ -235,9 +298,9 @@ app
     screenWidth = width;
     screenHeight = height;
 
-
     createWindow();
     createDialWindow();
+    createMessageWindow();
 
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

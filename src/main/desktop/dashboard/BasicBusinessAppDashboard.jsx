@@ -16,6 +16,8 @@ const { electron } = window;
 
 let ps;
 
+const newMessageAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/message.mp3');
+
 const BasicBusinessAppDashboard = (props) => {
   const [navDrawerOpen, setNavDrawerOpen] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
@@ -159,8 +161,25 @@ const BasicBusinessAppDashboard = (props) => {
           case MessageType.CANCEL_CALL:
             cancelCall(be.payload);
             break;
+          case MessageType.CHAT_MESSAGE:
+            onChatMessage(be.payload);
+            break;
         }
       }
+    }
+  };
+
+  const onChatMessage = (payload) => {
+    console.log('ON CHAT DASH: ', payload);
+
+    let loggedInUser = JSON.parse(sessionStorage.getItem('userDetails'));
+
+    if (payload.message.participant.userId !== loggedInUser.userId) {
+      newMessageAudio.play();
+
+      electron.ipcRenderer.sendMessage('receivingMessage', {
+        payload: payload
+      });
     }
   };
 
@@ -196,6 +215,20 @@ const BasicBusinessAppDashboard = (props) => {
     });
   };
 
+  const joinChatRooms = () => {
+    get(`${host}/api/v1/chat/fetchChats`, (response) => {
+      const ids = response.map(chat => chat.id);
+
+      socketManager.chatEvents = response;
+
+      socketManager.emitEvent(MessageType.JOIN_CHAT_ROOM, {
+        socketId: socketManager.socket.id,
+        rooms: ids
+      });
+    }, (e) => {
+    })
+  }
+
   React.useEffect(() => {
     if (loading) {
       if (Utils.isNull(sessionStorage.getItem("accessToken"))) {
@@ -206,9 +239,10 @@ const BasicBusinessAppDashboard = (props) => {
           setUserDetails(response);
           init();
           socketManager.init();
-          socketManager.addSubscriptions(handler(), MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL);
+          socketManager.addSubscriptions(handler(), MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE);
           onAnswerCall();
           onDeclineCall();
+          joinChatRooms();
         }, (e) => {
         })
       }

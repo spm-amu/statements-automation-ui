@@ -35,7 +35,7 @@ import {
   CancelPresentation,
   ChatBubbleOutline, Done,
   People,
-  PresentToAll,
+  PresentToAll, Reply,
   Videocam,
   VideocamOff
 } from '@material-ui/icons';
@@ -51,6 +51,8 @@ class Icon extends Component {
       return <AddIcon/>
     } else if (this.props.id === 'EDIT') {
       return <EditIcon/>
+    } else if (this.props.id === 'REPLY') {
+      return <Reply/>
     } else if (this.props.id === 'CLOSE') {
       return <Close/>
     } else if (this.props.id === 'MINIMIZE') {

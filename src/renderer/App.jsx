@@ -17,6 +17,7 @@ import LottieIcon from '../main/common/components/LottieIcon';
 import IconButton from '@material-ui/core/IconButton';
 import Icon from '../main/common/components/Icon';
 import DialingPreview from '../main/common/components/vc/DialingPreview';
+import MessagePreview from '../main/common/components/vc/MessagePreview';
 
 const armscorTheme = createTheme({
     palette: {
@@ -49,6 +50,14 @@ const Dialing = () => {
   );
 };
 
+const Message = () => {
+  return (
+    <div style={{width: '99vw', height: '100vh', backgroundColor: '#E5E5E5', overflow: 'hidden'}}>
+      <MessagePreview />
+    </div>
+  );
+};
+
 const Dashboard = () => {
   return (
     <div style={{width: '100%'}}>
@@ -74,6 +83,7 @@ export default function App() {
             <Route path="/dashboard/*" element={<Dashboard/>}/>
             <Route path="/login" element={<Login/>}/>
             <Route path="/dialingPreview" element={<Dialing />}/>
+            <Route path="/messagePreview" element={<Message />}/>
           </Routes>
         </Router>
       </ThemeProvider>

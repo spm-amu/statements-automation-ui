@@ -8,6 +8,7 @@ class SocketManager {
       this.subscriptions = [];
       this.userPeerMap = [];
       this.usersOnline = [];
+      this.chatEvents = [];
       SocketManager.instance = this;
     }
 
@@ -37,14 +38,15 @@ class SocketManager {
   };
 
   init = () => {
-    let socket = io.connect('http://svn.agilemotion.co.za');
-    // let socket = io.connect('http://100.72.122.19:8000');
+    // let socket = io.connect('http://svn.agilemotion.co.za');
+    let socket = io.connect('http://localhost:8000');
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     for (const value of Object.keys(MessageType)) {
       socket.on(value, (payload) => {
         if (value !== MessageType.USERS_ONLINE
-          || value !== MessageType.USER_ONLINE || value !== MessageType.USER_OFFLINE) {
+          && value !== MessageType.USER_ONLINE && value !== MessageType.USER_OFFLINE && value !== MessageType.CHAT_MESSAGE) {
+          console.log('EVENT: ', value);
           this.fireEvent(value, {socket: this.socket, payload: payload});
         }
       });
@@ -61,6 +63,15 @@ class SocketManager {
       }
 
       this.fireEvent(MessageType.USERS_ONLINE, {socket: this.socket, payload: payload});
+    });
+
+    socket.on(MessageType.CHAT_MESSAGE, (payload) => {
+      const chatEvent = this.chatEvents.find(e => e.id === payload.roomId);
+      chatEvent.messages.push(payload.message);
+      chatEvent.updatedDate = new Date();
+
+      console.log('FIRE EVENT::: ', payload);
+      this.fireEvent(MessageType.CHAT_MESSAGE, {socket: this.socket, payload: payload});
     });
 
     socket.on(MessageType.USER_ONLINE, (payload) => {
