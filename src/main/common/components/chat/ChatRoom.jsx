@@ -33,7 +33,8 @@ const ChatRoom = (props) => {
   const [messages, setMessages] = useState([]);
   const [confirm, setImgUploadConfirm] = useState('');
   const messagesEndRef = useRef(null);
-  const [ roomId, setRoomId ] = useState(null);
+  const [roomId, setRoomId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const handler = () => {
     return {
@@ -50,11 +51,16 @@ const ChatRoom = (props) => {
     }
   };
 
+
+  const eventHandler = {
+    api: handler()
+  };
+
   const onChatMessage = (be) => {
     if (be.payload.message.participant.userId !== currentUser.userId) {
       setMessages(oldMsgs => [...oldMsgs, be.payload.message]);
     }
-  }
+  };
 
   const loadMessages = () => {
     scrollToBottom();
@@ -67,6 +73,8 @@ const ChatRoom = (props) => {
 
     setChatEvent(selectedEvent);
     setMessages([].concat(selectedEvent.messages));
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -75,13 +83,18 @@ const ChatRoom = (props) => {
 
   useEffect(() => {
     setCurrentUser(JSON.parse(sessionStorage.getItem('userDetails')));
+    socketManager.addSubscriptions(eventHandler, MessageType.CHAT_MESSAGE);
   }, []);
 
   useEffect(() => {
-    const eventHandler = handler();
-    socketManager.removeSubscriptions(eventHandler);
-    socketManager.addSubscriptions(eventHandler, MessageType.CHAT_MESSAGE);
+    socketManager.api = handler();
   });
+
+  useEffect(() => {
+    return () => {
+      socketManager.removeSubscriptions(socketEventHandler);
+    };
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -107,7 +120,7 @@ const ChatRoom = (props) => {
       socketManager.emitEvent(MessageType.CHAT_MESSAGE, {
         roomId: chatEvent.id,
         message: msg
-      })
+      });
 
       setMessages(oldMsgs => [...oldMsgs, msg]);
 
@@ -290,7 +303,7 @@ const ChatRoom = (props) => {
         <p className="image__text">{confirm}</p>
       </div>
     );
-  } else {
+  } else if(!loading){
     return (
       <div className={'centered-flex-box'}>
         <div className="emptychat">
@@ -300,6 +313,8 @@ const ChatRoom = (props) => {
         </div>
       </div>
     );
+  } else {
+        return null;
   }
 };
 

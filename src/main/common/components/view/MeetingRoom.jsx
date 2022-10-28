@@ -106,7 +106,9 @@ const MeetingRoom = (props) => {
   const [audioMuted, setAudioMuted] = useState(false);
   const userVideo = useRef();
   const navigate = useNavigate();
-  const eventHandler = handler();
+  const eventHandler = {
+    api: handler()
+  };
 
   const {
     selectedMeeting,
@@ -221,8 +223,13 @@ const MeetingRoom = (props) => {
   };
 
   useEffect(() => {
+    socketEventHandler.api = handler();
+  });
+
+  useEffect(() => {
     return () => {
       endCall();
+      socketManager.removeSubscriptions(socketEventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
     };
   }, []);

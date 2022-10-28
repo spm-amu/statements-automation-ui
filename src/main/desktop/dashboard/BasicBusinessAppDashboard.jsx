@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {LARGE} from 'material-ui/utils/withWidth';
 import PropTypes from 'prop-types';
 import Utils from '../../common/Utils'
@@ -169,6 +169,10 @@ const BasicBusinessAppDashboard = (props) => {
     }
   };
 
+  const socketEventHandler = {
+    api: handler()
+  };
+
   const onChatMessage = (payload) => {
     console.log('ON CHAT DASH: ', payload);
 
@@ -227,7 +231,11 @@ const BasicBusinessAppDashboard = (props) => {
       });
     }, (e) => {
     })
-  }
+  };
+
+  useEffect(() => {
+    socketManager.api = handler();
+  });
 
   React.useEffect(() => {
     if (loading) {
@@ -239,7 +247,7 @@ const BasicBusinessAppDashboard = (props) => {
           setUserDetails(response);
           init();
           socketManager.init();
-          socketManager.addSubscriptions(handler(), MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE);
+          socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE);
           onAnswerCall();
           onDeclineCall();
           joinChatRooms();

@@ -37,7 +37,13 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
   };
 
   const [online, setOnline] = useState(false);
-  const socketEventHandler = handler();
+  const socketEventHandler = {
+    api: handler()
+  };
+
+  useEffect(() => {
+    socketEventHandler.api = handler();
+  });
 
   useEffect(() => {
     setOnline(socketManager.isUserOnline(props.data));

@@ -118,7 +118,7 @@ class SocketManager {
   async fireEvent(eventType, be) {
     for (const subscription of this.subscriptions) {
       if (subscription.eventType === eventType) {
-        subscription.handler.on(eventType, be);
+        subscription.handler.api.on(eventType, be);
       }
     }
   }
