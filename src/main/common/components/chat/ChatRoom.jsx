@@ -51,7 +51,6 @@ const ChatRoom = (props) => {
     }
   };
 
-
   const eventHandler = {
     api: handler()
   };
