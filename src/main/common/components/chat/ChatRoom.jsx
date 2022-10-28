@@ -87,12 +87,12 @@ const ChatRoom = (props) => {
   }, []);
 
   useEffect(() => {
-    socketManager.api = handler();
+    eventHandler.api = handler();
   });
 
   useEffect(() => {
     return () => {
-      socketManager.removeSubscriptions(socketEventHandler);
+      socketManager.removeSubscriptions(eventHandler);
     };
   }, []);
 

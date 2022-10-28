@@ -234,7 +234,7 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   useEffect(() => {
-    socketManager.api = handler();
+    socketEventHandler.api = handler();
   });
 
   React.useEffect(() => {
