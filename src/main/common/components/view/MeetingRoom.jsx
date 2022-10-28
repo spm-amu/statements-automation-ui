@@ -223,7 +223,7 @@ const MeetingRoom = (props) => {
   };
 
   useEffect(() => {
-    socketEventHandler.api = handler();
+    eventHandler.api = handler();
   });
 
   useEffect(() => {
