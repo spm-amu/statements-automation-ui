@@ -229,7 +229,7 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     return () => {
       endCall();
-      socketManager.removeSubscriptions(socketEventHandler);
+      socketManager.removeSubscriptions(eventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
     };
   }, []);
