@@ -10,6 +10,7 @@ const {electron} = window;
 const MessagePreview = (props) => {
   const [messenger, setMessenger] = useState(null);
   const [initials, setInitials] = useState('');
+  const [counter, setCounter] = useState(7);
 
   useEffect(() => {
     electron.ipcRenderer.on('messageViewContent', args => {
@@ -22,6 +23,14 @@ const MessagePreview = (props) => {
       setInitials(Utils.getInitials(messenger.message.participant.name));
     }
   }, [messenger]);
+
+  useEffect(() => {
+    if (counter > 0) {
+      setTimeout(() => setCounter(counter - 1), 5000);
+    } else {
+      electron.ipcRenderer.sendMessage('hideMessagePreview', {});
+    }
+  }, [counter]);
 
   return (
     messenger &&
