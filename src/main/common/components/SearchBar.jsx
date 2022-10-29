@@ -17,28 +17,32 @@ const SearchBarComponent = React.memo(React.forwardRef((props, ref) => {
         <TextField
           style={{width: '100%'}}
           value={searchValue}
+          label={'Search'}
           id="title"
           valueChangeHandler={(e) => {
             setSearchValue(e.target.value);
-            if(props.valueChangeHandler) {
+            if (props.valueChangeHandler) {
               props.valueChangeHandler(e.target.value);
             }
           }}
           errorMessage={'A meeting title is required. Please enter a value'}
         />
       </div>
-      <div className={"icon"}>
-        <IconButton
-          onClick={(e) => {
-            props.onSearch(searchValue);
-          }}
-          style={{
-            marginRight: '4px'
-          }}
-        >
-          <Icon id={'SEARCH'}/>
-        </IconButton>
-      </div>
+      {
+        !props.valueChangeHandler &&
+        <div className={"icon"}>
+          <IconButton
+            onClick={(e) => {
+              props.onSearch(searchValue);
+            }}
+            style={{
+              marginRight: '4px'
+            }}
+          >
+            <Icon id={'SEARCH'}/>
+          </IconButton>
+        </div>
+      }
     </div>
   );
 }));

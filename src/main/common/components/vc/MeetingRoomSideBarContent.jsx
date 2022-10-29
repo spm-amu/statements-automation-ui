@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import "./MeetingRoomSideBarContent.css"
 import Button from '../RegularButton';
 import styles from "../view/security/LoginStyle";
 import Dialog from "@material-ui/core/Dialog";
@@ -13,6 +12,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Icon from "../Icon";
 import SearchBar from "../SearchBar";
 import People from "../view/People";
+import "./MeetingRoomSideBarContent.css"
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -39,7 +39,8 @@ const MeetingRoomSideBarContent = (props) => {
   const [peopleDialogOpen, setPeopleDialogOpen] = useState(false);
 
   const {
-    tab
+    tab,
+    meetingId
   } = props;
 
   React.useEffect(() => {
@@ -61,7 +62,7 @@ const MeetingRoomSideBarContent = (props) => {
         <DialogTitle id="people-window-title">
           <div className={'closable-panel-header row'}>
             <div className={'title col'}>
-              Search
+              Request to join
             </div>
             <div style={{width: '64px'}}>
               <IconButton
@@ -78,8 +79,8 @@ const MeetingRoomSideBarContent = (props) => {
           </div>
         </DialogTitle>
         <DialogContent>
-          <div style={{height: '100%'}}>
-            <People chatEnabled={false} onAudioCallHandler={(e) => alert('Dial fireeee')}/>
+          <div style={{height: '100%'}} className={'request-to-join-dialog-content'}>
+            <People exclusions={['peter.miyambo@gmail.com']} chatEnabled={false} onAudioCallHandler={(e) => alert('Dial fireeee')}/>
           </div>
         </DialogContent>
         <DialogActions>
@@ -105,6 +106,11 @@ const MeetingRoomSideBarContent = (props) => {
         }
       </div>
       <div className={'list'}>
+        <People dialEnabled={false}
+                showOnlineIndicator={false}
+                avatarSize={'S'}
+                meetingId={meetingId}
+        />
       </div>
     </div>
   );

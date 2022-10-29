@@ -486,7 +486,7 @@ const MeetingRoom = (props) => {
                 closeHandler={(e) => setSideBarOpen(false)}
                 title={sideBarTab}
               >
-                <MeetingRoomSideBarContent tab={sideBarTab}/>
+                <MeetingRoomSideBarContent tab={sideBarTab} meetingId={selectedMeeting.id}/>
               </ClosablePanel>
             </div>
           }

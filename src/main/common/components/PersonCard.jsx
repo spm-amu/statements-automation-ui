@@ -58,8 +58,8 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
 
   return (
     <div className="person-card">
-      <div className="row" style={{borderBottom: '1px solid #e1e1e1', paddingBottom: '8px'}}>
-        <div>
+      <div className="row no-margin" style={{borderBottom: '1px solid #e1e1e1', paddingBottom: '8px'}}>
+        <div className={props.avatarSize === 'S' ? 'avatar-small' : null}>
           <img
             src={props.data.avatar ? props.data.avatar : require('../../desktop/dashboard/images/noimage-person.png')}
             alt={""} style={{borderRadius: '50%'}}/>
@@ -70,37 +70,46 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
           }
         </div>
       </div>
-      <div className={"bottom-strip row"}>
+      <div className={"bottom-strip row no-margin"}>
         <div className={'indicator col'}>
-          <div className={online ? 'online' : 'offline'}>
+          {
+            props.showOnlineIndicator &&
+            <div className={online ? 'online' : 'offline'}>
+            </div>
+          }
+        </div>
+        {
+          props.dialEnabled &&
+          <div style={{marginRight: '4px'}} className={'buttons'}>
+            <IconButton
+              onClick={(e) => {
+                props.onAudioCallHandler(props.data)
+              }}
+              disabled={!online}
+              style={{
+                marginRight: '4px'
+              }}
+            >
+              <Icon id={'CALL_END'}/>
+            </IconButton>
           </div>
-        </div>
-        <div style={{marginRight: '4px'}} className={'buttons'}>
-          <IconButton
-            onClick={(e) => {
-              props.onAudioCallHandler(props.data)
-            }}
-            disabled={!online}
-            style={{
-              marginRight: '4px'
-            }}
-          >
-            <Icon id={'CALL_END'}/>
-          </IconButton>
-        </div>
-        <div className={'col-*-*'}>
-          <IconButton
-            onClick={(e) => {
+        }
+        {
+          props.dialEnabled &&
+          <div className={'col-*-*'}>
+            <IconButton
+              onClick={(e) => {
 
-            }}
-            disabled={online}
-            style={{
-              marginRight: '4px'
-            }}
-          >
-            <Icon id={'CAMERA'}/>
-          </IconButton>
-        </div>
+              }}
+              disabled={online}
+              style={{
+                marginRight: '4px'
+              }}
+            >
+              <Icon id={'CAMERA'}/>
+            </IconButton>
+          </div>
+        }
         {
           props.chatEnabled &&
           <div className={'col-*-*'}>

@@ -16,28 +16,46 @@ const People = (props) => {
     records: []
   });
 
-  const onValueChangedHandler = (searchValue) => {
-    if (searchValue) {
-      post(`${host}/api/v1/auth/search`, (response) => {
-          console.log('RESPONSE: ', response);
-          setSearchResult(response);
-        }, (e) => {
+  const {meetingId, exclusions} = props;
 
-        },
-        {
-          "parameters": [
-            {
-              "name": 'emailAddress',
-              "value": searchValue
-            }
-          ],
-          "pageSize": 2000,
-          "currentPage": 0
-        })
+  useEffect(() => {
+    if(meetingId) {
+      // TODO : If a meeting id is passed, search for all meeting attendees
+    }
+  }, []);
+
+  const onValueChangedHandler = (searchValue) => {
+    if(meetingId) {
+      // TODO : If a meeting id is passed, search for all meeting attendees and pass the search value as a filter ONLY within those attendees
     } else {
-      setSearchResult({
-        records: []
-      });
+      // NB : If there are exclusions(i.e people who have already joined the meeting), we call the API and pass the exclusions. We do not want to include them in the search result
+      // @Nsovo - update the backend to take into account any exclusions
+      if (searchValue) {
+        post(`${host}/api/v1/auth/search`, (response) => {
+            console.log('RESPONSE: ', response);
+            setSearchResult(response);
+          }, (e) => {
+
+          },
+          {
+            "parameters": [
+              {
+                "name": 'emailAddress',
+                "value": searchValue
+              },
+              {
+                "name": 'exclusions',
+                "value": exclusions ? exclusions : null
+              }
+            ],
+            "pageSize": 2000,
+            "currentPage": 0
+          })
+      } else {
+        setSearchResult({
+          records: []
+        });
+      }
     }
   };
 
@@ -78,7 +96,13 @@ const People = (props) => {
       <div className={'people-content row'}>
         {searchResult.records.map((user, index) => {
           return <div key={index} className={'col person-card-wrapper'} style={{marginLeft: '0', paddingLeft: '0', maxWidth: '400px'}}>
-              <PersonCard onAudioCallHandler={(data) => onAudioCallHandler(data)} data={user} chatEnabled={!Utils.isNull(props.chatEnabled) ? props.chatEnabled : true}/>
+              <PersonCard onAudioCallHandler={(data) => onAudioCallHandler(data)}
+                          data={user}
+                          avatarSize={!Utils.isNull(props.avatarSize) ? props.avatarSize : true}
+                          showOnlineIndicator={!Utils.isNull(props.showOnlineIndicator) ? props.showOnlineIndicator : true}
+                          chatEnabled={!Utils.isNull(props.chatEnabled) ? props.chatEnabled : true}
+                          dialEnabled={!Utils.isNull(props.dialEnabled) ? props.dialEnabled : true}
+              />
           </div>
         })}
       </div>
