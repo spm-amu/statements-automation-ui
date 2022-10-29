@@ -35,7 +35,6 @@ const Footer = (props) => {
         </div>
         <div className={'col'}>
           <div
-            className={'col'}
             style={{display: 'flex', justifyContent: 'flex-end'}}
           >
             <section className="call-overlay-footer-yourself">

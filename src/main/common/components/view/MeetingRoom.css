@@ -124,11 +124,20 @@
   margin: 0 16px 0 0;
 }
 
+.meeting-window-container {
+  height: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 16px !important;
+  margin-right: 16px !important;
+}
+
 #meeting-window-description {
   height: 100%;
 }
 
 #meeting-window-title {
+  margin-top: 8px;
 }
 
 @media screen and (max-width:800px) {

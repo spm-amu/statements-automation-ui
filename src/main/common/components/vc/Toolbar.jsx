@@ -56,8 +56,12 @@ const Toolbar = (props) => {
     eventHandler.endCall();
   };
 
-  const openSidebar = () => {
+  const showPeople = () => {
+    eventHandler.showPeople()
+  };
 
+  const showChat = () => {
+    eventHandler.showChat()
   };
 
 	return (
@@ -126,7 +130,7 @@ const Toolbar = (props) => {
             color: 'white',
             marginRight: '4px'
           }}
-          onClick={(e) => openSidebar('CHAT')}
+          onClick={(e) => showChat()}
         >
           <Icon id={'CHAT_BUBBLE'}/>
         </IconButton>
@@ -143,7 +147,7 @@ const Toolbar = (props) => {
         </IconButton>
 
         <IconButton
-          onClick={(e) => openSidebar('PEOPLE')}
+          onClick={(e) => showPeople()}
           style={{
             backgroundColor: '#404239',
             color: 'white',

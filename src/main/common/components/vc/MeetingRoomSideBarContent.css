@@ -1,0 +1,29 @@
+.meeting-room-sb-container {
+  height: 100%;
+  width: 100%;
+  padding: 16px;
+}
+
+.people-container {
+  padding: 0 !important;
+}
+
+.people-content {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.person-card-wrapper {
+  min-width: 100% !important;
+  padding-bottom: 4px;
+  padding-right: 0 !important;
+}
+
+.meeting-room-sb-container .raised-hands{
+}
+
+.meeting-room-sb-container .toolbar{
+}
+
+.meeting-room-sb-container .list{
+}

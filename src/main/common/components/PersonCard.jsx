@@ -4,7 +4,7 @@ import Icon from "./Icon";
 import IconButton from "@material-ui/core/IconButton";
 import socketManager from "../../common/service/SocketManager";
 import {MessageType} from "../types";
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
 
@@ -21,12 +21,12 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
             setOnline(socketManager.isUserOnline(props.data));
             break;
           case MessageType.USER_ONLINE:
-            if(be.payload.userId === props.data.userId) {
+            if (be.payload.userId === props.data.userId) {
               setOnline(true);
             }
             break;
           case MessageType.USER_OFFLINE:
-            if(be.payload.userId === props.data.userId) {
+            if (be.payload.userId === props.data.userId) {
               setOnline(false);
             }
 
@@ -101,19 +101,22 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
             <Icon id={'CAMERA'}/>
           </IconButton>
         </div>
-        <div className={'col-*-*'}>
-          <IconButton
-            onClick={(e) => {
+        {
+          props.chatEnabled &&
+          <div className={'col-*-*'}>
+            <IconButton
+              onClick={(e) => {
 
-            }}
-            disabled={online}
-            style={{
-              marginRight: '4px'
-            }}
-          >
-            <Icon id={'CHAT_BUBBLE'}/>
-          </IconButton>
-        </div>
+              }}
+              disabled={online}
+              style={{
+                marginRight: '4px'
+              }}
+            >
+              <Icon id={'CHAT_BUBBLE'}/>
+            </IconButton>
+          </div>
+        }
       </div>
     </div>
   );

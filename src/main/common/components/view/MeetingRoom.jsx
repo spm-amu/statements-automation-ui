@@ -4,8 +4,6 @@ import './Calendar.css';
 import './MeetingRoom.css';
 import {useNavigate} from 'react-router-dom';
 import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Icon from '../Icon';
@@ -18,6 +16,8 @@ import socketManager from "../../service/SocketManager";
 import {MessageType} from "../../types";
 import Utils from "../../Utils";
 import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
+import ClosablePanel from "../layout/ClosablePanel";
+import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -96,6 +96,7 @@ const MeetingRoom = (props) => {
   };
 
   const [sideBarOpen, setSideBarOpen] = useState(false);
+  const [sideBarTab, setSideBarTab] = useState('');
   const [windowTransformValue, setWindowTransformValue] = useState(null);
   const [displayState, setDisplayState] = useState('MAXIMIZED');
   const [participants, setParticipants] = useState([]);
@@ -388,7 +389,7 @@ const MeetingRoom = (props) => {
         PaperComponent={PaperComponent}
         PaperProps={{id: 'meetingDialogPaper', disabled: displayState === 'MAXIMIZED'}}
       >
-        <DialogTitle id="meeting-window-title">
+        <div id="meeting-window-title">
           {
             step === Steps.SESSION &&
             <div className={'dialogHeader'}>
@@ -418,61 +419,78 @@ const MeetingRoom = (props) => {
               }
             </div>
           }
-        </DialogTitle>
-        <DialogContent className={'row-*-* meeting-window-container'}>
-          <div style={{height: 'calc(100% - 144px)'}}>
-            {
-              step === Steps.LOBBY || (lobbyWaitingList && lobbyWaitingList.length > 0) ?
-                <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
-                       acceptUserHandler={
-                         (item) => {
-                           acceptUser(item);
-                         }}
-                       rejectUserHandler={
-                         (item) => {
-                           rejectUser(item);
-                         }}
-                />
-                :
-                <MeetingParticipantGrid participants={participants} videoMuted={videoMuted}/>
-            }
-            {
-              currentUserStream &&
-              <Footer userVideo={userVideo}
-                      userStream={currentUserStream}
-                      audioMuted={audioMuted}
-                      videoMuted={videoMuted}
-                      toolbarEventHandler={
-                        {
-                          onMuteVideo: (muted) => {
-                            setVideoMuted(muted);
-                          },
-                          onMuteAudio: (muted) => {
-                            setAudioMuted(muted);
-                          },
-                          endCall: () => {
-                            if (isDirectCall && participants.length === 0) {
-                              console.log("USER TO CALL : ", userToCall);
-                              socketManager.emitEvent(MessageType.CANCEL_CALL, {userId: userToCall.userId});
-                              onCallEnded();
-                            } else {
-                              endCall();
+        </div>
+        <div className={'row meeting-window-container'}>
+          <div className={'col'}>
+            <div style={{height: 'calc(100% - 144px)'}}>
+              {
+                step === Steps.LOBBY || (lobbyWaitingList && lobbyWaitingList.length > 0) ?
+                  <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
+                         acceptUserHandler={
+                           (item) => {
+                             acceptUser(item);
+                           }}
+                         rejectUserHandler={
+                           (item) => {
+                             rejectUser(item);
+                           }}
+                  />
+                  :
+                  <MeetingParticipantGrid participants={participants} videoMuted={videoMuted}/>
+              }
+              {
+                currentUserStream &&
+                <Footer userVideo={userVideo}
+                        userStream={currentUserStream}
+                        audioMuted={audioMuted}
+                        videoMuted={videoMuted}
+                        toolbarEventHandler={
+                          {
+                            onMuteVideo: (muted) => {
+                              setVideoMuted(muted);
+                            },
+                            onMuteAudio: (muted) => {
+                              setAudioMuted(muted);
+                            },
+                            endCall: () => {
+                              if (isDirectCall && participants.length === 0) {
+                                console.log("USER TO CALL : ", userToCall);
+                                socketManager.emitEvent(MessageType.CANCEL_CALL, {userId: userToCall.userId});
+                                onCallEnded();
+                              } else {
+                                endCall();
+                              }
+                            },
+                            shareScreen: () => {
+                            },
+                            stopShareScreen: () => {
+                            },
+                            showPeople: () => {
+                              setSideBarTab('People');
+                              setSideBarOpen(true);
+                            },
+                            showChat: () => {
+                              setSideBarTab('Chat');
+                              setSideBarOpen(true);
                             }
-                          },
-                          shareScreen: () => {
-                          },
-                          stopShareScreen: () => {
-                          },
-                          showPeople: () => {
-                          },
-                          showChat: () => {
                           }
                         }
-                      }
-              />
-            }
+                />
+              }
+            </div>
           </div>
-        </DialogContent>
+          {
+            sideBarOpen && sideBarTab &&
+            <div style={{width: '320px'}}>
+              <ClosablePanel
+                closeHandler={(e) => setSideBarOpen(false)}
+                title={sideBarTab}
+              >
+                <MeetingRoomSideBarContent tab={sideBarTab}/>
+              </ClosablePanel>
+            </div>
+          }
+        </div>
         <DialogActions>
         </DialogActions>
       </StyledDialog>

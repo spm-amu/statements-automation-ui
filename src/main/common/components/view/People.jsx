@@ -7,6 +7,7 @@ import socketManager from '../../service/SocketManager';
 import { MessageType } from '../../types';
 import uuid from 'react-uuid';
 import { useNavigate } from 'react-router-dom';
+import Utils from "../../Utils";
 
 const People = (props) => {
 
@@ -41,28 +42,32 @@ const People = (props) => {
   };
 
   const onAudioCallHandler = ( userToCall ) => {
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
-    const directCallRoom = {
-      id: uuid()
-    };
+    if(props.onAudioCallHandler) {
+      props.onAudioCallHandler(userToCall);
+    } else {
+      let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+      const directCallRoom = {
+        id: uuid()
+      };
 
-    socketManager.emitEvent(MessageType.CALL_USER, {
-      room: directCallRoom.id,
-      userToCall: userToCall,
-      callerId: socketManager.socket.id,
-      name: userDetails.name,
-    });
+      socketManager.emitEvent(MessageType.CALL_USER, {
+        room: directCallRoom.id,
+        userToCall: userToCall,
+        callerId: socketManager.socket.id,
+        name: userDetails.name,
+      });
 
-    navigate("/view/meetingRoom", {
-      state: {
-        displayMode: 'window',
-        selectedMeeting: directCallRoom,
-        videoMuted: true,
-        audioMuted: false,
-        isDirectCall: true,
-        userToCall
-      }
-    })
+      navigate("/view/meetingRoom", {
+        state: {
+          displayMode: 'window',
+          selectedMeeting: directCallRoom,
+          videoMuted: true,
+          audioMuted: false,
+          isDirectCall: true,
+          userToCall
+        }
+      })
+    }
   };
 
   return (
@@ -72,8 +77,8 @@ const People = (props) => {
       </div>
       <div className={'people-content row'}>
         {searchResult.records.map((user, index) => {
-          return <div key={index} className={'col'} style={{marginLeft: '0', paddingLeft: '0', maxWidth: '400px'}}>
-              <PersonCard onAudioCallHandler={onAudioCallHandler} data={user} />
+          return <div key={index} className={'col person-card-wrapper'} style={{marginLeft: '0', paddingLeft: '0', maxWidth: '400px'}}>
+              <PersonCard onAudioCallHandler={(data) => onAudioCallHandler(data)} data={user} chatEnabled={!Utils.isNull(props.chatEnabled) ? props.chatEnabled : true}/>
           </div>
         })}
       </div>

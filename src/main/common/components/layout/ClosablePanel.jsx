@@ -8,21 +8,31 @@ import Icon from "../Icon";
 const ClosablePanel = (props) => {
   const params = useParams();
   const location = useLocation();
+  const {
+    children
+  } = props;
 
   return (
     <div style={{width: '100%'}} className={'closable-panel h-100'}>
-      <div className={'closable-panel-header'}>
-        <IconButton
-          style={{
-            marginRight: '4px'
-          }}
-          onClick={(e) => props.closeHandler(e)}
-        >
-          <Icon id={'CLOSE'} />
-        </IconButton>
+      <div className={'closable-panel-header row'}>
+        <div className={'title col'}>
+          {props.title}
+        </div>
+        <div style={{width: '64px'}}>
+          <IconButton
+            style={{
+              marginRight: '4px'
+            }}
+            onClick={(e) => props.closeHandler(e)}
+          >
+            <Icon id={'CLOSE'}/>
+          </IconButton>
+        </div>
       </div>
       <div className={'closable-panel-content'}>
-
+        {
+          children
+        }
       </div>
     </div>
   );
