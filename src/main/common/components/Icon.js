@@ -20,6 +20,7 @@ import MicrophoneOff from '@material-ui/icons/MicOff';
 import Minimize from '@material-ui/icons/Minimize';
 import Maximize from '@material-ui/icons/Maximize';
 import Work from '@material-ui/icons/Work';
+import PanTool from '@material-ui/icons/PanTool';
 import Home from '@material-ui/icons/Home';
 import List from '@material-ui/icons/List';
 import Calender from '@material-ui/icons/CalendarToday';
@@ -33,12 +34,13 @@ import {
   Call,
   CallEnd,
   CancelPresentation,
-  ChatBubbleOutline, Done, PanTool,
+  ChatBubbleOutline, Done,
   People,
   PresentToAll, Reply,
   Videocam,
   VideocamOff
 } from '@material-ui/icons';
+import {IconButton} from "@material-ui/core";
 
 class Icon extends Component {
 
@@ -94,7 +96,7 @@ class Icon extends Component {
     } else if (this.props.id === 'LIST') {
       return <List/>
     }  else if (this.props.id === 'MIC') {
-      return <Microphone/>
+      return <Microphone {...this.props}/>
     }  else if (this.props.id === 'MIC_OFF') {
       return <MicrophoneOff/>
     }  else if (this.props.id === 'CAMERA') {
@@ -110,7 +112,7 @@ class Icon extends Component {
     } else if (this.props.id === 'PRESENT_TO_ALL') {
       return <PresentToAll/>
     } else if (this.props.id === 'CHAT_BUBBLE') {
-      return <ChatBubbleOutline/>
+      return <ChatBubbleOutline {...this.props}  />
     } else if (this.props.id === 'CALL') {
       return <Call/>
     } else if (this.props.id === 'CALL_END') {
@@ -129,6 +131,8 @@ class Icon extends Component {
       return <PanTool/>
     } else if (this.props.id === 'ZOOM_OUT') {
       return <ZoomOut/>
+    } else if (this.props.id === 'PANTOOL') {
+      return <PanTool {...this.props}/>
     } else if (this.props.id === 'PERSON') {
       return <Person/>
     } else if (this.props.id === 'INITIAL') {

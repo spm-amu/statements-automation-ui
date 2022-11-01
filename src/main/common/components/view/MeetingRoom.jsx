@@ -209,7 +209,6 @@ const MeetingRoom = (props) => {
 
         if (participants.length === userPeerMap.length) {
           if (!isHost) {
-            console.log("SETTING PARTICIPANTS : ", eventHandler.api.participants);
             setParticipants(participants);
             if (userPeerMap.length > 0) {
               if (step === Steps.LOBBY) {
@@ -329,22 +328,12 @@ const MeetingRoom = (props) => {
   };
 
   const onRaiseHand = (payload) => {
-    console.log('ON RAISE: ', payload);
-    console.log('EH VERSION: ', eventHandler.api.version);
-    console.log('RAISE - EH: ', eventHandler.api.participants);
-    console.log('ON RAISE participants: ', participants);
     const raisedHandParticipant = participants.find(p => p.userId === payload.userId);
-    console.log('ON RAISE raisedHandParticipant: ', raisedHandParticipant);
     setParticipantsRaisedHands(oldParticipants => [...oldParticipants, raisedHandParticipant]);
   };
 
   const onLowerHand = (payload) => {
-    console.log('LOWER - EH: ', eventHandler.api.participants);
-    const index = participantsRaisedHands.findIndex(p => {
-      return p.userId === payload.userId;
-    });
-
-    setParticipantsRaisedHands([].concat(participantsRaisedHands.splice(index, 1)));
+    setParticipantsRaisedHands(participantsRaisedHands.filter((p) => p.userId !== payload.userId));
   };
 
 
