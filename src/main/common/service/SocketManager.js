@@ -124,7 +124,7 @@ class SocketManager {
   }
 
   removeSubscriptions = (handler) => {
-    this.subscriptions = this.subscriptions.filter((sub) => sub.handler.id !== handler.id);
+    this.subscriptions = this.subscriptions.filter((sub) => sub.handler.api.id !== handler.api.id);
   };
 
   /**
@@ -150,6 +150,7 @@ class SocketManager {
         callerID: this.socket.id,
         signal,
         name: userDetails.name,
+        userAlias: userDetails.userId,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
       });
     });
@@ -243,9 +244,10 @@ class SocketManager {
     const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.id, stream) :
       this.addPeer(payload.callerID, stream);
 
+    console.log("\n\n\n\nPAYLOAD : ", payload);
     let item = {
       peer: peer,
-      user: payload,
+      user: payload
     };
 
     this.userPeerMap.push(item);
@@ -253,7 +255,9 @@ class SocketManager {
   };
 
   endCall = () => {
-    this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
+    if(this.socket) {
+      this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
+    }
   };
 
   endDirectCall = (callerSocketId) => {

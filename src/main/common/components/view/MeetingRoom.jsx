@@ -61,11 +61,29 @@ const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/wai
 
 
 const MeetingRoom = (props) => {
+  const [sideBarOpen, setSideBarOpen] = useState(false);
+  const [sideBarTab, setSideBarTab] = useState('');
+  const [windowTransformValue, setWindowTransformValue] = useState(null);
+  const [displayState, setDisplayState] = useState('MAXIMIZED');
+  const [participants, setParticipants] = useState([]);
+  const [participantsRaisedHands, setParticipantsRaisedHands] = useState([]);
+  const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
+  const [step, setStep] = useState('LOBBY');
+  const [currentUserStream, setCurrentUserStream] = useState(null);
+  const [videoMuted, setVideoMuted] = useState(false);
+  const [audioMuted, setAudioMuted] = useState(false);
+  const [handRaised, setHandRaised] = useState(false);
+  const [eventHandler] = useState({});
+  const userVideo = useRef();
+  const navigate = useNavigate();
 
   const handler = () => {
     return {
       get id() {
         return 'meeting-room-' + selectedMeeting.id;
+      },
+      get participants() {
+        return participants;
       },
       on: (eventType, be) => {
         switch (eventType) {
@@ -101,24 +119,6 @@ const MeetingRoom = (props) => {
     }
   };
 
-  const [sideBarOpen, setSideBarOpen] = useState(false);
-  const [sideBarTab, setSideBarTab] = useState('');
-  const [windowTransformValue, setWindowTransformValue] = useState(null);
-  const [displayState, setDisplayState] = useState('MAXIMIZED');
-  const [participants, setParticipants] = useState([]);
-  const [participantsRaisedHands, setParticipantsRaisedHands] = useState([]);
-  const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
-  const [step, setStep] = useState('LOBBY');
-  const [currentUserStream, setCurrentUserStream] = useState(null);
-  const [videoMuted, setVideoMuted] = useState(false);
-  const [audioMuted, setAudioMuted] = useState(false);
-  const [handRaised, setHandRaised] = useState(false);
-  const userVideo = useRef();
-  const navigate = useNavigate();
-  const eventHandler = {
-    api: handler()
-  };
-
   const {
     selectedMeeting,
     isHost,
@@ -135,7 +135,7 @@ const MeetingRoom = (props) => {
     });
 
     setHandRaised(!handRaised)
-  }
+  };
 
   const lowerHand = () => {
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
@@ -146,7 +146,7 @@ const MeetingRoom = (props) => {
     });
 
     setHandRaised(!handRaised)
-  }
+  };
 
   const removeUser = (user) => {
     socketManager.removeFromUserToPeerMap(user.id);
@@ -169,6 +169,7 @@ const MeetingRoom = (props) => {
 
     let user = {
       peerID: userToPeerItem.user.callerID,
+      userId: userToPeerItem.user.userAlias,
       peer: userToPeerItem.peer,
       name: userToPeerItem.user.name,
       avatar: userToPeerItem.user.avatar
@@ -196,6 +197,7 @@ const MeetingRoom = (props) => {
     let participants = [];
     for (const mapItem of userPeerMap) {
       let user = {
+        userId: mapItem.user.userAlias,
         peer: mapItem.peer,
         name: mapItem.user.name,
         avatar: mapItem.user.avatar,
@@ -207,6 +209,7 @@ const MeetingRoom = (props) => {
 
         if (participants.length === userPeerMap.length) {
           if (!isHost) {
+            console.log("SETTING PARTICIPANTS : ", eventHandler.api.participants);
             setParticipants(participants);
             if (userPeerMap.length > 0) {
               if (step === Steps.LOBBY) {
@@ -262,7 +265,7 @@ const MeetingRoom = (props) => {
       meetingJoinRequest: true,
       userToCall: requestedUser
     });
-  }
+  };
 
   useEffect(() => {
     eventHandler.api = handler();
@@ -286,6 +289,8 @@ const MeetingRoom = (props) => {
       } else {
         askForPermission();
       }
+    } else {
+      socketManager.removeSubscriptions(eventHandler);
     }
   }, [currentUserStream]);
 
@@ -325,19 +330,23 @@ const MeetingRoom = (props) => {
 
   const onRaiseHand = (payload) => {
     console.log('ON RAISE: ', payload);
+    console.log('EH VERSION: ', eventHandler.api.version);
+    console.log('RAISE - EH: ', eventHandler.api.participants);
     console.log('ON RAISE participants: ', participants);
     const raisedHandParticipant = participants.find(p => p.userId === payload.userId);
     console.log('ON RAISE raisedHandParticipant: ', raisedHandParticipant);
     setParticipantsRaisedHands(oldParticipants => [...oldParticipants, raisedHandParticipant]);
-  }
+  };
 
   const onLowerHand = (payload) => {
+    console.log('LOWER - EH: ', eventHandler.api.participants);
     const index = participantsRaisedHands.findIndex(p => {
       return p.userId === payload.userId;
     });
 
     setParticipantsRaisedHands([].concat(participantsRaisedHands.splice(index, 1)));
-  }
+  };
+
 
   const endCall = () => {
     if (currentUserStream) {

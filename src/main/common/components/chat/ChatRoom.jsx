@@ -51,9 +51,9 @@ const ChatRoom = (props) => {
     }
   };
 
-  const eventHandler = {
+  const eventHandler = useState({
     api: handler()
-  };
+  });
 
   const onChatMessage = (be) => {
     if (be.payload.message.participant.userId !== currentUser.userId) {

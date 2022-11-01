@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {LARGE} from 'material-ui/utils/withWidth';
 import PropTypes from 'prop-types';
 import Utils from '../../common/Utils'
@@ -129,7 +129,6 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute.isParent = true;
     newRoutes.push(newRoute);
 
-
     let utilsRoutes = [];
     newRoute = {};
     newRoute.name = "Help";
@@ -169,9 +168,9 @@ const BasicBusinessAppDashboard = (props) => {
     }
   };
 
-  const socketEventHandler = {
+  const socketEventHandler = useState({
     api: handler()
-  };
+  });
 
   const onChatMessage = (payload) => {
     console.log('ON CHAT DASH: ', payload);
