@@ -13,6 +13,7 @@ import Icon from "../Icon";
 import SearchBar from "../SearchBar";
 import People from "../view/People";
 import "./MeetingRoomSideBarContent.css"
+import InCall from '../view/InCall';
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -40,7 +41,9 @@ const MeetingRoomSideBarContent = (props) => {
 
   const {
     tab,
-    meetingId
+    meetingId,
+    participants,
+    participantsRaisedHands
   } = props;
 
   React.useEffect(() => {
@@ -80,7 +83,7 @@ const MeetingRoomSideBarContent = (props) => {
         </DialogTitle>
         <DialogContent>
           <div style={{height: '100%'}} className={'request-to-join-dialog-content'}>
-            <People exclusions={['peter.miyambo@gmail.com']} chatEnabled={false} onAudioCallHandler={(e) => alert('Dial fireeee')}/>
+            <People exclusions={['peter']} meetingId={meetingId} dialEnabled={true} chatEnabled={false} onAudioCallHandler={(e) => props.onAudioCallHandler(e)}/>
           </div>
         </DialogContent>
         <DialogActions>
@@ -106,11 +109,7 @@ const MeetingRoomSideBarContent = (props) => {
         }
       </div>
       <div className={'list'}>
-        <People dialEnabled={false}
-                showOnlineIndicator={false}
-                avatarSize={'S'}
-                meetingId={meetingId}
-        />
+        <InCall participants={participants} participantsRaisedHands={participantsRaisedHands} />
       </div>
     </div>
   );

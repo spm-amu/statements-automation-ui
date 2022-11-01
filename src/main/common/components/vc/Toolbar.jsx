@@ -13,7 +13,8 @@ const Toolbar = (props) => {
   const {
     userStream,
     userVideo,
-    eventHandler
+    eventHandler,
+    handRaised
   } = props;
 
   const muteVideo = () => {
@@ -62,6 +63,14 @@ const Toolbar = (props) => {
 
   const showChat = () => {
     eventHandler.showChat()
+  };
+
+  const raiseHand = () => {
+    eventHandler.raiseHand()
+  };
+
+  const lowerHand = () => {
+    eventHandler.lowerHand()
   };
 
 	return (
@@ -155,6 +164,23 @@ const Toolbar = (props) => {
           }}
         >
           <Icon id={'PEOPLE'}/>
+        </IconButton>
+
+        <IconButton
+          onClick={(e) => {
+            if(handRaised) {
+              lowerHand();
+            } else {
+              raiseHand();
+            }
+          }}
+          style={{
+            backgroundColor: '#404239',
+            color: handRaised ? '#e2b030' : 'white',
+            marginRight: '4px'
+          }}
+        >
+          <Icon id={'PAN_TOOL'}/>
         </IconButton>
       </div>
     </div>

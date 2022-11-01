@@ -59,6 +59,7 @@ const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/perm
 const errorAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/error.mp3');
 const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
 
+
 const MeetingRoom = (props) => {
 
   const handler = () => {
@@ -87,8 +88,13 @@ const MeetingRoom = (props) => {
             removeUser(be.payload);
             break;
           case MessageType.CALL_ENDED:
-            console.log("\n\n\nCALL ENDED : ", socketManager.userPeerMap);
             onCallEnded();
+            break;
+          case MessageType.RAISE_HAND:
+            onRaiseHand(be.payload);
+            break;
+          case MessageType.LOWER_HAND:
+            onLowerHand(be.payload);
             break;
         }
       }
@@ -100,11 +106,13 @@ const MeetingRoom = (props) => {
   const [windowTransformValue, setWindowTransformValue] = useState(null);
   const [displayState, setDisplayState] = useState('MAXIMIZED');
   const [participants, setParticipants] = useState([]);
+  const [participantsRaisedHands, setParticipantsRaisedHands] = useState([]);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
   const [currentUserStream, setCurrentUserStream] = useState(null);
   const [videoMuted, setVideoMuted] = useState(false);
   const [audioMuted, setAudioMuted] = useState(false);
+  const [handRaised, setHandRaised] = useState(false);
   const userVideo = useRef();
   const navigate = useNavigate();
   const eventHandler = {
@@ -117,6 +125,28 @@ const MeetingRoom = (props) => {
     userToCall,
     isDirectCall
   } = props;
+
+  const raiseHand = () => {
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
+    socketManager.emitEvent(MessageType.RAISE_HAND, {
+      userId: userDetails.userId,
+      roomID: selectedMeeting.id
+    });
+
+    setHandRaised(!handRaised)
+  }
+
+  const lowerHand = () => {
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
+    socketManager.emitEvent(MessageType.LOWER_HAND, {
+      userId: userDetails.userId,
+      roomID: selectedMeeting.id
+    });
+
+    setHandRaised(!handRaised)
+  }
 
   const removeUser = (user) => {
     socketManager.removeFromUserToPeerMap(user.id);
@@ -223,6 +253,17 @@ const MeetingRoom = (props) => {
     });
   };
 
+  const requestUserToJoin = (requestedUser) => {
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+
+    socketManager.emitEvent(MessageType.REQUEST_TO_JOIN, {
+      roomId: selectedMeeting.id,
+      callerName: userDetails.name,
+      meetingJoinRequest: true,
+      userToCall: requestedUser
+    });
+  }
+
   useEffect(() => {
     eventHandler.api = handler();
   });
@@ -238,7 +279,7 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     if (currentUserStream) {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
-        MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED);
+        MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
 
       if (isHost || isDirectCall) {
         join();
@@ -281,6 +322,22 @@ const MeetingRoom = (props) => {
       paper.style.margin = '136px 0 0 0';
     }
   };
+
+  const onRaiseHand = (payload) => {
+    console.log('ON RAISE: ', payload);
+    console.log('ON RAISE participants: ', participants);
+    const raisedHandParticipant = participants.find(p => p.userId === payload.userId);
+    console.log('ON RAISE raisedHandParticipant: ', raisedHandParticipant);
+    setParticipantsRaisedHands(oldParticipants => [...oldParticipants, raisedHandParticipant]);
+  }
+
+  const onLowerHand = (payload) => {
+    const index = participantsRaisedHands.findIndex(p => {
+      return p.userId === payload.userId;
+    });
+
+    setParticipantsRaisedHands([].concat(participantsRaisedHands.splice(index, 1)));
+  }
 
   const endCall = () => {
     if (currentUserStream) {
@@ -444,6 +501,7 @@ const MeetingRoom = (props) => {
                         userStream={currentUserStream}
                         audioMuted={audioMuted}
                         videoMuted={videoMuted}
+                        handRaised={handRaised}
                         toolbarEventHandler={
                           {
                             onMuteVideo: (muted) => {
@@ -472,7 +530,13 @@ const MeetingRoom = (props) => {
                             showChat: () => {
                               setSideBarTab('Chat');
                               setSideBarOpen(true);
-                            }
+                            },
+                            raiseHand: () => {
+                              raiseHand();
+                            },
+                            lowerHand: () => {
+                              lowerHand();
+                            },
                           }
                         }
                 />
@@ -486,7 +550,13 @@ const MeetingRoom = (props) => {
                 closeHandler={(e) => setSideBarOpen(false)}
                 title={sideBarTab}
               >
-                <MeetingRoomSideBarContent tab={sideBarTab} meetingId={selectedMeeting.id}/>
+                <MeetingRoomSideBarContent
+                  tab={sideBarTab}
+                  meetingId={selectedMeeting.id}
+                  participantsRaisedHands={participantsRaisedHands}
+                  participants={participants}
+                  onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
+                />
               </ClosablePanel>
             </div>
           }

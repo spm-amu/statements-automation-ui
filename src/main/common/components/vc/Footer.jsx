@@ -9,7 +9,8 @@ const Footer = (props) => {
     audioMuted,
     screenShared,
     userStream,
-    userVideo
+    userVideo,
+    handRaised
   } = props;
 
   return (
@@ -31,7 +32,7 @@ const Footer = (props) => {
           </h3>
         </div>
         <div className={'col'}>
-          <Toolbar eventHandler={props.toolbarEventHandler} userVideo={userVideo} userStream={userStream}/>
+          <Toolbar eventHandler={props.toolbarEventHandler} handRaised={handRaised} userVideo={userVideo} userStream={userStream}/>
         </div>
         <div className={'col'}>
           <div

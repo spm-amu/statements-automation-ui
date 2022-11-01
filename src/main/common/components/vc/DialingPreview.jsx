@@ -11,6 +11,7 @@ const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/wai
 
 const DialingPreview = (props) => {
   const [caller, setCaller] = useState(null);
+  const [meetingRequest, setMeetingRequest] = useState(null);
   const [initials, setInitials] = useState('');
   const soundInterval = useRef();
 
@@ -19,7 +20,12 @@ const DialingPreview = (props) => {
       soundInterval.current = setInterval(() => {
         waitingAudio.play();
       }, 100);
-      setCaller(args.payload);
+
+      if (args.payload.meetingJoinRequest) {
+        setMeetingRequest(args.payload);
+      } else {
+        setCaller(args.payload);
+      }
     });
 
     electron.ipcRenderer.on('cancelCall', args => {
@@ -34,12 +40,18 @@ const DialingPreview = (props) => {
     }
   }, [caller]);
 
+  useEffect(() => {
+    if (meetingRequest) {
+      setInitials(Utils.getInitials(meetingRequest.callerName));
+    }
+  }, [meetingRequest]);
+
   const onAnswerCall = () => {
     waitingAudio.pause();
     clearInterval(soundInterval.current);
 
     electron.ipcRenderer.sendMessage('answerCall', {
-      payload: caller
+      payload: caller ? caller : meetingRequest
     });
   };
 
@@ -49,16 +61,18 @@ const DialingPreview = (props) => {
 
     electron.ipcRenderer.sendMessage('declineCall', {
       payload: {
-        callerId: caller.callerUser.socketId
+        callerId: caller ? caller.callerUser.socketId : null
       }
     });
   };
 
   return (
-    caller &&
+    (caller || meetingRequest) &&
     <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
       <div className={'centered-flex-box w-100'} style={{height: '72px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
-        {caller.callerUser.name} is trying to call you
+        {
+          caller ? `${caller.callerUser.name} is trying to call you` : `${ meetingRequest.callerName } wants you to join meeting`
+        }
       </div>
       <div className={'centered-flex-box w-100'} style={{height: 'calc(100% - 180px)'}}>
         <div className={'avatar'} data-label={initials}/>

@@ -33,7 +33,7 @@ import {
   Call,
   CallEnd,
   CancelPresentation,
-  ChatBubbleOutline, Done,
+  ChatBubbleOutline, Done, PanTool,
   People,
   PresentToAll, Reply,
   Videocam,
@@ -125,6 +125,8 @@ class Icon extends Component {
       return <RotateRight/>
     } else if (this.props.id === 'ZOOM_IN') {
       return <ZoomIn/>
+    } else if (this.props.id === 'PAN_TOOL') {
+      return <PanTool/>
     } else if (this.props.id === 'ZOOM_OUT') {
       return <ZoomOut/>
     } else if (this.props.id === 'PERSON') {
