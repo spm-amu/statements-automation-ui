@@ -152,8 +152,8 @@ class SocketManager {
         name: userDetails.name,
         userAlias: userDetails.userId,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
-        audioMuted: stream.getTracks()[1].enabled,
-        videoMuted: stream.getTracks()[0].enabled
+        audioMuted: !stream.getTracks()[1].enabled,
+        videoMuted: !stream.getTracks()[0].enabled
       });
     });
 
@@ -179,8 +179,8 @@ class SocketManager {
         signalData: signal,
         callerId: this.socket.id,
         name: userDetails.name,
-        audioMuted: stream.getTracks()[1].enabled,
-        videoMuted: stream.getTracks()[0].enabled
+        audioMuted: !stream.getTracks()[1].enabled,
+        videoMuted: !stream.getTracks()[0].enabled
       });
     });
 
@@ -198,8 +198,8 @@ class SocketManager {
       this.socket.emit(MessageType.RETURNING_SIGNAL, {
         signal,
         callerID: callerId,
-        audioMuted: stream.getTracks()[1].enabled,
-        videoMuted: stream.getTracks()[0].enabled
+        audioMuted: !stream.getTracks()[1].enabled,
+        videoMuted: !stream.getTracks()[0].enabled
       });
     });
 

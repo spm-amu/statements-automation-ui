@@ -171,6 +171,8 @@ const MeetingRoom = (props) => {
     let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED);
     joinInAudio.play();
 
+    console.log("\n\n\nADD USER : ", payload);
+
     let user = {
       peerID: userToPeerItem.user.callerID,
       userId: userToPeerItem.user.userAlias,
@@ -194,6 +196,8 @@ const MeetingRoom = (props) => {
 
   const createParticipants = (users, socket) => {
     socketManager.clearUserToPeerMap();
+
+    console.log("\n\n\nCREATE PARTICIPANTS : ", users);
 
     let userPeerMap = [];
     users.forEach((user) => {
