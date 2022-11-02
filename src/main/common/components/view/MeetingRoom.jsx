@@ -115,6 +115,9 @@ const MeetingRoom = (props) => {
           case MessageType.LOWER_HAND:
             onLowerHand(be.payload);
             break;
+          case MessageType.AUDIO_VISUAL_SETTINGS_CHANGED:
+            onAVSettingsChange(be.payload);
+            break;
         }
       }
     }
@@ -173,7 +176,9 @@ const MeetingRoom = (props) => {
       userId: userToPeerItem.user.userAlias,
       peer: userToPeerItem.peer,
       name: userToPeerItem.user.name,
-      avatar: userToPeerItem.user.avatar
+      avatar: userToPeerItem.user.avatar,
+      audioMuted: payload.audioMuted,
+      videoMuted: payload.videoMuted
     };
 
     userToPeerItem.peer.on('stream', (stream) => {
@@ -202,6 +207,8 @@ const MeetingRoom = (props) => {
         peer: mapItem.peer,
         name: mapItem.user.name,
         avatar: mapItem.user.avatar,
+        audioMuted: mapItem.user.audioMuted,
+        videoMuted: mapItem.user.videoMuted
       };
 
       mapItem.peer.on('stream', (stream) => {
@@ -252,7 +259,9 @@ const MeetingRoom = (props) => {
       name: userDetails.name,
       avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
       email: userDetails.emailAddress,
-      isHost: isHost
+      isHost: isHost,
+      audioMuted: audioMuted,
+      videoMuted: videoMuted
     });
   };
 
@@ -282,7 +291,8 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     if (currentUserStream) {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
-        MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
+        MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
+        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED);
 
       if (isHost || isDirectCall) {
         join();
@@ -336,6 +346,10 @@ const MeetingRoom = (props) => {
   const onRaiseHand = (payload) => {
     const raisedHandParticipant = participants.find(p => p.userId === payload.userId);
     setParticipantsRaisedHands(oldParticipants => [...oldParticipants, raisedHandParticipant]);
+  };
+
+  const onAVSettingsChange = (payload) => {
+
   };
 
   const onLowerHand = (payload) => {
@@ -436,7 +450,7 @@ const MeetingRoom = (props) => {
     removeFromLobbyWaiting(item);
   };
 
-  function onAVSettingsChange() {
+  function emitAVSettingsChange() {
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
     socketManager.emitEvent(MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, {
       meetingId: selectedMeeting.id,
@@ -452,7 +466,7 @@ const MeetingRoom = (props) => {
       if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         if (!screenShared) {
           videoTrack.enabled = !videoMuted;
-          onAVSettingsChange();
+          emitAVSettingsChange();
         }
       }
     }
@@ -467,7 +481,7 @@ const MeetingRoom = (props) => {
       let audioTrack = currentUserStream.getTracks()[0];
       if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         audioTrack.enabled = !audioMuted;
-        onAVSettingsChange();
+        emitAVSettingsChange();
       }
     }
   }
@@ -537,7 +551,7 @@ const MeetingRoom = (props) => {
                            }}
                   />
                   :
-                  <MeetingParticipantGrid participants={participants} videoMuted={videoMuted} audioMuted={audioMuted}/>
+                  <MeetingParticipantGrid participants={participants} />
               }
               </div>
               {

@@ -152,6 +152,8 @@ class SocketManager {
         name: userDetails.name,
         userAlias: userDetails.userId,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
+        audioMuted: stream.getTracks()[1].enabled,
+        videoMuted: stream.getTracks()[0].enabled
       });
     });
 
@@ -177,6 +179,8 @@ class SocketManager {
         signalData: signal,
         callerId: this.socket.id,
         name: userDetails.name,
+        audioMuted: stream.getTracks()[1].enabled,
+        videoMuted: stream.getTracks()[0].enabled
       });
     });
 
@@ -194,11 +198,12 @@ class SocketManager {
       this.socket.emit(MessageType.RETURNING_SIGNAL, {
         signal,
         callerID: callerId,
+        audioMuted: stream.getTracks()[1].enabled,
+        videoMuted: stream.getTracks()[0].enabled
       });
     });
 
     peer.on('close', () => {
-      alert("PEER CLOSED");
     });
 
     return peer;
@@ -244,7 +249,6 @@ class SocketManager {
     const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.id, stream) :
       this.addPeer(payload.callerID, stream);
 
-    console.log("\n\n\n\nPAYLOAD : ", payload);
     let item = {
       peer: peer,
       user: payload
