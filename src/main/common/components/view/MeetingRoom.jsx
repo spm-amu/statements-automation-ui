@@ -74,6 +74,7 @@ const MeetingRoom = (props) => {
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
+  const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [eventHandler] = useState({});
   const userVideo = useRef();
   const navigate = useNavigate();
@@ -155,23 +156,29 @@ const MeetingRoom = (props) => {
   const removeUser = (user) => {
     socketManager.removeFromUserToPeerMap(user.id);
 
-    const userId = user.id;
-    const alias = user.alias;
-    const peerObj = participants.find((p) => p.peerID === userId);
-    const newParticipants = participants.filter((p) => !Utils.isNull(p.peer) && p.peer.peerID !== userId);
+    const userId = user.alias;
+    const peerObj = participants.find((p) => p.peerID === user.id);
+    const newParticipants = participants.filter((p) => p.userId !== userId);
 
     setParticipants(newParticipants);
     if (newParticipants.length === 0) {
-      onCallEnded();
-      props.closeHandler();
+      //onCallEnded();
+      //props.closeHandler();
+      setAllUserParticipantsLeft(true);
     }
   };
+
+
+  useEffect(() => {
+    if(allUserParticipantsLeft) {
+      setStep("LOBBY");
+    }
+  }, [allUserParticipantsLeft]);
+
 
   const addUser = (payload) => {
     let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED);
     joinInAudio.play();
-
-    console.log("\n\n\nADD USER : ", payload);
 
     let user = {
       peerID: userToPeerItem.user.callerID,
@@ -186,6 +193,7 @@ const MeetingRoom = (props) => {
     userToPeerItem.peer.on('stream', (stream) => {
       user.stream = stream;
       setParticipants((participants) => [...participants, user]);
+      setAllUserParticipantsLeft(false);
       if (step === Steps.LOBBY) {
         setStep(Steps.SESSION);
       }
@@ -196,8 +204,6 @@ const MeetingRoom = (props) => {
 
   const createParticipants = (users, socket) => {
     socketManager.clearUserToPeerMap();
-
-    console.log("\n\n\nCREATE PARTICIPANTS : ", users);
 
     let userPeerMap = [];
     users.forEach((user) => {
@@ -222,6 +228,8 @@ const MeetingRoom = (props) => {
         if (participants.length === userPeerMap.length) {
           if (!isHost) {
             setParticipants(participants);
+            setAllUserParticipantsLeft(false);
+
             if (userPeerMap.length > 0) {
               if (step === Steps.LOBBY) {
                 setStep(Steps.SESSION);
@@ -559,6 +567,7 @@ const MeetingRoom = (props) => {
                            (item) => {
                              rejectUser(item);
                            }}
+                         allUserParticipantsLeft={allUserParticipantsLeft}
                   />
                   :
                   <MeetingParticipantGrid participants={participants} />

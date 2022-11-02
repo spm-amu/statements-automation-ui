@@ -4,8 +4,8 @@ import LottieIcon from "../LottieIcon";
 import LobbyWaitingList from "./LobbyWaitingList";
 import Utils from '../../Utils';
 
-const HOST_WAITING_MESSAGE = 'Waiting for others to join';
-const ATTENDEE_WAITING_MESSAGE = 'Waiting for the meeting host to let you in';
+const WAITING_FOR_OTHERS_TO_JOIN_MESSAGE = 'Waiting for others to join';
+const ATTENDEE_WAITING_FOR_PERMISION_MESSAGE = 'Waiting for the meeting host to let you in';
 
 
 const Lobby = (props) => {
@@ -47,10 +47,10 @@ const Lobby = (props) => {
               </div>
               <div>
                 {
-                  props.isHost ?
-                    HOST_WAITING_MESSAGE
+                  props.isHost || props.allUserParticipantsLeft ?
+                    WAITING_FOR_OTHERS_TO_JOIN_MESSAGE
                     :
-                    ATTENDEE_WAITING_MESSAGE
+                    ATTENDEE_WAITING_FOR_PERMISION_MESSAGE
                 }
               </div>
             </div>
