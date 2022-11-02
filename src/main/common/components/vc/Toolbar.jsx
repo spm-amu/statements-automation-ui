@@ -18,13 +18,6 @@ const Toolbar = (props) => {
   } = props;
 
   const muteVideo = () => {
-    let videoTrack = userStream.getTracks()[1];
-    if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
-      if (!screenShared) {
-        videoTrack.enabled = !videoTrack.enabled;
-      }
-    }
-
     setVideoMuted((prevStatus) => !prevStatus);
   };
 
@@ -37,11 +30,6 @@ const Toolbar = (props) => {
   }, [audioMuted]);
 
   const muteAudio = () => {
-    let audioTrack = userStream.getTracks()[0];
-    if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
-      audioTrack.enabled = !audioTrack.enabled;
-    }
-
     setAudioMuted((prevStatus) => !prevStatus);
   };
 

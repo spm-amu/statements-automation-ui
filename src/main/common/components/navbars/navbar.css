@@ -8,6 +8,10 @@
   background-color: #f9f9f9 !important;
 }
 
+.navbar.navbar-absolute {
+  z-index: 100000 !important;
+}
+
 .navbar .navbar-brand {
   margin-left: 0 !important;
   padding-left: 0 !important;

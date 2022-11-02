@@ -32,7 +32,13 @@ const Footer = (props) => {
           </h3>
         </div>
         <div className={'col'}>
-          <Toolbar eventHandler={props.toolbarEventHandler} handRaised={handRaised} userVideo={userVideo} userStream={userStream}/>
+          <Toolbar eventHandler={props.toolbarEventHandler}
+                   handRaised={handRaised}
+                   userVideo={userVideo}
+                   userStream={userStream}
+                   videoMuted={videoMuted}
+                   audioMuted={audioMuted}
+          />
         </div>
         <div className={'col'}>
           <div

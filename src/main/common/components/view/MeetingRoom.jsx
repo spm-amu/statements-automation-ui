@@ -70,9 +70,10 @@ const MeetingRoom = (props) => {
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
   const [currentUserStream, setCurrentUserStream] = useState(null);
-  const [videoMuted, setVideoMuted] = useState(false);
-  const [audioMuted, setAudioMuted] = useState(false);
+  const [videoMuted, setVideoMuted] = useState(props.videoMuted);
+  const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
+  const [screenShared, setScreenShared] = useState(false);
   const [eventHandler] = useState({});
   const userVideo = useRef();
   const navigate = useNavigate();
@@ -308,6 +309,11 @@ const MeetingRoom = (props) => {
     if (userVideo.current && !userVideo.current.srcObject) {
       userVideo.current.srcObject = currentUserStream;
     }
+
+    if(currentUserStream && userVideo.current && userVideo.current.srcObject) {
+      toggleAudio();
+      toggleVideo();
+    }
   }, [userVideo.current, currentUserStream]);
 
   useEffect(() => {
@@ -335,7 +341,6 @@ const MeetingRoom = (props) => {
   const onLowerHand = (payload) => {
     setParticipantsRaisedHands(participantsRaisedHands.filter((p) => p.userId !== payload.userId));
   };
-
 
   const endCall = () => {
     if (currentUserStream) {
@@ -431,6 +436,46 @@ const MeetingRoom = (props) => {
     removeFromLobbyWaiting(item);
   };
 
+  function onAVSettingsChange() {
+    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    socketManager.emitEvent(MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, {
+      meetingId: selectedMeeting.id,
+      userId: userDetails.userId,
+      audioMuted: audioMuted,
+      videoMuted: videoMuted
+    });
+  }
+
+  function toggleVideo() {
+    if (currentUserStream) {
+      let videoTrack = currentUserStream.getTracks()[1];
+      if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
+        if (!screenShared) {
+          videoTrack.enabled = !videoMuted;
+          onAVSettingsChange();
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    toggleVideo();
+  }, [videoMuted]);
+
+  function toggleAudio() {
+    if (currentUserStream) {
+      let audioTrack = currentUserStream.getTracks()[0];
+      if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
+        audioTrack.enabled = !audioMuted;
+        onAVSettingsChange();
+      }
+    }
+  }
+
+  useEffect(() => {
+    toggleAudio();
+  }, [audioMuted]);
+
   return (
     <div style={{width: '100%', height: '100%'}}>
       <StyledDialog
@@ -477,7 +522,8 @@ const MeetingRoom = (props) => {
         </div>
         <div className={'row meeting-window-container'}>
           <div className={'col'}>
-            <div style={{height: 'calc(100% - 144px)'}}>
+            <div style={{height: '100%', maxHeight: '100%', overflowY: 'auto', overflowX: 'hidden'}}>
+              <div style={{height: 'calc(100% - 200px)', maxHeight: '100%', overflow: 'hidden'}}>
               {
                 step === Steps.LOBBY || (lobbyWaitingList && lobbyWaitingList.length > 0) ?
                   <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
@@ -491,8 +537,9 @@ const MeetingRoom = (props) => {
                            }}
                   />
                   :
-                  <MeetingParticipantGrid participants={participants} videoMuted={videoMuted}/>
+                  <MeetingParticipantGrid participants={participants} videoMuted={videoMuted} audioMuted={audioMuted}/>
               }
+              </div>
               {
                 currentUserStream &&
                 <Footer userVideo={userVideo}
