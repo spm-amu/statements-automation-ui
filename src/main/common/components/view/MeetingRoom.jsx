@@ -353,7 +353,13 @@ const MeetingRoom = (props) => {
   };
 
   const onAVSettingsChange = (payload) => {
+    let participant = participants.find((p) => p.userId === payload.userId);
+    if(participant) {
+      participant.audioMuted = payload.audioMuted;
+      participant.videoMuted = payload.videoMuted;
+    }
 
+    setParticipants([].concat(participants));
   };
 
   const onLowerHand = (payload) => {
