@@ -2,6 +2,7 @@
 import React, {Fragment, useEffect, useRef} from 'react';
 import './MeetingParticipantGrid.css';
 import MeetingParticipant from "./MeetingParticipant";
+import LobbyWaitingList from "./LobbyWaitingList";
 
 const MAX_COLS = 2;
 const MAX_ROWS = 3;
@@ -12,12 +13,15 @@ const MeetingParticipantGrid = (props) => {
   const {participants} = props;
   const [grid, setGrid] = React.useState(null);
   const [sideGrid, setSideGrid] = React.useState(null);
+  const {
+    waitingList
+  } = props;
 
   useEffect(() => {
     let gridData = createGrid();
     setGrid(gridData.mainGrid);
     setSideGrid(gridData.sideGrid);
-  }, []);
+  }, [participants]);
 
   const createColumn = (index) => {
     let col = [];
@@ -63,7 +67,8 @@ const MeetingParticipantGrid = (props) => {
       <div className={'col item'} key={index}>
         {col.map((participant, index) => {
           return <div style={{height: ((100 / col.length)) + '%'}} key={index}>
-            <MeetingParticipant data={participant} showName={true} videoMuted={participant.videoMuted} audioMuted={participant.audioMuted}/>
+            <MeetingParticipant data={participant} showName={true} videoMuted={participant.videoMuted}
+                                audioMuted={participant.audioMuted}/>
           </div>
         })}
       </div>
@@ -85,13 +90,27 @@ const MeetingParticipantGrid = (props) => {
           </div>
         </div>
         {
-          sideGrid && sideGrid.length > 0 &&
+          (sideGrid && sideGrid.length > 0) || (waitingList && waitingList.length > 0) &&
           <div className={'no-side-margin no-side-padding grid-side-bar'} style={{backgroundColor: 'transparent'}}>
-            {sideGrid.map((participant, index) => {
-              return <div key={index} className={'side-grid-item'}>
-                <MeetingParticipant data={participant} videoMuted={participant.videoMuted} audioMuted={participant.audioMuted} showName={true} padding={'0'}/>
-              </div>
-            })}
+            {
+              waitingList && waitingList.length > 0 &&
+              <LobbyWaitingList waitingList={waitingList}
+                                rejectUserHandler={props.rejectUserHandler}
+                                acceptUserHandler={props.acceptUserHandler}/>
+            }
+            {
+              sideGrid && sideGrid.length > 0 &&
+              <Fragment>
+                {
+                  sideGrid.map((participant, index) => {
+                    return <div key={index} className={'side-grid-item'}>
+                      <MeetingParticipant data={participant} videoMuted={participant.videoMuted}
+                                          audioMuted={participant.audioMuted} showName={true} padding={'0'}/>
+                    </div>
+                  })
+                }
+              </Fragment>
+            }
           </div>
         }
       </div>

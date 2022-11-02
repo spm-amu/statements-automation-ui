@@ -175,6 +175,9 @@ const MeetingRoom = (props) => {
     }
   }, [allUserParticipantsLeft]);
 
+  useEffect(() => {
+    console.log("\n\n\n\nPARTICIPANTS : ", participants);
+  }, [participants]);
 
   const addUser = (payload) => {
     let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED);
@@ -192,6 +195,7 @@ const MeetingRoom = (props) => {
 
     userToPeerItem.peer.on('stream', (stream) => {
       user.stream = stream;
+      console.log("UPDATING PARTICIPANTS");
       setParticipants((participants) => [...participants, user]);
       setAllUserParticipantsLeft(false);
       if (step === Steps.LOBBY) {
@@ -205,41 +209,46 @@ const MeetingRoom = (props) => {
   const createParticipants = (users, socket) => {
     socketManager.clearUserToPeerMap();
 
-    let userPeerMap = [];
-    users.forEach((user) => {
-      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS))
-    });
-
-    let participants = [];
-    for (const mapItem of userPeerMap) {
-      let user = {
-        userId: mapItem.user.userAlias,
-        peer: mapItem.peer,
-        name: mapItem.user.name,
-        avatar: mapItem.user.avatar,
-        audioMuted: mapItem.user.audioMuted,
-        videoMuted: mapItem.user.videoMuted
-      };
-
-      mapItem.peer.on('stream', (stream) => {
-        user.stream = stream;
-        participants.push(user);
-
-        if (participants.length === userPeerMap.length) {
-          if (!isHost) {
-            setParticipants(participants);
-            setAllUserParticipantsLeft(false);
-
-            if (userPeerMap.length > 0) {
-              if (step === Steps.LOBBY) {
-                setStep(Steps.SESSION);
-              }
-            }
-          } else {
-            setLobbyWaitingList(participants);
-          }
-        }
+    if(isHost && users.length > 0) {
+      // If this condition is true, then the host is re-joining the session
+      // TODO : Implement host re-join
+    } else {
+      let userPeerMap = [];
+      users.forEach((user) => {
+        userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS))
       });
+
+      let participants = [];
+      for (const mapItem of userPeerMap) {
+        let user = {
+          userId: mapItem.user.userAlias,
+          peer: mapItem.peer,
+          name: mapItem.user.name,
+          avatar: mapItem.user.avatar,
+          audioMuted: mapItem.user.audioMuted,
+          videoMuted: mapItem.user.videoMuted
+        };
+
+        mapItem.peer.on('stream', (stream) => {
+          user.stream = stream;
+          participants.push(user);
+
+          if (participants.length === userPeerMap.length) {
+            if (!isHost) {
+              setParticipants(participants);
+              setAllUserParticipantsLeft(false);
+
+              if (userPeerMap.length > 0) {
+                if (step === Steps.LOBBY) {
+                  setStep(Steps.SESSION);
+                }
+              }
+            } else {
+              setLobbyWaitingList(participants);
+            }
+          }
+        });
+      }
     }
   };
 
@@ -557,7 +566,7 @@ const MeetingRoom = (props) => {
             <div style={{height: '100%', maxHeight: '100%', overflowY: 'auto', overflowX: 'hidden'}}>
               <div style={{height: 'calc(100% - 200px)', maxHeight: '100%', overflow: 'hidden'}}>
               {
-                step === Steps.LOBBY || (lobbyWaitingList && lobbyWaitingList.length > 0) ?
+                step === Steps.LOBBY ?
                   <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
                          acceptUserHandler={
                            (item) => {
@@ -570,7 +579,17 @@ const MeetingRoom = (props) => {
                          allUserParticipantsLeft={allUserParticipantsLeft}
                   />
                   :
-                  <MeetingParticipantGrid participants={participants} />
+                  <MeetingParticipantGrid participants={participants}
+                                          waitingList={lobbyWaitingList}
+                                          acceptUserHandler={
+                                            (item) => {
+                                              acceptUser(item);
+                                            }}
+                                          rejectUserHandler={
+                                            (item) => {
+                                              rejectUser(item);
+                                            }}
+                  />
               }
               </div>
               {
