@@ -4,6 +4,8 @@ import './DialingPreview.css';
 import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
 import Utils from '../../Utils';
+import styles from '../view/security/LoginStyle';
+import Button from '../RegularButton';
 
 const {electron} = window;
 
@@ -13,6 +15,7 @@ const DialingPreview = (props) => {
   const [caller, setCaller] = useState(null);
   const [meetingRequest, setMeetingRequest] = useState(null);
   const [initials, setInitials] = useState('');
+  const [systemAlert, setSystemAlert] = useState(null);
   const soundInterval = useRef();
 
   useEffect(() => {
@@ -21,10 +24,14 @@ const DialingPreview = (props) => {
         waitingAudio.play();
       }, 100);
 
-      if (args.payload.meetingJoinRequest) {
-        setMeetingRequest(args.payload);
+      if (args.payload.type) {
+        setSystemAlert(args.payload);
       } else {
-        setCaller(args.payload);
+        if (args.payload.meetingJoinRequest) {
+          setMeetingRequest(args.payload);
+        } else {
+          setCaller(args.payload);
+        }
       }
     });
 
@@ -66,39 +73,78 @@ const DialingPreview = (props) => {
     });
   };
 
+  const joinMeeting = () => {
+    electron.ipcRenderer.sendMessage('joinMeetingEvent', {
+      payload: systemAlert
+    });
+  };
+
+  const editMeeting = () => {
+    electron.ipcRenderer.sendMessage('editMeetingEvent', {
+      payload: systemAlert
+    });
+  };
+
   return (
-    (caller || meetingRequest) &&
+    (caller || meetingRequest || systemAlert) &&
     <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
       <div className={'centered-flex-box w-100'} style={{height: '72px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
         {
-          caller ? `${caller.callerUser.name} is trying to call you` : `${ meetingRequest.callerName } wants you to join meeting`
+          systemAlert ? systemAlert.message :
+            caller ? `${caller.callerUser.name} is trying to call you` : `${ meetingRequest.callerName } wants you to join meeting`
         }
       </div>
       <div className={'centered-flex-box w-100'} style={{height: 'calc(100% - 180px)'}}>
         <div className={'avatar'} data-label={initials}/>
       </div>
       <div className={'centered-flex-box w-100'} style={{marginTop: '32px'}}>
-        <IconButton
-          onClick={onAnswerCall}
-          style={{
-            backgroundColor: 'green',
-            color: 'white',
-            marginRight: '4px'
-          }}
-        >
-          <Icon id={'CALL'}/>
-        </IconButton>
+        {
+          systemAlert ?
+            <>
+              <Button
+                onClick={() => joinMeeting()}
+                variant="contained"
+                color="primary"
+                fullWidth={true}
+                style={styles.loginBtn}
+              >
+                <span>JOIN</span>
+              </Button>
 
-        <IconButton
-          onClick={onDeclineCall}
-          style={{
-            backgroundColor: '#eb3f21',
-            color: 'white',
-            marginRight: '4px'
-          }}
-        >
-          <Icon id={'CALL_END'}/>
-        </IconButton>
+              <Button
+                onClick={() => editMeeting()}
+                variant="contained"
+                color="primary"
+                fullWidth={true}
+                style={styles.loginBtn}
+              >
+                <span>EDIT</span>
+              </Button>
+            </> :
+            <>
+              <IconButton
+                onClick={onAnswerCall}
+                style={{
+                  backgroundColor: 'green',
+                  color: 'white',
+                  marginRight: '4px'
+                }}
+              >
+                <Icon id={'CALL'}/>
+              </IconButton>
+
+              <IconButton
+                onClick={onDeclineCall}
+                style={{
+                  backgroundColor: '#eb3f21',
+                  color: 'white',
+                  marginRight: '4px'
+                }}
+              >
+                <Icon id={'CALL_END'}/>
+              </IconButton>
+            </>
+        }
       </div>
     </div>
   );

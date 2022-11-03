@@ -163,6 +163,9 @@ const BasicBusinessAppDashboard = (props) => {
           case MessageType.CHAT_MESSAGE:
             onChatMessage(be.payload);
             break;
+          case MessageType.SYSTEM_ALERT:
+            onSystemAlert(be.payload);
+            break;
         }
       }
     }
@@ -190,6 +193,12 @@ const BasicBusinessAppDashboard = (props) => {
     electron.ipcRenderer.sendMessage('cancelCall', {});
   };
 
+  const onSystemAlert = (payload) => {
+    electron.ipcRenderer.sendMessage('systemAlert', {
+      payload: payload
+    });
+  };
+
   const receiveCall = (payload) => {
     electron.ipcRenderer.sendMessage('receivingCall', {
       payload: payload
@@ -207,6 +216,21 @@ const BasicBusinessAppDashboard = (props) => {
           videoMuted: true,
           audioMuted: false,
           isDirectCall: true
+        }
+      })
+    });
+  };
+
+  const joinMeeting = () => {
+    electron.ipcRenderer.on('joinMeetingEvent', args => {
+      navigate("/view/meetingRoom", {
+        state: {
+          displayMode: 'window',
+          selectedMeeting: {
+            id: args.payload.roomId
+          },
+          videoMuted: true,
+          audioMuted: true,
         }
       })
     });
@@ -248,10 +272,11 @@ const BasicBusinessAppDashboard = (props) => {
           setUserDetails(response);
           init();
           socketManager.init();
-          socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE);
+          socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
           onAnswerCall();
           onDeclineCall();
           joinChatRooms();
+          joinMeeting();
         }, (e) => {
         })
       }

@@ -234,6 +234,16 @@ ipcMain.on("receivingCall", async (_event, args) => {
   dialWindow.focus();
 });
 
+ipcMain.on("systemAlert", async (_event, args) => {
+  if (!dialWindow) {
+    throw new Error('"dialingWindow" is not defined');
+  }
+
+  dialWindow.webContents.send('dialingViewContent', args);
+  dialWindow.show();
+  dialWindow.focus();
+});
+
 ipcMain.on("receivingMessage", async (_event, args) => {
   if (!messageWindow) {
     throw new Error('"messageWindow" is not defined');
@@ -242,6 +252,16 @@ ipcMain.on("receivingMessage", async (_event, args) => {
   messageWindow.webContents.send('messageViewContent', args);
   messageWindow.show();
   messageWindow.focus();
+});
+
+ipcMain.on("joinMeetingEvent", async (_event, args) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  mainWindow.webContents.send('joinMeetingEvent', args);
+
+  dialWindow?.hide();
 });
 
 ipcMain.on("answerCall", async (_event, args) => {
