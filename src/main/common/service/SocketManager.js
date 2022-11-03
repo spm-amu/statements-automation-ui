@@ -48,6 +48,10 @@ class SocketManager {
           && value !== MessageType.USER_ONLINE && value !== MessageType.USER_OFFLINE && value !== MessageType.CHAT_MESSAGE) {
           console.log('EVENT: ', value);
           this.fireEvent(value, {socket: this.socket, payload: payload});
+
+          if(value === MessageType.SYSTEM_ALERT) {
+            alert(payload.message);
+          }
         }
       });
     }

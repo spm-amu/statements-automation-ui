@@ -1,6 +1,6 @@
 export type WebRTCUser = {
   userId: string | null;
-	session?: any;
+  session?: any;
 };
 
 export type PeerSignal = {
@@ -51,6 +51,7 @@ export enum MessageType {
   LOWER_HAND = "LOWER_HAND",
   REQUEST_TO_JOIN = "REQUEST_TO_JOIN",
   REQUESTED_TO_JOIN_MEETING = "REQUESTED_TO_JOIN_MEETING",
-  AUDIO_VISUAL_SETTINGS_CHANGED = "AUDIO_VISUAL_SETTINGS_CHANGED"
+  AUDIO_VISUAL_SETTINGS_CHANGED = "AUDIO_VISUAL_SETTINGS_CHANGED",
+  SYSTEM_ALERT = "SYSTEM_ALERT"
 
 }
