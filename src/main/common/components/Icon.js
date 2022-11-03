@@ -23,7 +23,7 @@ import Work from '@material-ui/icons/Work';
 import PanTool from '@material-ui/icons/PanTool';
 import Home from '@material-ui/icons/Home';
 import List from '@material-ui/icons/List';
-import Calender from '@material-ui/icons/CalendarToday';
+import Calendar from '@material-ui/icons/CalendarTodayTwoTone';
 import Notifications from '@material-ui/icons/Notifications';
 import Person from '@material-ui/icons/Person';
 import Folder from '@material-ui/icons/Folder';
@@ -75,8 +75,8 @@ class Icon extends Component {
       return <Download/>
     } else if (this.props.id === 'HELP') {
       return <Help/>
-    } else if (this.props.id === 'CALENDER') {
-      return <img src={require('/assets/icons/menu/calendar.svg')} width={'27px'} alt={''}/>
+    } else if (this.props.id === 'CALENDAR') {
+      return <Calendar {...this.props}/>
     } else if (this.props.id === 'CHATS') {
       return <img src={require('/assets/icons/menu/chats.svg')} width={'27px'} alt={''}/>
     } else if (this.props.id === 'FILES') {

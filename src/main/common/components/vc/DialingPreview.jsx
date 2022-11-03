@@ -4,12 +4,12 @@ import './DialingPreview.css';
 import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
 import Utils from '../../Utils';
-import styles from '../view/security/LoginStyle';
 import Button from '../RegularButton';
 
 const {electron} = window;
 
 const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
+const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
 
 const DialingPreview = (props) => {
   const [caller, setCaller] = useState(null);
@@ -20,13 +20,15 @@ const DialingPreview = (props) => {
 
   useEffect(() => {
     electron.ipcRenderer.on('dialingViewContent', args => {
-      soundInterval.current = setInterval(() => {
-        waitingAudio.play();
-      }, 100);
-
       if (args.payload.type) {
         setSystemAlert(args.payload);
+        soundInterval.current = null;
+        permitAudio.play();
       } else {
+        soundInterval.current = setInterval(() => {
+          waitingAudio.play();
+        }, 100);
+
         if (args.payload.meetingJoinRequest) {
           setMeetingRequest(args.payload);
         } else {
@@ -79,48 +81,55 @@ const DialingPreview = (props) => {
     });
   };
 
-  const editMeeting = () => {
-    electron.ipcRenderer.sendMessage('editMeetingEvent', {
-      payload: systemAlert
-    });
+  const closeWindow = () => {
+    electron.ipcRenderer.sendMessage('closeWindowEvent');
   };
 
   return (
     (caller || meetingRequest || systemAlert) &&
     <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
-      <div className={'centered-flex-box w-100'} style={{height: '72px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
+      <div className={'centered-flex-box w-100'}
+           style={{height: '72px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
         {
           systemAlert ? systemAlert.message :
-            caller ? `${caller.callerUser.name} is trying to call you` : `${ meetingRequest.callerName } wants you to join meeting`
+            caller ? `${caller.callerUser.name} is trying to call you` : `${meetingRequest.callerName} wants you to join meeting`
         }
       </div>
       <div className={'centered-flex-box w-100'} style={{height: 'calc(100% - 180px)'}}>
-        <div className={'avatar'} data-label={initials}/>
+        {
+          systemAlert ?
+            <div className={'avatar'} data-label={initials}>
+              <Icon id={'CALENDAR'} style={{color: '#FFFFFF'}} fontSize={'large'}/>
+            </div>
+            :
+            <div className={'avatar'} data-label={initials}/>
+        }
       </div>
       <div className={'centered-flex-box w-100'} style={{marginTop: '32px'}}>
         {
           systemAlert ?
-            <>
-              <Button
-                onClick={() => joinMeeting()}
-                variant="contained"
-                color="primary"
-                fullWidth={true}
-                style={styles.loginBtn}
-              >
-                <span>JOIN</span>
-              </Button>
-
-              <Button
-                onClick={() => editMeeting()}
-                variant="contained"
-                color="primary"
-                fullWidth={true}
-                style={styles.loginBtn}
-              >
-                <span>EDIT</span>
-              </Button>
-            </> :
+            <div style={{padding: '8px'}} className={'row no-margin w-100'}>
+              <div className={'col no-margin'} style={{paddingRight: '8px'}}>
+                <Button
+                  onClick={() => joinMeeting()}
+                  variant="contained"
+                  color="success"
+                  fullWidth={true}
+                >
+                  <span>JOIN</span>
+                </Button>
+              </div>
+              <div style={{paddingLeft: '0'}} className={'col no-margin'}>
+                <Button
+                  onClick={() => closeWindow()}
+                  variant="contained"
+                  color="danger"
+                  fullWidth={true}
+                >
+                  <span>CLOSE</span>
+                </Button>
+              </div>
+            </div> :
             <>
               <IconButton
                 onClick={onAnswerCall}

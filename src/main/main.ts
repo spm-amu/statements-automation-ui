@@ -264,6 +264,14 @@ ipcMain.on("joinMeetingEvent", async (_event, args) => {
   dialWindow?.hide();
 });
 
+ipcMain.on("closeWindowEvent", async (_event) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  dialWindow?.hide();
+});
+
 ipcMain.on("answerCall", async (_event, args) => {
   if (!mainWindow) {
     throw new Error('"mainWindow" is not defined');

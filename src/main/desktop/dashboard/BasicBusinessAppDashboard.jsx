@@ -87,7 +87,7 @@ const BasicBusinessAppDashboard = (props) => {
 
     newRoute.name = "Calendar";
     newRoute.path = "calendar";
-    newRoute.icon = "CALENDER";
+    newRoute.icon = "CALENDAR";
     newRoute.layout = "/admin";
     newRoute.level = 0;
     newRoute.isParent = true;
@@ -223,16 +223,28 @@ const BasicBusinessAppDashboard = (props) => {
 
   const joinMeeting = () => {
     electron.ipcRenderer.on('joinMeetingEvent', args => {
-      navigate("/view/meetingRoom", {
-        state: {
-          displayMode: 'window',
-          selectedMeeting: {
-            id: args.payload.roomId
-          },
-          videoMuted: true,
-          audioMuted: true,
-        }
-      })
+      get(`${host}/api/v1/meeting/fetch/${args.payload.params.meetingId}`, (response) => {
+        let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+        let isHost = false;
+        response.extendedProps.attendees.forEach(att => {
+          if (att.userId === userDetails.userId) {
+            isHost = att.type === 'HOST';
+          }
+        });
+
+        navigate("/view/meetingRoom", {
+          state: {
+            displayMode: 'window',
+            selectedMeeting: {
+              id: response.id
+            },
+            videoMuted: true,
+            audioMuted: true,
+            isHost
+          }
+        })
+      }, (e) => {
+      });
     });
   };
 

@@ -175,10 +175,6 @@ const MeetingRoom = (props) => {
     }
   }, [allUserParticipantsLeft]);
 
-  useEffect(() => {
-    console.log("\n\n\n\nPARTICIPANTS : ", participants);
-  }, [participants]);
-
   const addUser = (payload) => {
     let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED);
     joinInAudio.play();
@@ -328,6 +324,7 @@ const MeetingRoom = (props) => {
   const {settings} = props;
 
   useEffect(() => {
+    console.log("\n\n\n\n\n JOINING : ", selectedMeeting.id);
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     navigator.mediaDevices
       .getUserMedia({video: true, audio: true})

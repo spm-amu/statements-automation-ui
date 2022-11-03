@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
-import Button from "@material-ui/core/Button";
+import Button from '../RegularButton';
 
 const HOST_WAITING_MESSAGE = 'Waiting for others to join';
 const ATTENDEE_WAITING_MESSAGE = 'Waiting for the meeting host to let you in';
@@ -34,9 +34,10 @@ const Lobby = (props) => {
                   </div>
                   <div style={{marginRight: '4px'}} className={'col-*-*'}>
                     <Button
+                      color={'success'}
                       style={{
-                        backgroundColor: 'green',
-                        color: '#FFFFFF'
+                        color: '#FFFFFF',
+                        width: '80px'
                       }}
                       onClick={
                         (e) => {
@@ -48,9 +49,10 @@ const Lobby = (props) => {
                   </div>
                   <div className={'col-*-*'}>
                     <Button
+                      color={'danger'}
                       style={{
-                        backgroundColor: 'red',
-                        color: '#FFFFFF'
+                        color: '#FFFFFF',
+                        width: '80px'
                       }}
                       onClick={
                         (e) => {
