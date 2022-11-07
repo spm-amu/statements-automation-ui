@@ -1,10 +1,6 @@
 ﻿import React, {useState} from 'react';
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
-import "./Modal.css";
-import Modal from "@material-ui/core/Modal";
-import Button from "@material-ui/core/Button";
-
 
 const EventMessageComponent = React.memo(React.forwardRef((props, ref) => {
 
@@ -12,22 +8,30 @@ const EventMessageComponent = React.memo(React.forwardRef((props, ref) => {
 
     let prefix = "Occurs every";
     if(props.recurringType === 'DAILY') {
-      if(props.eventRecurrenceNumber > 1 ) {
-        return prefix + " " + props.eventRecurrenceNumber + " days";
+      if(props.numberOfOccurences > 1 ) {
+        return prefix + " " + props.numberOfOccurences + " days";
       } else {
         return prefix + " day";
       }
     } else if(props.recurringType === 'WEEKLY') {
-      if(props.eventRecurrenceNumber > 1 ) {
-        return prefix + " " + props.eventRecurrenceNumber + " weeks";
+      if(props.numberOfOccurences > 1 ) {
+        return prefix + " " + props.numberOfOccurences + " weeks";
       } else {
         return prefix + " week";
       }
     } else if(props.recurringType === 'MONTHLY') {
-      if(props.eventRecurrenceNumber > 1 ) {
-        return prefix + " " + props.eventRecurrenceNumber + " months";
+      if(props.monthlyDayType === 'monthlyWeekDay') {
+        if (props.numberOfOccurences > 1) {
+          return prefix + " " + props.numberOfOccurences + " months on " + props.monthlyPeriod + " " + props.monthlyDay;
+        } else {
+          return prefix + " month on " + props.monthlyPeriod + " " + props.monthlyDay;
+        }
       } else {
-        return prefix + " day";
+        if (props.numberOfOccurences > 1) {
+          return prefix + " " + props.numberOfOccurences + " months on day " + props.monthlyCalendarDay;
+        } else {
+          return prefix + " month on day " + props.monthlyCalendarDay;
+        }
       }
     }
   }

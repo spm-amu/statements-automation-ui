@@ -11,27 +11,13 @@ const ModalComponent = React.memo(React.forwardRef((props, ref) => {
   const dynamicModalClass = () => (props.open ? { display: 'block' } : '');
 
   return (
-    <div>
-      {/*<button type="button" onClick={handleOpen}>*/}
-      {/*  {props.openLabel}*/}
-      {/*</button>*/}
-      <Modal open={props.open} onClose={props.onClose}>
+
+      <Modal open={props.open} onClose={props.onClose} >
         <div className="modal" style={dynamicModalClass()} id="channelModal">
           <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
                 <h4 className="modal-title text">{props.modalHeader}</h4>
-
-                {/*<button*/}
-                {/*  onClick={handleClose}*/}
-                {/*  style={{ color: '#fff' }}*/}
-                {/*  type="button"*/}
-                {/*  className="close"*/}
-                {/*  data-dismiss="modal"*/}
-                {/*  aria-label="Close"*/}
-                {/*>*/}
-                {/*  <span aria-hidden="true">&times;</span>*/}
-                {/*</button>*/}
               </div>
 
               <div className="modal-body">
@@ -45,7 +31,9 @@ const ModalComponent = React.memo(React.forwardRef((props, ref) => {
                     <Button
                       variant={'contained'}
                       size="large"
-                      color={'primary'}>
+                      color={'primary'}
+                      onClick={props.onSave}
+                    >
                       SAVE
                     </Button>
                   </div>
@@ -62,7 +50,6 @@ const ModalComponent = React.memo(React.forwardRef((props, ref) => {
           </div>
         </div>
       </Modal>
-    </div>
   );
 }));
 

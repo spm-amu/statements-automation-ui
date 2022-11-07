@@ -16,6 +16,8 @@ import {get, host} from "../../service/RestService";
 import Utils from '../../Utils';
 import {useNavigate} from 'react-router-dom';
 
+// https://fullcalendar.io/docs/rrule-plugin documentation to use for recurrence
+
 const eventTemplate = {
   id: '',
   title: '',
@@ -153,7 +155,10 @@ const CalendarComponent = (props) => {
         startDate: new Date(clickedEvent.start),
         startTime: new Date(clickedEvent.start),
         endDate: new Date(clickedEvent.end),
-        endTime: new Date(clickedEvent.end)
+        endTime: new Date(clickedEvent.end),
+        recurringStartDate: new Date(clickedEvent.extendedProps.recurringStart),
+        recurringEndDate: new Date(clickedEvent.extendedProps.recurringEnd)
+
       };
 
       setSelectedEvent(value);
@@ -180,7 +185,9 @@ const CalendarComponent = (props) => {
       const event = {
         ...eventTemplate,
         "startDate": new Date(info.dateStr),
-        "endDate": new Date(info.dateStr)
+        "endDate": new Date(info.dateStr),
+        "recurringStartDate": new Date(info.dateStr),
+        "recurringEndDate": new Date(info.dateStr)
       };
 
       setSelectedEvent(event);

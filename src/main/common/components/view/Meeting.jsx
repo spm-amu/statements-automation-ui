@@ -16,6 +16,7 @@ import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
 import FormControl from "@material-ui/core/FormControl";
 import RadioGroup from "@material-ui/core/RadioGroup";
+import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Radio from "@material-ui/core/Radio";
 import {useNavigate} from 'react-router-dom';
@@ -39,9 +40,15 @@ const Meeting = (props) => {
   const [edited, setEdited] = useState(false);
   const [eventRecurrence, setEventRecurrence] = React.useState('NONE');
   const [repeatingEvery, setRepeatingEvery] = React.useState('');
-  const [eventRecurrenceNumber, setEventRecurrenceNumber] = React.useState('');
+  const [numberOfOccurences, setNumberOfOccurences] = React.useState(1);
+  const [monthlyPeriod, setMonthlyPeriod] = React.useState('');
+  const [monthlyDay, setMonthlyDay] = React.useState('');
+  const [monthlyDayType, setMonthlyDayType] = React.useState('monthlyWeekDay');
+  const [monthlyCalendarDay, setMonthlyCalendarDay] = React.useState(1);
   const [open, setOpen] = React.useState(false);
+  const [weekDays, setWeekDays] = useState([]);
   const [recurrenceChecked, setRecurrenceChecked] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -69,8 +76,12 @@ const Meeting = (props) => {
     } else {
       setValue({
         startDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.startDate) ? props.selectedEvent.startDate : now,
+        //recurringStartDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.recurringStartDate) ? props.selectedEvent.recurringStartDate : now,
+        recurringStartDate: now,
         startTime: now,
         endDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.endDate) ? props.selectedEvent.endDate : now,
+       // recurringEndDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.recurringEndDate) ? props.selectedEvent.recurringEndDate : now,
+        recurringEndDate: now,
         endTime: now,
         attendees: [],
         locations: [],
@@ -241,14 +252,67 @@ const Meeting = (props) => {
     setOpen(false);
   };
 
+  const handleEventRecurringSave = () => {
+
+    console.log("meetingValue", value);
+    console.log("1. eventRecurrence", eventRecurrence);
+    console.log("2. repeatingEvery", repeatingEvery);
+    console.log("3. numberOfOccurences", numberOfOccurences);
+    console.log("4. recurrenceChecked", recurrenceChecked);
+    console.log("5. weekDays", weekDays);
+    console.log("6. monthlyDayType", monthlyDayType);
+    console.log("7. monthlyCalendarDay", monthlyCalendarDay);
+    console.log("8. monthlyPeriod", monthlyPeriod);
+    console.log("9. monthlyDay", monthlyDay);
+    setOpen(false);
+  };
+
   const handleEventRecurring = (e) => {
 
     setEventRecurrence(e.target.value);
     if(e.target.value !== 'NONE') {
       setRepeatingEvery(e.target.value);
+      setNumberOfOccurences(1);
       setOpen(true);
-    } else {
+      setMonthlyPeriod('');
+      setMonthlyDay('');
+      setMonthlyDayType('');
+      setMonthlyCalendarDay(1);
+      setWeekDays([]);
+      if(e.target.value === 'MONTHLY') {
+        setMonthlyPeriod('first');
+        setMonthlyDay('Monday');
+        setMonthlyDayType('monthlyWeekDay');
+      }
+    }
+  };
 
+  const handleMonthlyDay = (e) => {
+    setMonthlyDay(e.target.value);
+  };
+
+
+  const handleMonthlyPeriod = (e) => {
+    setMonthlyPeriod(e.target.value);
+  };
+
+  const handleWeekdayChange = (event) => {
+
+    const index = weekDays.indexOf(event.target.value);
+    if(index === -1) {
+      setWeekDays([ ...weekDays, event.target.value ]);
+    } else {
+      setWeekDays(weekDays.filter((weekDay) => weekDay !== event.target.value));
+    }
+  };
+
+  const handleMonthlyChange = (event) => {
+
+    const index = weekDays.indexOf(event.target.value);
+    if(index === -1) {
+      setWeekDays([ ...weekDays, event.target.value ]);
+    } else {
+      setWeekDays(weekDays.filter((weekDay) => weekDay !== event.target.value));
     }
   };
 
@@ -363,37 +427,260 @@ const Meeting = (props) => {
   );
 
   const onRecurrenceChecked = () => {
+    console.log("recurrenceChecked", recurrenceChecked);
     setEventRecurrence("NONE");
     setRecurrenceChecked(!recurrenceChecked);
   };
 
   const setRecurrentBody = (
-    <div style={{width: '80%'}}>
-      <div className={'row no-margin'}>
-          <FormControl>
-            <InputLabel id="repeatingEveryLabel">Repeating every</InputLabel>
-            <Select
-              style={{width: "100%"}}
-              labelId="repeating-every-label"
-              id="repeatingEveryLabelSelect"
-              value={repeatingEvery}
-              label="Repeating every"
-              disabled={readOnly}
-              onChange={handleEventRecurring}
-            >
-              <MenuItem value={"DAILY"}>Day</MenuItem>
-              <MenuItem value={"WEEKLY"}>Week</MenuItem>
-              <MenuItem value={"MONTHLY"}>Month</MenuItem>
-            </Select>
-          </FormControl>
-     </div>
+    <div style={{width: '100%'}}>
 
       <div className={'row no-margin'}>
-        <EventMessageComponent recurringType={eventRecurrence} eventRecurrenceNumber={2} />
+        <div className={'col-*-*'}>
+          <DatePicker
+            label="Recurring Start date"
+            id="recurringStartDate"
+            disabled={readOnly}
+            // hasError={errors.recurringStartDate}
+            //value={value.recurringStartDate}
+            required={true}
+            valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+            errorMessage={'A recurring start date is required. Please select a value'}
+          />
+        </div>
+      </div>
+
+      <div className={'row no-margin'}>
+        <p>&nbsp;&nbsp;&nbsp;</p>
+      </div>
+
+      <div className={'row no-margin'}>
+
+        <div className={'col-*-*'}>
+          <TextField
+            disabled={readOnly}
+            label="Repeat every"
+            id="numberOfOccurencesId"
+            type={"number"}
+            value={numberOfOccurences}
+            required={true}
+            valueChangeHandler={(e) => {
+              console.log(e.target.value);
+             // if(e.target.value > 0 && e.target.value < 100) {
+                setNumberOfOccurences(e.target.value);
+             // }
+            }}
+            errorMessage={'Specify number of occurences required. Please enter a number'}
+          />
+          <br/>
+        </div>
+          <div className={'col-*-*'}>
+          <Select
+            style={{width: "100%"}}
+            labelId="event-recurrence-label"
+            id="setEventRecurrenceSelect"
+            value={eventRecurrence}
+            label="Set Recurrence"
+            disabled={readOnly}
+            onChange={handleEventRecurring}
+          >
+            <MenuItem value={"DAILY"}>Day</MenuItem>
+            <MenuItem value={"WEEKLY"}>Week</MenuItem>
+            <MenuItem value={"MONTHLY"}>Month</MenuItem>
+          </Select>
+          <br/><br/>
+        </div>
+
+        {
+          eventRecurrence==="WEEKLY" ?
+        <div className={'col-*-*'}>
+          <FormGroup row>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={weekDays.includes('monday')}
+                  onChange={handleWeekdayChange}
+                  value="monday"
+                />
+              }
+              label="Mon"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={weekDays.includes('tuesday')}
+                  onChange={handleWeekdayChange}
+                  value="tuesday"
+                />
+              }
+              label="Tue"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={weekDays.includes('wednesday')}
+                  onChange={handleWeekdayChange}
+                  value="wednesday"
+                />
+              }
+              label="Wed"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={weekDays.includes('thursday')}
+                  onChange={handleWeekdayChange}
+                  value="thursday"
+                />
+              }
+              label="Thur"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={weekDays.includes('friday')}
+                  onChange={handleWeekdayChange}
+                  value="friday"
+                />
+              }
+              label="Fri"
+            />
+          </FormGroup>
+        </div>
+            : null }
+
+      </div>
+
+      {
+        eventRecurrence==="MONTHLY" ?
+          <RadioGroup
+            aria-labelledby="radio-monthly-day-type-label"
+            row
+            disabled={readOnly}
+            value={monthlyDayType}
+            name="radio-buttons-group"
+            onChange={(e, val) => {
+              console.log("monthlyDayType1", val);
+              console.log("before-monthlyDayType2", monthlyDayType);
+              setMonthlyDayType(val);
+              console.log("after-monthlyDayType3", monthlyDayType);
+            }}
+          >
+          <div className={'row no-margin'}>
+
+            <div className={'col-*-*'}>
+              <FormControlLabel value="monthlyCalendarDay" control={<Radio />} label="On day"/>
+            </div>
+
+            <div className={'col-*-*'}>
+              <TextField
+                disabled={monthlyDayType !== 'monthlyCalendarDay'}
+                label="On day"
+                id="monthlyCalendarDay"
+                type={"number"}
+                value={monthlyCalendarDay}
+                required={true}
+                valueChangeHandler={(e) => {
+                   setMonthlyCalendarDay(e.target.value);
+                }}
+                errorMessage={'Please enter a number'}
+              />
+              <br/>
+            </div>
+
+          </div>
+
+          <div className={'row no-margin'}>
+
+            <div className={'col-*-*'}>
+              <FormControlLabel value="monthlyWeekDay" control={<Radio />} label="On the"/>
+            </div>
+
+            <div className={'col-*-*'}>
+              <Select
+                style={{width: "100%"}}
+                labelId="monthly-period-label"
+                id="monthlyPeriodSelect"
+                value={monthlyPeriod}
+                label="On the"
+                disabled={monthlyDayType !== 'monthlyWeekDay'}
+                onChange={handleMonthlyPeriod}
+              >
+                <MenuItem value={"first"}>First</MenuItem>
+                <MenuItem value={"second"}>Second</MenuItem>
+                <MenuItem value={"third"}>Third</MenuItem>
+                <MenuItem value={"fourth"}>Fourth</MenuItem>
+                <MenuItem value={"last"}>Last</MenuItem>
+              </Select>
+            </div>
+
+            <div className={'col-*-*'}>
+              <p>&nbsp;&nbsp;&nbsp;</p>
+            </div>
+
+            <div className={'col-*-*'}>
+              <Select
+                style={{width: "100%"}}
+                labelId="monthly-day-label"
+                id="monthlyDaydSelect"
+                value={monthlyDay}
+                label="On the"
+                disabled={monthlyDayType !== 'monthlyWeekDay'}
+                onChange={handleMonthlyDay}
+              >
+                <MenuItem value={"Sunday"}>Sunday</MenuItem>
+                <MenuItem value={"Monday"}>Monday</MenuItem>
+                <MenuItem value={"Tuesday"}>Tuesday</MenuItem>
+                <MenuItem value={"Wednesday"}>Wednesday</MenuItem>
+                <MenuItem value={"Thursday"}>Thursday</MenuItem>
+                <MenuItem value={"Friday"}>Friday</MenuItem>
+                <MenuItem value={"Saturday"}>Saturday</MenuItem>
+              </Select>
+            </div>
+          </div>
+
+          <div className={'row no-margin'}>
+            <p>&nbsp;&nbsp;&nbsp;</p>
+          </div>
+
+          </RadioGroup>
+      : null }
+
+      <div className={'row no-margin'}>
+        <div className={'col-*-*'}>
+          <DatePicker
+            label="Recurring End date"
+            id="recurringEndDate"
+            disabled={readOnly}
+            // hasError={errors.recurringStartDate}
+           //  value={value.recurringEndDate}
+            required={true}
+            valueChangeHandler={(date, id) => handleFormValueChange(date, id, true)}
+            errorMessage={'A recurring end date is required. Please select a value'}
+          />
+        </div>
+      </div>
+
+      <div className={'row no-margin'}>
+        <div className={'col-*-*'}>
+          <EventMessageComponent
+            recurringType={eventRecurrence}
+            numberOfOccurences={numberOfOccurences}
+            monthlyDayType={monthlyDayType}
+            monthlyCalendarDay={monthlyCalendarDay}
+            monthlyDay={monthlyDay}
+            monthlyPeriod={monthlyPeriod}/>
+        </div>
       </div>
 
   </div>
-  );
+
+);
 
   return (
     value &&
@@ -407,7 +694,13 @@ const Meeting = (props) => {
 
       <div>
         <h2 className="text-center">
-          <ModalComponent open={open} onClose={handleEventRecurringClose} body={setRecurrentBody} openLabel={"Set recurrence"} modalHeader={"Set recurrence"}/>
+          <ModalComponent
+            open={open}
+            onClose={handleEventRecurringClose}
+            onSave={handleEventRecurringSave}
+            body={setRecurrentBody}
+            openLabel={"Set recurrence"}
+            modalHeader={"Set recurrence"}/>
         </h2>
       </div>
 
@@ -462,16 +755,16 @@ const Meeting = (props) => {
                   label="Recurring"
                   value={recurrenceChecked}
                   control={
-                    <Checkbox color="primary" checked={recurrenceChecked} onChange={onRecurrenceChecked}/>
+                    <Checkbox color="primary" disabled={readOnly} checked={recurrenceChecked} onChange={onRecurrenceChecked}/>
                   }
                 />
               </FormControl>
 
-          {
-            !recurrenceChecked ?
               <div>
                 <div>
                   <div className={'row no-margin'}>
+                    {
+                      !recurrenceChecked ?
                     <div className={'col-*-*'}>
                       <DatePicker
                         label="Start date"
@@ -484,6 +777,7 @@ const Meeting = (props) => {
                         errorMessage={'A start date is required. Please select a value'}
                       />
                     </div>
+                    : null }
                     <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
                       <TimePicker
                         label="Start time"
@@ -500,7 +794,9 @@ const Meeting = (props) => {
                 </div>
                 <div>
                   <div className={'row no-margin'}>
-                    <div className={'col-*-*'}>
+                    {
+                      !recurrenceChecked ?
+                      <div className={'col-*-*'}>
                       <DatePicker
                         label="End date"
                         disabled={readOnly}
@@ -512,6 +808,8 @@ const Meeting = (props) => {
                         errorMessage={'An end date is required. Please select a value'}
                       />
                     </div>
+                      : null }
+
                     <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
                       <TimePicker
                         label="End time"
@@ -527,25 +825,41 @@ const Meeting = (props) => {
                   </div>
                 </div>
               </div>
-              :
 
-              <FormControl>
-                <InputLabel id="setEventRecurrenceLabel">Set Recurrence</InputLabel>
-                <Select
-                  style={{width: "100%"}}
-                  labelId="event-recurrence-label"
-                  id="setEventRecurrenceSelect"
-                  value={eventRecurrence}
-                  label="Set Recurrence"
-                  disabled={readOnly}
-                  onChange={handleEventRecurring}
-                >
-                  <MenuItem value={"NONE"}>Select recurrence</MenuItem>
-                  <MenuItem value={"DAILY"}>Daily</MenuItem>
-                  <MenuItem value={"WEEKLY"}>Weekly</MenuItem>
-                  <MenuItem value={"MONTHLY"}>Monthly</MenuItem>
-                </Select>
-              </FormControl>
+                    {
+                      recurrenceChecked ?
+
+                      <div className={'row no-margin'}>
+                <div className={'col-*-*'}>
+                  <FormControl>
+                    <InputLabel id="setEventRecurrenceLabel">Set Recurrence</InputLabel>
+                    <Select
+                      style={{width: "100%"}}
+                      labelId="event-recurrence-label"
+                      id="setEventRecurrenceSelect"
+                      value={eventRecurrence}
+                      label="Set Recurrence"
+                      disabled={readOnly}
+                      onChange={handleEventRecurring}
+                    >
+                      <MenuItem value={"NONE"}>Not repeating</MenuItem>
+                      <MenuItem value={"DAILY"}>Daily</MenuItem>
+                      <MenuItem value={"WEEKLY"}>Weekly</MenuItem>
+                      <MenuItem value={"MONTHLY"}>Monthly</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                <div className={'col-*-*'}>
+                  <EventMessageComponent
+                    recurringType={eventRecurrence}
+                    numberOfOccurences={numberOfOccurences}
+                    monthlyDayType={monthlyDayType}
+                    monthlyCalendarDay={monthlyCalendarDay}
+                    monthlyDay={monthlyDay}
+                    monthlyPeriod={monthlyPeriod} />
+                </div>
+              </div>
+                      : null
           }
 
           <div style={{marginTop: '8px'}}>
