@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import ModalComponent from '../customInput/Modal';
 import { Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
 import EventMessageComponent from '../customInput/EventMessage';
+import uuid from 'react-uuid';
 
 const options = ['NONE', 'TEST'];
 
@@ -164,7 +165,7 @@ const Meeting = (props) => {
     let newAttendees = [].concat(value.attendees);
     newAttendees.push(hostAttendee);
 
-    return {
+    const eventData = {
       id: value.id,
       title: value.title,
       attendees: newAttendees, //[hostAttendee].concat(attendees),
@@ -176,9 +177,23 @@ const Meeting = (props) => {
         startDate: Utils.getFormattedDate(value.startDate),
         startTime: value.startTime.toLocaleTimeString('it-IT'),
         endDate: Utils.getFormattedDate(value.endDate),
-        endTime: value.endTime.toLocaleTimeString('it-IT'),
+        endTime: value.endTime.toLocaleTimeString('it-IT')
       },
     };
+
+    if (eventRecurrence !== 'NONE') {
+      let days = [1 , 2, 3, 4, 5];
+      if (eventRecurrence === 'WEEKLY') {
+        days = weekDays;
+      }
+
+      eventData.schedule.daysOfWeek = days;
+      eventData.schedule.groupId = uuid();
+      eventData.schedule.startRecur =  Utils.getFormattedDate(value.startDate);
+      eventData.schedule.endRecur = Utils.getFormattedDate(value.endDate);
+    }
+
+    return eventData;
   };
 
   const handleAdd = () => {
@@ -323,9 +338,9 @@ const Meeting = (props) => {
   const handleWeekdayChange = (event) => {
     const index = weekDays.indexOf(event.target.value);
     if (index === -1) {
-      setWeekDays([...weekDays, event.target.value]);
+      setWeekDays([...weekDays, parseInt(event.target.value)]);
     } else {
-      setWeekDays(weekDays.filter((weekDay) => weekDay !== event.target.value));
+      setWeekDays(weekDays.filter((weekDay) => weekDay !== parseInt(event.target.value)));
     }
   };
 
@@ -532,9 +547,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes('monday')}
+                    checked={weekDays.includes(1)}
                     onChange={handleWeekdayChange}
-                    value="monday"
+                    value={1}
                   />
                 }
                 label="Mon"
@@ -543,9 +558,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes('tuesday')}
+                    checked={weekDays.includes(2)}
                     onChange={handleWeekdayChange}
-                    value="tuesday"
+                    value={2}
                   />
                 }
                 label="Tue"
@@ -554,9 +569,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes('wednesday')}
+                    checked={weekDays.includes(3)}
                     onChange={handleWeekdayChange}
-                    value="wednesday"
+                    value={3}
                   />
                 }
                 label="Wed"
@@ -565,9 +580,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes('thursday')}
+                    checked={weekDays.includes(4)}
                     onChange={handleWeekdayChange}
-                    value="thursday"
+                    value={4}
                   />
                 }
                 label="Thur"
@@ -576,9 +591,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes('friday')}
+                    checked={weekDays.includes(5)}
                     onChange={handleWeekdayChange}
-                    value="friday"
+                    value={5}
                   />
                 }
                 label="Fri"
@@ -703,6 +718,16 @@ const Meeting = (props) => {
             }
           />
         </div>
+        {/*<div className={'col-*-*'}>*/}
+        {/*  <Button*/}
+        {/*    onClick={() => {}}*/}
+        {/*    variant="contained"*/}
+        {/*    color="primary"*/}
+        {/*    fullWidth={true}*/}
+        {/*  >*/}
+        {/*    <span>Remove</span>*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
       </div>
 
       <div className={'row no-margin'}>
@@ -714,6 +739,7 @@ const Meeting = (props) => {
             monthlyCalendarDay={monthlyCalendarDay}
             monthlyDay={monthlyDay}
             monthlyPeriod={monthlyPeriod}
+            recurringEndDate={value && value.endDate ? value.endDate : null}
           />
         </div>
       </div>
@@ -812,7 +838,7 @@ const Meeting = (props) => {
                 <div className={'row no-margin'}>
                   <div className={'col-*-*'}>
                     <DatePicker
-                      label="Start date"
+                      label={eventRecurrence !== 'NONE' ? 'Recurring Start date' : 'Start date'}
                       id="startDate"
                       disabled={readOnly}
                       hasError={errors.startDate}
@@ -848,12 +874,12 @@ const Meeting = (props) => {
                 <div className={'row no-margin'}>
                   <div className={'col-*-*'}>
                     <DatePicker
-                      label="End date"
+                      label={eventRecurrence !== 'NONE' ? 'Recurring End date' : 'End date'}
                       disabled={readOnly}
                       id="endDate"
                       hasError={errors.endDate}
                       value={value.endDate}
-                      required={true}
+                      required={eventRecurrence === 'NONE'}
                       valueChangeHandler={(date, id) =>
                         handleFormValueChange(date, id, true)
                       }

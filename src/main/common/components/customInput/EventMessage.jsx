@@ -4,8 +4,9 @@ import '../../assets/scss/flatpickr/flatpickr.scss';
 
 const EventMessageComponent = React.memo(React.forwardRef((props, ref) => {
 
-  const generateEventMessage = () => {
+  console.log('######: ', props.recurringEndDate);
 
+  const generateEventMessage = () => {
     let prefix = "Occurs every";
     if(props.recurringType === 'DAILY') {
       if(props.numberOfOccurences > 1 ) {
@@ -39,7 +40,9 @@ const EventMessageComponent = React.memo(React.forwardRef((props, ref) => {
   return (
     <div>
       <br/>
-      <p>{generateEventMessage()}</p>
+      <p>
+        { props.recurringEndDate ? `${generateEventMessage()} until ${props.recurringEndDate.toLocaleDateString("en-US")}` : generateEventMessage()}
+      </p>
     </div>
   );
 }));
