@@ -188,6 +188,12 @@
   "build": {
     "productName": "Armscor Connect",
     "appId": "armscode.connect",
+    "protocols": {
+      "name": "armscor-deep-linking",
+      "schemes": [
+        "armscor-connect"
+      ]
+    },
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

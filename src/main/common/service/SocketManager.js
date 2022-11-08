@@ -38,8 +38,8 @@ class SocketManager {
   };
 
   init = () => {
-    // let socket = io.connect('http://svn.agilemotion.co.za');
-    let socket = io.connect('http://localhost:8000');
+    let socket = io.connect('http://svn.agilemotion.co.za');
+    // let socket = io.connect('http://100.72.207.105:8000');
     let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
 
     for (const value of Object.keys(MessageType)) {

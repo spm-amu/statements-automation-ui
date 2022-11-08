@@ -29,6 +29,8 @@ let messageWindow: BrowserWindow | null = null;
 let screenWidth: number;
 let screenHeight: number;
 
+let deeplinkingUrl: string | undefined;
+
 ipcMain.on('ipc-armscor', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
@@ -309,6 +311,60 @@ ipcMain.on("hideMessagePreview", async (_event, args) => {
 
   messageWindow.hide();
 });
+
+if (process.env.NODE_ENV === 'development' && process.platform === 'win32') {
+  // Set the path of electron.exe and your app.
+  // These two additional parameters are only available on windows.
+  // Setting this is required to get this working in dev mode.
+  app.setAsDefaultProtocolClient('armscor-connect', process.execPath, [
+    path.resolve(process.argv[1])
+  ]);
+} else {
+  app.setAsDefaultProtocolClient('armscor-connect');
+}
+
+app.on('open-url', function (event, url) {
+  event.preventDefault();
+  deeplinkingUrl = url;
+  let meetingId = '';
+
+  if (deeplinkingUrl) {
+    const lastIndex = deeplinkingUrl.lastIndexOf('/');
+    meetingId = deeplinkingUrl.slice(lastIndex + 1);
+  }
+
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+
+    mainWindow.webContents.send('joinMeetingEvent', {
+      payload: {
+        params: {
+          meetingId: meetingId
+        }
+      }
+    });
+  }
+});
+
+// Force single application instance
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (e, argv) => {
+    if (process.platform !== 'darwin') {
+      // Find the arg that is our custom protocol url and store it
+      deeplinkingUrl = argv.find((arg) => arg.startsWith('armscor-connect://'));
+    }
+
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
