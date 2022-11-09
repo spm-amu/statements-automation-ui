@@ -396,14 +396,14 @@ const Meeting = (props) => {
         }}
       >
         <div style={{ marginRight: '4px' }}>
-          <Button
+          {/*<Button
             variant={'contained'}
             size="large"
             color={'primary'}
             onClick={(e) => handleClose(e)}
           >
             RESPOND
-          </Button>
+          </Button>*/}
         </div>
         <Button
           variant={'contained'}
@@ -751,7 +751,10 @@ const Meeting = (props) => {
       <div
         style={{
           width: '100%',
-          height: '88vh',
+          height: '100%',
+          maxHeight: '100%',
+          overflowX: 'hidden',
+          overflowY: 'auto',
           padding: '32px',
           backgroundColor: '#FFFFFF',
           marginTop: '2px',
@@ -992,7 +995,7 @@ const Meeting = (props) => {
                 valueChangeHandler={(e) => formValueChangeHandler(e)}
               />
             </div>
-            <div>
+            {/*<div>
               {readOnly ? (
                 <FormControl>
                   <RadioGroup
@@ -1022,7 +1025,7 @@ const Meeting = (props) => {
                   </RadioGroup>
                 </FormControl>
               ) : null}
-            </div>
+            </div>*/}
             <div className="d-flex mb-1">
               <EventActions />
             </div>

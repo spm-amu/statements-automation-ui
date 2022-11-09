@@ -14,7 +14,8 @@ const Toolbar = (props) => {
     userStream,
     userVideo,
     eventHandler,
-    handRaised
+    handRaised,
+    step
   } = props;
 
   const muteVideo = () => {
@@ -120,18 +121,20 @@ const Toolbar = (props) => {
             <Icon id={'PRESENT_TO_ALL'}/>
           )}
         </IconButton>
+        {
+          step === 'SESSION' &&
+          <IconButton
+            style={{
+              backgroundColor: '#404239',
+              color: 'white',
+              marginRight: '4px'
+            }}
+            onClick={(e) => showChat()}
+          >
+            <Icon id={'CHAT_BUBBLE'}/>
+          </IconButton>
 
-        <IconButton
-          style={{
-            backgroundColor: '#404239',
-            color: 'white',
-            marginRight: '4px'
-          }}
-          onClick={(e) => showChat()}
-        >
-          <Icon id={'CHAT_BUBBLE'}/>
-        </IconButton>
-
+        }
         <IconButton
           onClick={endCall}
           style={{
@@ -142,17 +145,19 @@ const Toolbar = (props) => {
         >
           <Icon id={'CALL_END'}/>
         </IconButton>
-
-        <IconButton
-          onClick={(e) => showPeople()}
-          style={{
-            backgroundColor: '#404239',
-            color: 'white',
-            marginRight: '4px'
-          }}
-        >
-          <Icon id={'PEOPLE'}/>
-        </IconButton>
+        {
+          step === 'SESSION' &&
+          <IconButton
+            onClick={(e) => showPeople()}
+            style={{
+              backgroundColor: '#404239',
+              color: 'white',
+              marginRight: '4px'
+            }}
+          >
+            <Icon id={'PEOPLE'}/>
+          </IconButton>
+        }
 
         <IconButton
           onClick={(e) => {

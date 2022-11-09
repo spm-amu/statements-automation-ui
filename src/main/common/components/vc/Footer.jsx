@@ -10,18 +10,20 @@ const Footer = (props) => {
     screenShared,
     userStream,
     userVideo,
-    handRaised
+    handRaised,
+    step
   } = props;
 
   return (
     <div className={'vc-footer'}
     >
       <div className={'row'}>
-        <div className={'col'}>
+        <div  className={'col time'}>
           <h3
             style={{
               position: 'absolute',
               fontSize: 'auto',
+              marginBottom: '0'
             }}
           >
             {new Date().toLocaleString('en-US', {
@@ -31,16 +33,17 @@ const Footer = (props) => {
             })}
           </h3>
         </div>
-        <div className={'col'}>
+        <div className={'col toolbar-container'}>
           <Toolbar eventHandler={props.toolbarEventHandler}
                    handRaised={handRaised}
                    userVideo={userVideo}
                    userStream={userStream}
                    videoMuted={videoMuted}
                    audioMuted={audioMuted}
+                   step={step}
           />
         </div>
-        <div className={'col'}>
+        <div className={'col video'}>
           <div
             style={{display: 'flex', justifyContent: 'flex-end'}}
           >

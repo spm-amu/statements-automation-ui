@@ -324,7 +324,6 @@ const MeetingRoom = (props) => {
   const {settings} = props;
 
   useEffect(() => {
-    console.log("\n\n\n\n\n JOINING : ", selectedMeeting.id);
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     navigator.mediaDevices
       .getUserMedia({video: true, audio: true})
@@ -515,7 +514,7 @@ const MeetingRoom = (props) => {
   }, [audioMuted]);
 
   return (
-    <div style={{width: '100%', height: '100%'}}>
+    <div style={{width: '100%', height: '100%', maxHeight: '100%', overflowX: 'hidden', overflowY: 'auto', border: '8px solid red'}}>
       <StyledDialog
         open={true}
         onClose={(e) => {
@@ -596,6 +595,7 @@ const MeetingRoom = (props) => {
                         audioMuted={audioMuted}
                         videoMuted={videoMuted}
                         handRaised={handRaised}
+                        step={step}
                         toolbarEventHandler={
                           {
                             onMuteVideo: (muted) => {

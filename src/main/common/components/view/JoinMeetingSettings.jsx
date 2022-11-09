@@ -4,7 +4,9 @@ import MeetingSettingsComponent from "../vc/MeetingSettingsComponent";
 const JoinMeetingSettings = (props) => {
 
   return (
-    <MeetingSettingsComponent {...props}/>
+    <div style={{maxHeight: '100%', height: '100%', overflowX: 'hidden', overflowY: 'auto'}}>
+        <MeetingSettingsComponent {...props}/>
+    </div>
   );
 };
 

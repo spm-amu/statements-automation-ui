@@ -5,6 +5,12 @@
   box-shadow: none !important;
 }
 
+.sidebar .nav,
+.off-canvas-sidebar .nav {
+  max-height: unset !important;
+  overflow: hidden !important;
+}
+
 .menu-item {
   margin-left: 3px;
   opacity: .4;

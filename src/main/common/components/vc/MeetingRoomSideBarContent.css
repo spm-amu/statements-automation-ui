@@ -1,7 +1,6 @@
 .meeting-room-sb-container {
-  height: 100%;
   width: 100%;
-  padding: 16px;
+  min-width: 320px;
 }
 
 .meeting-room-sb-container .people-container,

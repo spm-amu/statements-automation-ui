@@ -19,6 +19,7 @@ const Lobby = (props) => {
         style={{
           height: 'calc(100% - 32px)',
           width: '100%',
+          minWidth: '320px',
           fontSize: '32px',
           overflow: 'hidden'
         }}

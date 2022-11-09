@@ -225,7 +225,7 @@ class Sidebar extends React.Component {
     return (
       <div className={this.props.className} data={activeColor}
            style={{overflow: 'auto', maxHeight: '100vh'}}>
-        <table style={{height: "96%", maxHeight: "100%", width: "100%"}}>
+        <table style={{height: "96%", maxHeight: "90%", width: "100%"}}>
           <tbody>
           <tr>
             <td style={{height: '10%'}}>
