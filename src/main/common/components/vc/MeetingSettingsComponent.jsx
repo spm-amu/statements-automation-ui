@@ -101,7 +101,7 @@ const MeetingSettingsComponent = (props) => {
   };
 
   return (
-    <div className={'meeting-container'}>
+    <div className={'meeting-settings-container'}>
       <div className="toolbar row">
         <Button
           onClick={close}
@@ -112,7 +112,7 @@ const MeetingSettingsComponent = (props) => {
           CLOSE
         </Button>
       </div>
-      <div className={'row centered-flex-box'} style={{maxHeight: '80%', overflow: 'auto'}}>
+      <div className={'row centered-flex-box'}>
         <table>
           <tbody>
           <tr>
