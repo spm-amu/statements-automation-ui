@@ -275,7 +275,7 @@ const BasicBusinessAppDashboard = (props) => {
   });
 
   React.useEffect(() => {
-    if (loading) {
+    //if (loading) {
       if (Utils.isNull(sessionStorage.getItem("accessToken"))) {
         navigate('/login');
       } else {
@@ -292,7 +292,7 @@ const BasicBusinessAppDashboard = (props) => {
         }, (e) => {
         })
       }
-    }
+    //}
   }, []);
 
   React.useEffect(() => {

@@ -559,8 +559,8 @@ const MeetingRoom = (props) => {
         </div>
         <div className={'row meeting-window-container'}>
           <div className={'col'}>
-            <div style={{height: '100%', maxHeight: '100%', overflowY: 'auto', overflowX: 'hidden'}}>
-              <div style={{height: 'calc(100% - 200px)', maxHeight: '100%', overflow: 'hidden'}}>
+            <div style={{height: '100%'}}>
+              <div style={{height: 'calc(100% - 200px)', maxHeight: 'calc(100% - 200px)', overflow: 'hidden'}}>
               {
                 step === Steps.LOBBY ?
                   <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}

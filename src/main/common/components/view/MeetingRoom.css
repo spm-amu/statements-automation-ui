@@ -126,6 +126,9 @@
 
 .meeting-window-container {
   height: 100%;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding-left: 0;
   padding-right: 0;
   margin-left: 16px !important;
