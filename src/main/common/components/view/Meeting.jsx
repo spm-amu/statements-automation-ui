@@ -43,7 +43,7 @@ const Meeting = (props) => {
   const [monthlyPeriod, setMonthlyPeriod] = React.useState('');
   const [monthlyDay, setMonthlyDay] = React.useState('');
   const [monthlyDayType, setMonthlyDayType] = React.useState('monthlyWeekDay');
-  const [monthlyCalendarDay, setMonthlyCalendarDay] = React.useState(1);
+  const [monthlyCalendarDay, setMonthlyCalendarDay] = React.useState(0);
   const [open, setOpen] = React.useState(false);
   const [weekDays, setWeekDays] = useState([]);
   const [recurrenceChecked, setRecurrenceChecked] = useState(false);
@@ -182,16 +182,38 @@ const Meeting = (props) => {
     };
 
     if (eventRecurrence !== 'NONE') {
-      let days = [1 , 2, 3, 4, 5];
-      if (eventRecurrence === 'WEEKLY') {
-        days = weekDays;
+
+      let recEndDate = new Date(Utils.getFormattedDate(value.endDate));
+      recEndDate.setDate(recEndDate.getDate() + 1);
+
+      eventData.schedule.rrule = {
+        freq: eventRecurrence,
+        interval: numberOfOccurences,
+        dtstart: new Date(Utils.getFormattedDate(value.startDate) + " " + value.startTime.toLocaleTimeString('it-IT')),
+        until: recEndDate
       }
 
-      eventData.schedule.daysOfWeek = days;
-      eventData.schedule.groupId = uuid();
-      eventData.schedule.startRecur =  Utils.getFormattedDate(value.startDate);
-      eventData.schedule.endRecur = Utils.getFormattedDate(value.endDate);
+      if (eventRecurrence === 'WEEKLY') {
+        let occurs = [ 'mo', 'tu', 'we', 'th', 'fr', 'sa', 'su' ];
+
+        if (weekDays && weekDays.length > 0) {
+          occurs = weekDays;
+        }
+
+        eventData.schedule.rrule.byweekday = occurs;
+      }
+
+      if (eventRecurrence === 'MONTHLY') {
+        if (monthlyDayType !== 'monthlyCalendarDay') {
+          eventData.schedule.rrule.bymonthday = monthlyCalendarDay
+        } else {
+          eventData.schedule.rrule.bysetpos = monthlyPeriod;
+          eventData.schedule.rrule.byweekday = [monthlyDay];
+        }
+      }
     }
+
+    console.log('DATA: ', eventData);
 
     return eventData;
   };
@@ -332,15 +354,15 @@ const Meeting = (props) => {
   };
 
   const handleMonthlyPeriod = (e) => {
-    setMonthlyPeriod(e.target.value);
+    setMonthlyPeriod(parseInt(e.target.value));
   };
 
   const handleWeekdayChange = (event) => {
     const index = weekDays.indexOf(event.target.value);
     if (index === -1) {
-      setWeekDays([...weekDays, parseInt(event.target.value)]);
+      setWeekDays([...weekDays, event.target.value]);
     } else {
-      setWeekDays(weekDays.filter((weekDay) => weekDay !== parseInt(event.target.value)));
+      setWeekDays(weekDays.filter((weekDay) => weekDay !== event.target.value));
     }
   };
 
@@ -547,9 +569,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes(1)}
+                    checked={weekDays.includes('MO')}
                     onChange={handleWeekdayChange}
-                    value={1}
+                    value={'MO'}
                   />
                 }
                 label="Mon"
@@ -558,9 +580,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes(2)}
+                    checked={weekDays.includes('TU')}
                     onChange={handleWeekdayChange}
-                    value={2}
+                    value={'TU'}
                   />
                 }
                 label="Tue"
@@ -569,9 +591,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes(3)}
+                    checked={weekDays.includes('WE')}
                     onChange={handleWeekdayChange}
-                    value={3}
+                    value={'WE'}
                   />
                 }
                 label="Wed"
@@ -580,9 +602,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes(4)}
+                    checked={weekDays.includes('TH')}
                     onChange={handleWeekdayChange}
-                    value={4}
+                    value={'TH'}
                   />
                 }
                 label="Thur"
@@ -591,9 +613,9 @@ const Meeting = (props) => {
                 control={
                   <Checkbox
                     size="small"
-                    checked={weekDays.includes(5)}
+                    checked={weekDays.includes('FR')}
                     onChange={handleWeekdayChange}
-                    value={5}
+                    value={'FR'}
                   />
                 }
                 label="Fri"
@@ -611,10 +633,7 @@ const Meeting = (props) => {
           value={monthlyDayType}
           name="radio-buttons-group"
           onChange={(e, val) => {
-            console.log('monthlyDayType1', val);
-            console.log('before-monthlyDayType2', monthlyDayType);
             setMonthlyDayType(val);
-            console.log('after-monthlyDayType3', monthlyDayType);
           }}
         >
           <div className={'row no-margin'}>
@@ -662,11 +681,11 @@ const Meeting = (props) => {
                 disabled={monthlyDayType !== 'monthlyWeekDay'}
                 onChange={handleMonthlyPeriod}
               >
-                <MenuItem value={'first'}>First</MenuItem>
-                <MenuItem value={'second'}>Second</MenuItem>
-                <MenuItem value={'third'}>Third</MenuItem>
-                <MenuItem value={'fourth'}>Fourth</MenuItem>
-                <MenuItem value={'last'}>Last</MenuItem>
+                <MenuItem value={1}>First</MenuItem>
+                <MenuItem value={2}>Second</MenuItem>
+                <MenuItem value={3}>Third</MenuItem>
+                <MenuItem value={4}>Fourth</MenuItem>
+                <MenuItem value={-1}>Last</MenuItem>
               </Select>
             </div>
 
@@ -684,13 +703,13 @@ const Meeting = (props) => {
                 disabled={monthlyDayType !== 'monthlyWeekDay'}
                 onChange={handleMonthlyDay}
               >
-                <MenuItem value={'Sunday'}>Sunday</MenuItem>
-                <MenuItem value={'Monday'}>Monday</MenuItem>
-                <MenuItem value={'Tuesday'}>Tuesday</MenuItem>
-                <MenuItem value={'Wednesday'}>Wednesday</MenuItem>
-                <MenuItem value={'Thursday'}>Thursday</MenuItem>
-                <MenuItem value={'Friday'}>Friday</MenuItem>
-                <MenuItem value={'Saturday'}>Saturday</MenuItem>
+                <MenuItem value={'SU'}>Sunday</MenuItem>
+                <MenuItem value={'MO'}>Monday</MenuItem>
+                <MenuItem value={'TU'}>Tuesday</MenuItem>
+                <MenuItem value={'WE'}>Wednesday</MenuItem>
+                <MenuItem value={'TH'}>Thursday</MenuItem>
+                <MenuItem value={'FR'}>Friday</MenuItem>
+                <MenuItem value={'SA'}>Saturday</MenuItem>
               </Select>
             </div>
           </div>

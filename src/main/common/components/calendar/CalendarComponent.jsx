@@ -2,6 +2,7 @@ import {memo, useEffect, useRef, useState} from 'react';
 
 import FullCalendar from '@fullcalendar/react';
 import listPlugin from '@fullcalendar/list';
+import rrulePlugin from '@fullcalendar/rrule';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -68,6 +69,7 @@ const CalendarComponent = (props) => {
 
   const loadEvents = () => {
     get(`${host}/api/v1/meeting/fetchMeetings`, (response) => {
+      console.log('EVENTS: ', response);
       setEvents(response);
     }, (e) => {
 
@@ -89,7 +91,7 @@ const CalendarComponent = (props) => {
 
   const calendarOptions = {
     events: events,
-    plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
+    plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, rrulePlugin],
     initialView: 'dayGridMonth',
     headerToolbar: {
       start: 'sidebarToggle, prev,next, title',
