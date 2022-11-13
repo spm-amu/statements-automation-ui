@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './MettingSettingsComponent.css';
 import Button from '@material-ui/core/Button';
 import {Switch} from '@material-ui/core';
@@ -28,14 +28,14 @@ const MeetingSettingsComponent = (props) => {
         },
       });
 
-    if(userMedia && userVideo.current) {
+    if (userMedia && userVideo.current) {
       userMedia
         .then((myStream) => {
           userStream.current = myStream;
           videoTrack.current = userStream.current.getTracks()[1];
           audioTrack.current = userStream.current.getTracks()[0];
 
-          if(userVideo.current) {
+          if (userVideo.current) {
             userVideo.current.srcObject = myStream;
           }
         });
@@ -136,9 +136,9 @@ const MeetingSettingsComponent = (props) => {
               >
                 {
                   videoMuted &&
-                    <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
-                      <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)} />
-                    </div>
+                  <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
+                    <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)}/>
+                  </div>
                 }
                 <video
                   hidden={videoMuted}

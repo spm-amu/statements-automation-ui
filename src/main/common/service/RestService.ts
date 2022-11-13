@@ -19,7 +19,7 @@ const json = (response: any) => {
 };
 
 class RestService {
-  doFetch(url: string, successCallback: any, errorCallback: any, body: any, method: string, track: boolean = true, secure: boolean = true) {
+  doFetch(url: string, successCallback: any, errorCallback: any, body: any, method: string, successMessage: string, track: boolean = true, secure: boolean = true) {
     const accessToken = Utils.getCookie("accessToken");
 
     let data = body ? JSON.stringify(body) : null;
@@ -40,24 +40,29 @@ class RestService {
 
     if (track) {
       trackPromise(
-        this.executeFetch(url, fetchConfig, successCallback, errorCallback)
+        this.executeFetch(url, fetchConfig, successMessage, successCallback, errorCallback)
       );
     } else {
-      this.executeFetch(url, fetchConfig, successCallback, errorCallback);
+      this.executeFetch(url, fetchConfig, successMessage, successCallback, errorCallback);
     }
   }
 
-  executeFetch(url: string, fetchConfig: any, successCallback: any, errorCallback: any) {
+  executeFetch(url: string, fetchConfig: any, successMessage: string, successCallback: any, errorCallback: any) {
     return fetch(encodeURI(url), fetchConfig)
       .then(status)
       .then(json)
       .then((data) => {
         successCallback(JSON.parse(data));
+        appManager.fireEvent(SystemEventType.API_SUCCESS, {message: successMessage});
       }).catch((e) => {
         console.error(e);
         if (e.status === 401 && !url.endsWith("/logout")) {
           errorCallback(e);
           appManager.fireEvent(SystemEventType.UNAUTHORISED_API_CALL, null);
+        } else {
+          e.json().then((error: any) => {
+            appManager.fireEvent(SystemEventType.API_ERROR, error);
+          });
         }
 
         if (errorCallback !== null) {
@@ -68,10 +73,10 @@ class RestService {
 }
 
 const rest = new RestService();
-export const post = (url: string, successCallback: any, errorCallback: any, body: any, track: boolean = true, secure: boolean = true) => {
-  return rest.doFetch(url, successCallback, errorCallback, body, 'POST', track, secure);
+export const post = (url: string, successCallback: any, errorCallback: any, body: any, successMessage: string = '', track: boolean = true, secure: boolean = true) => {
+  return rest.doFetch(url, successCallback, errorCallback, body, 'POST', successMessage, track, secure);
 };
 
-export const get = (url: string, successCallback: any, errorCallback: any, track: boolean = true, secure: boolean = true) => {
-  return rest.doFetch(url, successCallback, errorCallback, null, 'GET', track, secure);
+export const get = (url: string, successCallback: any, errorCallback: any, successMessage: string = '', track: boolean = true, secure: boolean = true) => {
+  return rest.doFetch(url, successCallback, errorCallback, null, 'GET', successMessage, track, secure);
 };

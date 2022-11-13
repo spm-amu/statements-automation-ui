@@ -21,6 +21,8 @@ export type WebsocketMessage = {
 export enum SystemEventType {
 
   UNAUTHORISED_API_CALL = "UNAUTHORISED_API_CALL",
+  API_ERROR = "API_ERROR",
+  API_SUCCESS = "API_SUCCESS",
 
 }
 

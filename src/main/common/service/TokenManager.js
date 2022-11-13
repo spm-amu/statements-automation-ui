@@ -27,7 +27,7 @@ class TokenManager {
                       },
                         (e) => {
                             console.error('Error refreshing token');
-                        }, false)
+                        }, null,false)
                 }
             }
         }, MINUTE);

@@ -14,8 +14,11 @@ import socketManager from "../../common/service/SocketManager";
 import appManager from "../../common/service/AppManager";
 import tokenManager from "../../common/service/TokenManager";
 import {MessageType, SystemEventType} from '../../common/types';
-const { electron } = window;
 import LottieIcon from "../../common/components/LottieIcon";
+import LoadingIndicator from "../../common/components/LoadingIndicator";
+import Alert from "react-bootstrap/Alert";
+
+const {electron} = window;
 
 let ps;
 
@@ -35,6 +38,8 @@ const BasicBusinessAppDashboard = (props) => {
   const [sidebarOpened, setSidebarOpened] = React.useState(document.documentElement.className.indexOf("nav-open") !== -1);
   const [sidebarMini, setSidebarMini] = React.useState(true);
   const [opacity, setOpacity] = React.useState(0);
+  const [errorMessage, setErrorMessage] = React.useState(null);
+  const [successMessage, setSuccessMessage] = React.useState(null);
   const [tokenRefreshMonitorStarted, setTokenRefreshMonitorStarted] = React.useState(null);
   const navigate = useNavigate();
 
@@ -161,8 +166,28 @@ const BasicBusinessAppDashboard = (props) => {
           case SystemEventType.UNAUTHORISED_API_CALL:
             navigate('/login');
             break;
+          case SystemEventType.API_ERROR:
+            handleApiError(be);
+            break;
+          case SystemEventType.API_SUCCESS:
+            handleApiSuccess(be);
+            break;
         }
       }
+    }
+  };
+
+  const handleApiError = (error) => {
+    setErrorMessage(error.message);
+  };
+
+  const handleApiSuccess = (event) => {
+    if(event.message && event.message.length > 0) {
+      setSuccessMessage(event.message);
+      const messageTimeout = setTimeout(() => {
+        setSuccessMessage(null);
+        clearTimeout(messageTimeout);
+      }, 2000)
     }
   };
 
@@ -299,30 +324,30 @@ const BasicBusinessAppDashboard = (props) => {
   });
 
   React.useEffect(() => {
-    appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL);
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL, SystemEventType.API_ERROR, SystemEventType.API_SUCCESS);
     //if (loading) {
-      if (Utils.isNull(Utils.getCookie("accessToken"))) {
-        navigate('/login');
-      } else {
-        get(`${host}/api/v1/auth/userInfo`, (response) => {
-          appManager.setUserDetails(response);
-          setUserDetails(response);
-          init();
-          socketManager.init();
-          socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
+    if (Utils.isNull(Utils.getCookie("accessToken"))) {
+      navigate('/login');
+    } else {
+      get(`${host}/api/v1/auth/userInfo`, (response) => {
+        appManager.setUserDetails(response);
+        setUserDetails(response);
+        init();
+        socketManager.init();
+        socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
 
-          if (!tokenRefreshMonitorStarted) {
-            tokenManager.startTokenRefreshMonitor( `${host}/api/v1/auth/refresh`, response.username);
-            setTokenRefreshMonitorStarted(true);
-          }
+        if (!tokenRefreshMonitorStarted) {
+          tokenManager.startTokenRefreshMonitor(`${host}/api/v1/auth/refresh`, response.username);
+          setTokenRefreshMonitorStarted(true);
+        }
 
-          onAnswerCall();
-          onDeclineCall();
-          joinChatRooms();
-          joinMeeting();
-        }, (e) => {
-        })
-      }
+        onAnswerCall();
+        onDeclineCall();
+        joinChatRooms();
+        joinMeeting();
+      }, (e) => {
+      })
+    }
     //}
   }, []);
 
@@ -487,6 +512,7 @@ const BasicBusinessAppDashboard = (props) => {
       :
       <>
         <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>
+          <LoadingIndicator color={"#945c33"}/>
           <Sidebar
             {...props}
             routes={routes}
@@ -527,6 +553,25 @@ const BasicBusinessAppDashboard = (props) => {
                 />{" "}
               </div>
               <div>
+                <div style={{padding: '0 32px 0 32px', maxHeight: '64px', width: '90%', borderBottom: '1px solid #e2e2e2', zIndex: '1000000000', position: 'absolute'}}>
+                  <Alert
+                    variant={'danger'}
+                    show={errorMessage !== null}
+                    fade={true}
+                    onClose={() => {setErrorMessage(null)}}
+                    dismissible
+                  >
+                    <Alert.Heading>Error</Alert.Heading>
+                    <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{errorMessage}</p>
+                  </Alert>
+                  <Alert
+                    variant={'success'}
+                    show={successMessage !== null}
+                    fade={true}
+                  >
+                    <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
+                  </Alert>
+                </div>
                 <ViewPort settings={props.settings}/>
               </div>
             </div>

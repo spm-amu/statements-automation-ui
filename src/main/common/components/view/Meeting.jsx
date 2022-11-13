@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { X } from 'react-feather';
-import { components } from 'react-select';
-import { Form } from 'reactstrap';
+import React, {useState} from 'react';
+import {X} from 'react-feather';
+import {components} from 'react-select';
+import {Form} from 'reactstrap';
 import Button from '@material-ui/core/Button';
 import TextField from '../customInput/TextField';
 import DatePicker from '../customInput/DatePicker';
@@ -10,7 +10,7 @@ import AutoComplete from '../customInput/AutoComplete';
 import Files from '../customInput/Files';
 import Utils from '../../Utils';
 import Avatar from '../avatar';
-import { get, host, post } from '../../service/RestService';
+import {get, host, post} from '../../service/RestService';
 
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
@@ -19,9 +19,9 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import ModalComponent from '../customInput/Modal';
-import { Select, InputLabel, MenuItem, Checkbox } from '@material-ui/core';
+import {Checkbox, MenuItem, Select} from '@material-ui/core';
 import EventMessageComponent from '../customInput/EventMessage';
 import appManager from "../../../common/service/AppManager";
 
@@ -255,7 +255,8 @@ const Meeting = (props) => {
           handleClose();
         },
         (e) => {},
-        data
+        data,
+        "The meeting details have been saved successfully"
       );
     }
   };
@@ -274,7 +275,8 @@ const Meeting = (props) => {
       (response) => {
         handleClose();
       },
-      (e) => {}
+      (e) => {},
+      "The meeting has been cancelled successfully"
     );
   };
 
