@@ -5,6 +5,7 @@ import {Switch} from '@material-ui/core';
 import Icon from '../Icon';
 import {useNavigate} from 'react-router-dom';
 import Utils from '../../Utils';
+import appManager from "../../../common/service/AppManager";
 
 const MeetingSettingsComponent = (props) => {
   const userStream = useRef();
@@ -55,7 +56,7 @@ const MeetingSettingsComponent = (props) => {
 
   useEffect(() => {
     localVideoStream();
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let userDetails = appManager.getUserDetails();
     setLoggedInUser(userDetails.name)
   }, []);
 
@@ -188,7 +189,7 @@ const MeetingSettingsComponent = (props) => {
                 size="large"
                 color={'primary'}
                 onClick={(e) => {
-                  let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+                  let userDetails = appManager.getUserDetails();
                   let isHost = false;
                   selectedMeeting.attendees.forEach(att => {
                     if (att.userId === userDetails.userId) {

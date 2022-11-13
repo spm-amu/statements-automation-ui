@@ -19,13 +19,12 @@ import Utils from '../../Utils';
 import socketManager from '../../service/SocketManager';
 import { MessageType } from '../../types';
 import uuid from 'react-uuid';
+import appManager from "../../../common/service/AppManager";
 
 const ChatRoom = (props) => {
   const { selectedMeeting } = props;
 
-  const [currentUser, setCurrentUser] = useState(
-    JSON.parse(sessionStorage.getItem('userDetails'))
-  );
+  const [currentUser, setCurrentUser] = useState(appManager.getUserDetails());
   const [message, setMessage] = useState('');
   const [test, setTest] = useState(false);
   const [chatEvent, setChatEvent] = useState(null);

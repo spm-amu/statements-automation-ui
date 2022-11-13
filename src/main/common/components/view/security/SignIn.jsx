@@ -1,34 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Row,
-  Col,
-  Form,
-  Input,
-  Label,
-  CardText,
-  CardTitle,
-  UncontrolledTooltip,
-} from 'reactstrap';
-import { useForm, Controller } from 'react-hook-form';
-import InputPasswordToggle from '../../InputPasswordToggle';
+import React, {useEffect, useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
+import {CardText, CardTitle, Col, Row,} from 'reactstrap';
 import '../../../assets/scss/page-authentication.scss';
-import Utils from '../../../Utils';
-import TextField from '@material-ui/core/TextField';
 import Button from '../../RegularButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import { host, post } from '../../../service/RestService';
+import {host, post} from '../../../service/RestService';
 import styles from './LoginStyle';
-
-import { useNavigate } from 'react-router-dom';
-import CardHeader from '../../card/CardHeader';
-import Danger from '../../typography/Danger';
 import CustomInput from '../../customInput/CustomInput';
-import { Face } from '@material-ui/icons';
-import { Alert } from '@material-ui/lab';
+import {Face} from '@material-ui/icons';
+import {Alert} from '@material-ui/lab';
+import appManager from "../../../../common/service/AppManager";
+import Utils from "../../../Utils";
 
 const SignIn = (props) => {
   const [usernameError, setUsernameError] = useState(false);
@@ -55,7 +40,7 @@ const SignIn = (props) => {
     setUsernameState('');
     setPasswordState('');
     setErrorMessage('');
-  }
+  };
 
   useEffect(() => {
     clearErrorStates()
@@ -80,14 +65,21 @@ const SignIn = (props) => {
         (response) => {
           setIsLoading(false);
 
+          // TODO : Set expiry date for desktop app in line with the user's AD password change. DO NOT SET expiry date for web all so that the cookie dies with the browser
+          Utils.setCookie("accessToken", response.access_token, 30);
+          Utils.setCookie("refreshToken", response.refresh_token, 30);
+          Utils.setCookie("lastLogin", new Date().getTime(), 30);
+
+          /*
           sessionStorage.setItem('accessToken', response.access_token);
-          sessionStorage.setItem('idToken', response.response_token);
-          sessionStorage.setItem('username', username);
+          sessionStorage.setItem('refreshToken', response.refresh_token);
+          sessionStorage.setItem('idToken', response.id_token);
+          */
 
           navigate('/dashboard');
         },
         (e) => {
-          console.log('#### ERROR: ' + JSON.stringify(e))
+          console.log('#### ERROR: ' + JSON.stringify(e));
           setIsLoading(false);
           setErrorMessage('Invalid username or password');
         },

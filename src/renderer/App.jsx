@@ -90,3 +90,7 @@ export default function App() {
     </MuiThemeProvider>
   );
 }
+
+export const navigate = (path) => {
+  navigate(path);
+};

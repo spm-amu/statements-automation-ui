@@ -11,8 +11,11 @@ import "../../common/assets/scss/black-dashboard-react.scss";
 import "./BasicBusinessAppDashboard.css"
 import {get, host} from "../../common/service/RestService";
 import socketManager from "../../common/service/SocketManager";
-import { MessageType } from '../../common/types';
+import appManager from "../../common/service/AppManager";
+import tokenManager from "../../common/service/TokenManager";
+import {MessageType, SystemEventType} from '../../common/types';
 const { electron } = window;
+import LottieIcon from "../../common/components/LottieIcon";
 
 let ps;
 
@@ -32,6 +35,7 @@ const BasicBusinessAppDashboard = (props) => {
   const [sidebarOpened, setSidebarOpened] = React.useState(document.documentElement.className.indexOf("nav-open") !== -1);
   const [sidebarMini, setSidebarMini] = React.useState(true);
   const [opacity, setOpacity] = React.useState(0);
+  const [tokenRefreshMonitorStarted, setTokenRefreshMonitorStarted] = React.useState(null);
   const navigate = useNavigate();
 
   //const dispatch = useDispatch();
@@ -147,7 +151,22 @@ const BasicBusinessAppDashboard = (props) => {
     //}
   };
 
-  const handler = () => {
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'dashboard-system-event-handler-api';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.UNAUTHORISED_API_CALL:
+            navigate('/login');
+            break;
+        }
+      }
+    }
+  };
+
+  const socketEventHandlerApi = () => {
     return {
       get id() {
         return 'global-1223';
@@ -172,13 +191,17 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   const socketEventHandler = useState({
-    api: handler()
+    api: socketEventHandlerApi()
+  });
+
+  const systemEventHandler = useState({
+    api: systemEventHandlerApi()
   });
 
   const onChatMessage = (payload) => {
     console.log('ON CHAT DASH: ', payload);
 
-    let loggedInUser = JSON.parse(sessionStorage.getItem('userDetails'));
+    let loggedInUser = appManager.getUserDetails();
 
     if (payload.message.participant.userId !== loggedInUser.userId) {
       newMessageAudio.play();
@@ -224,7 +247,7 @@ const BasicBusinessAppDashboard = (props) => {
   const joinMeeting = () => {
     electron.ipcRenderer.on('joinMeetingEvent', args => {
       get(`${host}/api/v1/meeting/fetch/${args.payload.params.meetingId}`, (response) => {
-        let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+        let userDetails = appManager.getUserDetails();
         let isHost = false;
         response.extendedProps.attendees.forEach(att => {
           if (att.userId === userDetails.userId) {
@@ -271,20 +294,28 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   useEffect(() => {
-    socketEventHandler.api = handler();
+    socketEventHandler.api = socketEventHandlerApi();
+    systemEventHandler.api = systemEventHandlerApi();
   });
 
   React.useEffect(() => {
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL);
     //if (loading) {
-      if (Utils.isNull(sessionStorage.getItem("accessToken"))) {
+      if (Utils.isNull(Utils.getCookie("accessToken"))) {
         navigate('/login');
       } else {
         get(`${host}/api/v1/auth/userInfo`, (response) => {
-          sessionStorage.setItem("userDetails", JSON.stringify(response));
+          appManager.setUserDetails(response);
           setUserDetails(response);
           init();
           socketManager.init();
           socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
+
+          if (!tokenRefreshMonitorStarted) {
+            tokenManager.startTokenRefreshMonitor( `${host}/api/v1/auth/refresh`, response.username);
+            setTokenRefreshMonitorStarted(true);
+          }
+
           onAnswerCall();
           onDeclineCall();
           joinChatRooms();
@@ -297,6 +328,7 @@ const BasicBusinessAppDashboard = (props) => {
 
   React.useEffect(() => {
     return () => {
+      appManager.clearAllEventListeners();
       socketManager.clearAllEventListeners();
       socketManager.disconnectSocket();
     };
@@ -449,7 +481,9 @@ const BasicBusinessAppDashboard = (props) => {
 
   return (
     loading || !userDetails ?
-      <div>Loading...</div>
+      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+        <LottieIcon id={'waiting'}/>
+      </div>
       :
       <>
         <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>

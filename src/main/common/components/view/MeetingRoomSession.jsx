@@ -18,6 +18,7 @@ import useWindowDimensions from '../../hooks/useWindowDimensions';
 import MyToolTip from '../MyToolTip';
 import Icon from '../Icon';
 import Peer from 'simple-peer';
+import appManager from "../../../common/service/AppManager";
 
 const MeetingRoomSession = (props) => {
 
@@ -117,7 +118,7 @@ const MeetingRoomSession = (props) => {
     if (!isHost) {
       setPopUp("Waiting");
 
-      let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+      let userDetails = appManager.getUserDetails();
 
       const userAlias = userDetails.userId;
 

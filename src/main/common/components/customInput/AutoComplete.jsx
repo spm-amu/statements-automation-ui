@@ -5,6 +5,7 @@ import Box from '@material-ui/core/Box';
 import {host, post} from "../../service/RestService";
 import "./Form.css";
 import Utils from "../../Utils";
+import appManager from "../../../common/service/AppManager";
 
 const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
 
@@ -67,7 +68,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
     if (!Utils.isNull(newInputValue) && !Utils.isStringEmpty(newInputValue) && !Utils.isNull(props.optionsUrl)) {
       post(`${props.optionsUrl}`, (response) => {
           if (response.records.length > 0) {
-            let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+            let userDetails = appManager.getUserDetails();
             setOptions(response.records.filter(option => option.userId !== userDetails.userId))
           } else {
             if(validateInput(newInputValue)) {

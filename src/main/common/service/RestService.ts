@@ -1,15 +1,16 @@
 import {trackPromise} from 'react-promise-tracker';
 import Utils from "../Utils";
+import appManager from "../../common/service/AppManager";
+import {SystemEventType} from "../types";
 
 // export const host = window.location.protocol + "//" + window.location.hostname + "/vc";
-export const host = "http://svn.agilemotion.co.za/vc";
-//export const host = "http://localhost:8080/vc";
+//export const host = "http://svn.agilemotion.co.za/vc";
+export const host = "http://localhost:8082/vc";
 const status = (response: any) => {
   if (response.ok) {
     return Promise.resolve(response);
   } else {
-    let error = new Error(response.statusText);
-    return Promise.reject(error);
+    return Promise.reject(response);
   }
 };
 
@@ -19,7 +20,7 @@ const json = (response: any) => {
 
 class RestService {
   doFetch(url: string, successCallback: any, errorCallback: any, body: any, method: string, track: boolean = true, secure: boolean = true) {
-    const accessToken = sessionStorage.getItem("accessToken");
+    const accessToken = Utils.getCookie("accessToken");
 
     let data = body ? JSON.stringify(body) : null;
     let fetchConfig = {
@@ -54,9 +55,9 @@ class RestService {
         successCallback(JSON.parse(data));
       }).catch((e) => {
         console.error(e);
-        if (e.code === 401 && !url.endsWith("/logout")) {
+        if (e.status === 401 && !url.endsWith("/logout")) {
           errorCallback(e);
-          // TODO : Navigate to login screen
+          appManager.fireEvent(SystemEventType.UNAUTHORISED_API_CALL, null);
         }
 
         if (errorCallback !== null) {

@@ -18,6 +18,7 @@ import Utils from "../../Utils";
 import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
 import ClosablePanel from "../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
+import appManager from "../../../common/service/AppManager";
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -259,7 +260,7 @@ const MeetingRoom = (props) => {
   };
 
   const askForPermission = () => {
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let userDetails = appManager.getUserDetails();
     const userAlias = userDetails.userId;
     socketManager.emitEvent(MessageType.PERMISSION, {
       user: userAlias,
@@ -269,7 +270,7 @@ const MeetingRoom = (props) => {
   };
 
   const join = () => {
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
       userIdentity: userDetails.userId,
@@ -283,7 +284,7 @@ const MeetingRoom = (props) => {
   };
 
   const requestUserToJoin = (requestedUser) => {
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let userDetails = appManager.getUserDetails();
 
     socketManager.emitEvent(MessageType.REQUEST_TO_JOIN, {
       roomId: selectedMeeting.id,
@@ -474,7 +475,7 @@ const MeetingRoom = (props) => {
   };
 
   function emitAVSettingsChange() {
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, {
       meetingId: selectedMeeting.id,
       userId: userDetails.userId,

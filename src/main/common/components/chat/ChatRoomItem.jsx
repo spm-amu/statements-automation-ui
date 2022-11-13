@@ -5,16 +5,17 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../Icon';
 import { Calendar } from 'react-feather';
 import Utils from '../../Utils';
+import appManager from "../../../common/service/AppManager";
 
 const ChatRoomItem = ({ event }) => {
   const [currentUser, setCurrentUser] = useState(
-    JSON.parse(sessionStorage.getItem('userDetails'))
+    appManager.getUserDetails()
   );
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCurrentUser(JSON.parse(sessionStorage.getItem('userDetails')));
+    setCurrentUser(appManager.getUserDetails());
   }, []);
 
   const goToRoom = (id) => {
