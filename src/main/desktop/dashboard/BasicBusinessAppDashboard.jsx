@@ -109,7 +109,7 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute = {};
     newRoute.name = "Chats";
     newRoute.path = "chats";
-    newRoute.icon = "CHATS";
+    newRoute.icon = "CHAT_BUBBLE";
     newRoute.layout = "/admin";
     newRoute.level = 0;
     newRoute.isParent = true;
@@ -118,7 +118,7 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute = {};
     newRoute.name = "Files";
     newRoute.path = "files";
-    newRoute.icon = "FILES";
+    newRoute.icon = "FOLDER";
     newRoute.layout = "/admin";
     newRoute.level = 0;
     newRoute.isParent = true;
@@ -127,7 +127,7 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute = {};
     newRoute.name = "Meeting history";
     newRoute.path = "meetingHistory";
-    newRoute.icon = "MEETINGS";
+    newRoute.icon = "HISTORY";
     newRoute.layout = "/admin";
     newRoute.level = 0;
     newRoute.isParent = true;
