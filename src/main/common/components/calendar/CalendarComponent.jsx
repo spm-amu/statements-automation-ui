@@ -17,8 +17,6 @@ import {get, host} from "../../service/RestService";
 import Utils from '../../Utils';
 import {useNavigate} from 'react-router-dom';
 
-// https://fullcalendar.io/docs/rrule-plugin documentation to use for recurrence
-
 const eventTemplate = {
   id: '',
   title: '',
@@ -70,6 +68,25 @@ const CalendarComponent = (props) => {
   const loadEvents = () => {
     get(`${host}/api/v1/meeting/fetchMeetings`, (response) => {
       console.log('EVENTS: ', response);
+      // FREQ=MONTHLY;BYSETPOS=3;BYDAY=WE;INTERVAL=1
+     // let myEvent = {
+     //    events: [
+     //      {
+     //        title: 'my recurring event',
+     //       // rrule: 'DTSTART:20221113T103000Z\nRRULE:FREQ=MONTHLY;BYSETPOS=-1;BYDAY=WE;INTERVAL=1'
+     //        rrule: {
+     //          freq: 'MONTHLY',
+     //          dtstart: '2022-11-13',
+     //          bysetpos: -1,
+     //          byweekday: 'WE',
+     //          // bymonthday: 21,
+     //          interval: 1
+     //        }
+     //      }
+     //    ]
+     //  };
+     //
+     //  setEvents(myEvent.events);
       setEvents(response);
     }, (e) => {
 

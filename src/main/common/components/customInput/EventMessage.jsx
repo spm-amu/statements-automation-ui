@@ -23,15 +23,15 @@ const EventMessageComponent = React.memo(React.forwardRef((props, ref) => {
     } else if(props.recurringType === 'MONTHLY') {
       if(props.monthlyDayType === 'monthlyWeekDay') {
         if (props.numberOfOccurences > 1) {
-          return prefix + " " + props.numberOfOccurences + " months on " + props.monthlyPeriod + " " + props.monthlyDay;
+          return prefix + " " + props.numberOfOccurences + " months on " + props.bysetpos + " " + props.byDay;
         } else {
-          return prefix + " month on " + props.monthlyPeriod + " " + props.monthlyDay;
+          return prefix + " month on " + props.bysetpos + " " + props.byDay;
         }
       } else {
         if (props.numberOfOccurences > 1) {
-          return prefix + " " + props.numberOfOccurences + " months on day " + props.monthlyCalendarDay;
+          return prefix + " " + props.numberOfOccurences + " months on day " + props.byMonthDay;
         } else {
-          return prefix + " month on day " + props.monthlyCalendarDay;
+          return prefix + " month on day " + props.byMonthDay;
         }
       }
     }
