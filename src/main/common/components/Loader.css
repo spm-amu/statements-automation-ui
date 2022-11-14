@@ -11,15 +11,6 @@
 	background-color: rgba(0,0,0,0.1); /* Black w/ opacity */
 }
 
-/* Modal Content/Box */
-.modal-content {
-	background-color: transparent;
-	margin: 30% auto; /* 15% from the top and centered */
-	padding: 20px;
-	border: 1px solid #888;
-	width: 10%; /* Could be more or less, depending on screen size */
-}
-
 /* The Close Button */
 .close {
 	color: #aaa;

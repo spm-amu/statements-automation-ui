@@ -41,7 +41,7 @@ const Meeting = (props) => {
   const [repeatingEvery, setRepeatingEvery] = React.useState('');
   const [numberOfOccurences, setNumberOfOccurences] = React.useState(1);
   const [bysetpos, setBysetpos] = React.useState(0);
-  const [byDay, setByDay] = React.useState('');
+  const [byWeekDay, setByWeekDay] = React.useState('');
   const [monthlyDayType, setMonthlyDayType] = React.useState('monthlyWeekDay');
   const [byMonthDay, setByMonthDay] = React.useState(0);
   const [open, setOpen] = React.useState(false);
@@ -210,7 +210,7 @@ const Meeting = (props) => {
           eventData.schedule.rrule.bymonthday = byMonthDay;
         } else {
           eventData.schedule.rrule.bysetpos = bysetpos;
-          eventData.schedule.rrule.byweekday = [byDay];
+          eventData.schedule.rrule.byweekday = [byWeekDay];
         }
       }
     }
@@ -330,7 +330,7 @@ const Meeting = (props) => {
     console.log('6. monthlyDayType', monthlyDayType);
     console.log('7. monthlyCalendarDay', byMonthDay);
     console.log('8. bysetpos', bysetpos);
-    console.log('9. byDay', byDay);
+    console.log('9. byWeekDay', byWeekDay);
     setOpen(false);
   };
 
@@ -341,20 +341,20 @@ const Meeting = (props) => {
       setNumberOfOccurences(1);
       setOpen(true);
       setBysetpos(0);
-      setByDay('');
+      setByWeekDay('');
       setMonthlyDayType('');
       setByMonthDay(1);
       setWeekDays([]);
       if (e.target.value === 'MONTHLY') {
         setBysetpos(1);
-        setByDay('MO');
+        setByWeekDay('MO');
         setMonthlyDayType('monthlyWeekDay');
       }
     }
   };
 
-  const handleByDay = (e) => {
-    setByDay(e.target.value);
+  const handleByWeekDay = (e) => {
+    setByWeekDay(e.target.value);
   };
 
   const handleBysetpos = (e) => {
@@ -700,12 +700,12 @@ const Meeting = (props) => {
             <div className={'col-*-*'}>
               <Select
                 style={{ width: '100%' }}
-                labelId="monthly-day-label"
-                id="byDaySelect"
-                value={byDay}
+                labelId="byWeek-day-label"
+                id="byWeekDaySelect"
+                value={byWeekDay}
                 label="On the"
                 disabled={monthlyDayType !== 'monthlyWeekDay'}
-                onChange={handleByDay}
+                onChange={handleByWeekDay}
               >
                 <MenuItem value={'SU'}>Sunday</MenuItem>
                 <MenuItem value={'MO'}>Monday</MenuItem>
@@ -750,7 +750,7 @@ const Meeting = (props) => {
             numberOfOccurences={numberOfOccurences}
             monthlyDayType={monthlyDayType}
             byMonthDay={byMonthDay}
-            byDay={byDay}
+            byWeekDay={byWeekDay}
             bysetpos={bysetpos}
             recurringEndDate={value && value.endDate ? value.endDate : null}
           />

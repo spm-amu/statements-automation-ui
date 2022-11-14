@@ -553,7 +553,7 @@ const BasicBusinessAppDashboard = (props) => {
                 />{" "}
               </div>
               <div>
-                <div style={{padding: '0 32px 0 32px', maxHeight: '64px', width: '90%', borderBottom: '1px solid #e2e2e2', zIndex: '1000000000', position: 'absolute'}}>
+                <div style={{padding: '0 32px 0 32px', maxHeight: '64px', width: '90%', borderBottom: '1px solid #e2e2e2', zIndex: '1200', position: 'absolute'}}>
                   <Alert
                     variant={'danger'}
                     show={errorMessage !== null}
