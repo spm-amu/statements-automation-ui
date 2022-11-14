@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { get, host } from '../../service/RestService';
+import React, {useState} from 'react';
+import {host} from '../../service/RestService';
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
-import Download from '@material-ui/icons/CloudDownload';
 import {DataGrid} from "../DataGrid";
 import SearchBar from "../SearchBar";
 import "./Files.css";
+
 const { electron } = window;
 
 const grid = {

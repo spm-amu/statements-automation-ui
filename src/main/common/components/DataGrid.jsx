@@ -14,7 +14,7 @@ import Button from '@material-ui/core/Button';
 import {observable, observe} from "mobx"
 import * as $ from "jquery";
 import Alert from "react-bootstrap/Alert";
-import {get, post, host} from "../service/RestService";
+import {post} from "../service/RestService";
 
 export const MULTI_SELECT_CHECKBOX_COL_WIDTH = 64;
 

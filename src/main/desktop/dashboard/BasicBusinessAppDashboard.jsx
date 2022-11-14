@@ -11,8 +11,14 @@ import "../../common/assets/scss/black-dashboard-react.scss";
 import "./BasicBusinessAppDashboard.css"
 import {get, host} from "../../common/service/RestService";
 import socketManager from "../../common/service/SocketManager";
-import { MessageType } from '../../common/types';
-const { electron } = window;
+import appManager from "../../common/service/AppManager";
+import tokenManager from "../../common/service/TokenManager";
+import {MessageType, SystemEventType} from '../../common/types';
+import LottieIcon from "../../common/components/LottieIcon";
+import LoadingIndicator from "../../common/components/LoadingIndicator";
+import Alert from "react-bootstrap/Alert";
+
+const {electron} = window;
 
 let ps;
 
@@ -32,6 +38,9 @@ const BasicBusinessAppDashboard = (props) => {
   const [sidebarOpened, setSidebarOpened] = React.useState(document.documentElement.className.indexOf("nav-open") !== -1);
   const [sidebarMini, setSidebarMini] = React.useState(true);
   const [opacity, setOpacity] = React.useState(0);
+  const [errorMessage, setErrorMessage] = React.useState(null);
+  const [successMessage, setSuccessMessage] = React.useState(null);
+  const [tokenRefreshMonitorStarted, setTokenRefreshMonitorStarted] = React.useState(null);
   const navigate = useNavigate();
 
   //const dispatch = useDispatch();
@@ -105,7 +114,7 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute = {};
     newRoute.name = "Chats";
     newRoute.path = "chats";
-    newRoute.icon = "CHATS";
+    newRoute.icon = "CHAT_BUBBLE";
     newRoute.layout = "/admin";
     newRoute.level = 0;
     newRoute.isParent = true;
@@ -114,7 +123,7 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute = {};
     newRoute.name = "Files";
     newRoute.path = "files";
-    newRoute.icon = "FILES";
+    newRoute.icon = "FOLDER";
     newRoute.layout = "/admin";
     newRoute.level = 0;
     newRoute.isParent = true;
@@ -123,7 +132,7 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute = {};
     newRoute.name = "Meeting history";
     newRoute.path = "meetingHistory";
-    newRoute.icon = "MEETINGS";
+    newRoute.icon = "HISTORY";
     newRoute.layout = "/admin";
     newRoute.level = 0;
     newRoute.isParent = true;
@@ -147,7 +156,42 @@ const BasicBusinessAppDashboard = (props) => {
     //}
   };
 
-  const handler = () => {
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'dashboard-system-event-handler-api';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.UNAUTHORISED_API_CALL:
+            navigate('/login');
+            break;
+          case SystemEventType.API_ERROR:
+            handleApiError(be);
+            break;
+          case SystemEventType.API_SUCCESS:
+            handleApiSuccess(be);
+            break;
+        }
+      }
+    }
+  };
+
+  const handleApiError = (error) => {
+    setErrorMessage(error.message);
+  };
+
+  const handleApiSuccess = (event) => {
+    if(event.message && event.message.length > 0) {
+      setSuccessMessage(event.message);
+      const messageTimeout = setTimeout(() => {
+        setSuccessMessage(null);
+        clearTimeout(messageTimeout);
+      }, 2000)
+    }
+  };
+
+  const socketEventHandlerApi = () => {
     return {
       get id() {
         return 'global-1223';
@@ -172,13 +216,17 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   const socketEventHandler = useState({
-    api: handler()
+    api: socketEventHandlerApi()
+  });
+
+  const systemEventHandler = useState({
+    api: systemEventHandlerApi()
   });
 
   const onChatMessage = (payload) => {
     console.log('ON CHAT DASH: ', payload);
 
-    let loggedInUser = JSON.parse(sessionStorage.getItem('userDetails'));
+    let loggedInUser = appManager.getUserDetails();
 
     if (payload.message.participant.userId !== loggedInUser.userId) {
       newMessageAudio.play();
@@ -224,7 +272,7 @@ const BasicBusinessAppDashboard = (props) => {
   const joinMeeting = () => {
     electron.ipcRenderer.on('joinMeetingEvent', args => {
       get(`${host}/api/v1/meeting/fetch/${args.payload.params.meetingId}`, (response) => {
-        let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+        let userDetails = appManager.getUserDetails();
         let isHost = false;
         response.extendedProps.attendees.forEach(att => {
           if (att.userId === userDetails.userId) {
@@ -271,32 +319,41 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   useEffect(() => {
-    socketEventHandler.api = handler();
+    socketEventHandler.api = socketEventHandlerApi();
+    systemEventHandler.api = systemEventHandlerApi();
   });
 
   React.useEffect(() => {
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL, SystemEventType.API_ERROR, SystemEventType.API_SUCCESS);
     //if (loading) {
-      if (Utils.isNull(sessionStorage.getItem("accessToken"))) {
-        navigate('/login');
-      } else {
-        get(`${host}/api/v1/auth/userInfo`, (response) => {
-          sessionStorage.setItem("userDetails", JSON.stringify(response));
-          setUserDetails(response);
-          init();
-          socketManager.init();
-          socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
-          onAnswerCall();
-          onDeclineCall();
-          joinChatRooms();
-          joinMeeting();
-        }, (e) => {
-        })
-      }
+    if (Utils.isNull(Utils.getCookie("accessToken"))) {
+      navigate('/login');
+    } else {
+      get(`${host}/api/v1/auth/userInfo`, (response) => {
+        appManager.setUserDetails(response);
+        setUserDetails(response);
+        init();
+        socketManager.init();
+        socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
+
+        if (!tokenRefreshMonitorStarted) {
+          tokenManager.startTokenRefreshMonitor(`${host}/api/v1/auth/refresh`, response.username);
+          setTokenRefreshMonitorStarted(true);
+        }
+
+        onAnswerCall();
+        onDeclineCall();
+        joinChatRooms();
+        joinMeeting();
+      }, (e) => {
+      })
+    }
     //}
   }, []);
 
   React.useEffect(() => {
     return () => {
+      appManager.clearAllEventListeners();
       socketManager.clearAllEventListeners();
       socketManager.disconnectSocket();
     };
@@ -449,10 +506,13 @@ const BasicBusinessAppDashboard = (props) => {
 
   return (
     loading || !userDetails ?
-      <div>Loading...</div>
+      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+        <LottieIcon id={'waiting'}/>
+      </div>
       :
       <>
         <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>
+          <LoadingIndicator color={"#945c33"}/>
           <Sidebar
             {...props}
             routes={routes}
@@ -493,6 +553,25 @@ const BasicBusinessAppDashboard = (props) => {
                 />{" "}
               </div>
               <div>
+                <div style={{padding: '0 32px 0 32px', maxHeight: '64px', width: '90%', borderBottom: '1px solid #e2e2e2', zIndex: '1000000000', position: 'absolute'}}>
+                  <Alert
+                    variant={'danger'}
+                    show={errorMessage !== null}
+                    fade={true}
+                    onClose={() => {setErrorMessage(null)}}
+                    dismissible
+                  >
+                    <Alert.Heading>Error</Alert.Heading>
+                    <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{errorMessage}</p>
+                  </Alert>
+                  <Alert
+                    variant={'success'}
+                    show={successMessage !== null}
+                    fade={true}
+                  >
+                    <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
+                  </Alert>
+                </div>
                 <ViewPort settings={props.settings}/>
               </div>
             </div>

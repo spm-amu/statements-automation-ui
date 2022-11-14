@@ -1,2 +1,29 @@
+.alert-dismissible {
+  text-align: right;
+  z-index: 100000;
+}
+
+.alert-dismissible p {
+  text-align: center;
+  font-size: 20px;
+  border-top: 1px solid #ffffff;
+  padding: 12px 0 0 0;
+}
+
+.alert-dismissible button {
+  background-color: transparent;
+  color: #ffffff !important;
+}
+
+.alert-dismissible button:before{
+  content: "X";
+}
+
+.alert-heading {
+  position: absolute;
+  top: 24px;
+  text-align: left;
+}
+
 @media screen and (max-width: 991px) {
 }

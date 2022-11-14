@@ -1,7 +1,8 @@
 ﻿import moment from 'moment';
 
 export default class Utils {
-  constructor() {}
+  constructor() {
+  }
 
   SYSTEM_ERROR_MESSAGE =
     'A system error has accured. Please contact your system administrator';
@@ -13,7 +14,7 @@ export default class Utils {
   static isObjectsEqual(obj1, obj2) {
     let properties = Object.getOwnPropertyNames(obj1);
     for (let i = 0; i < properties.length; i++) {
-      if(JSON.stringify(obj1[properties[i]]) !== JSON.stringify(obj2[properties[i]])) {
+      if (JSON.stringify(obj1[properties[i]]) !== JSON.stringify(obj2[properties[i]])) {
         return true;
       }
     }
@@ -21,7 +22,7 @@ export default class Utils {
     return true;
   }
 
-  static getInitials (name) {
+  static getInitials(name) {
     const parts = name.split(' ');
     let initials = '';
     for (let i = 0; i < parts.length; i++) {
@@ -32,7 +33,7 @@ export default class Utils {
     return initials
   }
 
-  static isToday (date) {
+  static isToday(date) {
     return !moment(date).isBefore(moment(), "day");
   }
 
@@ -108,7 +109,7 @@ export default class Utils {
     const stateDate = viewRef.state[refDateName];
     const tempDate = stateDate;
     if (Utils.isNull(stateDate) || stateDate.getTime() !== newDate.getTime()) {
-      viewRef.setState({ ...viewRef.state, [refDateName]: newDate }, () => {
+      viewRef.setState({...viewRef.state, [refDateName]: newDate}, () => {
         if (!Utils.isNull(tempDate) && !Utils.isNull(viewRef.state.id)) {
           const autoFillDate = Utils.offsetDate(
             newDate,
@@ -210,11 +211,36 @@ export default class Utils {
   };
 
   static getComponentAttribute(field, attribute, defaultValue) {
-    if(this.isNull(field.attributes)) {
+    if (this.isNull(field.attributes)) {
       return defaultValue;
     }
 
     return this.isNull(field.attributes[attribute]) ? defaultValue : field.attributes[attribute];
+  }
+
+  static setCookie(name, value, expDays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (expDays * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+  }
+
+  static getCookie(name) {
+    var cname = name + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1);
+      }
+
+      if (c.indexOf(cname) === 0) {
+        return c.substring(cname.length, c.length);
+      }
+    }
+
+    return "";
   }
 }
 

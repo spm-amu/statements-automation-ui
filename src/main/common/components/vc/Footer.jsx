@@ -2,6 +2,7 @@ import React, {useRef, useState} from "react";
 import "./Footer.css"
 import Toolbar from './Toolbar'
 import MeetingParticipant from "./MeetingParticipant";
+import appManager from "../../../common/service/AppManager";
 
 const Footer = (props) => {
   const {
@@ -51,7 +52,7 @@ const Footer = (props) => {
               <MeetingParticipant
                 data={{
                   peer: null,
-                  name: JSON.parse(sessionStorage.getItem('userDetails')).name,
+                  name: appManager.getUserDetails().name,
                   avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
                 }}
                 videoMuted={videoMuted}

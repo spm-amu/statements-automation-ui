@@ -21,7 +21,6 @@ import Minimize from '@material-ui/icons/Minimize';
 import Maximize from '@material-ui/icons/Maximize';
 import Work from '@material-ui/icons/Work';
 import PanTool from '@material-ui/icons/PanTool';
-import Home from '@material-ui/icons/Home';
 import List from '@material-ui/icons/List';
 import Calendar from '@material-ui/icons/CalendarTodayTwoTone';
 import Notifications from '@material-ui/icons/Notifications';
@@ -34,13 +33,15 @@ import {
   Call,
   CallEnd,
   CancelPresentation,
-  ChatBubbleOutline, Done,
+  ChatBubbleOutline,
+  Done,
   People,
-  PresentToAll, Reply,
+  PresentToAll,
+  Reply,
   Videocam,
-  VideocamOff
+  VideocamOff,
+  History
 } from '@material-ui/icons';
-import {IconButton} from "@material-ui/core";
 
 class Icon extends Component {
 
@@ -95,13 +96,13 @@ class Icon extends Component {
       return <img src={require('/assets/armscor_logo.png')} height={'35px'} alt={''}/>
     } else if (this.props.id === 'LIST') {
       return <List/>
-    }  else if (this.props.id === 'MIC') {
+    } else if (this.props.id === 'MIC') {
       return <Microphone {...this.props}/>
-    }  else if (this.props.id === 'MIC_OFF') {
+    } else if (this.props.id === 'MIC_OFF') {
       return <MicrophoneOff/>
-    }  else if (this.props.id === 'CAMERA') {
+    } else if (this.props.id === 'CAMERA') {
       return <Camera/>
-    }  else if (this.props.id === 'CAMERA_OFF') {
+    } else if (this.props.id === 'CAMERA_OFF') {
       return <CameraOff/>
     } else if (this.props.id === 'VIDEOCAM_OFF') {
       return <VideocamOff/>
@@ -139,6 +140,8 @@ class Icon extends Component {
       return <i className="fas fa-signature" style={{color: this.props.color}}/>
     } else if (this.props.id === 'FOLDER') {
       return <Folder/>
+    } else if (this.props.id === 'HISTORY') {
+      return <History/>
     } else if (this.props.id === 'SIGN') {
       return <i className="fas fa-pen-nib" style={{color: this.props.color}}/>
     } else if (this.props.id === 'ERROR') {

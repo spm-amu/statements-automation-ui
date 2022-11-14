@@ -1,15 +1,16 @@
 import {trackPromise} from 'react-promise-tracker';
 import Utils from "../Utils";
+import appManager from "../../common/service/AppManager";
+import {SystemEventType} from "../types";
 
 // export const host = window.location.protocol + "//" + window.location.hostname + "/vc";
-export const host = "http://svn.agilemotion.co.za/vc";
-//export const host = "http://localhost:8080/vc";
+//export const host = "http://svn.agilemotion.co.za/vc";
+export const host = "http://localhost:8082/vc";
 const status = (response: any) => {
   if (response.ok) {
     return Promise.resolve(response);
   } else {
-    let error = new Error(response.statusText);
-    return Promise.reject(error);
+    return Promise.reject(response);
   }
 };
 
@@ -18,8 +19,8 @@ const json = (response: any) => {
 };
 
 class RestService {
-  doFetch(url: string, successCallback: any, errorCallback: any, body: any, method: string, track: boolean = true, secure: boolean = true) {
-    const accessToken = sessionStorage.getItem("accessToken");
+  doFetch(url: string, successCallback: any, errorCallback: any, body: any, method: string, successMessage: string, track: boolean = true, secure: boolean = true) {
+    const accessToken = Utils.getCookie("accessToken");
 
     let data = body ? JSON.stringify(body) : null;
     let fetchConfig = {
@@ -39,24 +40,29 @@ class RestService {
 
     if (track) {
       trackPromise(
-        this.executeFetch(url, fetchConfig, successCallback, errorCallback)
+        this.executeFetch(url, fetchConfig, successMessage, successCallback, errorCallback)
       );
     } else {
-      this.executeFetch(url, fetchConfig, successCallback, errorCallback);
+      this.executeFetch(url, fetchConfig, successMessage, successCallback, errorCallback);
     }
   }
 
-  executeFetch(url: string, fetchConfig: any, successCallback: any, errorCallback: any) {
+  executeFetch(url: string, fetchConfig: any, successMessage: string, successCallback: any, errorCallback: any) {
     return fetch(encodeURI(url), fetchConfig)
       .then(status)
       .then(json)
       .then((data) => {
         successCallback(JSON.parse(data));
+        appManager.fireEvent(SystemEventType.API_SUCCESS, {message: successMessage});
       }).catch((e) => {
         console.error(e);
-        if (e.code === 401 && !url.endsWith("/logout")) {
+        if (e.status === 401 && !url.endsWith("/logout")) {
           errorCallback(e);
-          // TODO : Navigate to login screen
+          appManager.fireEvent(SystemEventType.UNAUTHORISED_API_CALL, null);
+        } else {
+          e.json().then((error: any) => {
+            appManager.fireEvent(SystemEventType.API_ERROR, error);
+          });
         }
 
         if (errorCallback !== null) {
@@ -67,10 +73,10 @@ class RestService {
 }
 
 const rest = new RestService();
-export const post = (url: string, successCallback: any, errorCallback: any, body: any, track: boolean = true, secure: boolean = true) => {
-  return rest.doFetch(url, successCallback, errorCallback, body, 'POST', track, secure);
+export const post = (url: string, successCallback: any, errorCallback: any, body: any, successMessage: string = '', track: boolean = true, secure: boolean = true) => {
+  return rest.doFetch(url, successCallback, errorCallback, body, 'POST', successMessage, track, secure);
 };
 
-export const get = (url: string, successCallback: any, errorCallback: any, track: boolean = true, secure: boolean = true) => {
-  return rest.doFetch(url, successCallback, errorCallback, null, 'GET', track, secure);
+export const get = (url: string, successCallback: any, errorCallback: any, successMessage: string = '', track: boolean = true, secure: boolean = true) => {
+  return rest.doFetch(url, successCallback, errorCallback, null, 'GET', successMessage, track, secure);
 };

@@ -1,10 +1,11 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './MettingSettingsComponent.css';
 import Button from '@material-ui/core/Button';
 import {Switch} from '@material-ui/core';
 import Icon from '../Icon';
 import {useNavigate} from 'react-router-dom';
 import Utils from '../../Utils';
+import appManager from "../../../common/service/AppManager";
 
 const MeetingSettingsComponent = (props) => {
   const userStream = useRef();
@@ -27,14 +28,14 @@ const MeetingSettingsComponent = (props) => {
         },
       });
 
-    if(userMedia && userVideo.current) {
+    if (userMedia && userVideo.current) {
       userMedia
         .then((myStream) => {
           userStream.current = myStream;
           videoTrack.current = userStream.current.getTracks()[1];
           audioTrack.current = userStream.current.getTracks()[0];
 
-          if(userVideo.current) {
+          if (userVideo.current) {
             userVideo.current.srcObject = myStream;
           }
         });
@@ -55,7 +56,7 @@ const MeetingSettingsComponent = (props) => {
 
   useEffect(() => {
     localVideoStream();
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let userDetails = appManager.getUserDetails();
     setLoggedInUser(userDetails.name)
   }, []);
 
@@ -135,9 +136,9 @@ const MeetingSettingsComponent = (props) => {
               >
                 {
                   videoMuted &&
-                    <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
-                      <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)} />
-                    </div>
+                  <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
+                    <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)}/>
+                  </div>
                 }
                 <video
                   hidden={videoMuted}
@@ -188,7 +189,7 @@ const MeetingSettingsComponent = (props) => {
                 size="large"
                 color={'primary'}
                 onClick={(e) => {
-                  let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+                  let userDetails = appManager.getUserDetails();
                   let isHost = false;
                   selectedMeeting.attendees.forEach(att => {
                     if (att.userId === userDetails.userId) {

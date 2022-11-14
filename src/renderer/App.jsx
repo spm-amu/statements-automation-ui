@@ -1,21 +1,15 @@
 import React from 'react';
 import icon from '../../assets/armscor_logo.png';
 import './App.css';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import LoginView from '../main/common/components/view/security/Login';
+import {HashRouter as Router, Route, Routes} from 'react-router-dom';
 import BasicBusinessAppDashboard from '../main/desktop/dashboard/BasicBusinessAppDashboard';
 import ThemeDefault from './theme-default';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {createTheme} from "@material-ui/core";
 import ThemeProvider from "@material-ui/styles/ThemeProvider";
-
 // ** Fake Database
 import '../main/@fake-db';
 import SignIn from '../main/common/components/view/security/SignIn';
-import LottieIcon from '../main/common/components/LottieIcon';
-import IconButton from '@material-ui/core/IconButton';
-import Icon from '../main/common/components/Icon';
 import DialingPreview from '../main/common/components/vc/DialingPreview';
 import MessagePreview from '../main/common/components/vc/MessagePreview';
 
@@ -90,3 +84,7 @@ export default function App() {
     </MuiThemeProvider>
   );
 }
+
+export const navigate = (path) => {
+  navigate(path);
+};

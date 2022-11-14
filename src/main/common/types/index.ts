@@ -18,6 +18,14 @@ export type WebsocketMessage = {
   peerSignal?: PeerSignal;
 };
 
+export enum SystemEventType {
+
+  UNAUTHORISED_API_CALL = "UNAUTHORISED_API_CALL",
+  API_ERROR = "API_ERROR",
+  API_SUCCESS = "API_SUCCESS",
+
+}
+
 export enum MessageType {
   JOIN_MEETING = "JOIN_MEETING",
   CALL_USER = "CALL_USER",

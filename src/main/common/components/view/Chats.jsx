@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import ChatRooms from '../chat/ChatRooms';
 import ChatRoom from '../chat/ChatRoom';
 import './Chat.scss';
-import { get, host } from '../../service/RestService';
 
 const Chats = (props) => {
   const { selectedMeeting } = props;

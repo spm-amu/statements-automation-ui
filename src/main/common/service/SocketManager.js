@@ -1,6 +1,7 @@
 import io from "socket.io-client";
 import {MessageType} from "../types";
 import Peer from "simple-peer";
+import appManager from "./AppManager";
 
 class SocketManager {
   constructor() {
@@ -40,7 +41,7 @@ class SocketManager {
   init = () => {
     let socket = io.connect('http://svn.agilemotion.co.za');
     // let socket = io.connect('http://100.72.207.105:8000');
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let userDetails = appManager.getUserDetails();
 
     for (const value of Object.keys(MessageType)) {
       socket.on(value, (payload) => {
@@ -136,7 +137,7 @@ class SocketManager {
   };
 
   createPeer = (userToSignal, stream) => {
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let userDetails = appManager.getUserDetails();
 
     const peer = new Peer({
       initiator: true,
@@ -165,7 +166,7 @@ class SocketManager {
   };
 
   callUser = (userToSignal, stream) => {
-    let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+    let userDetails = appManager.getUserDetails();
 
     const peer = new Peer({
       initiator: true,

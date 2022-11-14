@@ -65,7 +65,7 @@ const ViewContainer = (props) => {
         element = <JoinMeetingSettings selectedMeeting={location.state}/>;
         break;
       case 'meetingRoom':
-        element = <Calendar/>;
+        //element = <Calendar/>;
         break;
       case 'people':
         element = <People/>;

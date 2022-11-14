@@ -8,6 +8,7 @@ import {MessageType} from '../../types';
 import uuid from 'react-uuid';
 import {useNavigate} from 'react-router-dom';
 import Utils from "../../Utils";
+import appManager from "../../../common/service/AppManager";
 
 const People = (props) => {
 
@@ -70,7 +71,7 @@ const People = (props) => {
     if (props.onAudioCallHandler) {
       props.onAudioCallHandler(userToCall);
     } else {
-      let userDetails = JSON.parse(sessionStorage.getItem('userDetails'));
+      let userDetails = appManager.getUserDetails();
       const directCallRoom = {
         id: uuid()
       };
