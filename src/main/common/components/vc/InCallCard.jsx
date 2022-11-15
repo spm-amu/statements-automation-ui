@@ -25,7 +25,7 @@ const InCall = (props) => {
       style={{marginLeft: '0', paddingLeft: '0', maxWidth: '400px', borderBottom: '1px solid #e1e1e1'}}
     >
       <div className="participant-card">
-        <div className="row no-margiperson-cardn">
+        <div className="row no-margin person-card">
           <div className={'avatar-small'}>
             <img
               src={
@@ -38,7 +38,7 @@ const InCall = (props) => {
             />
           </div>
           <div className={'col user-details'}>{participant.name}</div>
-          <div className={'col'} style={{
+          <div style={{
             marginTop: '4px',
             marginLeft: '0',
             marginRight: '0',
