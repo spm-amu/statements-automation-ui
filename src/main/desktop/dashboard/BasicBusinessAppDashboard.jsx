@@ -231,9 +231,9 @@ const BasicBusinessAppDashboard = (props) => {
     if (payload.message.participant.userId !== loggedInUser.userId) {
       newMessageAudio.play();
 
-      electron.ipcRenderer.sendMessage('receivingMessage', {
+      /*electron.ipcRenderer.sendMessage('receivingMessage', {
         payload: payload
-      });
+      });*/
     }
   };
 
