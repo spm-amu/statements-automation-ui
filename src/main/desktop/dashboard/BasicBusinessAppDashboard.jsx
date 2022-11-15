@@ -269,6 +269,9 @@ const BasicBusinessAppDashboard = (props) => {
     });
   };
 
+
+
+
   const joinMeeting = () => {
     electron.ipcRenderer.on('joinMeetingEvent', args => {
       get(`${host}/api/v1/meeting/fetch/${args.payload.params.meetingId}`, (response) => {
@@ -292,7 +295,7 @@ const BasicBusinessAppDashboard = (props) => {
           }
         })
       }, (e) => {
-      });
+      }, '', false);
     });
   };
 
