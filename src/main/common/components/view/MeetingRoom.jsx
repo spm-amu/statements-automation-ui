@@ -133,7 +133,7 @@ const MeetingRoom = (props) => {
   } = props;
 
   const raiseHand = () => {
-    let userDetails = JSON.parse(appManager.getUserDetails());
+    let userDetails = appManager.getUserDetails();
 
     socketManager.emitEvent(MessageType.RAISE_HAND, {
       userId: userDetails.userId,
@@ -144,7 +144,7 @@ const MeetingRoom = (props) => {
   };
 
   const lowerHand = () => {
-    let userDetails = JSON.parse(appManager.getUserDetails());
+    let userDetails = appManager.getUserDetails();
 
     socketManager.emitEvent(MessageType.LOWER_HAND, {
       userId: userDetails.userId,
