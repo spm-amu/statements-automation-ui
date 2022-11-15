@@ -219,14 +219,16 @@ export default class Utils {
   }
 
   static setCookie(name, value, expDays) {
-    var d = new Date();
+    /*var d = new Date();
     d.setTime(d.getTime() + (expDays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toGMTString();
-    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";*/
+
+    sessionStorage.setItem(name, value);
   }
 
   static getCookie(name) {
-    var cname = name + "=";
+    /*var cname = name + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
     for (var i = 0; i < ca.length; i++) {
@@ -240,7 +242,9 @@ export default class Utils {
       }
     }
 
-    return "";
+    return "";*/
+
+    return sessionStorage.getItem(name);
   }
 }
 
