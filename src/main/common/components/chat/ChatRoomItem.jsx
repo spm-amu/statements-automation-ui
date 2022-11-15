@@ -7,7 +7,8 @@ import { Calendar } from 'react-feather';
 import Utils from '../../Utils';
 import appManager from "../../../common/service/AppManager";
 
-const ChatRoomItem = ({ event }) => {
+const ChatRoomItem = (props) => {
+  const { event } = props;
   const [currentUser, setCurrentUser] = useState(
     appManager.getUserDetails()
   );
@@ -19,16 +20,17 @@ const ChatRoomItem = ({ event }) => {
   }, []);
 
   const goToRoom = (id) => {
-    navigate("/view/chats", {
+    /*navigate("/view/chats", {
       state: {
         id: id,
       }
-    })
+    })*/
+
+    props.selectionHandler(event);
   };
 
   return (
     <div
-      key={event.id}
       className="chatroom__item"
       onClick={() => {
         goToRoom(event.id);
@@ -55,7 +57,7 @@ const ChatRoomItem = ({ event }) => {
           </p>
         </div>
         <div className="chatroom__message">
-          {event.messages.length > 0 && currentUser
+          {event.messages && event.messages.length > 0 && currentUser
             ? [
                 event.messages[event.messages.length - 1].participant.userId ===
                 currentUser.userId

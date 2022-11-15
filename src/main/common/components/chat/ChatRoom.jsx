@@ -63,7 +63,7 @@ const ChatRoom = (props) => {
   const loadMessages = () => {
     scrollToBottom();
 
-    let selectedEvent =  socketManager.chatEvents[0];
+    /*let selectedEvent =  socketManager.chatEvents[0];
 
     if (selectedMeeting) {
       selectedEvent =  socketManager.chatEvents.find(event => event.id === selectedMeeting.id);
@@ -71,6 +71,7 @@ const ChatRoom = (props) => {
 
     setChatEvent(selectedEvent);
     setMessages([].concat(selectedEvent.messages));
+    */
 
     setLoading(false);
   };
@@ -209,21 +210,21 @@ const ChatRoom = (props) => {
       .childNodes[1].click();
   };
 
-  if (chatEvent && messages) {
+  if (selectedMeeting && messages) {
     return (
       <div className="chatroom">
         <div className="chatroom__header">
           <div className="chatroom__headerleft">
             <Avatar>
-              {chatEvent.type === 'CALENDAR_MEETING' ? (
+              {selectedMeeting.type === 'CALENDAR_MEETING' ? (
                 <Calendar />
               ) : (
-                Utils.getInitials(chatEvent.participants.find(p => p.userId !== currentUser.userId).name)
+                Utils.getInitials(selectedMeeting.participants.find(p => p.userId !== currentUser.userId).name)
               )}
             </Avatar>
 
             <h5>
-              { chatEvent.type === 'CALENDAR_MEETING' ? chatEvent.title : chatEvent.participants.find(p => p.userId !== currentUser.userId).name }
+              { selectedMeeting.type === 'CALENDAR_MEETING' ? selectedMeeting.title : selectedMeeting.participants.find(p => p.userId !== currentUser.userId).name }
             </h5>
 
             <Tooltip title="Edit">
@@ -301,7 +302,7 @@ const ChatRoom = (props) => {
         <p className="image__text">{confirm}</p>
       </div>
     );
-  } else if(!loading){
+  } else if(!loading && selectedMeeting){
     return (
       <div className={'centered-flex-box'}>
         <div className="emptychat">

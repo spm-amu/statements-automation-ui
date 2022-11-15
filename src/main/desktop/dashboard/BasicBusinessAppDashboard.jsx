@@ -307,6 +307,7 @@ const BasicBusinessAppDashboard = (props) => {
     });
   };
 
+
   const joinChatRooms = () => {
     get(`${host}/api/v1/chat/fetchChats`, (response) => {
       const ids = response.map(chat => chat.id);
