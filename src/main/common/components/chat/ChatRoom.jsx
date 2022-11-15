@@ -80,7 +80,7 @@ const ChatRoom = (props) => {
   }, [selectedMeeting]);
 
   useEffect(() => {
-    setCurrentUser(JSON.parse(sessionStorage.getItem('userDetails')));
+    setCurrentUser(appManager.getUserDetails());
     socketManager.addSubscriptions(eventHandler, MessageType.CHAT_MESSAGE);
   }, []);
 
