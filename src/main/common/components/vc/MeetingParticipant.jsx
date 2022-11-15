@@ -9,9 +9,7 @@ const MeetingParticipant = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (props.data.peer) {
-      props.data.peer.on("stream", (stream) => {
-        videoRef.current.srcObject = stream;
-      });
+      videoRef.current.srcObject = props.data.stream;
     }
   }, []);
 
@@ -33,13 +31,13 @@ const MeetingParticipant = forwardRef((props, ref) => {
                   <video
                     hidden={props.videoMuted}
                     muted playsInline autoPlay ref={videoRef}
-                    style={{width: '100%', maxHeight: 'calc(100vh - 500px)'}}
+                    style={{width: '100%', height: '100%'}}
                   />
                   :
                   <video
                     hidden={props.videoMuted}
                     playsInline autoPlay ref={videoRef}
-                    style={{width: '100%', maxHeight: 'calc(100vh - 500px)'}}
+                    style={{width: '100%', height: '100%'}}
                   />
               }
               <div className={'name-label'}> {props.showName ? props.data.name : 'You'}</div>
