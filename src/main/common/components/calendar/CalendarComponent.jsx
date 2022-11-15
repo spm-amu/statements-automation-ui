@@ -163,6 +163,8 @@ const CalendarComponent = (props) => {
 
     eventClick({event: clickedEvent}) {
 
+      console.log("clickedEvent", clickedEvent);
+
       let value = {
         id: clickedEvent.id,
         title: clickedEvent.title,
@@ -175,8 +177,13 @@ const CalendarComponent = (props) => {
         startTime: new Date(clickedEvent.start),
         endDate: new Date(clickedEvent.end),
         endTime: new Date(clickedEvent.end),
-        recurringStartDate: new Date(clickedEvent.extendedProps.recurringStart),
-        recurringEndDate: new Date(clickedEvent.extendedProps.recurringEnd)
+        recurringFreq: clickedEvent.extendedProps.schedule.rrule.freq,
+        recurringInterval: clickedEvent.extendedProps.schedule.rrule.interval,
+        recurringDtstart: new Date(clickedEvent.extendedProps.schedule.rrule.dtstart),
+        recurringUntil: clickedEvent.extendedProps.schedule.rrule.until,
+        recurringByweekday: clickedEvent.extendedProps.schedule.rrule.byweekday,
+        recurringBysetpos: clickedEvent.extendedProps.schedule.rrule.bysetpos,
+        recurringBymonthday: clickedEvent.extendedProps.schedule.rrule.bymonthday
 
       };
 

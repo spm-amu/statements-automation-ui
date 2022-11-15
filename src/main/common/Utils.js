@@ -96,6 +96,38 @@ export default class Utils {
     return new Date(year, month, day);
   }
 
+  static getMonthlyPeriod(val) {
+    if(val === -1) {
+      return "Last";
+    } else if(val === 1) {
+      return "First";
+    } else if(val === 2) {
+      return "Second";
+    } else if(val === 3) {
+      return "Third";
+    } else {
+      return "Fourth";
+    }
+  }
+
+  static getDayOfWeekDescription(val) {
+    if(val === "SU") {
+      return "Sunday";
+    } else if(val === "MO") {
+      return "Monday";
+    } else if(val === "TU") {
+      return "Tuesday";
+    } else if(val === "WE") {
+      return "Wednesday";
+    } else if(val === "TH") {
+      return "Thursday";
+    } else if(val === "FR") {
+      return "Friday";
+    } else {
+      return "Saturday";
+    }
+  }
+
   autoSetDate(
     viewRef,
     formRef,

@@ -51,6 +51,7 @@ const Meeting = (props) => {
   const navigate = useNavigate();
 
   const getInitialValue = (propsValue) => {
+    console.log("selectedEvent", props.selectedEvent);
     let userDetails = appManager.getUserDetails();
     let host = null;
     for (const attendee of props.selectedEvent.attendees) {
@@ -59,6 +60,25 @@ const Meeting = (props) => {
           host = attendee;
           break;
         }
+      }
+    }
+
+    if(props.selectedEvent.recurringFreq !== null) {
+      setRepeatingEvery(props.selectedEvent.recurringFreq);
+      setEventRecurrence(props.selectedEvent.recurringFreq);
+      setNumberOfOccurences(props.selectedEvent.recurringInterval);
+
+      if (props.selectedEvent.recurringFreq === 'MONTHLY') {
+        if(props.selectedEvent.recurringBymonthday !== null) {
+          setMonthlyDayType("monthlyCalendarDay");
+          setByMonthDay(props.selectedEvent.recurringBymonthday);
+        } else {
+          setMonthlyDayType("monthlyWeekDay");
+          setBysetpos(props.selectedEvent.recurringBysetpos);
+          setByWeekDay(props.selectedEvent.recurringByweekday[0]);
+        }
+      } else if (props.selectedEvent.recurringFreq === 'WEEKLY') {
+         setWeekDays(props.selectedEvent.recurringByweekday);
       }
     }
 
@@ -86,7 +106,6 @@ const Meeting = (props) => {
           !Utils.isNull(props.selectedEvent.startDate)
             ? props.selectedEvent.startDate
             : now,
-        //recurringStartDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.recurringStartDate) ? props.selectedEvent.recurringStartDate : now,
         recurringStartDate: now,
         startTime: now,
         endDate:
@@ -94,7 +113,6 @@ const Meeting = (props) => {
           !Utils.isNull(props.selectedEvent.endDate)
             ? props.selectedEvent.endDate
             : now,
-        // recurringEndDate: !Utils.isNull(props.selectedEvent) && !Utils.isNull(props.selectedEvent.recurringEndDate) ? props.selectedEvent.recurringEndDate : now,
         recurringEndDate: now,
         endTime: now,
         attendees: [],
@@ -321,16 +339,6 @@ const Meeting = (props) => {
   };
 
   const handleEventRecurringSave = () => {
-    console.log('meetingValue', value);
-    console.log('1. eventRecurrence', eventRecurrence);
-    console.log('2. repeatingEvery', repeatingEvery);
-    console.log('3. numberOfOccurences', numberOfOccurences);
-    console.log('4. recurrenceChecked', recurrenceChecked);
-    console.log('5. weekDays', weekDays);
-    console.log('6. monthlyDayType', monthlyDayType);
-    console.log('7. monthlyCalendarDay', byMonthDay);
-    console.log('8. bysetpos', bysetpos);
-    console.log('9. byWeekDay', byWeekDay);
     setOpen(false);
   };
 
@@ -943,6 +951,21 @@ const Meeting = (props) => {
                     <MenuItem value={'MONTHLY'}>Monthly</MenuItem>
                   </Select>
                 </div>
+
+                {
+                  eventRecurrence === 'MONTHLY' ? (
+                <div className={'col-*-*'}>
+                  <EventMessageComponent
+                    recurringType={eventRecurrence}
+                    numberOfOccurences={numberOfOccurences}
+                    monthlyDayType={monthlyDayType}
+                    byMonthDay={byMonthDay}
+                    byWeekDay={byWeekDay}
+                    bysetpos={bysetpos}
+                    recurringEndDate={value && value.endDate ? value.endDate : null}
+                  />
+                </div>) : null
+                }
               </div>
             </div>
 
