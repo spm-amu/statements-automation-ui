@@ -40,10 +40,10 @@ const Meeting = (props) => {
   const [eventRecurrence, setEventRecurrence] = React.useState('NONE');
   const [repeatingEvery, setRepeatingEvery] = React.useState('');
   const [numberOfOccurences, setNumberOfOccurences] = React.useState(1);
-  const [monthlyPeriod, setMonthlyPeriod] = React.useState('');
-  const [monthlyDay, setMonthlyDay] = React.useState('');
+  const [bysetpos, setBysetpos] = React.useState(0);
+  const [byWeekDay, setByWeekDay] = React.useState('');
   const [monthlyDayType, setMonthlyDayType] = React.useState('monthlyWeekDay');
-  const [monthlyCalendarDay, setMonthlyCalendarDay] = React.useState(0);
+  const [byMonthDay, setByMonthDay] = React.useState(0);
   const [open, setOpen] = React.useState(false);
   const [weekDays, setWeekDays] = useState([]);
   const [recurrenceChecked, setRecurrenceChecked] = useState(false);
@@ -203,12 +203,14 @@ const Meeting = (props) => {
         eventData.schedule.rrule.byweekday = occurs;
       }
 
+      console.log("Submitting => monthlyDayType", monthlyDayType);
       if (eventRecurrence === 'MONTHLY') {
-        if (monthlyDayType !== 'monthlyCalendarDay') {
-          eventData.schedule.rrule.bymonthday = monthlyCalendarDay
+        eventData.schedule.monthlyDayType = monthlyDayType;
+        if (monthlyDayType === 'monthlyCalendarDay') {
+          eventData.schedule.rrule.bymonthday = byMonthDay;
         } else {
-          eventData.schedule.rrule.bysetpos = monthlyPeriod;
-          eventData.schedule.rrule.byweekday = [monthlyDay];
+          eventData.schedule.rrule.bysetpos = bysetpos;
+          eventData.schedule.rrule.byweekday = [byWeekDay];
         }
       }
     }
@@ -326,9 +328,9 @@ const Meeting = (props) => {
     console.log('4. recurrenceChecked', recurrenceChecked);
     console.log('5. weekDays', weekDays);
     console.log('6. monthlyDayType', monthlyDayType);
-    console.log('7. monthlyCalendarDay', monthlyCalendarDay);
-    console.log('8. monthlyPeriod', monthlyPeriod);
-    console.log('9. monthlyDay', monthlyDay);
+    console.log('7. monthlyCalendarDay', byMonthDay);
+    console.log('8. bysetpos', bysetpos);
+    console.log('9. byWeekDay', byWeekDay);
     setOpen(false);
   };
 
@@ -338,25 +340,25 @@ const Meeting = (props) => {
       setRepeatingEvery(e.target.value);
       setNumberOfOccurences(1);
       setOpen(true);
-      setMonthlyPeriod('');
-      setMonthlyDay('');
+      setBysetpos(0);
+      setByWeekDay('');
       setMonthlyDayType('');
-      setMonthlyCalendarDay(1);
+      setByMonthDay(1);
       setWeekDays([]);
       if (e.target.value === 'MONTHLY') {
-        setMonthlyPeriod('first');
-        setMonthlyDay('Monday');
+        setBysetpos(1);
+        setByWeekDay('MO');
         setMonthlyDayType('monthlyWeekDay');
       }
     }
   };
 
-  const handleMonthlyDay = (e) => {
-    setMonthlyDay(e.target.value);
+  const handleByWeekDay = (e) => {
+    setByWeekDay(e.target.value);
   };
 
-  const handleMonthlyPeriod = (e) => {
-    setMonthlyPeriod(parseInt(e.target.value));
+  const handleBysetpos = (e) => {
+    setBysetpos(parseInt(e.target.value));
   };
 
   const handleWeekdayChange = (event) => {
@@ -651,12 +653,12 @@ const Meeting = (props) => {
               <TextField
                 disabled={monthlyDayType !== 'monthlyCalendarDay'}
                 label="On day"
-                id="monthlyCalendarDay"
+                id="byMonthDay"
                 type={'number'}
-                value={monthlyCalendarDay}
+                value={byMonthDay}
                 required={true}
                 valueChangeHandler={(e) => {
-                  setMonthlyCalendarDay(e.target.value);
+                  setByMonthDay(e.target.value);
                 }}
                 errorMessage={'Please enter a number'}
               />
@@ -676,12 +678,12 @@ const Meeting = (props) => {
             <div className={'col-*-*'}>
               <Select
                 style={{ width: '100%' }}
-                labelId="monthly-period-label"
-                id="monthlyPeriodSelect"
-                value={monthlyPeriod}
+                labelId="bysetpos-label"
+                id="bySetPosSelect"
+                value={bysetpos}
                 label="On the"
                 disabled={monthlyDayType !== 'monthlyWeekDay'}
-                onChange={handleMonthlyPeriod}
+                onChange={handleBysetpos}
               >
                 <MenuItem value={1}>First</MenuItem>
                 <MenuItem value={2}>Second</MenuItem>
@@ -698,12 +700,12 @@ const Meeting = (props) => {
             <div className={'col-*-*'}>
               <Select
                 style={{ width: '100%' }}
-                labelId="monthly-day-label"
-                id="monthlyDaydSelect"
-                value={monthlyDay}
+                labelId="byWeek-day-label"
+                id="byWeekDaySelect"
+                value={byWeekDay}
                 label="On the"
                 disabled={monthlyDayType !== 'monthlyWeekDay'}
-                onChange={handleMonthlyDay}
+                onChange={handleByWeekDay}
               >
                 <MenuItem value={'SU'}>Sunday</MenuItem>
                 <MenuItem value={'MO'}>Monday</MenuItem>
@@ -739,16 +741,6 @@ const Meeting = (props) => {
             }
           />
         </div>
-        {/*<div className={'col-*-*'}>*/}
-        {/*  <Button*/}
-        {/*    onClick={() => {}}*/}
-        {/*    variant="contained"*/}
-        {/*    color="primary"*/}
-        {/*    fullWidth={true}*/}
-        {/*  >*/}
-        {/*    <span>Remove</span>*/}
-        {/*  </Button>*/}
-        {/*</div>*/}
       </div>
 
       <div className={'row no-margin'}>
@@ -757,9 +749,9 @@ const Meeting = (props) => {
             recurringType={eventRecurrence}
             numberOfOccurences={numberOfOccurences}
             monthlyDayType={monthlyDayType}
-            monthlyCalendarDay={monthlyCalendarDay}
-            monthlyDay={monthlyDay}
-            monthlyPeriod={monthlyPeriod}
+            byMonthDay={byMonthDay}
+            byWeekDay={byWeekDay}
+            bysetpos={bysetpos}
             recurringEndDate={value && value.endDate ? value.endDate : null}
           />
         </div>
@@ -951,16 +943,6 @@ const Meeting = (props) => {
                     <MenuItem value={'MONTHLY'}>Monthly</MenuItem>
                   </Select>
                 </div>
-                {/*<div className={'col-*-* centered-flex-box'} style={{ marginLeft: '8px' }}>*/}
-                {/*  <EventMessageComponent*/}
-                {/*    recurringType={eventRecurrence}*/}
-                {/*    numberOfOccurences={numberOfOccurences}*/}
-                {/*    monthlyDayType={monthlyDayType}*/}
-                {/*    monthlyCalendarDay={monthlyCalendarDay}*/}
-                {/*    monthlyDay={monthlyDay}*/}
-                {/*    monthlyPeriod={monthlyPeriod}*/}
-                {/*  />*/}
-                {/*</div>*/}
               </div>
             </div>
 
