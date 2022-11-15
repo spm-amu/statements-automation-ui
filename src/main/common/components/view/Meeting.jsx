@@ -205,7 +205,7 @@ const Meeting = (props) => {
 
       console.log("Submitting => monthlyDayType", monthlyDayType);
       if (eventRecurrence === 'MONTHLY') {
-        eventData.schedule.monthlyDayType = monthlyDayType;
+        eventData.schedule.rrule.monthlyDayType = monthlyDayType;
         if (monthlyDayType === 'monthlyCalendarDay') {
           eventData.schedule.rrule.bymonthday = byMonthDay;
         } else {
