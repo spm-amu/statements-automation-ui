@@ -69,6 +69,11 @@ class SocketManager {
 
     socket.on(MessageType.CHAT_MESSAGE, (payload) => {
       const chatEvent = this.chatEvents.find(e => e.id === payload.roomId);
+
+      if(!chatEvent.messages) {
+        chatEvent.messages = [];
+      }
+
       chatEvent.messages.push(payload.message);
       chatEvent.updatedDate = new Date();
 

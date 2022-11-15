@@ -27,7 +27,6 @@ const ChatRoom = (props) => {
   const [currentUser, setCurrentUser] = useState(appManager.getUserDetails());
   const [message, setMessage] = useState('');
   const [test, setTest] = useState(false);
-  const [chatEvent, setChatEvent] = useState(null);
   const [file, setFile] = useState();
   const [messages, setMessages] = useState([]);
   const [confirm, setImgUploadConfirm] = useState('');
@@ -73,6 +72,7 @@ const ChatRoom = (props) => {
     setMessages([].concat(selectedEvent.messages));
     */
 
+
     setLoading(false);
   };
 
@@ -117,7 +117,7 @@ const ChatRoom = (props) => {
       msg.participant.active = true;
 
       socketManager.emitEvent(MessageType.CHAT_MESSAGE, {
-        roomId: chatEvent.id,
+        roomId: selectedMeeting.id,
         message: msg
       });
 
