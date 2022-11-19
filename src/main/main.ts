@@ -26,6 +26,7 @@ class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 let dialWindow: BrowserWindow | null = null;
 let messageWindow: BrowserWindow | null = null;
+let meetingRoomWindow: BrowserWindow | null = null;
 let screenWidth: number;
 let screenHeight: number;
 
@@ -111,6 +112,52 @@ const createDialWindow = () => {
   }
 
   dialWindow.loadURL(resolveWindowHtmlPath('index.html#/dialingPreview'));
+};
+
+const createMeetingRoomWindow = () => {
+  // Create the browser window.
+  meetingRoomWindow = new BrowserWindow({
+    title: "Armscor",
+    width: 1100,
+    height: 600,
+    maxWidth: 550,
+    maxHeight: 300,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    closable: true,
+    fullscreenable: false,
+    parent: mainWindow,
+    roundedCorners: false,
+    x: screenWidth - 1200,
+    y: screenHeight - 700,
+    webPreferences: {
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
+    },
+    frame: false,
+    autoHideMenuBar: true,
+    transparent: true,
+    skipTaskbar: true,
+    hasShadow: false,
+    show: false,
+  });
+  // preventRefresh(dialWindow);
+
+  const dev = app.commandLine.hasSwitch("dev");
+  if (!dev) {
+    let level = "normal";
+    // Mac OS requires a different level for our drag/drop and overlay
+    // functionality to work as expected.
+    if (process.platform === "darwin") {
+      level = "floating";
+    }
+
+    meetingRoomWindow.setAlwaysOnTop(false, level);
+  }
+
+  meetingRoomWindow.loadURL(resolveWindowHtmlPath('index.html#/meetingRoom'));
 };
 
 const createMessageWindow = () => {
@@ -256,6 +303,16 @@ ipcMain.on("receivingMessage", async (_event, args) => {
   messageWindow.focus();
 });
 
+ipcMain.on("meetingRoomWindow", async (_event, args) => {
+  if (!meetingRoomWindow) {
+    throw new Error('meetingRoomWindow is not defined');
+  }
+
+  meetingRoomWindow.webContents.send('updateMeetingWindowContent', args);
+  meetingRoomWindow.show();
+  meetingRoomWindow.focus();
+});
+
 ipcMain.on("joinMeetingEvent", async (_event, args) => {
   if (!mainWindow) {
     throw new Error('"mainWindow" is not defined');
@@ -385,6 +442,7 @@ app
     createWindow();
     createDialWindow();
     createMessageWindow();
+    createMeetingRoomWindow();
 
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

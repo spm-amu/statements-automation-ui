@@ -19,6 +19,7 @@ import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
 import ClosablePanel from "../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
 import appManager from "../../../common/service/AppManager";
+import MeetingRoomSummary from "../vc/MeetingRoomSummary";
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -59,7 +60,6 @@ const joinInAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/join
 const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
 const errorAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/error.mp3');
 const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
-
 
 const MeetingRoom = (props) => {
   const [sideBarOpen, setSideBarOpen] = useState(false);
@@ -423,10 +423,14 @@ const MeetingRoom = (props) => {
         paper.style.transform = windowTransformValue;
       }
 
+      paper.style.color = '#FFFFFF';
+      paper.style.backgroundColor = '#000000';
       paper.style.width = '700px';
       paper.style.height = '350px';
       paper.style.margin = '0 16px 16px 16px';
 
+      let header = document.getElementsByClassName('dialogHeader')[0];
+      header.getElementsByTagName('button')[0].style.color = '#FFFFFF';
       document.getElementById('meeting-window-title').style.cursor = 'move';
       setDisplayState('MINIMIZED');
     }
@@ -443,10 +447,14 @@ const MeetingRoom = (props) => {
       setWindowTransformValue(paper.style.transform);
       paper.style.transform = 'translate(0, 0)';
 
+      paper.style.color = '#1d253b';
+      paper.style.backgroundColor = '#FFFFFF';
       paper.style.width = '100%';
       paper.style.height = '100%';
       paper.style.margin = isSidebarHidden ? '136px 0 0 0' : '136px 0 0 144px';
 
+      let header = document.getElementsByClassName('dialogHeader')[0];
+      header.getElementsByTagName('button')[0].style.color = 'rgba(0, 0, 0, 0.54)';
       document.getElementById('meeting-window-title').style.cursor = 'default';
       setDisplayState('MAXIMIZED');
     }
@@ -515,8 +523,9 @@ const MeetingRoom = (props) => {
   }, [audioMuted]);
 
   return (
-    <div style={{width: '100%', height: '100%', maxHeight: '100%', overflowX: 'hidden', overflowY: 'auto', border: '8px solid red'}}>
+    <div style={{width: '100%', height: '100%', maxHeight: '100%', overflowX: 'hidden', overflowY: 'auto'}}>
       <StyledDialog
+        disableEnforceFocus
         open={true}
         onClose={(e) => {
         }}
@@ -576,6 +585,7 @@ const MeetingRoom = (props) => {
                          allUserParticipantsLeft={allUserParticipantsLeft}
                   />
                   :
+                  displayState === 'MAXIMIZED' ?
                   <MeetingParticipantGrid participants={participants}
                                           waitingList={lobbyWaitingList}
                                           acceptUserHandler={
@@ -587,6 +597,8 @@ const MeetingRoom = (props) => {
                                               rejectUser(item);
                                             }}
                   />
+                    :
+                    <MeetingRoomSummary participants={participants} participantsRaisedHands={participantsRaisedHands}/>
               }
               </div>
               {
@@ -596,6 +608,7 @@ const MeetingRoom = (props) => {
                         audioMuted={audioMuted}
                         videoMuted={videoMuted}
                         handRaised={handRaised}
+                        displayState={displayState}
                         step={step}
                         toolbarEventHandler={
                           {

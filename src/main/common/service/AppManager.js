@@ -9,11 +9,21 @@ class AppManager {
     return AppManager.instance;
   }
 
+  setHandler = (handler) => {
+    this.handler = handler;
+  };
+
   setUserDetails = (userDetails) => {
     this.store.userDetails = userDetails;
   };
 
   getUserDetails = () => {
+    console.log("HANDLER : ", this.handler);
+    if (this.handler) {
+      console.log("USER DETAILS : ", this.handler.getUserDetails());
+      return this.handler.getUserDetails();
+    }
+
     return this.store.userDetails;
   };
 
@@ -24,11 +34,15 @@ class AppManager {
    * @param eventTypes the subscription to be added
    */
   addSubscriptions = (handler, ...eventTypes) => {
-    for (const eventType of eventTypes) {
-      this.subscriptions.push({
-        handler,
-        eventType
-      });
+    if (this.handler) {
+      this.handler.addSubscriptions(handler, eventTypes);
+    } else {
+      for (const eventType of eventTypes) {
+        this.subscriptions.push({
+          handler,
+          eventType
+        });
+      }
     }
   };
 
@@ -40,15 +54,23 @@ class AppManager {
    * @return false if any subscriptions cancel the event.
    */
   async fireEvent(eventType, be) {
-    for (const subscription of this.subscriptions) {
-      if (subscription.eventType === eventType) {
-        subscription.handler.api.on(eventType, be);
+    if (this.handler) {
+      this.handler.fireEvent(eventType, be);
+    } else {
+      for (const subscription of this.subscriptions) {
+        if (subscription.eventType === eventType) {
+          subscription.handler.api.on(eventType, be);
+        }
       }
     }
   }
 
-  removeSubscriptions = (handler) => {
-    this.subscriptions = this.subscriptions.filter((sub) => sub.handler.api.id !== handler.api.id);
+  removeSubscriptions = (eventHandler) => {
+    if (this.handler) {
+      this.handler.removeSubscriptions(eventHandler);
+    } else {
+      this.subscriptions = this.subscriptions.filter((sub) => sub.handler.api.id !== eventHandler.api.id);
+    }
   };
 
   /**
@@ -56,11 +78,15 @@ class AppManager {
    *
    */
   clearAllEventListeners() {
-    this.subscriptions.splice(0, this.subscriptions.length);
+    if (this.handler) {
+      this.handler.clearAllEventListeners();
+    } else {
+      this.subscriptions.splice(0, this.subscriptions.length);
+    }
   };
 }
 
 const instance = new AppManager();
-Object.freeze(instance);
+//Object.freeze(instance);
 
 export default instance;

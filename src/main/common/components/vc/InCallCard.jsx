@@ -22,7 +22,8 @@ const InCall = (props) => {
   return (
     <div
       className={'col person-card-wrapper'}
-      style={{marginLeft: '0', paddingLeft: '0', maxWidth: '400px', borderBottom: '1px solid #e1e1e1'}}
+      style={{marginLeft: '0', paddingLeft: '0', maxWidth: props.maxWidth ? props.maxWidth : '400px',
+        borderBottom: props.borderBottom ? props.borderBottom : '1px solid #e1e1e1'}}
     >
       <div className="participant-card">
         <div className="row no-margin person-card">

@@ -6,6 +6,7 @@ import appManager from "../../../common/service/AppManager";
 
 const Footer = (props) => {
   const {
+    displayState,
     videoMuted,
     audioMuted,
     screenShared,
@@ -19,21 +20,24 @@ const Footer = (props) => {
     <div className={'vc-footer'}
     >
       <div className={'row'}>
-        <div  className={'col time'}>
-          <h3
-            style={{
-              position: 'absolute',
-              fontSize: 'auto',
-              marginBottom: '0'
-            }}
-          >
-            {new Date().toLocaleString('en-US', {
-              hour12: true,
-              hour: 'numeric',
-              minute: 'numeric',
-            })}
-          </h3>
-        </div>
+        {
+          displayState === 'MAXIMIZED' &&
+          <div  className={'col time'}>
+            <h3
+              style={{
+                position: 'absolute',
+                fontSize: 'auto',
+                marginBottom: '0'
+              }}
+            >
+              {new Date().toLocaleString('en-US', {
+                hour12: true,
+                hour: 'numeric',
+                minute: 'numeric',
+              })}
+            </h3>
+          </div>
+        }
         <div className={'col toolbar-container'}>
           <Toolbar eventHandler={props.toolbarEventHandler}
                    handRaised={handRaised}
@@ -44,25 +48,28 @@ const Footer = (props) => {
                    step={step}
           />
         </div>
-        <div className={'col video'}>
-          <div
-            style={{display: 'flex', justifyContent: 'flex-end'}}
-          >
-            <section className="call-overlay-footer-yourself">
-              <MeetingParticipant
-                data={{
-                  peer: null,
-                  name: appManager.getUserDetails().name,
-                  avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
-                }}
-                videoMuted={videoMuted}
-                audioMuted={audioMuted}
-                displayName={false}
-                ref={userVideo}
-              />
-            </section>
+        {
+          displayState === 'MAXIMIZED' &&
+          <div className={'col video'}>
+            <div
+              style={{display: 'flex', justifyContent: 'flex-end'}}
+            >
+              <section className="call-overlay-footer-yourself">
+                <MeetingParticipant
+                  data={{
+                    peer: null,
+                    name: appManager.getUserDetails().name,
+                    avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+                  }}
+                  videoMuted={videoMuted}
+                  audioMuted={audioMuted}
+                  displayName={false}
+                  ref={userVideo}
+                />
+              </section>
+            </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   );
