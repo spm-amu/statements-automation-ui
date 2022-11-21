@@ -17,6 +17,8 @@
 video {
   object-fit: fill;
   height: unset;
+  max-height: 65vh;
+  min-height: 200px;
 }
 
 @media  screen and (max-width:800px) {

@@ -66,7 +66,7 @@ const MeetingParticipantGrid = (props) => {
     return (
       <div className={'col item'} key={index}>
         {col.map((participant, index) => {
-          return <div style={{height: ((100 / col.length)) + '%', maxHeight: ((100 / col.length)) + '%'}} key={index}>
+          return <div style={{width: '100%', height: ((100 / col.length)) + '%', maxHeight: ((100 / col.length)) + '%'}} key={index}>
             <MeetingParticipant data={participant} showName={true} videoMuted={participant.videoMuted}
                                 audioMuted={participant.audioMuted}/>
           </div>
