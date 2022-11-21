@@ -33,7 +33,7 @@ const Meeting = (props) => {
   const [hostAttendee, setHostAttendee] = useState(null);
   const [attendees, setAttendees] = useState([]);
   const [readOnly, setReadOnly] = useState(true);
-  const { selectedEvent: selectedMeeting } = props;
+  const {selectedEvent: selectedMeeting} = props;
   const [value, setValue] = useState(null);
   const [errors, setErrors] = useState({});
   const [edited, setEdited] = useState(false);
@@ -63,13 +63,13 @@ const Meeting = (props) => {
       }
     }
 
-    if(props.selectedEvent.recurringFreq !== null) {
+    if (props.selectedEvent.recurringFreq !== null) {
       setRepeatingEvery(props.selectedEvent.recurringFreq);
       setEventRecurrence(props.selectedEvent.recurringFreq);
       setNumberOfOccurences(props.selectedEvent.recurringInterval);
 
       if (props.selectedEvent.recurringFreq === 'MONTHLY') {
-        if(props.selectedEvent.recurringBymonthday !== null) {
+        if (props.selectedEvent.recurringBymonthday !== null) {
           setMonthlyDayType("monthlyCalendarDay");
           setByMonthDay(props.selectedEvent.recurringBymonthday);
         } else {
@@ -78,17 +78,17 @@ const Meeting = (props) => {
           setByWeekDay(props.selectedEvent.recurringByweekday[0]);
         }
       } else if (props.selectedEvent.recurringFreq === 'WEEKLY') {
-         setWeekDays(props.selectedEvent.recurringByweekday);
+        setWeekDays(props.selectedEvent.recurringByweekday);
       }
     }
 
     return !Utils.isNull(host)
       ? {
-          ...props.selectedEvent,
-          ['attendees']: props.selectedEvent.attendees.filter(
-            (item) => item.userId !== host.userId
-          ),
-        }
+        ...props.selectedEvent,
+        ['attendees']: props.selectedEvent.attendees.filter(
+          (item) => item.userId !== host.userId
+        ),
+      }
       : props.selectedEvent;
   };
 
@@ -148,20 +148,20 @@ const Meeting = (props) => {
   }, []);
 
   // ** Custom select components
-  const OptionComponent = ({ data, ...props }) => {
+  const OptionComponent = ({data, ...props}) => {
     return (
       <components.Option {...props}>
-        <span className={`bullet bullet-${data.color} bullet-sm me-50`} />
+        <span className={`bullet bullet-${data.color} bullet-sm me-50`}/>
         {data.label}
       </components.Option>
     );
   };
 
-  const GuestsComponent = ({ data, ...props }) => {
+  const GuestsComponent = ({data, ...props}) => {
     return (
       <components.Option {...props}>
         <div className="d-flex flex-wrap align-items-center">
-          <Avatar className="my-0 me-1" size="sm" img={data.avatar} />
+          <Avatar className="my-0 me-1" size="sm" img={data.avatar}/>
           <div>{data.name}</div>
         </div>
       </components.Option>
@@ -212,7 +212,7 @@ const Meeting = (props) => {
       }
 
       if (eventRecurrence === 'WEEKLY') {
-        let occurs = [ 'mo', 'tu', 'we', 'th', 'fr', 'sa', 'su' ];
+        let occurs = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
 
         if (weekDays && weekDays.length > 0) {
           occurs = weekDays;
@@ -274,7 +274,8 @@ const Meeting = (props) => {
         (response) => {
           handleClose();
         },
-        (e) => {},
+        (e) => {
+        },
         data,
         "The meeting details have been saved successfully"
       );
@@ -295,13 +296,14 @@ const Meeting = (props) => {
       (response) => {
         handleClose();
       },
-      (e) => {},
+      (e) => {
+      },
       "The meeting has been cancelled successfully"
     );
   };
 
   const handleJoin = (e) => {
-    navigate('/view/joinMeetingSettings', { state: selectedMeeting });
+    navigate('/view/joinMeetingSettings', {state: selectedMeeting});
   };
 
   const validateField = (fieldId, fieldValue) => {
@@ -310,7 +312,7 @@ const Meeting = (props) => {
       (typeof fieldValue === 'string' && Utils.isStringEmpty(fieldValue))
     ) {
       value[fieldId] = null;
-      setErrors({ ...errors, [fieldId]: true });
+      setErrors({...errors, [fieldId]: true});
       return false;
     }
 
@@ -322,7 +324,7 @@ const Meeting = (props) => {
       return;
     }
 
-    setErrors({ ...errors, [id]: false });
+    setErrors({...errors, [id]: false});
     value[id] = fieldValue;
 
     if (!Utils.isNull(props.selectedEvent)) {
@@ -403,7 +405,7 @@ const Meeting = (props) => {
             margin: '16px 0',
           }}
         >
-          <div style={{ marginRight: '4px' }}>
+          <div style={{marginRight: '4px'}}>
             <Button
               onClick={(e) => handleAdd()}
               variant={'contained'}
@@ -429,7 +431,7 @@ const Meeting = (props) => {
           margin: '16px 0',
         }}
       >
-        <div style={{ marginRight: '4px' }}>
+        <div style={{marginRight: '4px'}}>
           {/*<Button
             variant={'contained'}
             size="large"
@@ -439,14 +441,17 @@ const Meeting = (props) => {
             RESPOND
           </Button>*/}
         </div>
-        <Button
-          variant={'contained'}
-          size="large"
-          color={'primary'}
-          onClick={(e) => handleJoin(e)}
-        >
-          JOIN
-        </Button>
+        {
+          !appManager.get('CURRENT_MEETING') &&
+          <Button
+            variant={'contained'}
+            size="large"
+            color={'primary'}
+            onClick={(e) => handleJoin(e)}
+          >
+            JOIN
+          </Button>
+        }
         <Button variant={'text'} size="large" onClick={(e) => handleClose(e)}>
           CLOSE
         </Button>
@@ -460,18 +465,21 @@ const Meeting = (props) => {
           margin: '16px 0',
         }}
       >
-        <div style={{ marginRight: '4px' }}>
-          <Button
-            variant={'contained'}
-            size="large"
-            color={'primary'}
-            onClick={(e) => handleJoin(e)}
-          >
-            JOIN
-          </Button>
+        <div style={{marginRight: '4px'}}>
+          {
+            !appManager.get('CURRENT_MEETING') &&
+            <Button
+              variant={'contained'}
+              size="large"
+              color={'primary'}
+              onClick={(e) => handleJoin(e)}
+            >
+              JOIN
+            </Button>
+          }
         </div>
         {edited ? (
-          <div style={{ marginRight: '4px' }}>
+          <div style={{marginRight: '4px'}}>
             <Button
               variant={'contained'}
               size="large"
@@ -482,7 +490,7 @@ const Meeting = (props) => {
             </Button>
           </div>
         ) : null}
-        <div style={{ marginRight: '4px' }}>
+        <div style={{marginRight: '4px'}}>
           <Button
             variant={'text'}
             size="large"
@@ -500,7 +508,7 @@ const Meeting = (props) => {
 
   // ** Close BTN
   const CloseBtn = (
-    <X className="cursor-pointer" size={15} onClick={(e) => handleClose(e)} />
+    <X className="cursor-pointer" size={15} onClick={(e) => handleClose(e)}/>
   );
 
   const onRecurrenceChecked = () => {
@@ -511,7 +519,7 @@ const Meeting = (props) => {
 
   const setRecurrentBody = (
     value &&
-    <div style={{ width: '100%' }}>
+    <div style={{width: '100%'}}>
       <div className={'row no-margin'}>
         <div className={'col-*-*'}>
           <DatePicker
@@ -554,11 +562,11 @@ const Meeting = (props) => {
               'Specify number of occurences required. Please enter a number'
             }
           />
-          <br />
+          <br/>
         </div>
         <div className={'col-*-*'}>
           <Select
-            style={{ width: '100%' }}
+            style={{width: '100%'}}
             labelId="event-recurrence-label"
             id="setEventRecurrenceSelect"
             value={eventRecurrence}
@@ -570,8 +578,8 @@ const Meeting = (props) => {
             <MenuItem value={'WEEKLY'}>Week</MenuItem>
             <MenuItem value={'MONTHLY'}>Month</MenuItem>
           </Select>
-          <br />
-          <br />
+          <br/>
+          <br/>
         </div>
 
         {eventRecurrence === 'WEEKLY' ? (
@@ -652,7 +660,7 @@ const Meeting = (props) => {
             <div className={'col-*-*'}>
               <FormControlLabel
                 value="monthlyCalendarDay"
-                control={<Radio />}
+                control={<Radio/>}
                 label="On day"
               />
             </div>
@@ -670,7 +678,7 @@ const Meeting = (props) => {
                 }}
                 errorMessage={'Please enter a number'}
               />
-              <br />
+              <br/>
             </div>
           </div>
 
@@ -678,14 +686,14 @@ const Meeting = (props) => {
             <div className={'col-*-*'}>
               <FormControlLabel
                 value="monthlyWeekDay"
-                control={<Radio />}
+                control={<Radio/>}
                 label="On the"
               />
             </div>
 
             <div className={'col-*-*'}>
               <Select
-                style={{ width: '100%' }}
+                style={{width: '100%'}}
                 labelId="bysetpos-label"
                 id="bySetPosSelect"
                 value={bysetpos}
@@ -707,7 +715,7 @@ const Meeting = (props) => {
 
             <div className={'col-*-*'}>
               <Select
-                style={{ width: '100%' }}
+                style={{width: '100%'}}
                 labelId="byWeek-day-label"
                 id="byWeekDaySelect"
                 value={byWeekDay}
@@ -803,7 +811,7 @@ const Meeting = (props) => {
           </h2>
         </div>
 
-        <div style={{ width: '80%' }}>
+        <div style={{width: '80%'}}>
           <Form>
             {readOnly && !Utils.isNull(hostAttendee) ? (
               <div>From {hostAttendee.name}</div>
@@ -846,12 +854,12 @@ const Meeting = (props) => {
               >
                 <FormControlLabel
                   value="PRIVATE"
-                  control={<Radio disabled={readOnly} />}
+                  control={<Radio disabled={readOnly}/>}
                   label="Private"
                 />
                 <FormControlLabel
                   value="PUBLIC"
-                  control={<Radio disabled={readOnly} />}
+                  control={<Radio disabled={readOnly}/>}
                   label="Public"
                 />
               </RadioGroup>
@@ -876,7 +884,7 @@ const Meeting = (props) => {
                       }
                     />
                   </div>
-                  <div className={'col-*-*'} style={{ paddingLeft: '8px' }}>
+                  <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
                     <TimePicker
                       label="Start time"
                       id="startTime"
@@ -913,7 +921,7 @@ const Meeting = (props) => {
                     />
                   </div>
 
-                  <div className={'col-*-*'} style={{ paddingLeft: '8px' }}>
+                  <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
                     <TimePicker
                       label="End time"
                       disabled={readOnly}
@@ -933,11 +941,11 @@ const Meeting = (props) => {
               </div>
             </div>
 
-            <div style={{ marginTop: '8px' }}>
+            <div style={{marginTop: '8px'}}>
               <div className={'row no-margin'}>
-                <div className={'col-*-*'} style={{ width: '20%'}}>
+                <div className={'col-*-*'} style={{width: '20%'}}>
                   <Select
-                    style={{ width: '100%' }}
+                    style={{width: '100%'}}
                     labelId="event-recurrence-label"
                     id="setEventRecurrenceSelect"
                     value={eventRecurrence}
@@ -954,22 +962,22 @@ const Meeting = (props) => {
 
                 {
                   eventRecurrence === 'MONTHLY' ? (
-                <div className={'col-*-*'}>
-                  <EventMessageComponent
-                    recurringType={eventRecurrence}
-                    numberOfOccurences={numberOfOccurences}
-                    monthlyDayType={monthlyDayType}
-                    byMonthDay={byMonthDay}
-                    byWeekDay={byWeekDay}
-                    bysetpos={bysetpos}
-                    recurringEndDate={value && value.endDate ? value.endDate : null}
-                  />
-                </div>) : null
+                    <div className={'col-*-*'}>
+                      <EventMessageComponent
+                        recurringType={eventRecurrence}
+                        numberOfOccurences={numberOfOccurences}
+                        monthlyDayType={monthlyDayType}
+                        byMonthDay={byMonthDay}
+                        byWeekDay={byWeekDay}
+                        bysetpos={bysetpos}
+                        recurringEndDate={value && value.endDate ? value.endDate : null}
+                      />
+                    </div>) : null
                 }
               </div>
             </div>
 
-            <div style={{ marginTop: '8px' }}>
+            <div style={{marginTop: '8px'}}>
               <AutoComplete
                 id="attendees"
                 label={'Attendees'}
@@ -993,7 +1001,7 @@ const Meeting = (props) => {
                 optionsUrl={`${host}/api/v1/auth/search`}
               />
             </div>
-            <div style={{ marginTop: '12px' }}>
+            <div style={{marginTop: '12px'}}>
               <AutoComplete
                 id="locations"
                 label={'Locations'}
@@ -1053,7 +1061,7 @@ const Meeting = (props) => {
               ) : null}
             </div>*/}
             <div className="d-flex mb-1">
-              <EventActions />
+              <EventActions/>
             </div>
           </Form>
         </div>

@@ -5,6 +5,7 @@ import IconButton from "@material-ui/core/IconButton";
 import socketManager from "../../common/service/SocketManager";
 import {MessageType} from "../types";
 import {useNavigate} from 'react-router-dom';
+import appManager from "../service/AppManager";
 
 const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
 
@@ -79,7 +80,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
           }
         </div>
         {
-          props.dialEnabled &&
+          !appManager.get('CURRENT_MEETING') && props.dialEnabled &&
           <div style={{marginRight: '4px'}} className={'buttons'}>
             <IconButton
               onClick={(e) => {
@@ -95,7 +96,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
           </div>
         }
         {
-          props.dialEnabled &&
+          !appManager.get('CURRENT_MEETING') && props.dialEnabled &&
           <div className={'col-*-*'}>
             <IconButton
               onClick={(e) => {

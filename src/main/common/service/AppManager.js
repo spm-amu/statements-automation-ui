@@ -17,6 +17,18 @@ class AppManager {
     this.store.userDetails = userDetails;
   };
 
+  add = (id, value) => {
+    this.store[id] = value;
+  };
+
+  get = (id) => {
+    return this.store[id];
+  };
+
+  remove = (id) => {
+    delete this.store[id];
+  };
+
   getUserDetails = () => {
     console.log("HANDLER : ", this.handler);
     if (this.handler) {

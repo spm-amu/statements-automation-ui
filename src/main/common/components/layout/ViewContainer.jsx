@@ -11,6 +11,7 @@ import People from "../view/People";
 import MeetingRoom from "../view/MeetingRoom";
 import Window from "../Window";
 import {useNavigate} from 'react-router-dom';
+import appManager from "../../../common/service/AppManager";
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -61,6 +62,7 @@ const ViewContainer = (props) => {
 
     if (data !== currentMeeting && viewId === 'meetingRoom') {
       setCurrentMeeting(data);
+      appManager.add('CURRENT_MEETING', data);
     }
 
     switch (currentView) {
@@ -113,7 +115,10 @@ const ViewContainer = (props) => {
             onEndCall={() => {
               setWindowOpen(false);
               setCurrentDisplayMode('inline');
+              setWindowDisplayState('MAXIMIZED');
               setCurrentWindow(null);
+              setCurrentMeeting(null);
+              appManager.remove('CURRENT_MEETING');
             }}
             displayState={windowDisplayState}
             selectedMeeting={currentMeeting.selectedMeeting}
