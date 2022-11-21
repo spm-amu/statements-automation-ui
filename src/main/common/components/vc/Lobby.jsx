@@ -10,6 +10,7 @@ const ATTENDEE_WAITING_FOR_PERMISION_MESSAGE = 'Waiting for the meeting host to 
 
 const Lobby = (props) => {
   const {
+    meetingTitle,
     waitingList
   } = props;
 
@@ -43,10 +44,13 @@ const Lobby = (props) => {
                 overflow: 'hidden'
               }}
             >
-              <div className={'centered-flex-box'}>
-                <LottieIcon id={'waiting'}/>
+              <div style={props.displayState === 'MINIMIZED' ? {margin: '0 8px', fontSize: '20px'} : null}>
+                {meetingTitle}
               </div>
-              <div>
+              <div className={'centered-flex-box'}>
+                <LottieIcon id={props.displayState === 'MINIMIZED' ? 'waiting-sm' : 'waiting'}/>
+              </div>
+              <div style={props.displayState === 'MINIMIZED' ? {margin: '0 8px', fontSize: '20px'} : null}>
                 {
                   props.isHost || props.allUserParticipantsLeft ?
                     WAITING_FOR_OTHERS_TO_JOIN_MESSAGE

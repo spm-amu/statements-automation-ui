@@ -8,6 +8,25 @@ import chatData from '../assets/lotties/msg2';
 
 const LottieIcon = (props) => {
 
+	if (props.id === 'waiting-sm') {
+    return (
+      <div>
+        <Lottie
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: waitingData,
+            rendererSettings: {
+              preserveAspectRatio: "xMidYMid slice"
+            }
+          }}
+          height={80}
+          width={80}
+        />
+      </div>
+    );
+  }
+
 	if (props.id === 'waiting') {
     return (
       <div>

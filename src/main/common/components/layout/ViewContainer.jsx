@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {useLocation, useParams} from 'react-router-dom';
 import Calendar from '../view/Calendar';
@@ -7,16 +7,28 @@ import Files from '../view/Files';
 import MeetingHistory from '../view/MeetingHistory';
 import Meeting from '../view/Meeting';
 import JoinMeetingSettings from '../view/JoinMeetingSettings';
-import MeetingRoom from '../view/MeetingRoom';
 import People from "../view/People";
+import MeetingRoom from "../view/MeetingRoom";
+import Window from "../Window";
+import {useNavigate} from 'react-router-dom';
 
 const ViewContainer = (props) => {
   const params = useParams();
   const location = useLocation();
-  const currentView = useRef(null);
-  const ref = useRef();
-  const activeMeetingDetails = useRef(null);
-  const minimizeMaximizeViewSwitch = useRef(0);
+  const [currentWindow, setCurrentWindow] = useState(null);
+  const [currentView, setCurrentView] = useState(null);
+  const [currentMeeting, setCurrentMeeting] = useState(null);
+  const [currentDisplayMode, setCurrentDisplayMode] = useState('inline');
+  const [windowMinimizable, setWindowMinimizable] = useState(false);
+  const [windowOpen, setWindowOpen] = useState(false);
+  const [windowDisplayState, setWindowDisplayState] = useState('MAXIMIZED');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentDisplayMode === 'window') {
+      setWindowOpen(true);
+    }
+  }, [currentDisplayMode]);
 
   const renderView = () => {
     let viewId = params.id;
@@ -24,28 +36,34 @@ const ViewContainer = (props) => {
     let data = location.state;
     let displayMode = null;
 
-    if(data) {
+    if (data) {
       displayMode = data.displayMode;
     }
 
-    if (viewId !== currentView) {
-      minimizeMaximizeViewSwitch.current++;
+    if (!displayMode) {
+      displayMode = 'inline';
     }
 
-    if (viewId === 'meetingRoom'
-      && displayMode !== 'window') {
-      // Do not navigate
-      viewId = currentView.current;
-    } else {
-      if (viewId !== 'meetingRoom') {
-        currentView.current = viewId;
-      } else {
-        minimizeMaximizeViewSwitch.current = 0;
-        activeMeetingDetails.current = data;
+    if (displayMode !== currentDisplayMode) {
+      setCurrentDisplayMode(displayMode);
+    }
+
+    if (displayMode === 'inline' && viewId !== currentView) {
+      setCurrentView(viewId);
+      if(windowOpen) {
+        setWindowDisplayState('MINIMIZED');
       }
     }
 
-    switch (viewId) {
+    if (displayMode === 'window' && viewId !== currentWindow) {
+      setCurrentWindow(viewId);
+    }
+
+    if (data !== currentMeeting && viewId === 'meetingRoom') {
+      setCurrentMeeting(data);
+    }
+
+    switch (currentView) {
       case 'calendar':
         element = <Calendar/>;
         break;
@@ -64,9 +82,6 @@ const ViewContainer = (props) => {
       case 'joinMeetingSettings':
         element = <JoinMeetingSettings selectedMeeting={location.state}/>;
         break;
-      case 'meetingRoom':
-        //element = <Calendar/>;
-        break;
       case 'people':
         element = <People/>;
         break;
@@ -77,22 +92,38 @@ const ViewContainer = (props) => {
         element
       }
       {
-        activeMeetingDetails.current &&
-        <div style={{visibility: 'hidden', width: '100%', height: '100%'}} ref={ref}>
+        currentWindow === 'meetingRoom' && currentMeeting &&
+        <Window minimizable={true} open={windowOpen}
+                displayState={windowDisplayState} onDisplayModeChange={
+                  (mode) => {
+                    setWindowDisplayState(mode);
+                    let meetingContainer = document.getElementsByClassName('meeting-window-container')[0];
+                    meetingContainer.style.overflowY = mode === 'MINIMIZED' ? 'hidden' : 'auto';
+                    if(currentView === 'joinMeetingSettings') {
+                      navigate('/view/calendar');
+                    }
+                  }
+                }>
           <MeetingRoom
             closeHandler={() => {
-              activeMeetingDetails.current = null;
-              minimizeMaximizeViewSwitch.current = 0;
+              if(currentView === 'joinMeetingSettings') {
+                navigate('/view/calendar');
+              }
             }}
-            viewSwitch={minimizeMaximizeViewSwitch.current}
-            selectedMeeting={activeMeetingDetails.current.selectedMeeting}
-            videoMuted={activeMeetingDetails.current.videoMuted}
-            audioMuted={activeMeetingDetails.current.audioMuted}
-            isHost={activeMeetingDetails.current.isHost}
-            isDirectCall={activeMeetingDetails.current.isDirectCall}
-            userToCall={activeMeetingDetails.current.userToCall}
+            onEndCall={() => {
+              setWindowOpen(false);
+              setCurrentDisplayMode('inline');
+              setCurrentWindow(null);
+            }}
+            displayState={windowDisplayState}
+            selectedMeeting={currentMeeting.selectedMeeting}
+            videoMuted={currentMeeting.videoMuted}
+            audioMuted={currentMeeting.audioMuted}
+            isHost={currentMeeting.isHost}
+            isDirectCall={currentMeeting.isDirectCall}
+            userToCall={currentMeeting.userToCall}
           />
-        </div>
+        </Window>
       }
     </>
   };
