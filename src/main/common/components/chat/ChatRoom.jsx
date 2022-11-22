@@ -55,7 +55,7 @@ const ChatRoom = (props) => {
 
   useEffect(() => {
     loadMessages();
-  }, [selectedChat]);
+  }, [selectedChat, props.messageRefresher]);
 
   useEffect(() => {
     setCurrentUser(appManager.getUserDetails());
@@ -95,7 +95,7 @@ const ChatRoom = (props) => {
 
       setMessages(oldMsgs => [...oldMsgs, msg]);
 
-      props.onMassageHandler(msg);
+      props.onMassageHandler(msg, selectedChat);
 
       scrollToBottom();
     }

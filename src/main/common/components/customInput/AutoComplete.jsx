@@ -76,6 +76,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
               emptyOptions.push({
                 emailAddress: newInputValue,
                 type: 'REQUIRED',
+                external: true,
                 name: newInputValue,
                 label: newInputValue
               });

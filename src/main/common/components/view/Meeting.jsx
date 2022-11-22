@@ -209,7 +209,7 @@ const Meeting = (props) => {
         interval: numberOfOccurences,
         dtstart: new Date(Utils.getFormattedDate(value.startDate) + " " + value.startTime.toLocaleTimeString('it-IT')),
         until: recEndDate
-      }
+      };
 
       if (eventRecurrence === 'WEEKLY') {
         let occurs = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
@@ -248,6 +248,7 @@ const Meeting = (props) => {
     };
 
     setErrors(errorState);
+
     if (!hasErrors(errorState)) {
       let userDetails = appManager.getUserDetails();
       let _hostAttendee;
@@ -269,6 +270,27 @@ const Meeting = (props) => {
       }
 
       let data = createMeetingObject(_hostAttendee);
+      let externalAttendees = data.attendees.filter((attendee) => attendee.external === true);
+
+      console.log("\n\n\nDOCS : ", data.documents);
+      if(externalAttendees.length > 0 && data.documents && data.documents.length > 0) {
+        let hasNewDoc = false;
+
+        for (const document of data.documents) {
+          if(!document.id) {
+            hasNewDoc = true;
+            break;
+          }
+        }
+
+        // TODO : Check if the external user is new
+        if(hasNewDoc) {
+          alert("You have selected attendees outside your organisation. Would you like to proceed and share the attached files?");
+        }
+
+        return;
+      }
+
       post(
         `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
         (response) => {

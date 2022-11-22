@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import ChatRoomList from '../chat/ChatRoomList';
 import ChatRoom from '../chat/ChatRoom';
 import './Chat.scss';
 import ChatForm from "../chat/ChatForm";
 import socketManager from '../../service/SocketManager';
-import { get, host } from '../../service/RestService';
-import Utils from '../../Utils';
+import {get, host} from '../../service/RestService';
 import moment from 'moment';
-import { MessageType } from '../../types';
+import {MessageType} from '../../types';
 
 const Chats = (props) => {
   const [selectedChat, setSelectedChat] = useState(null);
   const [newChat, setNewChat] = useState(null);
   const [chatEvents, setChatEvents] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [messageRefresher, setMessageRefresher] = useState(false);
   const [mode, setMode] = useState('LIST');
   const [socketEventHandler] = useState({});
 
@@ -56,24 +56,24 @@ const Chats = (props) => {
     };
   }, []);
 
-  const onMessage = (message) => {
-    let updatedChatEvent = chatEvents.find(chat => chat.id === selectedChat.id);
-    updatedChatEvent.updatedAt = moment().format();
+  const onMessage = (payload) => {
+    let updatedChatEvent = chatEvents.find(chat => chat.id === payload.roomId);
+    processMessage(payload.chatMessage, updatedChatEvent);
+  };
 
-    if (message.chatMessage) {
-      updatedChatEvent.messages.push(message.chatMessage);
-    } else {
-      updatedChatEvent.messages.push(message);
-    }
+  const processMessage = (message, chat) => {
+    chat.updatedAt = moment().format();
+    chat.messages.push(message);
 
-    setSelectedChat(updatedChatEvent);
+    setSelectedChat(chat);
+    setMessageRefresher(!messageRefresher);
 
     const sorted = chatEvents
       .slice()
       .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
     setChatEvents([].concat(sorted))
-  }
+  };
 
   return (
     !loading &&
@@ -89,7 +89,10 @@ const Chats = (props) => {
             </div>
             <div style={{width: "70%"}}>
               {
-                selectedChat && <ChatRoom onMassageHandler={onMessage} selectedChat={selectedChat}/>
+                selectedChat && <ChatRoom onMassageHandler={(message, chat) => processMessage(message, chat)}
+                                          selectedChat={selectedChat}
+                                          messageRefresher={messageRefresher}
+                />
               }
             </div>
           </div>
