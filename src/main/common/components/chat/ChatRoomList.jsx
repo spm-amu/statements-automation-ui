@@ -1,16 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import ChatRoomItem from './ChatRoomItem';
 import './ChatRooms.scss';
-import {IconButton} from '@material-ui/core';
+import { IconButton } from '@material-ui/core';
 import Tooltip from '@material-ui/core/Tooltip';
-import socketManager from '../../service/SocketManager';
 
 const ChatRoomList = (props) => {
 
   const [chats, setChats] = useState([]);
 
   const updateChatList = (chat) => {
-    socketManager.chatEvents.push(chat);
     setChats(chats.concat([chat]));
   };
 
@@ -19,7 +17,7 @@ const ChatRoomList = (props) => {
   };
 
   useEffect(() => {
-    setChats(socketManager.chatEvents);
+    setChats(props.chatEvents);
   }, []);
 
   useEffect(() => {
@@ -49,8 +47,13 @@ const ChatRoomList = (props) => {
       </div>
       <div className="chatrooms__rooms">
         {chats
-          .sort((a, b) => new Date(b.updatedDate) - new Date(a.updatedDate))
+          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
           .map((event, index) => {
+
+            event.messages = event.messages
+              .slice()
+              .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
+
             return <ChatRoomItem key={index} event={event} selectionHandler={props.selectionHandler}/>;
           })}
       </div>

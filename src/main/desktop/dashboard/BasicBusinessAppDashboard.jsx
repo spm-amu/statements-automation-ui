@@ -226,7 +226,7 @@ const BasicBusinessAppDashboard = (props) => {
 
     let loggedInUser = appManager.getUserDetails();
 
-    if (payload.message.participant.userId !== loggedInUser.userId) {
+    if (payload.chatMessage.participant.userId !== loggedInUser.userId) {
       newMessageAudio.play();
 
       /*electron.ipcRenderer.sendMessage('receivingMessage', {
@@ -302,21 +302,6 @@ const BasicBusinessAppDashboard = (props) => {
     });
   };
 
-
-  const joinChatRooms = () => {
-    get(`${host}/api/v1/chat/fetchChats`, (response) => {
-      const ids = response.map(chat => chat.id);
-
-      socketManager.chatEvents = response;
-
-      socketManager.emitEvent(MessageType.JOIN_CHAT_ROOM, {
-        socketId: socketManager.socket.id,
-        rooms: ids
-      });
-    }, (e) => {
-    })
-  };
-
   useEffect(() => {
     socketEventHandler.api = socketEventHandlerApi();
     systemEventHandler.api = systemEventHandlerApi();
@@ -336,7 +321,6 @@ const BasicBusinessAppDashboard = (props) => {
 
     onAnswerCall();
     onDeclineCall();
-    joinChatRooms();
     joinMeeting();
   }
 
@@ -353,6 +337,9 @@ const BasicBusinessAppDashboard = (props) => {
     } else {
       get(`${host}/api/v1/auth/userInfo`, (response) => {
         setup(response);
+        onAnswerCall();
+        onDeclineCall();
+        joinMeeting();
       }, (e) => {
         if (e.status === 401) {
           if(refreshToken) {

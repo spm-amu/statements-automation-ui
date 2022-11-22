@@ -18,6 +18,7 @@ const ChatForm = (props) => {
     let chat = {
       title: title,
       participants: participants,
+      type: 'DIRECT',
       messages: []
     };
 

@@ -22,36 +22,15 @@ import uuid from 'react-uuid';
 import appManager from "../../../common/service/AppManager";
 
 const ChatRoom = (props) => {
-  const { selectedMeeting } = props;
-
   const [currentUser, setCurrentUser] = useState(appManager.getUserDetails());
   const [message, setMessage] = useState('');
-  const [test, setTest] = useState(false);
+  const [selectedChat, setSelectedChat] = useState(props.selectedChat);
   const [file, setFile] = useState();
   const [messages, setMessages] = useState([]);
   const [confirm, setImgUploadConfirm] = useState('');
   const messagesEndRef = useRef(null);
   const [roomId, setRoomId] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const handler = () => {
-    return {
-      get id() {
-        return 'chatRoom-1223';
-      },
-      on: (eventType, be) => {
-        switch (eventType) {
-          case MessageType.CHAT_MESSAGE:
-            onChatMessage(be);
-            break;
-        }
-      }
-    }
-  };
-
-  const eventHandler = useState({
-    api: handler()
-  });
 
   const onChatMessage = (be) => {
     if (be.payload.message.participant.userId !== currentUser.userId) {
@@ -62,37 +41,24 @@ const ChatRoom = (props) => {
   const loadMessages = () => {
     scrollToBottom();
 
-    /*let selectedEvent =  socketManager.chatEvents[0];
-
-    if (selectedMeeting) {
-      selectedEvent =  socketManager.chatEvents.find(event => event.id === selectedMeeting.id);
+    if (selectedChat) {
+      setMessages([].concat(selectedChat.messages));
     }
-
-    setChatEvent(selectedEvent);
-    setMessages([].concat(selectedEvent.messages));
-    */
-
 
     setLoading(false);
   };
 
   useEffect(() => {
+    setSelectedChat(props.selectedChat)
+
+  }, [props.selectedChat]);
+
+  useEffect(() => {
     loadMessages();
-  }, [selectedMeeting]);
+  }, [selectedChat]);
 
   useEffect(() => {
     setCurrentUser(appManager.getUserDetails());
-    socketManager.addSubscriptions(eventHandler, MessageType.CHAT_MESSAGE);
-  }, []);
-
-  useEffect(() => {
-    eventHandler.api = handler();
-  });
-
-  useEffect(() => {
-    return () => {
-      socketManager.removeSubscriptions(eventHandler);
-    };
   }, []);
 
   const scrollToBottom = () => {
@@ -108,20 +74,28 @@ const ChatRoom = (props) => {
     if (message) {
       const msg = {
         createdDate: new Date(),
-        id: uuid(),
         type: 'TEXT',
+        active: true,
         content: message,
         participant: currentUser
       };
 
       msg.participant.active = true;
 
+      const participantsToSignalIds = selectedChat
+        .participants
+        .filter(user => user.userId !== currentUser.userId)
+        .map(user => user.userId);
+
       socketManager.emitEvent(MessageType.CHAT_MESSAGE, {
-        roomId: selectedMeeting.id,
-        message: msg
+        roomId: selectedChat.id,
+        chatMessage: msg,
+        participantsToSignalIds
       });
 
       setMessages(oldMsgs => [...oldMsgs, msg]);
+
+      props.onMassageHandler(msg);
 
       scrollToBottom();
     }
@@ -146,7 +120,7 @@ const ChatRoom = (props) => {
         return (
           <div key={index} className="chatroom__message">
             <div className="mychat">
-              <span>{moment(message.createdDate).format('DD/MM, hh:mm')}</span>
+              <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
               <img
                 src={message.content}
                 alt=""
@@ -165,7 +139,7 @@ const ChatRoom = (props) => {
             </Avatar>
             <div className="peer">
               <span>{message.participant.name}</span>
-              <span>{moment(message.createdDate).format('DD/MM, hh:mm')}</span>
+              <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
               <img
                 src={message.content}
                 alt=""
@@ -181,7 +155,7 @@ const ChatRoom = (props) => {
         return (
           <div key={index} className="chatroom__message">
             <div className="mychat">
-              <span>{moment(message.createdDate).format('DD/MM, hh:mm')}</span>
+              <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
               <p key={index}>{message.content}</p>
             </div>
           </div>
@@ -195,7 +169,7 @@ const ChatRoom = (props) => {
             </Avatar>
             <div className="peer">
               <span>{message.participant.name}</span>
-              <span>{moment(message.createdDate).format('DD/MM, hh:mm')}</span>
+              <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
               <p key={index}>{message.content}</p>
             </div>
           </div>
@@ -210,21 +184,21 @@ const ChatRoom = (props) => {
       .childNodes[1].click();
   };
 
-  if (selectedMeeting && messages) {
+  if (selectedChat && messages) {
     return (
       <div className="chatroom">
         <div className="chatroom__header">
           <div className="chatroom__headerleft">
             <Avatar>
-              {selectedMeeting.type === 'CALENDAR_MEETING' ? (
+              {selectedChat.type === 'CALENDAR_MEETING' ? (
                 <Calendar />
               ) : (
-                Utils.getInitials(selectedMeeting.participants.find(p => p.userId !== currentUser.userId).name)
+                Utils.getInitials(selectedChat.participants.find(p => p.userId !== currentUser.userId).name)
               )}
             </Avatar>
 
             <h5>
-              { selectedMeeting.type === 'CALENDAR_MEETING' ? selectedMeeting.title : selectedMeeting.participants.find(p => p.userId !== currentUser.userId).name }
+              { selectedChat.type === 'CALENDAR_MEETING' ? selectedChat.title : selectedChat.participants.find(p => p.userId !== currentUser.userId).name }
             </h5>
 
             <Tooltip title="Edit">
@@ -248,7 +222,10 @@ const ChatRoom = (props) => {
           </div>
         </div>
         <div id="messages" className="chatroom__body">
-          {messages.sort((a, b) => a - b)?.map(renderMessages)}
+          {
+            messages
+              .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate))?.map(renderMessages)
+          }
           <div ref={messagesEndRef} />
         </div>
         <div>
@@ -302,7 +279,7 @@ const ChatRoom = (props) => {
         <p className="image__text">{confirm}</p>
       </div>
     );
-  } else if(!loading && selectedMeeting){
+  } else if(!loading && selectedChat){
     return (
       <div className={'centered-flex-box'}>
         <div className="emptychat">

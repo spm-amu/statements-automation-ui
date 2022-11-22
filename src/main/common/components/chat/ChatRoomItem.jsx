@@ -13,10 +13,10 @@ const ChatRoomItem = (props) => {
     appManager.getUserDetails()
   );
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     setCurrentUser(appManager.getUserDetails());
+    console.log('***********************: ', event.messages[event.messages.length - 1]);
+    console.log('----------: ', event.messages);
   }, []);
 
   const goToRoom = (id) => {
@@ -51,16 +51,15 @@ const ChatRoomItem = (props) => {
               : event.participants.find(p => p.userId !== currentUser.userId).name }
           </p>
           <p>
-            {Utils.isToday(event.updatedDate)
-              ? moment(event.updatedDate).format('hh:mm')
-              : moment(event.updatedDate).format('DD/MM')}
+            {Utils.isToday(event.updatedAt)
+              ? moment(event.updatedAt).format('HH:mm')
+              : moment(event.updatedAt).format('DD/MM')}
           </p>
         </div>
         <div className="chatroom__message">
           {event.messages && event.messages.length > 0 && currentUser
             ? [
-                event.messages[event.messages.length - 1].participant.userId ===
-                currentUser.userId
+                event.messages[event.messages.length - 1].participant.userId === currentUser.userId
                   ? [
                       event.messages[event.messages.length - 1].type ===
                       'FILE' ? (
