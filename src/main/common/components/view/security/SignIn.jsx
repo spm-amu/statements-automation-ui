@@ -14,6 +14,7 @@ import {Face} from '@material-ui/icons';
 import {Alert} from '@material-ui/lab';
 import appManager from "../../../../common/service/AppManager";
 import Utils from "../../../Utils";
+import {ACCESS_TOKEN_PROPERTY, REFRESH_TOKEN_PROPERTY} from "../../../service/TokenManager";
 
 const SignIn = (props) => {
   const [usernameError, setUsernameError] = useState(false);
@@ -66,17 +67,26 @@ const SignIn = (props) => {
           setIsLoading(false);
 
           // TODO : Set expiry date for desktop app in line with the user's AD password change. DO NOT SET expiry date for web all so that the cookie dies with the browser
-          Utils.setCookie("accessToken", response.access_token, 30);
-          Utils.setCookie("refreshToken", response.refresh_token, 30);
-          Utils.setCookie("lastLogin", new Date().getTime(), 30);
+          Utils.setSessionValue("accessToken", response.access_token);
+          Utils.setSessionValue("refreshToken", response.refresh_token);
+          Utils.setSessionValue("lastLogin", new Date().getTime());
+
+          electron.ipcRenderer.sendMessage('saveTokens', {
+            accessToken: response.access_token,
+            refreshToken: response.refresh_token
+          });
+
+
+          electron.ipcRenderer.on('tokensSaved', args => {
+            console.log("\n\nENTER DASH");
+            navigate('/dashboard');
+          });
 
           /*
           sessionStorage.setItem('accessToken', response.access_token);
           sessionStorage.setItem('refreshToken', response.refresh_token);
           sessionStorage.setItem('idToken', response.id_token);
           */
-
-          navigate('/dashboard');
         },
         (e) => {
           console.log('#### ERROR: ' + JSON.stringify(e));

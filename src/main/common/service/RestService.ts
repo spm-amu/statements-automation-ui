@@ -20,7 +20,7 @@ const json = (response: any) => {
 
 class RestService {
   doFetch(url: string, successCallback: any, errorCallback: any, body: any, method: string, successMessage: string, track: boolean = true, secure: boolean = true) {
-    const accessToken = Utils.getCookie("accessToken");
+    const accessToken = Utils.getSessionValue("accessToken");
 
     let data = body ? JSON.stringify(body) : null;
     let fetchConfig = {
@@ -56,8 +56,9 @@ class RestService {
         appManager.fireEvent(SystemEventType.API_SUCCESS, {message: successMessage});
       }).catch((e) => {
         console.error(e);
-        if (e.status === 401 && !url.endsWith("/logout")) {
-          errorCallback(e);
+        errorCallback(e);
+
+        if (e.status === 401 && !url.endsWith("/logout") && !url.endsWith("/userInfo")) {
           appManager.fireEvent(SystemEventType.UNAUTHORISED_API_CALL, null);
         } else {
           e.json().then((error: any) => {

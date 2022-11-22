@@ -14,6 +14,10 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import {resolveHtmlPath, resolveWindowHtmlPath} from './util';
+import Store from "electron-store";
+
+const { session } = require('electron');
+const store = new Store();
 
 class AppUpdater {
   constructor() {
@@ -339,6 +343,43 @@ ipcMain.on("answerCall", async (_event, args) => {
   mainWindow.webContents.send('answerCall', args);
 
   dialWindow?.hide();
+});
+
+ipcMain.on("readTokens", async (_event, args) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  let tokens = {} as any;
+  tokens.accessToken = store.get('accessToken');
+  tokens.refreshToken = store.get('refreshToken');
+
+  if(mainWindow) {
+    mainWindow.webContents.send('tokensRead', tokens);
+  }
+});
+
+
+ipcMain.on("saveTokens", async (_event, args) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  store.set('accessToken', args.accessToken);
+  store.set('refreshToken', args.refreshToken);
+
+  mainWindow.webContents.send('tokensSaved', {});
+});
+
+ipcMain.on("removeTokens", async (_event, args) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  store.delete('accessToken');
+  store.delete('refreshToken');
+
+  mainWindow.webContents.send('tokensRemoved', {});
 });
 
 ipcMain.on("declineCall", async (_event, args) => {

@@ -150,17 +150,19 @@ const MeetingRoom = (props) => {
   };
 
   const removeUser = (user) => {
-    socketManager.removeFromUserToPeerMap(user.id);
+    if(selectedMeeting.id === user.meetingId) {
+      socketManager.removeFromUserToPeerMap(user.id);
 
-    const userId = user.alias;
-    const peerObj = participants.find((p) => p.peerID === user.id);
-    const newParticipants = participants.filter((p) => p.userId !== userId);
+      const userId = user.alias;
+      const peerObj = participants.find((p) => p.peerID === user.id);
+      const newParticipants = participants.filter((p) => p.userId !== userId);
 
-    setParticipants(newParticipants);
-    if (newParticipants.length === 0) {
-      //onCallEnded();
-      //props.closeHandler();
-      setAllUserParticipantsLeft(true);
+      setParticipants(newParticipants);
+      if (newParticipants.length === 0) {
+        //onCallEnded();
+        //props.closeHandler();
+        setAllUserParticipantsLeft(true);
+      }
     }
   };
 
