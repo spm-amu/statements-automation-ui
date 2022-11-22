@@ -9,7 +9,7 @@ import appManager from "../service/AppManager";
 
 const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
 
-  const navigate = useNavigate();
+  const socketEventHandler = useState({});
 
   const handler = () => {
     return {
@@ -38,9 +38,6 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
   };
 
   const [online, setOnline] = useState(false);
-  const socketEventHandler = useState({
-    api: handler()
-  });
 
   useEffect(() => {
     socketEventHandler.api = handler();

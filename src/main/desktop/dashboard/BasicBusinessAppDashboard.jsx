@@ -45,6 +45,8 @@ const BasicBusinessAppDashboard = (props) => {
   const [errorMessage, setErrorMessage] = React.useState(null);
   const [successMessage, setSuccessMessage] = React.useState(null);
   const [tokenRefreshMonitorStarted, setTokenRefreshMonitorStarted] = React.useState(null);
+  const [socketEventHandler] = useState({});
+  const [systemEventHandler] = useState({});
   const navigate = useNavigate();
 
   //const dispatch = useDispatch();
@@ -218,14 +220,6 @@ const BasicBusinessAppDashboard = (props) => {
       }
     }
   };
-
-  const socketEventHandler = useState({
-    api: socketEventHandlerApi()
-  });
-
-  const systemEventHandler = useState({
-    api: systemEventHandlerApi()
-  });
 
   const onChatMessage = (payload) => {
     console.log('ON CHAT DASH: ', payload);
