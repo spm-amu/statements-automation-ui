@@ -47,7 +47,7 @@ class RestService {
     }
   }
 
-  executeFetch(url: string, fetchConfig: any, successMessage: string, successCallback: any, errorCallback: any) {
+  executeFetch(url: string, fetchConfig: any, successMessage: string, successCallback: any, errorCallback: any, reAttempting: boolean = false) {
     return fetch(encodeURI(url), fetchConfig)
       .then(status)
       .then(json)
@@ -56,17 +56,41 @@ class RestService {
         appManager.fireEvent(SystemEventType.API_SUCCESS, {message: successMessage});
       }).catch((e) => {
         console.error(e);
-        errorCallback(e);
 
-        if (e.status === 401 && !url.endsWith("/logout") && !url.endsWith("/userInfo")) {
-          appManager.fireEvent(SystemEventType.UNAUTHORISED_API_CALL, null);
+        if (e.status === 401 && !url.endsWith("/logout") && !url.endsWith("/userInfo") && !url.includes("/refresh?refreshToken=")) {
+          const refreshToken = Utils.getSessionValue("refreshToken");
+
+          if(!reAttempting) {
+            console.log("REFRESHING AND RE-ATTEMPTING");
+            let refreshFetchConfig = {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              }
+            };
+
+            fetch(encodeURI(`${host}/api/v1/auth/refresh?refreshToken=${refreshToken}`), refreshFetchConfig)
+              .then(status)
+              .then(json)
+              .then((data) => {
+                appManager.fireEvent(SystemEventType.SECURITY_TOKENS_REFRESHED, data);
+                fetchConfig.headers['Authorization'] = 'Bearer ' + data.access_token;
+
+                this.executeFetch(url, fetchConfig, successMessage, successCallback, errorCallback, true);
+              }).catch(() => {
+              appManager.fireEvent(SystemEventType.UNAUTHORISED_API_CALL, null);
+            });
+          } else {
+            appManager.fireEvent(SystemEventType.UNAUTHORISED_API_CALL, null);
+          }
         } else {
           e.json().then((error: any) => {
             appManager.fireEvent(SystemEventType.API_ERROR, error);
           });
         }
 
-        if (errorCallback !== null) {
+        if (errorCallback) {
           errorCallback(e);
         }
       });

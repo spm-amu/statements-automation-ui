@@ -368,7 +368,7 @@ ipcMain.on("saveTokens", async (_event, args) => {
   store.set('accessToken', args.accessToken);
   store.set('refreshToken', args.refreshToken);
 
-  mainWindow.webContents.send('tokensSaved', {});
+  mainWindow.webContents.send('tokensSaved', args);
 });
 
 ipcMain.on("removeTokens", async (_event, args) => {
@@ -379,7 +379,7 @@ ipcMain.on("removeTokens", async (_event, args) => {
   store.delete('accessToken');
   store.delete('refreshToken');
 
-  mainWindow.webContents.send('tokensRemoved', {});
+  mainWindow.webContents.send('tokensRemoved', args);
 });
 
 ipcMain.on("declineCall", async (_event, args) => {

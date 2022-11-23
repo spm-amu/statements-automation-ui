@@ -172,6 +172,9 @@ const BasicBusinessAppDashboard = (props) => {
           case SystemEventType.UNAUTHORISED_API_CALL:
             navigate('/login');
             break;
+          case SystemEventType.SECURITY_TOKENS_REFRESHED:
+            updateTokens(be);
+            break;
           case SystemEventType.API_ERROR:
             handleApiError(be);
             break;
@@ -181,6 +184,14 @@ const BasicBusinessAppDashboard = (props) => {
         }
       }
     }
+  };
+
+  const updateTokens = (payload) => {
+    electron.ipcRenderer.sendMessage('saveTokens', {
+      accessToken: payload.access_token,
+      refreshToken: payload.refresh_token,
+      reload: false
+    });
   };
 
   const handleApiError = (error) => {
@@ -251,7 +262,84 @@ const BasicBusinessAppDashboard = (props) => {
     });
   };
 
-  const onAnswerCall = () => {
+  useEffect(() => {
+    socketEventHandler.api = socketEventHandlerApi();
+    systemEventHandler.api = systemEventHandlerApi();
+  });
+
+  function setup(response) {
+    appManager.setUserDetails(response);
+    setUserDetails(response);
+    init();
+    socketManager.init();
+    socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
+
+    if (!tokenRefreshMonitorStarted) {
+      tokenManager.startTokenRefreshMonitor(`${host}/api/v1/auth/refresh`, response.username);
+      setTokenRefreshMonitorStarted(true);
+    }
+  }
+
+  function load() {
+    let accessToken = Utils.getSessionValue(ACCESS_TOKEN_PROPERTY);
+    let refreshToken = Utils.getSessionValue(REFRESH_TOKEN_PROPERTY);
+
+    if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
+      navigate('/login');
+    } else {
+      get(`${host}/api/v1/auth/userInfo`, (response) => {
+        setup(response);
+      }, (e) => {
+        if (e.status === 401) {
+          console.log("DASHBOARD REFRESH");
+          if(refreshToken) {
+            get(`${host}/api/v1/auth/refresh?refreshToken=${refreshToken}`, (response) => {
+              electron.ipcRenderer.sendMessage('saveTokens', {
+                accessToken: response.access_token,
+                refreshToken: response.refresh_token,
+                reload: true
+              });
+            }, (e) => {
+              navigate('/login');
+            }, null, true, false)
+          }
+        }
+      });
+    }
+  }
+
+  React.useEffect(() => {
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL, SystemEventType.API_ERROR, SystemEventType.API_SUCCESS);
+
+    electron.ipcRenderer.on('tokensRead', args => {
+      if(args.accessToken && args.refreshToken) {
+        Utils.setSessionValue(ACCESS_TOKEN_PROPERTY, args.accessToken);
+        Utils.setSessionValue(REFRESH_TOKEN_PROPERTY, args.refreshToken);
+
+        load();
+      } else {
+        navigate('/login');
+      }
+
+      electron.ipcRenderer.removeAllListeners("tokensRead");
+    });
+
+    electron.ipcRenderer.on('tokensRemoved', args => {
+      // TODO : Call backend and revoke access and refresh token
+    });
+
+
+    electron.ipcRenderer.on('tokensSaved', args => {
+      Utils.setSessionValue(ACCESS_TOKEN_PROPERTY, args.access_token);
+      Utils.setSessionValue(REFRESH_TOKEN_PROPERTY, args.refresh_token);
+      Utils.setSessionValue(LAST_LOGIN, new Date().getTime());
+
+      console.log("TOKENS SAVED CALLING LOAD");
+      if(args.reload) {
+        load();
+      }
+    });
+
     electron.ipcRenderer.on('answerCall', args => {
       navigate("/view/meetingRoom", {
         state: {
@@ -265,9 +353,7 @@ const BasicBusinessAppDashboard = (props) => {
         }
       })
     });
-  };
 
-  const joinMeeting = () => {
     electron.ipcRenderer.on('joinMeetingEvent', args => {
       get(`${host}/api/v1/meeting/fetch/${args.payload.params.meetingId}`, (response) => {
         let userDetails = appManager.getUserDetails();
@@ -292,94 +378,14 @@ const BasicBusinessAppDashboard = (props) => {
       }, (e) => {
       }, '', false);
     });
-  };
 
-  const onDeclineCall = () => {
     electron.ipcRenderer.on('declineCall', args => {
       if (args.payload.callerId) {
         socketManager.endDirectCall(args.payload.callerId);
       }
     });
-  };
 
-  useEffect(() => {
-    socketEventHandler.api = socketEventHandlerApi();
-    systemEventHandler.api = systemEventHandlerApi();
-  });
-
-  function setup(response) {
-    appManager.setUserDetails(response);
-    setUserDetails(response);
-    init();
-    socketManager.init();
-    socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
-
-    if (!tokenRefreshMonitorStarted) {
-      tokenManager.startTokenRefreshMonitor(`${host}/api/v1/auth/refresh`, response.username);
-      setTokenRefreshMonitorStarted(true);
-    }
-
-    onAnswerCall();
-    onDeclineCall();
-    joinMeeting();
-  }
-
-  function load() {
-    let accessToken = Utils.getSessionValue(ACCESS_TOKEN_PROPERTY);
-    let refreshToken = Utils.getSessionValue(REFRESH_TOKEN_PROPERTY);
-
-    console.log("STARTING LOAD WITH :");
-    console.log("RT=" + refreshToken + " : " + (typeof refreshToken));
-    console.log("AT=" + accessToken + " : " + (typeof accessToken));
-
-    if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
-      navigate('/login');
-    } else {
-      get(`${host}/api/v1/auth/userInfo`, (response) => {
-        setup(response);
-        onAnswerCall();
-        onDeclineCall();
-        joinMeeting();
-      }, (e) => {
-        if (e.status === 401) {
-          if(refreshToken) {
-            get(`${host}/api/v1/auth/refresh?refreshToken=${refreshToken}`, (response) => {
-
-              electron.ipcRenderer.sendMessage('saveTokens', {
-                accessToken: response.access_token,
-                refreshToken: response.refresh_token
-              });
-
-              electron.ipcRenderer.on('tokensSaved', args => {
-                Utils.setSessionValue(ACCESS_TOKEN_PROPERTY, response.access_token);
-                Utils.setSessionValue(REFRESH_TOKEN_PROPERTY, response.refresh_token);
-                Utils.setSessionValue(LAST_LOGIN, new Date().getTime());
-
-                load();
-              });
-            }, (e) => {
-              navigate('/login');
-            })
-          }
-        }
-      });
-    }
-  }
-
-  React.useEffect(() => {
-    appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL, SystemEventType.API_ERROR, SystemEventType.API_SUCCESS);
     electron.ipcRenderer.sendMessage('readTokens', {});
-
-    electron.ipcRenderer.on('tokensRead', args => {
-      if(args.accessToken && args.refreshToken) {
-        Utils.setSessionValue(ACCESS_TOKEN_PROPERTY, args.accessToken);
-        Utils.setSessionValue(REFRESH_TOKEN_PROPERTY, args.refreshToken);
-
-        load();
-      } else {
-        navigate('/login');
-      }
-    });
   }, []);
 
   React.useEffect(() => {
@@ -387,6 +393,12 @@ const BasicBusinessAppDashboard = (props) => {
       appManager.clearAllEventListeners();
       socketManager.clearAllEventListeners();
       socketManager.disconnectSocket();
+
+      electron.ipcRenderer.removeAllListeners("tokensRemoved");
+      electron.ipcRenderer.removeAllListeners("tokensSaved");
+      electron.ipcRenderer.removeAllListeners("answerCall");
+      electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
+      electron.ipcRenderer.removeAllListeners("declineCall");
     };
   }, []);
 
@@ -582,11 +594,6 @@ const BasicBusinessAppDashboard = (props) => {
 
 
                     electron.ipcRenderer.sendMessage('removeTokens', {});
-
-                    electron.ipcRenderer.on('tokensRemoved', args => {
-                      // TODO : Call backend and revoke access and refresh token
-                    });
-
                     navigate("/login");
                   }}
                 />{" "}

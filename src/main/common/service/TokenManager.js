@@ -1,5 +1,7 @@
 import Utils from "../Utils"
 import {get} from "../service/RestService";
+import appManager from "./AppManager";
+import {SystemEventType} from "../types";
 
 const MINUTE = 60000;
 export const ACCESS_TOKEN_PROPERTY = "accessToken";
@@ -22,10 +24,7 @@ class TokenManager {
                     if(refreshToken) {
                       let refreshUrl = `${url}?refreshToken=${refreshToken}`;
                       get(refreshUrl, (response) => {
-                          // TODO : Set expiry date for desktop app in line with the user's AD password change. DO NOT SET expiry date for web all so that the cookie dies with the browser
-                          Utils.setSessionValue(ACCESS_TOKEN_PROPERTY, response.access_token);
-                          Utils.setSessionValue(REFRESH_TOKEN_PROPERTY, response.refresh_token);
-                          Utils.setSessionValue(LAST_LOGIN, new Date().getTime());
+                          appManager.fireEvent(SystemEventType.SECURITY_TOKENS_REFRESHED, response);
                         },
                         (e) => {
                           console.error('Error refreshing token');
