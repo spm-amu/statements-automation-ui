@@ -327,6 +327,16 @@ ipcMain.on("joinMeetingEvent", async (_event, args) => {
   dialWindow?.hide();
 });
 
+ipcMain.on("replyMessage", async (_event, args) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  mainWindow.webContents.send('replyMessage', args);
+
+  messageWindow?.hide();
+});
+
 ipcMain.on("closeWindowEvent", async (_event) => {
   if (!mainWindow) {
     throw new Error('"mainWindow" is not defined');

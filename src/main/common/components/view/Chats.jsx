@@ -35,6 +35,14 @@ const Chats = (props) => {
   const loadChats = () => {
     get(`${host}/api/v1/chat/fetchChats`, (response) => {
       setChatEvents(response);
+
+      console.log('PROPS: ', props.selected);
+
+      if (props.selected && props.selected.chatId) {
+        const eventSelected = response.find(chat => chat.id === props.selected.chatId);
+        setSelectedChat(eventSelected);
+      }
+
       setLoading(false);
     }, (e) => {
     })
@@ -83,7 +91,6 @@ const Chats = (props) => {
           <div className="chat__rooms w-100">
             <div style={{width: "30%", borderRight: '1px solid #e1e1e1'}}>
               <ChatRoomList chatEvents={chatEvents} addedChat={newChat} selectionHandler={(selected) => {
-                console.log('props.selectedMeeting: ', selected);
                 setSelectedChat(selected);
               }} addHandler={() => setMode('FORM')}/>
             </div>

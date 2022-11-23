@@ -14,6 +14,8 @@ import SearchBar from "../SearchBar";
 import People from "../view/People";
 import "./MeetingRoomSideBarContent.css"
 import InCall from '../view/InCall';
+import ChatSideBar from '../view/ChatSideBar';
+import ChatRoom from '../chat/ChatRoom';
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -43,7 +45,8 @@ const MeetingRoomSideBarContent = (props) => {
     tab,
     meetingId,
     participants,
-    participantsRaisedHands
+    participantsRaisedHands,
+    meetingChat
   } = props;
 
   React.useEffect(() => {
@@ -109,7 +112,11 @@ const MeetingRoomSideBarContent = (props) => {
         }
       </div>
       <div className={'list'}>
-        <InCall participants={participants} participantsRaisedHands={participantsRaisedHands} />
+        {
+          tab === 'People' ?
+            <InCall participants={participants} participantsRaisedHands={participantsRaisedHands} /> :
+            <ChatRoom chatTab={true} selectedChat={meetingChat} />
+        }
       </div>
     </div>
   );

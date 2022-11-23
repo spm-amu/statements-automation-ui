@@ -240,9 +240,9 @@ const BasicBusinessAppDashboard = (props) => {
     if (payload.chatMessage.participant.userId !== loggedInUser.userId) {
       newMessageAudio.play();
 
-      /*electron.ipcRenderer.sendMessage('receivingMessage', {
+      electron.ipcRenderer.sendMessage('receivingMessage', {
         payload: payload
-      });*/
+      });
     }
   };
 
@@ -338,6 +338,14 @@ const BasicBusinessAppDashboard = (props) => {
       if(args.reload) {
         load();
       }
+    });
+
+    electron.ipcRenderer.on('replyMessage', args => {
+      navigate("/view/chats", {
+        state: {
+          chatId: args.chatId,
+        }
+      })
     });
 
     electron.ipcRenderer.on('answerCall', args => {

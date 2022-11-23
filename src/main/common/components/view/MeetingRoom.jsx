@@ -16,6 +16,7 @@ import ClosablePanel from "../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
 import appManager from "../../../common/service/AppManager";
 import MeetingRoomSummary from "../vc/MeetingRoomSummary";
+import { get, host, post } from '../../service/RestService';
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -62,6 +63,7 @@ const MeetingRoom = (props) => {
   const [sideBarTab, setSideBarTab] = useState('');
   const [displayState, setDisplayState] = useState(props.displayState);
   const [participants, setParticipants] = useState([]);
+  const [meetingChat, setMeetingChat] = useState(null);
   const [participantsRaisedHands, setParticipantsRaisedHands] = useState([]);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
@@ -326,7 +328,44 @@ const MeetingRoom = (props) => {
 
   const {settings} = props;
 
+  const fetchChats = () => {
+    console.log('fetchMeetingChat selectedMeeting: ', selectedMeeting);
+
+    get(`${host}/api/v1/chat/fetchMeetingChat/${selectedMeeting.id}`, (response) => {
+      if (response && response.id) {
+        setMeetingChat(response);
+      } else {
+        let chatParticipants = JSON.parse(JSON.stringify(selectedMeeting.attendees));
+
+        chatParticipants.forEach(chatParticipant => {
+          delete chatParticipant.id
+        });
+
+        let chat = {
+          meetingId: selectedMeeting.id,
+          title: selectedMeeting.title,
+          participants: chatParticipants,
+          type: 'CALENDAR_MEETING',
+          messages: []
+        };
+
+        post(
+          `${host}/api/v1/chat/create`,
+          (chat) => {
+            setMeetingChat(chat);
+          },
+          (e) => {},
+          chat
+        );
+      }
+    }, (e) => {
+
+    })
+  }
+
   useEffect(() => {
+    fetchChats();
+
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     navigator.mediaDevices
       .getUserMedia({video: true, audio: true})
@@ -566,6 +605,7 @@ const MeetingRoom = (props) => {
             title={sideBarTab}
           >
             <MeetingRoomSideBarContent
+              meetingChat={meetingChat}
               tab={sideBarTab}
               meetingId={selectedMeeting.id}
               participantsRaisedHands={participantsRaisedHands}

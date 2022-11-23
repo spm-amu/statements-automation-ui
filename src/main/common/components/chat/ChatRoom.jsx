@@ -32,11 +32,11 @@ const ChatRoom = (props) => {
   const [roomId, setRoomId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const onChatMessage = (be) => {
-    if (be.payload.message.participant.userId !== currentUser.userId) {
-      setMessages(oldMsgs => [...oldMsgs, be.payload.message]);
-    }
-  };
+  // const onChatMessage = () => {
+  //   if (be.payload.message.participant.userId !== currentUser.userId) {
+  //     setMessages(oldMsgs => [...oldMsgs, be.payload.message]);
+  //   }
+  // };
 
   const loadMessages = () => {
     scrollToBottom();
@@ -95,7 +95,9 @@ const ChatRoom = (props) => {
 
       setMessages(oldMsgs => [...oldMsgs, msg]);
 
-      props.onMassageHandler(msg, selectedChat);
+      if (!props.chatTab) {
+        props.onMassageHandler(msg, selectedChat);
+      }
 
       scrollToBottom();
     }

@@ -77,7 +77,7 @@ const ViewContainer = (props) => {
         element = <Calendar/>;
         break;
       case 'chats':
-        element = <Chats selectedMeeting={location.state}/>;
+        element = <Chats selected={location.state}/>;
         break;
       case 'meetingHistory':
         element = <MeetingHistory/>;
