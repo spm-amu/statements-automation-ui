@@ -39,7 +39,7 @@ const StyledDialog = withStyles({
 const PaperComponent = (props) => (
   <Draggable
     disabled={props.disabled}
-    handle="#meeting-window-title"
+    handle="#meeting-title"
     cancel={'[class*="MuiDialogContent-root"]'}
   >
     <Paper {...props} />
@@ -470,7 +470,7 @@ const MeetingRoom = (props) => {
   }, [audioMuted]);
 
   return (
-    <div className={'row meeting-window-container'}>
+    <div className={'row meeting-container'}>
       <div className={'col'} style={{paddingLeft: '0', paddingRight: '0'}}>
         <div style={{height: '100%'}}>
           <div style={{height: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null,

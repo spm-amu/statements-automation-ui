@@ -12,6 +12,7 @@ import MeetingRoom from "../view/MeetingRoom";
 import Window from "../Window";
 import {useNavigate} from 'react-router-dom';
 import appManager from "../../../common/service/AppManager";
+import "./ViewContainer.css"
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -30,6 +31,12 @@ const ViewContainer = (props) => {
       setWindowOpen(true);
     }
   }, [currentDisplayMode]);
+
+  React.useEffect(() => {
+    return () => {
+      setCurrentMeeting(null);
+    };
+  }, []);
 
   const renderView = () => {
     let viewId = params.id;
@@ -96,6 +103,7 @@ const ViewContainer = (props) => {
       {
         currentWindow === 'meetingRoom' && currentMeeting &&
         <Window minimizable={true} open={windowOpen}
+                containerClassName={'meeting-window-container'}
                 displayState={windowDisplayState} onDisplayModeChange={
                   (mode) => {
                     setWindowDisplayState(mode);

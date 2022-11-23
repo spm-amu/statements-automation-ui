@@ -121,6 +121,7 @@ const Window = (props) => {
         hideBackdrop={true}
         aria-labelledby="meeting-window-title"
         aria-describedby="meeting-window-description"
+        className={props.containerClassName}
         PaperComponent={PaperComponent}
         PaperProps={{id: 'meetingDialogPaper', disabled: displayState === 'MAXIMIZED'}}
       >

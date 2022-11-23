@@ -8,8 +8,8 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
 import LottieIcon from './LottieIcon';
-import Icon from './Icon';
-import IconButton from '@material-ui/core/IconButton';
+import './AlertDialog.css'
+import Icon from "./Icon";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
 	return <Slide direction="down" ref={ref} {...props} />;
@@ -27,12 +27,14 @@ export default function AlertDialog(props) {
 	}, []);
 
 	const handleClose = () => {
+	  /*
 		if (props.keepOpen) {
 			// dont close the dialog
 		} else {
 			setOpen(false);
 		}
 		props.onClose();
+		*/
 	};
 
 	const handleLeftButton = () => {
@@ -64,10 +66,9 @@ export default function AlertDialog(props) {
       fullWidth
     >
       <DialogTitle id="alert-dialog-title" style={{ borderBottom: '1px solid #404239' }}>
-        {props.title}
+        <Icon id={'WARNING'} /><span style={{paddingLeft: '8px'}}>{props.title}</span>
       </DialogTitle>
       <DialogContent className={'row alert-dialog-container'}>
-        <LottieIcon id={'loading'} />
         <DialogContentText id="alert-dialog-description" >
           {props.message}
         </DialogContentText>

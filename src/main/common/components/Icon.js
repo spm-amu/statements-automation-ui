@@ -40,7 +40,8 @@ import {
   Reply,
   Videocam,
   VideocamOff,
-  History
+  History,
+  Warning
 } from '@material-ui/icons';
 
 class Icon extends Component {
@@ -70,6 +71,8 @@ class Icon extends Component {
       return <SaveIcon/>
     } else if (this.props.id === 'INFO') {
       return <InfoIcon/>
+    } else if (this.props.id === 'WARNING') {
+      return <Warning/>
     } else if (this.props.id === 'DELETE') {
       return <DeleteIcon/>
     } else if (this.props.id === 'DOWNLOAD') {

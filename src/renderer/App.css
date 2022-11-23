@@ -84,6 +84,10 @@ a:hover {
   overflow-y: hidden !important;
 }
 
+.MuiDialog-root {
+  z-index: 1051 !important;
+}
+
 .avatar {
   font-size: 36px;
   width: 3em;

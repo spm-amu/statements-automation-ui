@@ -96,7 +96,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
           ],
           "pageSize": 2000,
           "currentPage": 0
-        })
+        }, null, false, true)
     }
   };
 

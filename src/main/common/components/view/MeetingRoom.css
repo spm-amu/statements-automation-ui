@@ -124,7 +124,7 @@
   margin: 0 16px 0 0;
 }
 
-.meeting-window-container {
+.meeting-container {
   height: 100%;
   max-height: 100%;
   overflow-x: hidden;
@@ -135,11 +135,11 @@
   margin-right: 16px !important;
 }
 
-#meeting-window-description {
+#meeting-description {
   height: 100%;
 }
 
-#meeting-window-title {
+#meeting-title {
   margin-top: 8px;
 }
 

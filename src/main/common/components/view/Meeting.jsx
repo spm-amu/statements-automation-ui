@@ -24,6 +24,7 @@ import ModalComponent from '../customInput/Modal';
 import {Checkbox, MenuItem, Select} from '@material-ui/core';
 import EventMessageComponent from '../customInput/EventMessage';
 import appManager from "../../../common/service/AppManager";
+import AlertDialog from "../AlertDialog";
 
 const options = ['NONE', 'TEST'];
 
@@ -47,6 +48,7 @@ const Meeting = (props) => {
   const [open, setOpen] = React.useState(false);
   const [weekDays, setWeekDays] = useState([]);
   const [recurrenceChecked, setRecurrenceChecked] = useState(false);
+  const [savePromiseContext, setSavePromiseContext] = useState(null);
 
   const navigate = useNavigate();
 
@@ -269,39 +271,51 @@ const Meeting = (props) => {
         };
       }
 
-      let data = createMeetingObject(_hostAttendee);
+      saveMeetingObject(_hostAttendee).then((data) => {
+        post(
+          `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
+          (response) => {
+            handleClose();
+          },
+          (e) => {
+          },
+          data,
+          "The meeting details have been saved successfully"
+        );
+      }, () => {
+      });
+
+    }
+  };
+
+  const saveMeetingObject = (hostAttendee) => {
+    return new Promise((resolve, reject) => {
+
+      let data = createMeetingObject(hostAttendee);
       let externalAttendees = data.attendees.filter((attendee) => attendee.external === true);
 
-      console.log("\n\n\nDOCS : ", data.documents);
-      if(externalAttendees.length > 0 && data.documents && data.documents.length > 0) {
-        let hasNewDoc = false;
+      if (data.documents && data.documents.length > 0) {
+        let newDocs = data.documents.filter((doc) => Utils.isNull(doc.id));
+        let shouldWarn = externalAttendees.length > 0 && newDocs.length > 0;
 
-        for (const document of data.documents) {
-          if(!document.id) {
-            hasNewDoc = true;
-            break;
-          }
+        if (!shouldWarn) {
+          let newlyAddedExternalAttendees = externalAttendees.filter((attendee) => Utils.isNull(attendee.id));
+          shouldWarn = newlyAddedExternalAttendees.length > 0;
         }
 
-        // TODO : Check if the external user is new
-        if(hasNewDoc) {
-          alert("You have selected attendees outside your organisation. Would you like to proceed and share the attached files?");
-        }
+        if (shouldWarn) {
+          setSavePromiseContext({
+            reject,
+            resolve,
+            data
+          });
 
-        return;
+          return;
+        }
       }
 
-      post(
-        `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
-        (response) => {
-          handleClose();
-        },
-        (e) => {
-        },
-        data,
-        "The meeting details have been saved successfully"
-      );
-    }
+      resolve(data)
+    });
   };
 
   const handleClose = () => {
@@ -811,6 +825,24 @@ const Meeting = (props) => {
           marginTop: '2px',
         }}
       >
+        {
+          savePromiseContext &&
+          <AlertDialog title={'Warning'}
+                       message={'You have selected attendees outside your organisation. Would you like to proceed and share the attached files?'}
+                       onLeft={() => {
+                         savePromiseContext.reject();
+                         setSavePromiseContext(null);
+                       }}
+                       onRight={() => {
+                         setSavePromiseContext(null);
+                         savePromiseContext.resolve(savePromiseContext.data)
+                       }}
+                       showLeft={true}
+                       showRight={true}
+                       btnTextLeft={'CANCEL'}
+                       btnTextRight={'PROCEED'}
+          />
+        }
         <h5 className="modal-title">
           {selectedMeeting &&
           selectedMeeting.title &&
