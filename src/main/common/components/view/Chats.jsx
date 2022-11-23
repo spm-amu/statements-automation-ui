@@ -13,21 +13,34 @@ const Chats = (props) => {
   const [newChat, setNewChat] = useState(null);
   const [chatEvents, setChatEvents] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [messageRefresher, setMessageRefresher] = useState(false);
   const [mode, setMode] = useState('LIST');
   const [socketEventHandler] = useState({});
 
   const socketEventHandlerApi = () => {
     return {
       get id() {
-        return 'chats-122991829';
+        return 'chats-111222';
       },
       on: (eventType, be) => {
         switch (eventType) {
           case MessageType.CHAT_MESSAGE:
-            onMessage(be.payload);
+            onSocketMessage(be.payload);
             break;
         }
+      }
+    }
+  };
+
+  const onSocketMessage = (payload) => {
+    if(!selectedChat) {
+      let chat = chatEvents.find((c) => c.id === payload.roomId);
+      if(chat) {
+        chat.messages.push(payload.chatMessage);
+        setSelectedChat(chat);
+      }
+    } else {
+      if(selectedChat.id !== payload.id) {
+        console.log('\n\n\nRECEIVED UNRELATED CHAT');
       }
     }
   };
@@ -49,14 +62,13 @@ const Chats = (props) => {
   };
 
   useEffect(() => {
+    socketEventHandler.api = socketEventHandlerApi();
+  });
+
+  useEffect(() => {
     loadChats();
     socketManager.addSubscriptions(socketEventHandler, MessageType.CHAT_MESSAGE);
   }, []);
-
-
-  useEffect(() => {
-    socketEventHandler.api = socketEventHandlerApi();
-  });
 
   React.useEffect(() => {
     return () => {
@@ -64,18 +76,10 @@ const Chats = (props) => {
     };
   }, []);
 
-  const onMessage = (payload) => {
-    let updatedChatEvent = chatEvents.find(chat => chat.id === payload.roomId);
-    processMessage(payload.chatMessage, updatedChatEvent);
-  };
-
-  const processMessage = (message, chat) => {
+  const onChatRoomMessage = (message, chat) => {
     chat.updatedAt = moment().format();
-    chat.messages.push(message);
 
     setSelectedChat(chat);
-    setMessageRefresher(!messageRefresher);
-
     const sorted = chatEvents
       .slice()
       .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
@@ -96,9 +100,8 @@ const Chats = (props) => {
             </div>
             <div style={{width: "70%"}}>
               {
-                selectedChat && <ChatRoom onMassageHandler={(message, chat) => processMessage(message, chat)}
+                selectedChat && <ChatRoom onMessage={(message, chat) => onChatRoomMessage(message, chat)}
                                           selectedChat={selectedChat}
-                                          messageRefresher={messageRefresher}
                 />
               }
             </div>

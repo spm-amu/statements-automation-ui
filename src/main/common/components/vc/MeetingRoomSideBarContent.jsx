@@ -10,11 +10,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "../Icon";
-import SearchBar from "../SearchBar";
 import People from "../view/People";
 import "./MeetingRoomSideBarContent.css"
 import InCall from '../view/InCall';
-import ChatSideBar from '../view/ChatSideBar';
 import ChatRoom from '../chat/ChatRoom';
 
 const StyledDialog = withStyles({
@@ -40,7 +38,6 @@ const PaperComponent = (props) => (
 
 const MeetingRoomSideBarContent = (props) => {
   const [peopleDialogOpen, setPeopleDialogOpen] = useState(false);
-
   const {
     tab,
     meetingId,

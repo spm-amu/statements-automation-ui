@@ -31,12 +31,39 @@ const ChatRoom = (props) => {
   const messagesEndRef = useRef(null);
   const [roomId, setRoomId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [socketEventHandler] = useState({});
+
+  const socketEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'chat-room-122991829';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case MessageType.CHAT_MESSAGE:
+            onMessage(be.payload);
+            break;
+        }
+      }
+    }
+  };
 
   // const onChatMessage = () => {
   //   if (be.payload.message.participant.userId !== currentUser.userId) {
   //     setMessages(oldMsgs => [...oldMsgs, be.payload.message]);
   //   }
   // };
+
+  const onMessage = (payload) => {
+    if(selectedChat && selectedChat.id === payload.roomId) {
+      if(props.onMessage) {
+        props.onMessage(payload.chatMessage, selectedChat);
+      }
+
+      selectedChat.messages.push(payload.chatMessage);
+      loadMessages();
+    }
+  };
 
   const loadMessages = () => {
     scrollToBottom();
@@ -50,15 +77,25 @@ const ChatRoom = (props) => {
 
   useEffect(() => {
     setSelectedChat(props.selectedChat)
-
   }, [props.selectedChat]);
 
   useEffect(() => {
     loadMessages();
-  }, [selectedChat, props.messageRefresher]);
+  }, [selectedChat]);
 
   useEffect(() => {
     setCurrentUser(appManager.getUserDetails());
+    socketManager.addSubscriptions(socketEventHandler, MessageType.CHAT_MESSAGE);
+  }, []);
+
+  useEffect(() => {
+    socketEventHandler.api = socketEventHandlerApi();
+  });
+
+  React.useEffect(() => {
+    return () => {
+      socketManager.removeSubscriptions(socketEventHandler);
+    };
   }, []);
 
   const scrollToBottom = () => {
@@ -95,8 +132,8 @@ const ChatRoom = (props) => {
 
       setMessages(oldMsgs => [...oldMsgs, msg]);
 
-      if (!props.chatTab) {
-        props.onMassageHandler(msg, selectedChat);
+      if (props.onMessage) {
+        props.onMessage(msg, selectedChat);
       }
 
       scrollToBottom();

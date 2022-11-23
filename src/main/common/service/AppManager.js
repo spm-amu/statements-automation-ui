@@ -17,6 +17,14 @@ class AppManager {
     this.store.userDetails = userDetails;
   };
 
+  setCurrentView = (currentView) => {
+    this.store.currentView = currentView;
+  };
+
+  getCurrentView = () => {
+    return this.store.currentView;
+  };
+
   add = (id, value) => {
     this.store[id] = value;
   };

@@ -240,9 +240,12 @@ const BasicBusinessAppDashboard = (props) => {
     if (payload.chatMessage.participant.userId !== loggedInUser.userId) {
       newMessageAudio.play();
 
-      electron.ipcRenderer.sendMessage('receivingMessage', {
-        payload: payload
-      });
+      alert(appManager.getCurrentView());
+      if(appManager.getCurrentView() !== 'chats') {
+        electron.ipcRenderer.sendMessage('receivingMessage', {
+          payload: payload
+        });
+      }
     }
   };
 
@@ -573,6 +576,7 @@ const BasicBusinessAppDashboard = (props) => {
             activeRouteMenu={'calendar'}
             className={"sidebar"}
             viewLauncher={(path) => {
+              appManager.setCurrentView(path);
               navigate('/view/' + path);
             }}
             appLogoPath={props.appLogoPath}
