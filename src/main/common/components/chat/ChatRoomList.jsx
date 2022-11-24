@@ -9,7 +9,7 @@ const ChatRoomList = (props) => {
   const [chats, setChats] = useState([]);
 
   const updateChatList = (chat) => {
-    setChats(chats.concat([chat]));
+    setChats([...chats, chat]);
   };
 
   const addChat = () => {

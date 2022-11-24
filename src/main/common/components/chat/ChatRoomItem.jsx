@@ -27,6 +27,28 @@ const ChatRoomItem = (props) => {
     props.selectionHandler(event);
   };
 
+  const getChatName = () => {
+    let name = '';
+
+    if (event.participants.length === 2) {
+      name = event.participants.find(p => p.userId !== currentUser.userId).name;
+    } else {
+      event.participants.forEach((user, index) => {
+        if (index < 3 && user.userId !== currentUser.userId) {
+          name = name + user.name + ', ';
+        }
+      })
+
+      name = name.slice(0, 22) + '...';
+
+      if (event.participants.length > 3) {
+        name = name + '+' + (event.participants.length - 2);
+      }
+    }
+
+    return name;
+  }
+
   return (
     <div
       className="chatroom__item"
@@ -46,7 +68,8 @@ const ChatRoomItem = (props) => {
           <p style={{ fontSize: '16px' }}>
             {event.type === 'CALENDAR_MEETING'
               ? event.title
-              : event.participants.find(p => p.userId !== currentUser.userId).name }
+              : getChatName()
+            }
           </p>
           <p>
             {Utils.isToday(event.updatedAt)
@@ -66,7 +89,7 @@ const ChatRoomItem = (props) => {
                           {event.messages[event.messages.length - 1].content ? (
                             event.messages[event.messages.length - 1].content
                           ) : (
-                            <span>image</span>
+                            <span>document</span>
                           )}
                         </span>
                       ) : (
@@ -100,7 +123,7 @@ const ChatRoomItem = (props) => {
                           {event.messages[event.messages.length - 1].content ? (
                             event.messages[event.messages.length - 1].content
                           ) : (
-                            <span>image</span>
+                            <span>document</span>
                           )}
                         </span>
                       ) : (

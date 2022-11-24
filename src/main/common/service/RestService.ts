@@ -4,7 +4,7 @@ import appManager from "../../common/service/AppManager";
 import {SystemEventType} from "../types";
 
 // export const host = window.location.protocol + "//" + window.location.hostname + "/vc";
-//export const host = "http://svn.agilemotion.co.za/vc";
+// export const host = "http://svn.agilemotion.co.za/vc";
 export const host = "http://localhost:8080/vc";
 const status = (response: any) => {
   if (response.ok) {
