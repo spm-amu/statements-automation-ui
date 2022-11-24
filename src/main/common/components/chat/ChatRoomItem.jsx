@@ -34,15 +34,15 @@ const ChatRoomItem = (props) => {
       name = event.participants.find(p => p.userId !== currentUser.userId).name;
     } else {
       event.participants.forEach((user, index) => {
-        if (index < 3 && user.userId !== currentUser.userId) {
-          name = name + user.name + ', ';
+        if (index < 5 && user.userId !== currentUser.userId) {
+          name = name + user.name.split(' ')[0] + ', ';
         }
       })
 
       name = name.slice(0, 22) + '...';
 
-      if (event.participants.length > 3) {
-        name = name + '+' + (event.participants.length - 2);
+      if (event.participants.length > 5) {
+        name = name + '+' + (event.participants.length - 3);
       }
     }
 
