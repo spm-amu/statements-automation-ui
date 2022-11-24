@@ -20,12 +20,13 @@ import socketManager from '../../service/SocketManager';
 import { MessageType } from '../../types';
 import uuid from 'react-uuid';
 import appManager from "../../../common/service/AppManager";
+import Files from '../customInput/Files';
 
 const ChatRoom = (props) => {
   const [currentUser, setCurrentUser] = useState(appManager.getUserDetails());
   const [message, setMessage] = useState('');
   const [selectedChat, setSelectedChat] = useState(props.selectedChat);
-  const [file, setFile] = useState();
+  const [file, setFile] = useState(null);
   const [messages, setMessages] = useState([]);
   const [confirm, setImgUploadConfirm] = useState('');
   const messagesEndRef = useRef(null);
@@ -111,14 +112,20 @@ const ChatRoom = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (message) {
+
+    if (message || file) {
+
       const msg = {
         createdDate: new Date(),
-        type: 'TEXT',
+        type: file && file.length > 0 ? 'FILE' : 'TEXT',
         active: true,
         content: message,
         participant: currentUser
       };
+
+      if (file && file.length > 0) {
+        msg.file = file[0];
+      }
 
       msg.participant.active = true;
 
@@ -144,6 +151,7 @@ const ChatRoom = (props) => {
     }
     setMessage('');
     setImgUploadConfirm('');
+    setFile(null)
   };
 
   const callNow = () => {
@@ -157,6 +165,35 @@ const ChatRoom = (props) => {
     setMessages((oldMsgs) => [...oldMsgs, finalMessage]);
   };
 
+  const renderFileThumbnail = (message) => {
+    const { document } = message;
+    if (document.type.includes('image')) {
+      return (
+        <>
+          <img
+            src={document.payload}
+            alt=""
+            style={{ width: 250, height: 'auto' }}
+          />
+          <p>{message.content}</p>
+        </>
+      )
+    }
+
+    if (document.type.includes('pdf')) {
+      return (
+        <div className={'col'}>
+          <img
+            src={require('../../assets/img/files/pdf-file.png')}
+            alt=""
+            style={{ width: 100, height: 'auto' }}
+          />
+          <p>{document.name}</p>
+        </div>
+      )
+    }
+  }
+
   const renderMessages = (message, index) => {
     if (message.type === 'FILE') {
       if (message.participant.userId === currentUser.userId) {
@@ -164,12 +201,9 @@ const ChatRoom = (props) => {
           <div key={index} className="chatroom__message">
             <div className="mychat">
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
-              <img
-                src={message.content}
-                alt=""
-                style={{ width: 250, height: 'auto' }}
-              />
-              <p key={index}>{message.content}</p>
+              {
+                renderFileThumbnail(message)
+              }
             </div>
           </div>
         );
@@ -184,7 +218,7 @@ const ChatRoom = (props) => {
               <span>{message.participant.name}</span>
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
               <img
-                src={message.content}
+                src={message.document.payload}
                 alt=""
                 style={{ width: 250, height: 'auto' }}
               />
@@ -219,12 +253,6 @@ const ChatRoom = (props) => {
         </div>
       );
     }
-  };
-
-  const uploadFileWithClick = () => {
-    document
-      .getElementsByClassName('message__imageSelector')[0]
-      .childNodes[1].click();
   };
 
   if (selectedChat && messages) {
@@ -275,20 +303,14 @@ const ChatRoom = (props) => {
           <form className="chatroom__sendMessage">
             <div
               className="message__imageSelector"
-              onClick={() => {
-                uploadFileWithClick();
-              }}
             >
-              <PhotoLibraryIcon style={{ color: '#464775' }} />
-              <FileBase
-                className="message__image"
-                type="file"
-                multiple={false}
-                onDone={({ base64 }) => {
-                  setFile(base64);
-                  setImgUploadConfirm(
-                    'Image is selected and will be displayed after sending the message!'
-                  );
+              <Files
+                enableFile={true}
+                id={'documents'}
+                value={file}
+                valueChangeHandler={(value, id) => {
+                  setFile(value);
+                  setImgUploadConfirm('File is selected and will be displayed after sending the message!');
                 }}
               />
             </div>

@@ -59,6 +59,8 @@ const Chats = (props) => {
 
       filteredChatEvents.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
+      console.log('CHATS: ', filteredChatEvents);
+
       setChatEvents(filteredChatEvents);
 
       if (props.selected && props.selected.chatId) {
