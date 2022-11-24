@@ -15,8 +15,6 @@ const ChatRoomItem = (props) => {
 
   useEffect(() => {
     setCurrentUser(appManager.getUserDetails());
-    console.log('***********************: ', event.messages[event.messages.length - 1]);
-    console.log('----------: ', event.messages);
   }, []);
 
   const goToRoom = (id) => {

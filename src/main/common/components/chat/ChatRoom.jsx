@@ -55,6 +55,9 @@ const ChatRoom = (props) => {
   // };
 
   const onMessage = (payload) => {
+    console.log('ChatRoom payload: ', payload);
+    console.log('ChatRoom selectedChat: ', selectedChat);
+
     if(selectedChat && selectedChat.id === payload.roomId) {
       if(props.onMessage) {
         props.onMessage(payload.chatMessage, selectedChat);
@@ -92,7 +95,7 @@ const ChatRoom = (props) => {
     socketEventHandler.api = socketEventHandlerApi();
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       socketManager.removeSubscriptions(socketEventHandler);
     };
@@ -127,7 +130,8 @@ const ChatRoom = (props) => {
       socketManager.emitEvent(MessageType.CHAT_MESSAGE, {
         roomId: selectedChat.id,
         chatMessage: msg,
-        participantsToSignalIds
+        participantsToSignalIds,
+        fromChatTab: props.chatTab
       });
 
       setMessages(oldMsgs => [...oldMsgs, msg]);

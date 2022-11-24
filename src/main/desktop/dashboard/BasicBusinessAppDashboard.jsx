@@ -233,15 +233,12 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   const onChatMessage = (payload) => {
-    console.log('ON CHAT DASH: ', payload);
-
     let loggedInUser = appManager.getUserDetails();
 
     if (payload.chatMessage.participant.userId !== loggedInUser.userId) {
       newMessageAudio.play();
 
-      alert(appManager.getCurrentView());
-      if(appManager.getCurrentView() !== 'chats') {
+      if(!payload.fromChatTab) {
         electron.ipcRenderer.sendMessage('receivingMessage', {
           payload: payload
         });

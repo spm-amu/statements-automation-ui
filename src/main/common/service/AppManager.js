@@ -38,7 +38,6 @@ class AppManager {
   };
 
   getUserDetails = () => {
-    console.log("HANDLER : ", this.handler);
     if (this.handler) {
       console.log("USER DETAILS : ", this.handler.getUserDetails());
       return this.handler.getUserDetails();

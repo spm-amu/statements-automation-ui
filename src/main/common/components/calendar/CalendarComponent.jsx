@@ -67,7 +67,6 @@ const CalendarComponent = (props) => {
 
   const loadEvents = () => {
     get(`${host}/api/v1/meeting/fetchMeetings`, (response) => {
-      console.log('EVENTS: ', response);
       // FREQ=MONTHLY;BYSETPOS=3;BYDAY=WE;INTERVAL=1
      // let myEvent = {
      //    events: [
