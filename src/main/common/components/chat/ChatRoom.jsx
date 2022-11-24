@@ -26,7 +26,7 @@ const ChatRoom = (props) => {
   const [currentUser, setCurrentUser] = useState(appManager.getUserDetails());
   const [message, setMessage] = useState('');
   const [selectedChat, setSelectedChat] = useState(props.selectedChat);
-  const [file, setFile] = useState(null);
+  const [document, setDocument] = useState(null);
   const [messages, setMessages] = useState([]);
   const [confirm, setImgUploadConfirm] = useState('');
   const messagesEndRef = useRef(null);
@@ -113,18 +113,18 @@ const ChatRoom = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (message || file) {
+    if (message || document) {
 
       const msg = {
         createdDate: new Date(),
-        type: file && file.length > 0 ? 'FILE' : 'TEXT',
+        type: document && document.length > 0 ? 'FILE' : 'TEXT',
         active: true,
         content: message,
         participant: currentUser
       };
 
-      if (file && file.length > 0) {
-        msg.file = file[0];
+      if (document && document.length > 0) {
+        msg.document = document[0];
       }
 
       msg.participant.active = true;
@@ -151,7 +151,7 @@ const ChatRoom = (props) => {
     }
     setMessage('');
     setImgUploadConfirm('');
-    setFile(null)
+    setDocument(null)
   };
 
   const callNow = () => {
@@ -195,6 +195,8 @@ const ChatRoom = (props) => {
   }
 
   const renderMessages = (message, index) => {
+    console.log('####: ', message);
+
     if (message.type === 'FILE') {
       if (message.participant.userId === currentUser.userId) {
         return (
@@ -307,9 +309,9 @@ const ChatRoom = (props) => {
               <Files
                 enableFile={true}
                 id={'documents'}
-                value={file}
+                value={document}
                 valueChangeHandler={(value, id) => {
-                  setFile(value);
+                  setDocument(value);
                   setImgUploadConfirm('File is selected and will be displayed after sending the message!');
                 }}
               />
