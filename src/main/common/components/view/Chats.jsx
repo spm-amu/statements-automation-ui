@@ -47,13 +47,25 @@ const Chats = (props) => {
 
   const loadChats = () => {
     get(`${host}/api/v1/chat/fetchChats`, (response) => {
-      setChatEvents(response);
+      const filteredChatEvents = response.filter(chat => {
+        if (chat.type === 'DIRECT') {
+          return true;
+        } else if (chat.type === 'CALENDAR_MEETING' && chat.status === 'ACTIVE' && chat.messages.length > 0) {
+          return true;
+        }
 
-      console.log('PROPS: ', props.selected);
+        return false;
+      })
+
+      filteredChatEvents.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+      setChatEvents(filteredChatEvents);
 
       if (props.selected && props.selected.chatId) {
         const eventSelected = response.find(chat => chat.id === props.selected.chatId);
         setSelectedChat(eventSelected);
+      } else if (filteredChatEvents && filteredChatEvents.length > 0) {
+        setSelectedChat(filteredChatEvents[0]);
       }
 
       setLoading(false);
