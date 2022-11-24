@@ -14,6 +14,7 @@ import People from "../view/People";
 import "./MeetingRoomSideBarContent.css"
 import InCall from '../view/InCall';
 import ChatRoom from '../chat/ChatRoom';
+import appManager from "../../../common/service/AppManager";
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -83,7 +84,7 @@ const MeetingRoomSideBarContent = (props) => {
         </DialogTitle>
         <DialogContent>
           <div style={{height: '100%'}} className={'request-to-join-dialog-content'}>
-            <People exclusions={['peter']} meetingId={meetingId} dialEnabled={true} chatEnabled={false} onAudioCallHandler={(e) => props.onAudioCallHandler(e)}/>
+            <People meetingId={meetingId} dialEnabled={true} chatEnabled={false} onAudioCallHandler={(e) => props.onAudioCallHandler(e)}/>
           </div>
         </DialogContent>
         <DialogActions>
