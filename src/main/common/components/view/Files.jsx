@@ -24,6 +24,7 @@ const grid = {
     },
     {
       "type": "gridColumn",
+      "fieldType": "DATE_TIME",
       "id": "createdDate",
       "attributes": {
         "filterable": false,
