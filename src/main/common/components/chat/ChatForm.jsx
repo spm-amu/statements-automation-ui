@@ -15,31 +15,33 @@ const ChatForm = (props) => {
   const [participants, setParticipants] = useState([]);
 
   const handleAdd = () => {
-    let chat = {
-      title: title,
-      participants: participants,
-      type: 'DIRECT',
-      messages: []
-    };
+    if (participants.length > 0) {
+      let chat = {
+        title: title,
+        participants: participants,
+        type: 'DIRECT',
+        messages: []
+      };
 
-    let userDetails = appManager.getUserDetails();
+      let userDetails = appManager.getUserDetails();
 
-    chat.participants.push({
-      emailAddress: userDetails.emailAddress,
-      name: userDetails.name,
-      phoneNumber: userDetails.phoneNumber,
-      userId: userDetails.userId
-    });
+      chat.participants.push({
+        emailAddress: userDetails.emailAddress,
+        name: userDetails.name,
+        phoneNumber: userDetails.phoneNumber,
+        userId: userDetails.userId
+      });
 
-    post(
-      `${host}/api/v1/chat/create`,
-      (response) => {
-        props.addHandler(chat);
-      },
-      (e) => {},
-      chat,
-      "The chat details have been saved successfully"
-    );
+      post(
+        `${host}/api/v1/chat/create`,
+        (response) => {
+          props.addHandler(chat);
+        },
+        (e) => {},
+        chat,
+        "The chat details have been saved successfully"
+      );
+    }
   };
 
   return (
@@ -64,27 +66,29 @@ const ChatForm = (props) => {
           <TextField
             label="Title"
             id="title"
-            required={true}
+            required={false}
             value={title}
             valueChangeHandler={(e) => setTitle(e.target.value)}
             errorMessage={
               'A chat title is required. Please enter a value'
             }
           />
-          <AutoComplete
-            id="participants"
-            label={'Participants'}
-            invalidText={'invalid participants'}
-            value={participants}
-            multiple={true}
-            showImages={true}
-            searchAttribute={'emailAddress'}
-            validationRegex={/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/}
-            valueChangeHandler={(value, id) => {
-              setParticipants(value);
-            }}
-            optionsUrl={`${host}/api/v1/auth/search`}
-          />
+          <div style={{ marginTop: '8px' }}>
+            <AutoComplete
+              id="participants"
+              label={'Participants'}
+              invalidText={'invalid participants'}
+              value={participants}
+              multiple={true}
+              showImages={true}
+              searchAttribute={'emailAddress'}
+              validationRegex={/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/}
+              valueChangeHandler={(value, id) => {
+                setParticipants(value);
+              }}
+              optionsUrl={`${host}/api/v1/auth/search`}
+            />
+          </div>
         </div>
       </Form>
       <div
