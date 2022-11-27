@@ -364,11 +364,13 @@ ipcMain.on("readTokens", async (_event, args) => {
   tokens.accessToken = store.get('accessToken');
   tokens.refreshToken = store.get('refreshToken');
 
+  let lastLogin = store.get('lastLogin') as string;
+  tokens.lastLogin = new Date(parseFloat(lastLogin)).getTime();
+
   if(mainWindow) {
     mainWindow.webContents.send('tokensRead', tokens);
   }
 });
-
 
 ipcMain.on("saveTokens", async (_event, args) => {
   if (!mainWindow) {
@@ -377,6 +379,7 @@ ipcMain.on("saveTokens", async (_event, args) => {
 
   store.set('accessToken', args.accessToken);
   store.set('refreshToken', args.refreshToken);
+  store.set('lastLogin', args.lastLogin);
 
   mainWindow.webContents.send('tokensSaved', args);
 });
@@ -388,6 +391,7 @@ ipcMain.on("removeTokens", async (_event, args) => {
 
   store.delete('accessToken');
   store.delete('refreshToken');
+  store.delete('lastLogin');
 
   mainWindow.webContents.send('tokensRemoved', args);
 });

@@ -67,26 +67,24 @@ const SignIn = (props) => {
           setIsLoading(false);
 
           // TODO : Set expiry date for desktop app in line with the user's AD password change. DO NOT SET expiry date for web all so that the cookie dies with the browser
-          Utils.setSessionValue("accessToken", response.access_token);
-          Utils.setSessionValue("refreshToken", response.refresh_token);
-          Utils.setSessionValue("lastLogin", new Date().getTime());
 
+          let lastLogin = new Date().getTime();
+          appManager.add("accessToken", response.access_token);
+          appManager.add("refreshToken", response.refresh_token);
+          appManager.add("lastLogin", lastLogin);
+
+          console.log("SIGN IN SAVING TOKENS");
           electron.ipcRenderer.sendMessage('saveTokens', {
             accessToken: response.access_token,
-            refreshToken: response.refresh_token
+            refreshToken: response.refresh_token,
+            lastLogin: lastLogin
           });
 
 
           electron.ipcRenderer.on('tokensSaved', args => {
-            console.log("\n\nENTER DASH");
+            electron.ipcRenderer.removeAllListeners("tokensSaved");
             navigate('/dashboard');
           });
-
-          /*
-          sessionStorage.setItem('accessToken', response.access_token);
-          sessionStorage.setItem('refreshToken', response.refresh_token);
-          sessionStorage.setItem('idToken', response.id_token);
-          */
         },
         (e) => {
           console.log('#### ERROR: ' + JSON.stringify(e));

@@ -172,9 +172,6 @@ const BasicBusinessAppDashboard = (props) => {
           case SystemEventType.UNAUTHORISED_API_CALL:
             navigate('/login');
             break;
-          case SystemEventType.SECURITY_TOKENS_REFRESHED:
-            updateTokens(be);
-            break;
           case SystemEventType.API_ERROR:
             handleApiError(be);
             break;
@@ -184,14 +181,6 @@ const BasicBusinessAppDashboard = (props) => {
         }
       }
     }
-  };
-
-  const updateTokens = (payload) => {
-    electron.ipcRenderer.sendMessage('saveTokens', {
-      accessToken: payload.access_token,
-      refreshToken: payload.refresh_token,
-      reload: false
-    });
   };
 
   const handleApiError = (error) => {
@@ -281,8 +270,8 @@ const BasicBusinessAppDashboard = (props) => {
   }
 
   function load() {
-    let accessToken = Utils.getSessionValue(ACCESS_TOKEN_PROPERTY);
-    let refreshToken = Utils.getSessionValue(REFRESH_TOKEN_PROPERTY);
+    let accessToken = appManager.get(ACCESS_TOKEN_PROPERTY);
+    let refreshToken = appManager.get(REFRESH_TOKEN_PROPERTY);
 
     if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
       navigate('/login');
@@ -313,8 +302,9 @@ const BasicBusinessAppDashboard = (props) => {
 
     electron.ipcRenderer.on('tokensRead', args => {
       if(args.accessToken && args.refreshToken) {
-        Utils.setSessionValue(ACCESS_TOKEN_PROPERTY, args.accessToken);
-        Utils.setSessionValue(REFRESH_TOKEN_PROPERTY, args.refreshToken);
+        appManager.add(ACCESS_TOKEN_PROPERTY, args.accessToken);
+        appManager.add(REFRESH_TOKEN_PROPERTY, args.refreshToken);
+        appManager.add(LAST_LOGIN, args.lastLogin);
 
         load();
       } else {
@@ -326,18 +316,6 @@ const BasicBusinessAppDashboard = (props) => {
 
     electron.ipcRenderer.on('tokensRemoved', args => {
       // TODO : Call backend and revoke access and refresh token
-    });
-
-
-    electron.ipcRenderer.on('tokensSaved', args => {
-      Utils.setSessionValue(ACCESS_TOKEN_PROPERTY, args.access_token);
-      Utils.setSessionValue(REFRESH_TOKEN_PROPERTY, args.refresh_token);
-      Utils.setSessionValue(LAST_LOGIN, new Date().getTime());
-
-      console.log("TOKENS SAVED CALLING LOAD");
-      if(args.reload) {
-        load();
-      }
     });
 
     electron.ipcRenderer.on('replyMessage', args => {
@@ -389,7 +367,7 @@ const BasicBusinessAppDashboard = (props) => {
 
     electron.ipcRenderer.on('declineCall', args => {
       if (args.payload.callerId) {
-        socketManager.endDirectCall(args.payload.callerId);
+        socketManager.declineDirectCall(args.payload.callerId);
       }
     });
 
@@ -403,7 +381,6 @@ const BasicBusinessAppDashboard = (props) => {
       socketManager.disconnectSocket();
 
       electron.ipcRenderer.removeAllListeners("tokensRemoved");
-      electron.ipcRenderer.removeAllListeners("tokensSaved");
       electron.ipcRenderer.removeAllListeners("answerCall");
       electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
       electron.ipcRenderer.removeAllListeners("declineCall");
@@ -627,7 +604,7 @@ const BasicBusinessAppDashboard = (props) => {
                     <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
                   </Alert>
                 </div>
-                <ViewPort settings={props.settings}/>
+                <ViewPort />
               </div>
             </div>
 

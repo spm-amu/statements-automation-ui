@@ -9,26 +9,36 @@ export const LAST_LOGIN = "lastLogin";
 const ID_TOKEN_PROPERTY = "idToken";
 export const REFRESH_TOKEN_PROPERTY = "refreshToken";
 
+const {electron} = window;
+
 class TokenManager {
 
     startTokenRefreshMonitor(url, username) {
         setInterval(function () {
-            let lastLogin = Utils.getSessionValue(LAST_LOGIN);
-            let refreshToken = Utils.getSessionValue(REFRESH_TOKEN_PROPERTY);
+            let lastLogin = appManager.get(LAST_LOGIN);
+            let refreshToken = appManager.get(REFRESH_TOKEN_PROPERTY);
 
             if (!Utils.isNull(lastLogin) && !Utils.isNull(refreshToken)) {
                 let diff = ((new Date().getTime() - parseFloat(lastLogin)) / MINUTE);
                 if (diff >= 57) {
-                    console.log("Refreshing Token AT [" + diff + "]");
-
                     if(refreshToken) {
                       let refreshUrl = `${url}?refreshToken=${refreshToken}`;
                       get(refreshUrl, (response) => {
-                          appManager.fireEvent(SystemEventType.SECURITY_TOKENS_REFRESHED, response);
+                        let lastLogin = new Date().getTime();
+                        console.log("REFRESHES SUCCESSFULLY AT : " + diff);
+                          electron.ipcRenderer.sendMessage('saveTokens', {
+                            accessToken: response.access_token,
+                            refreshToken: response.refresh_token,
+                            lastLogin: lastLogin
+                          });
+
+                          appManager.add(ACCESS_TOKEN_PROPERTY, response.access_token);
+                          appManager.add(REFRESH_TOKEN_PROPERTY, response.refresh_token);
+                          appManager.add(LAST_LOGIN, lastLogin);
                         },
                         (e) => {
                           console.error('Error refreshing token');
-                        }, null, false)
+                        }, null, false, false)
                     }
                 }
             }

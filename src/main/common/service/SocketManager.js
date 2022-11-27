@@ -40,7 +40,7 @@ class SocketManager {
 
   init = () => {
     // let socket = io.connect('http://svn.agilemotion.co.za');
-    // let socket = io.connect('http://localhost:8000');
+    let socket = io.connect('http://localhost:8000');
     // let socket = io.connect('http://100.72.124.104:8000');
     let userDetails = appManager.getUserDetails();
 
@@ -251,14 +251,14 @@ class SocketManager {
     return item;
   };
 
-  endCall = () => {
+  endCall = (isDirect = false) => {
     if(this.socket) {
-      this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id});
+      this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id, direct: isDirect});
     }
   };
 
-  endDirectCall = (callerSocketId) => {
-    this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId});
+  declineDirectCall = (callerSocketId) => {
+    this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId, direct: true, reject: true});
   }
 }
 

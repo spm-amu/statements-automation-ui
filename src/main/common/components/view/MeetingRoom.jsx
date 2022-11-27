@@ -176,7 +176,13 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (allUserParticipantsLeft) {
-      setStep("LOBBY");
+      if(!isDirectCall) {
+        // TODO : Introduce a new step for this
+        setStep("LOBBY");
+      } else {
+        endCall();
+        onCallEnded();
+      }
     }
   }, [allUserParticipantsLeft]);
 
@@ -275,6 +281,7 @@ const MeetingRoom = (props) => {
 
   const join = () => {
     let userDetails = appManager.getUserDetails();
+    alert(isHost);
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
       userIdentity: userDetails.userId,
@@ -283,7 +290,8 @@ const MeetingRoom = (props) => {
       email: userDetails.emailAddress,
       isHost: isHost,
       audioMuted: audioMuted,
-      videoMuted: videoMuted
+      videoMuted: videoMuted,
+      direct: isDirectCall
     });
   };
 
@@ -415,7 +423,7 @@ const MeetingRoom = (props) => {
 
   const endCall = () => {
     if (currentUserStream) {
-      socketManager.endCall();
+      socketManager.endCall(isDirectCall);
     }
 
     props.onEndCall();
@@ -462,7 +470,8 @@ const MeetingRoom = (props) => {
   const rejectUser = (item) => {
     socketManager.emitEvent(MessageType.PERMIT_STATUS, {
       allowed: false,
-      id: item.socketId
+      id: item.socketId,
+      meetingId: selectedMeeting.id
     });
 
     removeFromLobbyWaiting(item);
@@ -566,7 +575,7 @@ const MeetingRoom = (props) => {
                         endCall: () => {
                           if (isDirectCall && participants.length === 0) {
                             console.log("USER TO CALL : ", userToCall);
-                            socketManager.emitEvent(MessageType.CANCEL_CALL, {userId: userToCall.userId});
+                            socketManager.emitEvent(MessageType.CANCEL_CALL, {userId: userToCall.userId, callerId: appManager.getUserDetails().userId});
                             onCallEnded();
                           } else {
                             endCall();
