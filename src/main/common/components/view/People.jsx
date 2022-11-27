@@ -90,6 +90,7 @@ const People = (props) => {
           videoMuted: true,
           audioMuted: false,
           isDirectCall: true,
+          isHost: true,
           userToCall
         }
       })

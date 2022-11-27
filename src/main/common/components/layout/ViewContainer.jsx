@@ -19,7 +19,7 @@ const ViewContainer = (props) => {
   const [attributes] = useState({
     currentWindow: null,
     currentView: null,
-    currentMeeting: null,
+    data: null,
     currentDisplayMode: 'inline',
     windowClosing: false,
     windowDisplayState: 'MAXIMIZED',
@@ -32,7 +32,7 @@ const ViewContainer = (props) => {
   React.useEffect(() => {
     return () => {
       appManager.remove('CURRENT_MEETING');
-      attributes.currentMeeting = null;
+      attributes.data = null;
     };
   }, []);
 
@@ -84,8 +84,8 @@ const ViewContainer = (props) => {
         attributes.currentWindow = viewId;
       }
 
-      if (data !== attributes.currentMeeting && viewId === 'meetingRoom') {
-        attributes.currentMeeting = data;
+      if (data !== attributes.data && viewId === 'meetingRoom') {
+        attributes.data = data;
       }
 
       switch (attributes.currentView) {
@@ -120,7 +120,7 @@ const ViewContainer = (props) => {
         element
       }
       {
-        attributes.currentWindow === 'meetingRoom' && attributes.currentMeeting && windowOpen &&
+        attributes.currentWindow === 'meetingRoom' && attributes.data && windowOpen &&
         <Window minimizable={true} open={windowOpen}
                 containerClassName={'meeting-window-container'}
                 displayState={attributes.windowDisplayState} onDisplayModeChange={
@@ -144,17 +144,17 @@ const ViewContainer = (props) => {
 
               attributes.windowDisplayState = 'MAXIMIZED';
               attributes.currentWindow = null;
-              attributes.currentMeeting = null;
+              attributes.data = null;
 
               setWindowOpen(false);
             }}
             displayState={attributes.windowDisplayState}
-            selectedMeeting={attributes.currentMeeting.selectedMeeting}
-            videoMuted={attributes.currentMeeting.videoMuted}
-            audioMuted={attributes.currentMeeting.audioMuted}
-            isHost={attributes.currentMeeting.isHost}
-            isDirectCall={attributes.currentMeeting.isDirectCall}
-            userToCall={attributes.currentMeeting.userToCall}
+            selectedMeeting={attributes.data.selectedMeeting}
+            videoMuted={attributes.data.videoMuted}
+            audioMuted={attributes.data.audioMuted}
+            isHost={attributes.data.isHost}
+            isDirectCall={attributes.data.isDirectCall}
+            userToCall={attributes.data.userToCall}
           />
         </Window>
       }
