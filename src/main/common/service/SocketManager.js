@@ -56,7 +56,7 @@ class SocketManager {
     }
 
     socket.on("connect", () => {
-      socket.emit(MessageType.REGISTER_ONLINE, {id: userDetails.userId});
+      socket.emit(MessageType.REGISTER_ONLINE, {id: userDetails.userId, name: userDetails.name});
     });
 
     socket.on(MessageType.USERS_ONLINE, (payload) => {
@@ -252,9 +252,10 @@ class SocketManager {
     return item;
   };
 
-  endCall = (isDirect = false) => {
+  endCall = (isDirect = false, caller = null) => {
+    console.log("\n\n\n\nENDING CALL FROM ", caller);
     if(this.socket) {
-      this.emitEvent(MessageType.END_CALL, {callerID: this.socket.id, direct: isDirect});
+      this.emitEvent(MessageType.END_CALL, {callerID: isDirect && caller ? caller.socketId : this.socket.id, direct: isDirect});
     }
   };
 

@@ -58,11 +58,6 @@ const ViewContainer = (props) => {
       displayMode = 'inline';
     }
 
-    console.log("LOADING VIEW");
-    console.log(JSON.stringify(attributes));
-    console.log("\n\n\nDATA");
-    console.log(data);
-
     if (!attributes.windowClosing) {
       if (displayMode !== attributes.currentDisplayMode) {
         if (displayMode === 'window') {
@@ -150,6 +145,7 @@ const ViewContainer = (props) => {
             }}
             displayState={attributes.windowDisplayState}
             selectedMeeting={attributes.data.selectedMeeting}
+            callerUser={attributes.data.callerUser}
             videoMuted={attributes.data.videoMuted}
             audioMuted={attributes.data.audioMuted}
             isHost={attributes.data.isHost}

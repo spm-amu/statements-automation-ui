@@ -327,6 +327,7 @@ const BasicBusinessAppDashboard = (props) => {
     });
 
     electron.ipcRenderer.on('answerCall', args => {
+      console.log("\n\n\n\nANSWERING CALLL.....", args);
       navigate("/view/meetingRoom", {
         state: {
           displayMode: 'window',
@@ -335,7 +336,8 @@ const BasicBusinessAppDashboard = (props) => {
           },
           videoMuted: true,
           audioMuted: false,
-          isDirectCall: true
+          isDirectCall: true,
+          callerUser: args.payload.callerUser
         }
       })
     });

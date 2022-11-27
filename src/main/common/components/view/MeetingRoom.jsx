@@ -16,7 +16,7 @@ import ClosablePanel from "../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
 import appManager from "../../../common/service/AppManager";
 import MeetingRoomSummary from "../vc/MeetingRoomSummary";
-import { get, host, post } from '../../service/RestService';
+import {get, host, post} from '../../service/RestService';
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -126,7 +126,8 @@ const MeetingRoom = (props) => {
     selectedMeeting,
     isHost,
     userToCall,
-    isDirectCall
+    isDirectCall,
+    callerUser
   } = props;
 
   const raiseHand = () => {
@@ -152,7 +153,7 @@ const MeetingRoom = (props) => {
   };
 
   const removeUser = (user) => {
-    if(selectedMeeting.id === user.meetingId) {
+    if (selectedMeeting.id === user.meetingId) {
       socketManager.removeFromUserToPeerMap(user.id);
 
       const userId = user.alias;
@@ -176,7 +177,7 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (allUserParticipantsLeft) {
-      if(!isDirectCall) {
+      if (!isDirectCall) {
         // TODO : Introduce a new step for this
         setStep("LOBBY");
       } else {
@@ -343,7 +344,7 @@ const MeetingRoom = (props) => {
         setMeetingChat(response);
       } else {
         // TODO : Nsovo to check this if block. It causes an error if there are no attendees on a direct call
-        if(selectedMeeting.attendees) {
+        if (selectedMeeting.attendees) {
           let chatParticipants = JSON.parse(JSON.stringify(selectedMeeting.attendees));
 
           chatParticipants.forEach(chatParticipant => {
@@ -426,7 +427,7 @@ const MeetingRoom = (props) => {
 
   const endCall = () => {
     if (currentUserStream) {
-      socketManager.endCall(isDirectCall);
+      socketManager.endCall(isDirectCall, callerUser);
     }
 
     props.onEndCall();
@@ -524,8 +525,10 @@ const MeetingRoom = (props) => {
     <div className={'row meeting-container'}>
       <div className={'col'} style={{paddingLeft: '0', paddingRight: '0'}}>
         <div style={{height: '100%'}}>
-          <div style={{height: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null,
-            maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null, overflow: 'hidden'}}>
+          <div style={{
+            height: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null,
+            maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null, overflow: 'hidden'
+          }}>
             {
               step === Steps.LOBBY ?
                 <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
@@ -578,7 +581,12 @@ const MeetingRoom = (props) => {
                         endCall: () => {
                           if (isDirectCall && participants.length === 0) {
                             console.log("USER TO CALL : ", userToCall);
-                            socketManager.emitEvent(MessageType.CANCEL_CALL, {userId: userToCall.userId, callerId: appManager.getUserDetails().userId});
+                            socketManager.emitEvent(MessageType.CANCEL_CALL, {
+                              userId: userToCall.userId,
+                              userDescription: userToCall.name,
+                              callerId: appManager.getUserDetails().userId,
+                              callerDescription: appManager.getUserDetails().name
+                            });
                             onCallEnded();
                           } else {
                             endCall();
