@@ -49,6 +49,7 @@ class SocketManager {
         if (value !== MessageType.USERS_ONLINE
           && value !== MessageType.USER_ONLINE && value !== MessageType.USER_OFFLINE) {
           console.log('EVENT: ', value);
+          console.log(this.subscriptions);
           this.fireEvent(value, {socket: this.socket, payload: payload});
         }
       });

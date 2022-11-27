@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useState} from 'react';
 
-import {useLocation, useParams} from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import Calendar from '../view/Calendar';
 import Chats from '../view/Chats';
 import Files from '../view/Files';
@@ -10,7 +10,6 @@ import JoinMeetingSettings from '../view/JoinMeetingSettings';
 import People from "../view/People";
 import MeetingRoom from "../view/MeetingRoom";
 import Window from "../Window";
-import {useNavigate} from 'react-router-dom';
 import appManager from "../../../common/service/AppManager";
 import "./ViewContainer.css"
 
@@ -22,10 +21,11 @@ const ViewContainer = (props) => {
     currentView: null,
     currentMeeting: null,
     currentDisplayMode: 'inline',
+    windowClosing: false,
     windowDisplayState: 'MAXIMIZED',
   });
 
-  const [windowOpen, setWindowOpen] = useState(false);
+  const [windowOpen, setWindowOpen] = useState(null);
 
   const navigate = useNavigate();
 
@@ -36,10 +36,11 @@ const ViewContainer = (props) => {
     };
   }, []);
 
-
   React.useEffect(() => {
-    if(!windowOpen) {
+    if (windowOpen !== null && windowOpen === false) {
+      console.log("\n\n\nRESETING WINDOW VALUES");
       attributes.currentDisplayMode = 'inline';
+      attributes.windowClosing = true;
     }
   }, [windowOpen]);
 
@@ -49,10 +50,6 @@ const ViewContainer = (props) => {
     let data = location.state;
     let displayMode = null;
 
-    console.log("\n\n\nVC PROPS");
-    console.log(attributes);
-    console.log("WINDOW OPEN : " + windowOpen);
-
     if (data) {
       displayMode = data.displayMode;
     }
@@ -61,48 +58,61 @@ const ViewContainer = (props) => {
       displayMode = 'inline';
     }
 
-    if (displayMode !== attributes.currentDisplayMode) {
-      attributes.currentDisplayMode = displayMode;
-      setWindowOpen(displayMode === 'window');
-    }
+    console.log("LOADING VIEW");
+    console.log(JSON.stringify(attributes));
+    console.log("\n\n\nDATA");
+    console.log(data);
 
-    if (displayMode === 'inline' && viewId !== attributes.currentView) {
-      attributes.currentView = viewId;
-      if(windowOpen) {
-        attributes.windowDisplayState = 'MINIMIZED';
+    if (!attributes.windowClosing) {
+      if (displayMode !== attributes.currentDisplayMode) {
+        if (displayMode === 'window') {
+          setWindowOpen(true);
+        }
+
+        attributes.currentDisplayMode = displayMode;
       }
-    }
 
-    if (displayMode === 'window' && viewId !== attributes.currentWindow) {
-      attributes.currentWindow = viewId;
-    }
+      attributes.windowClosing = false;
+      if (displayMode === 'inline' && viewId !== attributes.currentView) {
+        attributes.currentView = viewId;
+        if (windowOpen) {
+          attributes.windowDisplayState = 'MINIMIZED';
+        }
+      }
 
-    if (data !== attributes.currentMeeting && viewId === 'meetingRoom') {
-      attributes.currentMeeting = data;
-    }
+      if (displayMode === 'window' && viewId !== attributes.currentWindow) {
+        attributes.currentWindow = viewId;
+      }
 
-    switch (attributes.currentView) {
-      case 'calendar':
-        element = <Calendar/>;
-        break;
-      case 'chats':
-        element = <Chats selected={location.state}/>;
-        break;
-      case 'meetingHistory':
-        element = <MeetingHistory/>;
-        break;
-      case 'files':
-        element = <Files/>;
-        break;
-      case 'meeting':
-        element = <Meeting selectedEvent={location.state}/>;
-        break;
-      case 'joinMeetingSettings':
-        element = <JoinMeetingSettings selectedMeeting={location.state}/>;
-        break;
-      case 'people':
-        element = <People dialEnabled={true} chatEnabled={false}/>;
-        break;
+      if (data !== attributes.currentMeeting && viewId === 'meetingRoom') {
+        attributes.currentMeeting = data;
+      }
+
+      switch (attributes.currentView) {
+        case 'calendar':
+          element = <Calendar/>;
+          break;
+        case 'chats':
+          element = <Chats selected={location.state}/>;
+          break;
+        case 'meetingHistory':
+          element = <MeetingHistory/>;
+          break;
+        case 'files':
+          element = <Files/>;
+          break;
+        case 'meeting':
+          element = <Meeting selectedEvent={location.state}/>;
+          break;
+        case 'joinMeetingSettings':
+          element = <JoinMeetingSettings selectedMeeting={location.state}/>;
+          break;
+        case 'people':
+          element = <People dialEnabled={true} chatEnabled={false}/>;
+          break;
+      }
+    } else {
+      attributes.windowClosing = false;
     }
 
     return <>
@@ -110,29 +120,27 @@ const ViewContainer = (props) => {
         element
       }
       {
-        attributes.currentWindow === 'meetingRoom' && attributes.currentMeeting &&
+        attributes.currentWindow === 'meetingRoom' && attributes.currentMeeting && windowOpen &&
         <Window minimizable={true} open={windowOpen}
                 containerClassName={'meeting-window-container'}
                 displayState={attributes.windowDisplayState} onDisplayModeChange={
-                  (mode) => {
-                    attributes.windowDisplayState = mode;
-                    let meetingContainer = document.getElementsByClassName('meeting-window-container')[0];
-                    meetingContainer.style.overflowY = mode === 'MINIMIZED' ? 'hidden' : 'auto';
-                    if(attributes.currentView === 'joinMeetingSettings') {
-                      navigate('/view/calendar');
-                    }
-                  }
-                }>
+          (mode) => {
+            attributes.windowDisplayState = mode;
+            let meetingContainer = document.getElementsByClassName('meeting-window-container')[0];
+            meetingContainer.style.overflowY = mode === 'MINIMIZED' ? 'hidden' : 'auto';
+            if (attributes.currentView === 'joinMeetingSettings') {
+              navigate('/view/calendar');
+            }
+          }
+        }>
           <MeetingRoom
             closeHandler={() => {
-              if(attributes.currentView === 'joinMeetingSettings') {
+              if (attributes.currentView === 'joinMeetingSettings') {
                 navigate('/view/calendar');
               }
             }}
             onEndCall={() => {
               appManager.remove('CURRENT_MEETING');
-
-              console.log("\n\n\n\nCLOSING WINDOW");
 
               attributes.windowDisplayState = 'MAXIMIZED';
               attributes.currentWindow = null;

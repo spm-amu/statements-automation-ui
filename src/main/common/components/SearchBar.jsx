@@ -4,6 +4,7 @@ import "./SearchBar.css"
 import Icon from "./Icon";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "./customInput/TextField";
+import appManager from "../service/AppManager";
 
 const SearchBarComponent = React.memo(React.forwardRef((props, ref) => {
   const [searchValue, setSearchValue] = React.useState();

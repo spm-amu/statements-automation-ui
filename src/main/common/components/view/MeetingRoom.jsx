@@ -372,7 +372,7 @@ const MeetingRoom = (props) => {
     }, (e) => {
 
     })
-  }
+  };
 
   useEffect(() => {
     fetchChats();
