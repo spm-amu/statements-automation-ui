@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {useLocation, useParams} from 'react-router-dom';
 import Calendar from '../view/Calendar';
@@ -17,32 +17,41 @@ import "./ViewContainer.css"
 const ViewContainer = (props) => {
   const params = useParams();
   const location = useLocation();
-  const [currentWindow, setCurrentWindow] = useState(null);
-  const [currentView, setCurrentView] = useState(null);
-  const [currentMeeting, setCurrentMeeting] = useState(null);
-  const [currentDisplayMode, setCurrentDisplayMode] = useState('inline');
-  const [windowMinimizable, setWindowMinimizable] = useState(false);
-  const [windowOpen, setWindowOpen] = useState(false);
-  const [windowDisplayState, setWindowDisplayState] = useState('MAXIMIZED');
-  const navigate = useNavigate();
+  const [attributes] = useState({
+    currentWindow: null,
+    currentView: null,
+    currentMeeting: null,
+    currentDisplayMode: 'inline',
+    windowDisplayState: 'MAXIMIZED',
+  });
 
-  useEffect(() => {
-    if (currentDisplayMode === 'window') {
-      setWindowOpen(true);
-    }
-  }, [currentDisplayMode]);
+  const [windowOpen, setWindowOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     return () => {
-      setCurrentMeeting(null);
+      appManager.remove('CURRENT_MEETING');
+      attributes.currentMeeting = null;
     };
   }, []);
+
+
+  React.useEffect(() => {
+    if(!windowOpen) {
+      attributes.currentDisplayMode = 'inline';
+    }
+  }, [windowOpen]);
 
   const renderView = () => {
     let viewId = params.id;
     let element;
     let data = location.state;
     let displayMode = null;
+
+    console.log("\n\n\nVC PROPS");
+    console.log(attributes);
+    console.log("WINDOW OPEN : " + windowOpen);
 
     if (data) {
       displayMode = data.displayMode;
@@ -52,27 +61,27 @@ const ViewContainer = (props) => {
       displayMode = 'inline';
     }
 
-    if (displayMode !== currentDisplayMode) {
-      setCurrentDisplayMode(displayMode);
+    if (displayMode !== attributes.currentDisplayMode) {
+      attributes.currentDisplayMode = displayMode;
+      setWindowOpen(displayMode === 'window');
     }
 
-    if (displayMode === 'inline' && viewId !== currentView) {
-      setCurrentView(viewId);
+    if (displayMode === 'inline' && viewId !== attributes.currentView) {
+      attributes.currentView = viewId;
       if(windowOpen) {
-        setWindowDisplayState('MINIMIZED');
+        attributes.windowDisplayState = 'MINIMIZED';
       }
     }
 
-    if (displayMode === 'window' && viewId !== currentWindow) {
-      setCurrentWindow(viewId);
+    if (displayMode === 'window' && viewId !== attributes.currentWindow) {
+      attributes.currentWindow = viewId;
     }
 
-    if (data !== currentMeeting && viewId === 'meetingRoom') {
-      setCurrentMeeting(data);
-      appManager.add('CURRENT_MEETING', data);
+    if (data !== attributes.currentMeeting && viewId === 'meetingRoom') {
+      attributes.currentMeeting = data;
     }
 
-    switch (currentView) {
+    switch (attributes.currentView) {
       case 'calendar':
         element = <Calendar/>;
         break;
@@ -92,7 +101,7 @@ const ViewContainer = (props) => {
         element = <JoinMeetingSettings selectedMeeting={location.state}/>;
         break;
       case 'people':
-        element = <People/>;
+        element = <People dialEnabled={true} chatEnabled={false}/>;
         break;
     }
 
@@ -101,40 +110,43 @@ const ViewContainer = (props) => {
         element
       }
       {
-        currentWindow === 'meetingRoom' && currentMeeting &&
+        attributes.currentWindow === 'meetingRoom' && attributes.currentMeeting &&
         <Window minimizable={true} open={windowOpen}
                 containerClassName={'meeting-window-container'}
-                displayState={windowDisplayState} onDisplayModeChange={
+                displayState={attributes.windowDisplayState} onDisplayModeChange={
                   (mode) => {
-                    setWindowDisplayState(mode);
+                    attributes.windowDisplayState = mode;
                     let meetingContainer = document.getElementsByClassName('meeting-window-container')[0];
                     meetingContainer.style.overflowY = mode === 'MINIMIZED' ? 'hidden' : 'auto';
-                    if(currentView === 'joinMeetingSettings') {
+                    if(attributes.currentView === 'joinMeetingSettings') {
                       navigate('/view/calendar');
                     }
                   }
                 }>
           <MeetingRoom
             closeHandler={() => {
-              if(currentView === 'joinMeetingSettings') {
+              if(attributes.currentView === 'joinMeetingSettings') {
                 navigate('/view/calendar');
               }
             }}
             onEndCall={() => {
-              setWindowOpen(false);
-              setCurrentDisplayMode('inline');
-              setWindowDisplayState('MAXIMIZED');
-              setCurrentWindow(null);
-              setCurrentMeeting(null);
               appManager.remove('CURRENT_MEETING');
+
+              console.log("\n\n\n\nCLOSING WINDOW");
+
+              attributes.windowDisplayState = 'MAXIMIZED';
+              attributes.currentWindow = null;
+              attributes.currentMeeting = null;
+
+              setWindowOpen(false);
             }}
-            displayState={windowDisplayState}
-            selectedMeeting={currentMeeting.selectedMeeting}
-            videoMuted={currentMeeting.videoMuted}
-            audioMuted={currentMeeting.audioMuted}
-            isHost={currentMeeting.isHost}
-            isDirectCall={currentMeeting.isDirectCall}
-            userToCall={currentMeeting.userToCall}
+            displayState={attributes.windowDisplayState}
+            selectedMeeting={attributes.currentMeeting.selectedMeeting}
+            videoMuted={attributes.currentMeeting.videoMuted}
+            audioMuted={attributes.currentMeeting.audioMuted}
+            isHost={attributes.currentMeeting.isHost}
+            isDirectCall={attributes.currentMeeting.isDirectCall}
+            userToCall={attributes.currentMeeting.userToCall}
           />
         </Window>
       }

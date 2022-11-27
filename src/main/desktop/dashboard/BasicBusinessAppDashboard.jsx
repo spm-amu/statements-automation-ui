@@ -575,9 +575,11 @@ const BasicBusinessAppDashboard = (props) => {
                   settingsMenu={null}
                   toggleSidebar={toggleSidebar}
                   logoutCallBack={(e) => {
-                    sessionStorage.setItem("access_token", null);
-                    sessionStorage.setItem("userDetails", null);
+                    appManager.remove("accessToken");
+                    appManager.remove("refreshToken");
+                    appManager.remove("lastLogin");
 
+                    tokenManager.stopTokenRefreshMonitor();
 
                     electron.ipcRenderer.sendMessage('removeTokens', {});
                     navigate("/login");

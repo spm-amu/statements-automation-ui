@@ -281,7 +281,6 @@ const MeetingRoom = (props) => {
 
   const join = () => {
     let userDetails = appManager.getUserDetails();
-    alert(isHost);
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
       userIdentity: userDetails.userId,
@@ -343,28 +342,32 @@ const MeetingRoom = (props) => {
       if (response && response.id) {
         setMeetingChat(response);
       } else {
-        let chatParticipants = JSON.parse(JSON.stringify(selectedMeeting.attendees));
+        // TODO : Nsovo to check this if block. It causes an error if there are no attendees on a direct call
+        if(selectedMeeting.attendees) {
+          let chatParticipants = JSON.parse(JSON.stringify(selectedMeeting.attendees));
 
-        chatParticipants.forEach(chatParticipant => {
-          delete chatParticipant.id
-        });
+          chatParticipants.forEach(chatParticipant => {
+            delete chatParticipant.id
+          });
 
-        let chat = {
-          meetingId: selectedMeeting.id,
-          title: selectedMeeting.title,
-          participants: chatParticipants,
-          type: 'CALENDAR_MEETING',
-          messages: []
-        };
+          let chat = {
+            meetingId: selectedMeeting.id,
+            title: selectedMeeting.title,
+            participants: chatParticipants,
+            type: 'CALENDAR_MEETING',
+            messages: []
+          };
 
-        post(
-          `${host}/api/v1/chat/create`,
-          (chat) => {
-            setMeetingChat(chat);
-          },
-          (e) => {},
-          chat
-        );
+          post(
+            `${host}/api/v1/chat/create`,
+            (chat) => {
+              setMeetingChat(chat);
+            },
+            (e) => {
+            },
+            chat
+          );
+        }
       }
     }, (e) => {
 

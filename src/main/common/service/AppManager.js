@@ -9,10 +9,6 @@ class AppManager {
     return AppManager.instance;
   }
 
-  setHandler = (handler) => {
-    this.handler = handler;
-  };
-
   setUserDetails = (userDetails) => {
     this.store.userDetails = userDetails;
   };
@@ -106,6 +102,6 @@ class AppManager {
 }
 
 const instance = new AppManager();
-//Object.freeze(instance);
+Object.freeze(instance);
 
 export default instance;

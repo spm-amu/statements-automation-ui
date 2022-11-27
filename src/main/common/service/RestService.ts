@@ -84,6 +84,7 @@ class RestService {
                   let authData = JSON.parse(data);
                   let lastLogin = new Date().getTime();
 
+                  // @ts-ignore
                   electron.ipcRenderer.sendMessage("saveTokens", {
                     accessToken: authData.access_token,
                     refreshToken: authData.refresh_token,

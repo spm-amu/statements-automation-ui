@@ -69,6 +69,8 @@ const People = (props) => {
 
   const onAudioCallHandler = (userToCall) => {
     if (props.onAudioCallHandler) {
+      console.log("\n\n\n\nCALLING DELEGATE");
+
       props.onAudioCallHandler(userToCall);
     } else {
       let userDetails = appManager.getUserDetails();
@@ -82,6 +84,8 @@ const People = (props) => {
         callerId: socketManager.socket.id,
         name: userDetails.name,
       });
+
+      console.log("\n\n\n\nNAVIGATING TO MEETING");
 
       navigate("/view/meetingRoom", {
         state: {

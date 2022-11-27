@@ -41,6 +41,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
 
   useEffect(() => {
     socketEventHandler.api = handler();
+    console.log("\n\n\nCARD : " + props.dialEnabled, appManager.get('CURRENT_MEETING'));
   });
 
   useEffect(() => {
