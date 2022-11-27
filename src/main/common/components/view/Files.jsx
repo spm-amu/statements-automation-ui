@@ -17,8 +17,19 @@ const grid = {
       "attributes": {
         "filterable": true,
         "filterValueTemplate": "%${value}%",
-        "width": "30.0%",
+        "width": "35.0%",
         "label": "Name",
+        "sortable": false
+      }
+    },
+    {
+      "type": "gridColumn",
+      "fieldType": "DATE_TIME",
+      "id": "createdDate",
+      "attributes": {
+        "filterable": false,
+        "width": "20.0%",
+        "label": "Created Date",
         "sortable": false
       }
     },
@@ -27,17 +38,17 @@ const grid = {
       "id": "origin",
       "attributes": {
         "filterable": false,
-        "width": "50.0%",
+        "width": "35.0%",
         "label": "Origin",
         "sortable": false
       }
     },
-    {
+   {
       "type": "gridColumn",
       "id": "actions",
       "attributes": {
         "filterable": false,
-        "width": "20.0%",
+        "width": "10.0%",
         "label": "",
         "toolbar": {
           "items": [
@@ -85,7 +96,7 @@ const Files = (props) => {
                     criteriaParams={criteriaParams}
                     dataUrl={`${host}/api/v1/document/fetchUserDocuments`}
                     actionHandler={(e) => {
-                      onDownload(e.data.documentId);
+                         onDownload(e.data.documentId);
                     }}
           />
         </ul>

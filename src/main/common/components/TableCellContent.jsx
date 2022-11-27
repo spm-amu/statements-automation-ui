@@ -78,6 +78,8 @@ const TableCellContent = React.memo(React.forwardRef((props, ref) => {
         displayValue = new Date(contentValue).toLocaleDateString();
       } else if (contentType === 'TIME') {
         displayValue = new Date(contentValue).toLocaleTimeString();
+      } else if (contentType === 'DATE_TIME') {
+        displayValue = new Date(contentValue).toLocaleDateString() + ' ' + new Date(contentValue).toLocaleTimeString();
       } else {
         if (typeof contentValue === 'object') {
           // TODO : First check if the editor has a display template. If it does, use it to get the display value
