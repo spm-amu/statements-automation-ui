@@ -31,7 +31,7 @@ import Close from '@material-ui/icons/Close';
 import Link from "@material-ui/icons/Link";
 import React, {Component} from "react";
 import {
-  Call,
+  Notifications,
   CallEnd,
   CancelPresentation,
   ChatBubbleOutline,
@@ -56,6 +56,8 @@ class Icon extends Component {
       return <AddIcon/>
     } else if (this.props.id === 'EDIT') {
       return <EditIcon/>
+    } else if (this.props.id === 'NOTIFICATIONS') {
+      return <Notifications/>
     } else if (this.props.id === 'REPLY') {
       return <Reply/>
     } else if (this.props.id === 'CLOSE') {

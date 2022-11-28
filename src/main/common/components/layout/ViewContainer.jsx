@@ -12,6 +12,7 @@ import MeetingRoom from "../view/MeetingRoom";
 import Window from "../Window";
 import appManager from "../../../common/service/AppManager";
 import "./ViewContainer.css"
+import Activity from "../view/Activity";
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -38,7 +39,6 @@ const ViewContainer = (props) => {
 
   React.useEffect(() => {
     if (windowOpen !== null && windowOpen === false) {
-      console.log("\n\n\nRESETING WINDOW VALUES");
       attributes.currentDisplayMode = 'inline';
       attributes.windowClosing = true;
     }
@@ -104,6 +104,9 @@ const ViewContainer = (props) => {
           break;
         case 'people':
           element = <People dialEnabled={true} chatEnabled={false}/>;
+          break;
+        case 'activity':
+          element = <Activity/>;
           break;
       }
     } else {

@@ -13,6 +13,10 @@
 
 .menu-item {
   margin-left: 3px;
+}
+
+.menu-item .menu-item-icon,
+.menu-item .menu-item-label {
   opacity: .4;
 }
 

@@ -57,7 +57,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
   return (
     <div className="person-card">
       <div className="row no-margin" style={{borderBottom: '1px solid #e1e1e1', paddingBottom: '8px'}}>
-        <div className={props.avatarSize === 'S' ? 'avatar-small' : null}>
+        <div className={props.avatarSize === 'S' ? 'avatar-small' : null} style={{width: '54px'}}>
           <img
             src={props.data.avatar ? props.data.avatar : require('../../desktop/dashboard/images/noimage-person.png')}
             alt={""} style={{borderRadius: '50%'}}/>

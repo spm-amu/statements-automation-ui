@@ -106,7 +106,7 @@ const People = (props) => {
       <div className={'people-content row'}>
         {searchResult.records.map((user, index) => {
           return <div key={index} className={'col person-card-wrapper'}
-                      style={{marginLeft: '0', paddingLeft: '0', maxWidth: '400px'}}>
+                      style={{marginLeft: '0', paddingLeft: '0', minWidth: '320px', maxWidth: '320px', marginBottom: '8px'}}>
             <PersonCard onAudioCallHandler={(data) => onAudioCallHandler(data)}
                         data={user}
                         avatarSize={!Utils.isNull(props.avatarSize) ? props.avatarSize : true}

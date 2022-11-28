@@ -1,21 +1,16 @@
 /*eslint-disable*/
 import React from "react";
-import {NavLink, withRouter} from "react-router-dom";
+import {withRouter} from "react-router-dom";
 import PropTypes from "prop-types";
 // javascript plugin used to create scrollbars on windows
-import PerfectScrollbar from "perfect-scrollbar";
 import Utils from "../../../../../common/Utils";
 import "./Sidebar.css"
-
 // reactstrap components
-import {Nav, Collapse} from "reactstrap";
+import {Collapse, Nav} from "reactstrap";
 import MenuLink from "../../../../../common/components/menu/MenuLink";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import {actionCreators} from "../../../../../common/redux/store/DashboardStore";
-import CardAvatar from "../../../../../common/components/card/CardAvatar";
 import {lighten} from "@material-ui/core";
 import Icon from "../../../../../common/components/Icon";
+import NotificationListener from "../../NoticationListener";
 
 let ps;
 
@@ -112,6 +107,14 @@ class Sidebar extends React.Component {
                   </tr>
                   <tr>
                     <td>
+                      {
+                        prop.hasNotificationListener &&
+                        <NotificationListener/>
+                      }
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className={'menu-item-label'}>
                       {prop.name}
                     </td>
                   </tr>

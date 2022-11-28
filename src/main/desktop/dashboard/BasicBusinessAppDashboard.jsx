@@ -100,6 +100,16 @@ const BasicBusinessAppDashboard = (props) => {
     let newRoutes = [];
     let newRoute = {};
 
+    newRoute.name = "Activity";
+    newRoute.path = "activity";
+    newRoute.icon = "NOTIFICATIONS";
+    newRoute.layout = "/admin";
+    newRoute.level = 0;
+    newRoute.isParent = true;
+    newRoute.hasNotificationListener = true;
+    newRoutes.push(newRoute);
+
+    newRoute = {};
     newRoute.name = "Calendar";
     newRoute.path = "calendar";
     newRoute.icon = "CALENDAR";
@@ -170,6 +180,11 @@ const BasicBusinessAppDashboard = (props) => {
       on: (eventType, be) => {
         switch (eventType) {
           case SystemEventType.UNAUTHORISED_API_CALL:
+
+            appManager.remove("accessToken");
+            appManager.remove("refreshToken");
+            appManager.remove("lastLogin");
+
             navigate('/login');
             break;
           case SystemEventType.API_ERROR:
