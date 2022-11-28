@@ -242,7 +242,7 @@ const BasicBusinessAppDashboard = (props) => {
     if (payload.chatMessage.participant.userId !== loggedInUser.userId) {
       newMessageAudio.play();
 
-      if(!payload.fromChatTab) {
+      if(!payload.skipAlert) {
         electron.ipcRenderer.sendMessage('receivingMessage', {
           payload: payload
         });

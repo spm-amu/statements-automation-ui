@@ -75,7 +75,9 @@ const MeetingRoom = (props) => {
   const [viewOpen, setViewOpen] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [eventHandler] = useState({});
+
   const userVideo = useRef();
+  const screenTrack = useRef();
 
   const handler = () => {
     return {
@@ -167,6 +169,35 @@ const MeetingRoom = (props) => {
         setAllUserParticipantsLeft(true);
       }
     }
+  };
+
+  const shareScreen = () => {
+    navigator.mediaDevices.getDisplayMedia({ cursor: true }).then((stream) => {
+      setScreenShared(true);
+
+      // store the video track i.e. our web cam stream into tmpTrack
+      // and replace the video track with our screen track
+      // so that it will be streamed on our screen as well as to our remote peers
+
+      let videoTrack = currentUserStream.getTracks()[1];
+
+      userVideo.current.srcObject = stream;
+      screenTrack.current = stream.getTracks()[0];
+      // tmpTrack.current = videoTrack.current;
+      // videoTrack.current = screenTrack.current;
+      //
+      // peersRef.current.forEach((peerObj) => {
+      //   peerObj.peer.replaceTrack(
+      //     tmpTrack.current, // prev video track - webcam
+      //     videoTrack.current, // current video track - screen track
+      //     userStream.current
+      //   );
+      // });
+
+      screenTrack.current.onended = () => {
+        // stopShareScreen();
+      };
+    });
   };
 
   useEffect(() => {

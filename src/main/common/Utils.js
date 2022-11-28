@@ -242,6 +242,32 @@ export default class Utils {
     return date.toLocaleDateString('en-GB').split('/').reverse().join('-');
   };
 
+  static getChatMeetingTitle = (participants, currentUserId, charMax) => {
+    let name = '';
+
+    if (participants.length === 2) {
+      name = participants.find(p => p.userId !== currentUserId).name;
+    } else {
+      participants.forEach((user, index) => {
+        if (index < 4 && user.userId !== currentUserId) {
+          name = name + user.name + ', ';
+        }
+      })
+
+      name = name.slice(0, charMax);
+
+      if (name.length < charMax || participants.length > 2) {
+        name = name + '...';
+      }
+
+      if (participants.length > 3) {
+        name = name + '+' + (participants.length - 3);
+      }
+    }
+
+    return name;
+  };
+
   static getComponentAttribute(field, attribute, defaultValue) {
     if (this.isNull(field.attributes)) {
       return defaultValue;

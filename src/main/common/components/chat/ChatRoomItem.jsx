@@ -27,28 +27,6 @@ const ChatRoomItem = (props) => {
     props.selectionHandler(event);
   };
 
-  const getChatName = () => {
-    let name = '';
-
-    if (event.participants.length === 2) {
-      name = event.participants.find(p => p.userId !== currentUser.userId).name;
-    } else {
-      event.participants.forEach((user, index) => {
-        if (index < 5 && user.userId !== currentUser.userId) {
-          name = name + user.name.split(' ')[0] + ', ';
-        }
-      })
-
-      name = name.slice(0, 22) + '...';
-
-      if (event.participants.length > 5) {
-        name = name + '+' + (event.participants.length - 3);
-      }
-    }
-
-    return name;
-  }
-
   return (
     <div
       className="chatroom__item"
@@ -57,7 +35,7 @@ const ChatRoomItem = (props) => {
       }}
     >
       <Avatar>
-        {event.type === 'CALENDAR_MEETING' ? (
+        {event.type === 'CALENDAR_MEETING' || event.participants.length > 2 ? (
           <Calendar />
         ) : (
           Utils.getInitials(event.participants.find(p => p.userId !== currentUser.userId).name)
@@ -68,7 +46,7 @@ const ChatRoomItem = (props) => {
           <p style={{ fontSize: '16px' }}>
             {event.type === 'CALENDAR_MEETING'
               ? event.title
-              : getChatName()
+              : Utils.getChatMeetingTitle(event.participants, currentUser.userId, 22)
             }
           </p>
           <p>

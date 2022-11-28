@@ -6,7 +6,7 @@ import SendIcon from '@material-ui/icons/Send';
 import CallIcon from '@material-ui/icons/Call';
 import Tooltip from '@material-ui/core/Tooltip';
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './ChatRooms.scss';
 import moment from 'moment';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -23,6 +23,8 @@ import appManager from "../../../common/service/AppManager";
 import Files from '../customInput/Files';
 
 const ChatRoom = (props) => {
+  const navigate = useNavigate();
+
   const [currentUser, setCurrentUser] = useState(appManager.getUserDetails());
   const [message, setMessage] = useState('');
   const [selectedChat, setSelectedChat] = useState(props.selectedChat);
@@ -56,9 +58,6 @@ const ChatRoom = (props) => {
   // };
 
   const onMessage = (payload) => {
-    console.log('ChatRoom payload: ', payload);
-    console.log('ChatRoom selectedChat: ', selectedChat);
-
     if(selectedChat && selectedChat.id === payload.roomId) {
       if(props.onMessage) {
         props.onMessage(payload.chatMessage, selectedChat);
@@ -73,7 +72,9 @@ const ChatRoom = (props) => {
     scrollToBottom();
 
     if (selectedChat) {
-      setMessages([].concat(selectedChat.messages));
+      // const newMessages = messages.concat(selectedChat.messages);
+      const newMessages = [].concat(selectedChat.messages);
+      setMessages(newMessages);
     }
 
     setLoading(false);
@@ -110,16 +111,23 @@ const ChatRoom = (props) => {
     setMessage(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const participantsUserIds = () => {
+    return selectedChat
+      .participants
+      .filter(user => user.userId !== currentUser.userId)
+      .map(user => user.userId);
+  }
+
+  const sendMessage = (e, finalMessage = null) => {
     e.preventDefault();
 
-    if (message || document) {
+    if (message || document || finalMessage) {
 
       const msg = {
         createdDate: new Date(),
         type: document && document.length > 0 ? 'FILE' : 'TEXT',
         active: true,
-        content: message,
+        content: finalMessage ? finalMessage : message,
         participant: currentUser
       };
 
@@ -129,16 +137,14 @@ const ChatRoom = (props) => {
 
       msg.participant.active = true;
 
-      const participantsToSignalIds = selectedChat
-        .participants
-        .filter(user => user.userId !== currentUser.userId)
-        .map(user => user.userId);
+      const participantsToSignalIds = participantsUserIds();
 
       socketManager.emitEvent(MessageType.CHAT_MESSAGE, {
         roomId: selectedChat.id,
         chatMessage: msg,
         participantsToSignalIds,
-        fromChatTab: props.chatTab
+        skipAlert: props.chatTab || finalMessage,
+        newChat: selectedChat.messages.length === 0
       });
 
       setMessages(oldMsgs => [...oldMsgs, msg]);
@@ -154,15 +160,36 @@ const ChatRoom = (props) => {
     setDocument(null)
   };
 
-  const callNow = () => {
-    const finalMessage = {
-      sender: currentUser.result.name,
-      senderId: currentUser.result._id,
-      message: `${currentUser.result.name} has started a video call. Click on the call icon to join the call.`,
-      type: 'text',
-      timestamp: new Date(),
+  const callNow = (e) => {
+    e.preventDefault();
+    sendMessage(e, `${currentUser.name} has started a call.`);
+
+    console.log('selectedChat: ', selectedChat);
+
+    const directCallRoom = {
+      id: uuid()
     };
-    setMessages((oldMsgs) => [...oldMsgs, finalMessage]);
+
+    const participantsToSignalIds = participantsUserIds();
+
+    socketManager.emitEvent(MessageType.CALL_MULTIPLE_USER, {
+      room: directCallRoom.id,
+      usersToCall: participantsToSignalIds,
+      callerId: socketManager.socket.id,
+      name: currentUser.name,
+    });
+
+    navigate("/view/meetingRoom", {
+      state: {
+        displayMode: 'window',
+        selectedMeeting: directCallRoom,
+        videoMuted: true,
+        audioMuted: false,
+        isDirectCall: true,
+        isHost: true,
+        usersToCall: participantsToSignalIds
+      }
+    })
   };
 
   const renderFileThumbnail = (message) => {
@@ -184,19 +211,67 @@ const ChatRoom = (props) => {
       return (
         <div className={'col'}>
           <img
-            src={require('../../assets/img/files/pdf-file.png')}
+            src={require('../../assets/img/files/pdf.png')}
             alt=""
-            style={{ width: 100, height: 'auto' }}
+            style={{ width: 80, height: 80 }}
           />
           <p>{document.name}</p>
         </div>
       )
     }
+
+    if (document.type.includes('doc')) {
+      return (
+        <div className={'col'}>
+          <img
+            src={require('../../assets/img/files/doc.png')}
+            alt=""
+            style={{ width: 80, height: 80 }}
+          />
+          <p>{document.name}</p>
+        </div>
+      )
+    }
+
+    if (document.type.includes('word')) {
+      return (
+        <div className={'col'}>
+          <img
+            src={require('../../assets/img/files/word.png')}
+            alt=""
+            style={{ width: 80, height: 80 }}
+          />
+          <p>{document.name}</p>
+        </div>
+      )
+    }
+
+    if (document.type.includes('xls')) {
+      return (
+        <div className={'col'}>
+          <img
+            src={require('../../assets/img/files/xls.png')}
+            alt=""
+            style={{ width: 80, height: 80 }}
+          />
+          <p>{document.name}</p>
+        </div>
+      )
+    }
+
+    return (
+      <div className={'col'}>
+        <img
+          src={require('../../assets/img/files/php.png')}
+          alt=""
+          style={{ width: 80, height: 80 }}
+        />
+        <p>{document.name}</p>
+      </div>
+    )
   }
 
   const renderMessages = (message, index) => {
-    console.log('####: ', message);
-
     if (message.type === 'FILE') {
       if (message.participant.userId === currentUser.userId) {
         return (
@@ -206,6 +281,7 @@ const ChatRoom = (props) => {
               {
                 renderFileThumbnail(message)
               }
+              <p key={index}>{message.content}</p>
             </div>
           </div>
         );
@@ -219,11 +295,9 @@ const ChatRoom = (props) => {
             <div className="peer">
               <span>{message.participant.name}</span>
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
-              <img
-                src={message.document.payload}
-                alt=""
-                style={{ width: 250, height: 'auto' }}
-              />
+              {
+                renderFileThumbnail(message)
+              }
               <p key={index}>{message.content}</p>
             </div>
           </div>
@@ -263,7 +337,7 @@ const ChatRoom = (props) => {
         <div className="chatroom__header">
           <div className="chatroom__headerleft">
             <Avatar>
-              {selectedChat.type === 'CALENDAR_MEETING' ? (
+              {selectedChat.type === 'CALENDAR_MEETING' || selectedChat.participants.length > 2 ? (
                 <Calendar />
               ) : (
                 Utils.getInitials(selectedChat.participants.find(p => p.userId !== currentUser.userId).name)
@@ -271,21 +345,15 @@ const ChatRoom = (props) => {
             </Avatar>
 
             <h5>
-              { selectedChat.type === 'CALENDAR_MEETING' ? selectedChat.title : selectedChat.participants.find(p => p.userId !== currentUser.userId).name }
+              { selectedChat.type === 'CALENDAR_MEETING' ? selectedChat.title : Utils.getChatMeetingTitle(selectedChat.participants, currentUser.userId, 58) }
             </h5>
-
-            <Tooltip title="Edit">
-              <IconButton>
-                <CreateIcon />
-              </IconButton>
-            </Tooltip>
           </div>
           <div className="chatroom__headerright">
             <Link to={`/room/${roomId}/1`} target="_blank">
               <Tooltip title="Call">
                 <IconButton
-                  onClick={() => {
-                    callNow();
+                  onClick={(e) => {
+                    callNow(e);
                   }}
                 >
                   <CallIcon />
@@ -328,7 +396,7 @@ const ChatRoom = (props) => {
                       style={styles.inputAdornmentIcon}
                       type="submit"
                       onClick={(e) => {
-                        handleSubmit(e);
+                        sendMessage(e);
                       }}
                     >
                       <SendIcon />

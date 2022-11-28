@@ -53,7 +53,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
       <div className={'col-*-*'} style={{marginLeft: '12px', width: '48px'}}>
         <input
           accept={props.style === 'IMAGE' ? "image/jpeg,image/gif,image/png,image/x-eps"
-            : "image/jpeg,image/gif,image/png,application/pdf,image/x-eps"}
+            : "image/*,application/*"}
           id={`file-upload-input`}
           multiple={false}
           style={{display: 'none'}}
