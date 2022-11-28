@@ -28,6 +28,7 @@ import Person from '@material-ui/icons/Person';
 import Folder from '@material-ui/icons/Folder';
 import Help from '@material-ui/icons/Help';
 import Close from '@material-ui/icons/Close';
+import Link from "@material-ui/icons/Link";
 import React, {Component} from "react";
 import {
   Call,
@@ -77,6 +78,8 @@ class Icon extends Component {
       return <DeleteIcon/>
     } else if (this.props.id === 'DOWNLOAD') {
       return <Download/>
+    } else if (this.props.id === 'LINK') {
+      return <Link/>
     } else if (this.props.id === 'HELP') {
       return <Help/>
     } else if (this.props.id === 'CALENDAR') {
