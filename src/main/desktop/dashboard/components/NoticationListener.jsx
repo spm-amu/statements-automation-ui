@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {MessageType} from "../../../common/types";
 import socketManager from "../../../common/service/SocketManager";
-const [eventHandler] = useState({});
 
 const NotificationListener = (props) => {
-  const [count, setCount] = React.useState(0);
+  const [eventHandler] = useState({});
+  const [count, setCount] = useState(0);
 
   const api = () => {
     return {
