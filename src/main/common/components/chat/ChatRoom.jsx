@@ -144,7 +144,8 @@ const ChatRoom = (props) => {
         chatMessage: msg,
         participantsToSignalIds,
         skipAlert: props.chatTab || finalMessage,
-        newChat: selectedChat.messages.length === 0
+        newChat: selectedChat.messages.length === 0,
+        meetingId: props.meetingId ? props.meetingId : null
       });
 
       setMessages(oldMsgs => [...oldMsgs, msg]);

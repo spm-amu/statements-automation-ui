@@ -322,7 +322,8 @@ const MeetingRoom = (props) => {
       isHost: isHost,
       audioMuted: audioMuted,
       videoMuted: videoMuted,
-      direct: isDirectCall
+      direct: isDirectCall,
+      userToCall
     });
   };
 
@@ -616,7 +617,8 @@ const MeetingRoom = (props) => {
                               userId: userToCall.userId,
                               userDescription: userToCall.name,
                               callerId: appManager.getUserDetails().userId,
-                              callerDescription: appManager.getUserDetails().name
+                              callerDescription: appManager.getUserDetails().name,
+                              meetingId: selectedMeeting.id
                             });
                             onCallEnded();
                           } else {

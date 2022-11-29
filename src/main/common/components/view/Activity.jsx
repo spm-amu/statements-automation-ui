@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import './Activity.css';
 import socketManager from '../../service/SocketManager';
-import {get, host} from '../../service/RestService';
 import {MessageType} from '../../types';
+import ActivityList from "../activity/ActivityList";
 
 const Activity = (props) => {
   const [socketEventHandler] = useState({});
-  const [loading, setLoading] = useState(true);
 
   const socketEventHandlerApi = () => {
     return {
@@ -27,19 +26,11 @@ const Activity = (props) => {
 
   };
 
-  const loadActivity = () => {
-    get(`${host}/api/v1/activity/fetch`, (response) => {
-      setLoading(false);
-    }, (e) => {
-    })
-  };
-
   useEffect(() => {
     socketEventHandler.api = socketEventHandlerApi();
   });
 
   useEffect(() => {
-    loadActivity();
     socketManager.addSubscriptions(socketEventHandler, MessageType.SYSTEM_ACTIVITY);
   }, []);
 
@@ -50,9 +41,17 @@ const Activity = (props) => {
   }, []);
 
   return (
-    !loading &&
-    <div className="activity">
-      ACTIVITY
+    <div className="activity row" style={{marginLeft: '0px', marginRight: '0px'}}>
+      <div className={'col'} style={{
+        borderRight: "1px solid #e1e1e1",
+        paddingRight: '8px',
+        paddingLeft: '8px'
+      }}>
+        <ActivityList/>
+      </div>
+      <div style={{width: '70%'}}>
+
+      </div>
     </div>
   )
 };

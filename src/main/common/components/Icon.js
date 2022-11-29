@@ -23,7 +23,6 @@ import Work from '@material-ui/icons/Work';
 import PanTool from '@material-ui/icons/PanTool';
 import List from '@material-ui/icons/List';
 import Calendar from '@material-ui/icons/CalendarTodayTwoTone';
-import Notifications from '@material-ui/icons/Notifications';
 import Person from '@material-ui/icons/Person';
 import Folder from '@material-ui/icons/Folder';
 import Help from '@material-ui/icons/Help';
@@ -32,6 +31,7 @@ import Link from "@material-ui/icons/Link";
 import React, {Component} from "react";
 import {
   Notifications,
+  Call,
   CallEnd,
   CancelPresentation,
   ChatBubbleOutline,
