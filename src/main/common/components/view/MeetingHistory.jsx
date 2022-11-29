@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import {host} from "../../service/RestService";
+import {get, host} from "../../service/RestService";
 import SearchBar from "../SearchBar";
 import {DataGrid} from "../DataGrid";
 import {useNavigate} from "react-router-dom";
+import appManager from "../../service/AppManager";
 
 const grid = {
   "id": "meetingList",
@@ -78,37 +79,17 @@ const MeetingHistory = (props) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const navigate = useNavigate();
 
-  const prepareSelectedMeeting = (selectedMeeting) => {
-    let value = {
-      id: selectedMeeting.id,
-      title: selectedMeeting.title,
-      locations: selectedMeeting.extendedProps.locations,
-      description: selectedMeeting.extendedProps.description,
-      attendees: selectedMeeting.extendedProps.attendees,
-      privacyType: selectedMeeting.extendedProps.privacyType,
-      documents: selectedMeeting.extendedProps.documents,
-      startDate: new Date(selectedMeeting.start),
-      startTime: new Date(selectedMeeting.start),
-      endDate: new Date(selectedMeeting.end),
-      endTime: new Date(selectedMeeting.end),
-      recurringFreq: selectedMeeting.extendedProps.schedule.rrule.freq,
-      recurringInterval: selectedMeeting.extendedProps.schedule.rrule.interval,
-      recurringDtstart: new Date(selectedMeeting.extendedProps.schedule.rrule.dtstart),
-      recurringUntil: selectedMeeting.extendedProps.schedule.rrule.until,
-      recurringByweekday: selectedMeeting.extendedProps.schedule.rrule.byweekday,
-      recurringBysetpos: selectedMeeting.extendedProps.schedule.rrule.bysetpos,
-      recurringBymonthday: selectedMeeting.extendedProps.schedule.rrule.bymonthday
+  const getSelectedMeetingEvent = (selectedMeeting) => {
+    get(`${host}/api/v1/meeting/fetchMeetingEvent/${selectedMeeting.id}`, (response) => {
+      navigate("/view/meeting", {state: response})
+    }, (e) => {
+    }, '', false);
 
-    };
-
-    console.log("selectedEvent", value);
-    navigate("/view/meeting", {state: value})
   }
 
 
   const viewMeeting = (selectedMeeting) => {
-    console.log("selectedMeeting", selectedMeeting);
-    prepareSelectedMeeting(selectedMeeting);
+    getSelectedMeetingEvent(selectedMeeting);
   };
 
   const onDownload = (documentId) => {
