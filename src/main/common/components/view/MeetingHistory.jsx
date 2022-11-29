@@ -32,7 +32,7 @@ const grid = {
     },
     {
       "type": "gridColumn",
-      "id": "actions",
+      "id": "viewActions",
       "attributes": {
         "filterable": false,
         "width": "20.0%",
@@ -51,7 +51,7 @@ const grid = {
     },
     {
       "type": "gridColumn",
-      "id": "actions",
+      "id": "downloadActions",
       "attributes": {
         "filterable": false,
         "width": "20.0%",
@@ -59,7 +59,7 @@ const grid = {
         "toolbar": {
           "items": [
             {
-              "id": "dowmload",
+              "id": "downloadRecording",
               "type": "iconButton",
               "icon": "DOWNLOAD"
             }
@@ -118,8 +118,15 @@ const MeetingHistory = (props) => {
                     criteriaParams={criteriaParams}
                     dataUrl={`${host}/api/v1/meeting/fetchMeetingHistory`}
                     actionHandler={(e) => {
-                      onDownload(e.data.id);
-                      viewMeeting(e.data);
+
+                      if(e.id === 'downloadRecording') {
+                        onDownload(e.data.id);
+                      }
+
+                      if(e.id === 'meetingLink') {
+                        viewMeeting(e.data);
+                      }
+
                     }}
           />
         </ul>
