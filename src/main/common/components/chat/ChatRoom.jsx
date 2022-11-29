@@ -202,7 +202,6 @@ const ChatRoom = (props) => {
             alt=""
             style={{ width: 250, height: 'auto' }}
           />
-          <p>{message.content}</p>
         </>
       )
     }

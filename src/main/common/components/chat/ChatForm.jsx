@@ -1,23 +1,17 @@
 import React, {useState} from 'react';
 import './ChartForm.css';
-import Utils from "../../Utils";
-import Files from "../view/Meeting";
 import {Form} from "reactstrap";
-import TextField from "../customInput/TextField";
 import {host, post} from "../../service/RestService";
 import AutoComplete from "../customInput/AutoComplete";
 import Button from "@material-ui/core/Button";
 import appManager from "../../service/AppManager";
 
 const ChatForm = (props) => {
-  const [selectedMeeting, setSelectedMeeting] = useState(props.selectedMeeting);
-  const [title, setTitle] = useState(null);
   const [participants, setParticipants] = useState([]);
 
   const handleAdd = () => {
     if (participants.length > 0) {
       let chat = {
-        title: title,
         participants: participants,
         type: 'DIRECT',
         messages: []
@@ -63,16 +57,6 @@ const ChatForm = (props) => {
       </h5>
       <Form>
         <div>
-          <TextField
-            label="Title"
-            id="title"
-            required={false}
-            value={title}
-            valueChangeHandler={(e) => setTitle(e.target.value)}
-            errorMessage={
-              'A chat title is required. Please enter a value'
-            }
-          />
           <div style={{ marginTop: '8px' }}>
             <AutoComplete
               id="participants"

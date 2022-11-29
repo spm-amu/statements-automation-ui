@@ -17,8 +17,9 @@ const ChatRoomList = (props) => {
   };
 
   useEffect(() => {
-    setChats(props.chatEvents);
-  }, []);
+    console.log('##### ROOM LIST EVENTS UPDATED')
+    setChats([].concat(props.chatEvents));
+  }, [props.chatEvents]);
 
   useEffect(() => {
     if(props.addedChat) {
@@ -50,8 +51,11 @@ const ChatRoomList = (props) => {
           .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
           .map((event, index) => {
 
-            event.messages = event.messages
-              .slice()
+            let newArr = [...event.messages];
+
+            console.log('new msges: ', newArr);
+
+            event.messages = newArr
               .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
 
             return <ChatRoomItem key={index} event={event} selectionHandler={props.selectionHandler}/>;

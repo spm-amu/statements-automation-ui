@@ -61,7 +61,7 @@ const Chats = (props) => {
 
       console.log('CHATS: ', filteredChatEvents);
 
-      setChatEvents(filteredChatEvents);
+      setChatEvents([].concat(filteredChatEvents));
 
       if (props.selected && props.selected.chatId) {
         const eventSelected = response.find(chat => chat.id === props.selected.chatId);
@@ -92,6 +92,7 @@ const Chats = (props) => {
 
   const onChatRoomMessage = (message, chat) => {
     chat.updatedAt = moment().format();
+    chat.messages.push(message);
 
     setSelectedChat(chat);
     const sorted = chatEvents
@@ -125,7 +126,8 @@ const Chats = (props) => {
             <ChatForm addHandler={(chat) => {
               setSelectedChat(chat);
               setMode('LIST');
-              setNewChat(chat);
+              // setNewChat(chat);
+              loadChats();
             }
             }>
             </ChatForm>
