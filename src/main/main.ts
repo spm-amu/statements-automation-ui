@@ -9,14 +9,13 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, systemPreferences, screen } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, systemPreferences, screen, desktopCapturer } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import {resolveHtmlPath, resolveWindowHtmlPath} from './util';
 import Store from "electron-store";
 
-const { session } = require('electron');
 const store = new Store();
 
 class AppUpdater {
@@ -35,6 +34,25 @@ let screenWidth: number;
 let screenHeight: number;
 
 let deeplinkingUrl: string | undefined;
+
+ipcMain.handle('get-sources', () => {
+  return desktopCapturer
+    .getSources({ types: ['window', 'screen'] })
+    .then(async sources => {
+      if (mainWindow) {
+        return sources.map((source) => ({
+          id: source.id,
+          name: source.name,
+          appIconUrl: source?.appIcon?.toDataURL(),
+          thumbnailUrl: source?.thumbnail
+            ?.resize({ height: 160 })
+            .toDataURL(),
+        }));
+      }
+
+      return null;
+  })
+});
 
 ipcMain.on('ipc-armscor', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
