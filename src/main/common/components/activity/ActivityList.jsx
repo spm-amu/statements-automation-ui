@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './ActivityList.css';
-import {host, post} from "../../service/RestService";
+import {get, host, post} from "../../service/RestService";
 import ActivityCard from "./ActivityCard";
 
 const ActivityList = (props) => {
@@ -14,21 +14,43 @@ const ActivityList = (props) => {
 
   const loadActivities = () => {
     post(`${host}/api/v1/activity/fetch`, (response) => {
-        console.log("\n\n\n\nRES : ", response);
         setLoading(false);
         setActivities(response.records);
       }, (e) => {
       },
       {
+        "parameters": [
+          {
+            "name": 'correlationId',
+            "value": rootEvent ? rootEvent.correlationId : null
+          }
+        ],
         "pageSize": 2000,
         "currentPage": 0
       })
   };
 
-  useEffect(() => {
-    if (!rootEvent) {
-      loadActivities();
+  const handleSelection = (selected) => {
+    if (!selected.read) {
+      get(`${host}/api/v1/activity/read/${selected.id}`, () => {
+        selected.read = true;
+        setSelected(selected);
+
+        if (props.selectionHandler) {
+          props.selectionHandler(selected);
+        }
+      }, (e) => {
+      })
+    } else {
+      setSelected(selected);
+      if (props.selectionHandler) {
+        props.selectionHandler(selected);
+      }
     }
+  };
+
+  useEffect(() => {
+    loadActivities();
   }, []);
 
   return (
@@ -37,7 +59,7 @@ const ActivityList = (props) => {
       {activities
         .map((activity, index) => {
           return <ActivityCard key={index} activity={activity} selected={selected}
-                               selectionHandler={(selected) => setSelected(selected)}/>;
+                               selectionHandler={(selected) => handleSelection(selected)}/>;
         })}
     </div>
   );

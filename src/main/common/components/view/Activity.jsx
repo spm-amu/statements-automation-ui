@@ -6,6 +6,7 @@ import ActivityList from "../activity/ActivityList";
 
 const Activity = (props) => {
   const [socketEventHandler] = useState({});
+  const [selected, setSelected] = useState(null);
 
   const socketEventHandlerApi = () => {
     return {
@@ -23,7 +24,6 @@ const Activity = (props) => {
   };
 
   const processActivity = (activity) => {
-
   };
 
   useEffect(() => {
@@ -47,10 +47,15 @@ const Activity = (props) => {
         paddingRight: '8px',
         paddingLeft: '8px'
       }}>
-        <ActivityList/>
+        <ActivityList selectionHandler={(selected) => {
+          setSelected(selected)
+        }}/>
       </div>
       <div style={{width: '70%'}}>
-
+        {
+          selected &&
+          <ActivityList rootEvent={selected}/>
+        }
       </div>
     </div>
   )

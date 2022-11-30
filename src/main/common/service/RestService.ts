@@ -57,6 +57,8 @@ class RestService {
       .then((data) => {
         if(data && data.length > 0) {
           successCallback(JSON.parse(data));
+        } else {
+          successCallback();
         }
 
         appManager.fireEvent(SystemEventType.API_SUCCESS, {message: successMessage});

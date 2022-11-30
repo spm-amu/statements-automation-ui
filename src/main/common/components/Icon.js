@@ -30,6 +30,7 @@ import Close from '@material-ui/icons/Close';
 import Link from "@material-ui/icons/Link";
 import React, {Component} from "react";
 import {
+  CallMissed,
   Notifications,
   Call,
   CallEnd,
@@ -126,6 +127,8 @@ class Icon extends Component {
       return <Call/>
     } else if (this.props.id === 'CALL_END') {
       return <CallEnd/>
+    } else if (this.props.id === 'CALL_MISSED') {
+      return <CallMissed/>
     } else if (this.props.id === 'PEOPLE') {
       return <People/>
     } else if (this.props.id === 'UPLOAD') {
