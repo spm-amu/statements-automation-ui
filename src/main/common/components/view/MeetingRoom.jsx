@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import './Calendar.css';
 import './MeetingRoom.css';
@@ -17,6 +17,8 @@ import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
 import appManager from "../../../common/service/AppManager";
 import MeetingRoomSummary from "../vc/MeetingRoomSummary";
 import {get, host, post} from '../../service/RestService';
+import SelectScreenShareDialog from '../SelectScreenShareDialog';
+const { electron } = window;
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -72,12 +74,15 @@ const MeetingRoom = (props) => {
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
+  const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
+  const [screenSources, setScreenSources] = useState();
   const [viewOpen, setViewOpen] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [eventHandler] = useState({});
 
   const userVideo = useRef();
   const screenTrack = useRef();
+  const tmpVideoTrack = useRef();
 
   const handler = () => {
     return {
@@ -171,33 +176,106 @@ const MeetingRoom = (props) => {
     }
   };
 
-  const shareScreen = () => {
-    navigator.mediaDevices.getDisplayMedia({ cursor: true }).then((stream) => {
-      setScreenShared(true);
-
-      // store the video track i.e. our web cam stream into tmpTrack
-      // and replace the video track with our screen track
-      // so that it will be streamed on our screen as well as to our remote peers
-
-      let videoTrack = currentUserStream.getTracks()[1];
-
-      userVideo.current.srcObject = stream;
-      screenTrack.current = stream.getTracks()[0];
-      // tmpTrack.current = videoTrack.current;
-      // videoTrack.current = screenTrack.current;
-      //
-      // peersRef.current.forEach((peerObj) => {
-      //   peerObj.peer.replaceTrack(
-      //     tmpTrack.current, // prev video track - webcam
-      //     videoTrack.current, // current video track - screen track
-      //     userStream.current
-      //   );
-      // });
-
-      screenTrack.current.onended = () => {
-        // stopShareScreen();
-      };
+  const onScreenChoose = useCallback(
+    async (sourceId, cb) => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: sourceId,
+        },
+      },
     });
+
+    const track = stream.getVideoTracks()[0];
+    setScreenSharePopupVisible(false);
+    cb?.();
+  },
+  []
+);
+
+  const handleScreenShareStream = (stream) => {
+    console.log('\n\n\n stream.getVideoTracks(): ', stream.getVideoTracks());
+    console.log('\n\n\n currentUserStream.getVideoTracks(): ', currentUserStream.getVideoTracks());
+
+    tmpVideoTrack.current = currentUserStream.getVideoTracks()[0];
+    currentUserStream.addTrack(stream.getVideoTracks()[0])
+
+    console.log('\n\n\n new currentUserStream.getVideoTracks(): ', currentUserStream.getVideoTracks());
+
+    socketManager.userPeerMap.forEach((peerObj) => {
+      peerObj.peer.replaceTrack(
+        currentUserStream.getVideoTracks()[0], // prev video track - webcam
+        stream.getVideoTracks()[0], // current video track - screen track
+        currentUserStream
+      );
+    });
+
+    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0])
+    userVideo.current.srcObject = currentUserStream;
+  }
+
+  const stopShareScreen = () => {
+    setScreenShared(false);
+
+    currentUserStream.addTrack(tmpVideoTrack.current);
+
+    socketManager.userPeerMap.forEach((peerObj) => {
+      peerObj.peer.replaceTrack(
+        currentUserStream.getVideoTracks()[0], // prev video track - webcam
+        tmpVideoTrack.current, // current video track - screen track
+        currentUserStream
+      );
+    });
+
+    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
+    userVideo.current.srcObject = currentUserStream;
+  };
+
+  const selectSourceHandler = (selectedSource) => {
+    if (screenSources && selectedSource) {
+      setScreenShared(true);
+      navigator.mediaDevices
+        .getUserMedia({
+          cursor: true,
+          audio: false,
+          video: {
+            mandatory: {
+              chromeMediaSource: 'desktop',
+              chromeMediaSourceId: selectedSource.id,
+              minWidth: 1280,
+              maxWidth: 1280,
+              minHeight: 720,
+              maxHeight: 720
+            }
+          }
+        })
+        .then((stream) => {
+          handleScreenShareStream(stream);
+        })
+        .catch(e => {
+          console.log(e)
+        });
+    }
+  }
+
+  const turnScreenSharingOn = () => {
+    //TODO Modal to select screen to share
+  }
+
+  const shareScreen = () => {
+    turnScreenSharingOn();
+
+    electron.ipcRenderer.getSources()
+      .then(sources => {
+        console.log('\n\n\n sources: ', sources);
+
+        if (sources && sources.length > 0) {
+          setScreenSources(sources);
+          setScreenSharePopupVisible(true);
+        }
+      });
   };
 
   useEffect(() => {
@@ -627,6 +705,15 @@ const MeetingRoom = (props) => {
                           }
                         },
                         shareScreen: () => {
+                          console.log('SHARE!!!!: ', currentUserStream);
+
+                          if (currentUserStream) {
+                            if (screenShared) {
+                              stopShareScreen();
+                            } else {
+                              shareScreen();
+                            }
+                          }
                         },
                         stopShareScreen: () => {
                         },
@@ -667,6 +754,16 @@ const MeetingRoom = (props) => {
             />
           </ClosablePanel>
         </div>
+      }
+
+      {
+        screenSharePopupVisible &&
+          <SelectScreenShareDialog
+            handleCloseHandler={() => { setScreenSharePopupVisible(false) }}
+            open={screenSharePopupVisible}
+            sources={screenSources}
+            selectSourceHandler={(selectedSource) => selectSourceHandler(selectedSource)}
+          />
       }
     </div>
   );

@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { contextBridge, ipcRenderer, IpcRendererEvent, desktopCapturer } from 'electron';
 
 export type Channels = 'ipc-armscor';
 
@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld('electron', {
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
+    getSources: () => ipcRenderer.invoke('get-sources'),
     removeAllListeners: ipcRenderer.removeAllListeners.bind(ipcRenderer),
   },
 });
