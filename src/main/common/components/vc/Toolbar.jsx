@@ -8,6 +8,7 @@ import Utils from "../../Utils";
 const Toolbar = (props) => {
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
+  const [isRecording, setIsRecording] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
 
   const {
@@ -21,6 +22,18 @@ const Toolbar = (props) => {
   const muteVideo = () => {
     setVideoMuted((prevStatus) => !prevStatus);
   };
+
+  const toggleRecorder = () => {
+    setIsRecording((prevStatus) => !prevStatus);
+  };
+
+  useEffect(() => {
+    if (!isRecording) {
+      eventHandler.stopRecording(isRecording);
+    } else {
+      eventHandler.recordMeeting(isRecording)
+    }
+  }, [isRecording]);
 
   useEffect(() => {
     eventHandler.onMuteVideo(videoMuted);
@@ -65,6 +78,20 @@ const Toolbar = (props) => {
 	return (
     <div className={'footer-toolbar'}>
       <div className={'row centered-flex-box'}>
+
+        <IconButton
+          onClick={() => {
+            toggleRecorder();
+          }}
+          style={{
+            backgroundColor: isRecording ? '#eb3f21' : '#404239',
+            color: 'white',
+            marginRight: '4px'
+          }}
+        >
+          <Icon id={'RECORD'}/>
+        </IconButton>
+
         {!screenShared && (
           <IconButton
             onClick={() => {
