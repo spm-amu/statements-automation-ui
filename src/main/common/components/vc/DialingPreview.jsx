@@ -12,7 +12,7 @@ const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/wai
 const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
 
 const DialingPreview = (props) => {
-  const [caller, setCaller] = useState(null);
+  const [callPayload, setCallPayload] = useState(null);
   const [meetingRequest, setMeetingRequest] = useState(null);
   const [initials, setInitials] = useState('');
   const [systemAlert, setSystemAlert] = useState(null);
@@ -32,7 +32,7 @@ const DialingPreview = (props) => {
         if (args.payload.meetingJoinRequest) {
           setMeetingRequest(args.payload);
         } else {
-          setCaller(args.payload);
+          setCallPayload(args.payload);
         }
       }
     });
@@ -44,10 +44,10 @@ const DialingPreview = (props) => {
   }, []);
 
   useEffect(() => {
-    if (caller) {
-      setInitials(Utils.getInitials(caller.callerUser.name));
+    if (callPayload) {
+      setInitials(Utils.getInitials(callPayload.callerUser.name));
     }
-  }, [caller]);
+  }, [callPayload]);
 
   useEffect(() => {
     if (meetingRequest) {
@@ -60,7 +60,7 @@ const DialingPreview = (props) => {
     clearInterval(soundInterval.current);
 
     electron.ipcRenderer.sendMessage('answerCall', {
-      payload: caller ? caller : meetingRequest
+      payload: callPayload ? callPayload : meetingRequest
     });
   };
 
@@ -70,7 +70,8 @@ const DialingPreview = (props) => {
 
     electron.ipcRenderer.sendMessage('declineCall', {
       payload: {
-        callerId: caller ? caller.callerUser.socketId : null
+        callerId: callPayload ? callPayload.callerUser.socketId : null,
+        callPayload: meetingRequest ? meetingRequest : callPayload
       }
     });
   };
@@ -86,13 +87,13 @@ const DialingPreview = (props) => {
   };
 
   return (
-    (caller || meetingRequest || systemAlert) &&
+    (callPayload || meetingRequest || systemAlert) &&
     <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
       <div className={'centered-flex-box w-100'}
            style={{height: '72px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
         {
           systemAlert ? systemAlert.message :
-            caller ? `${caller.callerUser.name} is trying to call you` : `${meetingRequest.callerName} wants you to join meeting`
+            callPayload ? `${callPayload.callerUser.name} is trying to call you` : `${meetingRequest.callerName} wants you to join meeting`
         }
       </div>
       <div className={'centered-flex-box w-100'} style={{height: 'calc(100% - 180px)'}}>

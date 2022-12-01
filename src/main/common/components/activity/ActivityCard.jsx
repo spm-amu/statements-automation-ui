@@ -20,11 +20,15 @@ const ActivityCardComponent = React.memo(React.forwardRef((props, ref) => {
     switch (activityType) {
       case 'START_CALL':
         return <Icon id={'CALL'}/>;
+      case 'REJECT_CALL':
+        return <Icon id={'CANCEL'}/>;
       case 'MISSED_CALL':
       case 'UN_ANSWERED_CALL':
         return <Icon id={'CALL_MISSED'}/>;
       case 'END_CALL':
         return <Icon id={'CALL_END'}/>;
+      case 'ANSWER_CALL':
+        return <Icon id={'CALL_RECEIVED'}/>;
     }
 
     return null;
