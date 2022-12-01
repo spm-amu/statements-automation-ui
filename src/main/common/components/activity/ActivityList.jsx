@@ -53,6 +53,10 @@ const ActivityList = (props) => {
     loadActivities();
   }, []);
 
+  useEffect(() => {
+    loadActivities();
+  }, [rootEvent]);
+
   return (
     !loading &&
     <div className="activities">

@@ -34,6 +34,7 @@ const Activity = (props) => {
     socketManager.addSubscriptions(socketEventHandler, MessageType.SYSTEM_ACTIVITY);
   }, []);
 
+
   React.useEffect(() => {
     return () => {
       socketManager.removeSubscriptions(socketEventHandler);

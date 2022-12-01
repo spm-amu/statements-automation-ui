@@ -1,9 +1,34 @@
-.activity-card,
-.activity-card-unread,
-.activity-card-selected {
-  border-bottom: 1px solid #e1e1e1;
+.activity-card-wrapper-child,
+.activity-card-wrapper-root {
   max-width: 100%;
   padding: 8px;
+  display: flex;
+}
+
+.activity-card-wrapper-root {
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.activity-card-wrapper-child {
+  border-radius: 4px;
+}
+
+.self {
+  justify-content: flex-end;
+}
+
+.activity-card-wrapper-root .activity-card,
+.activity-card-wrapper-root .activity-card-unread,
+.activity-card-wrapper-root .activity-card-selected {
+  width: 100%;
+}
+
+.activity-card-wrapper-child .activity-card,
+.activity-card-wrapper-child .activity-card-unread,
+.activity-card-wrapper-child .activity-card-selected {
+  background-color: #ffffff;
+  padding: 8px;
+  min-width: 320px;
 }
 
 .activity-card-unread {
@@ -11,7 +36,7 @@
 }
 
 .activity-card-selected {
-  background-color: #f9f9f9;
+  background-color: #ffffff;
 }
 
 .activity-card:hover,
