@@ -8,6 +8,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
 import './AlertDialog.css'
+import ActivityCard from './activity/ActivityCard';
 
 export default function SelectScreenShareDialog(props) {
 
@@ -18,6 +19,7 @@ export default function SelectScreenShareDialog(props) {
   return (
     <div>
       <Dialog
+        fullWidth={true}
         open={props.open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
@@ -27,21 +29,21 @@ export default function SelectScreenShareDialog(props) {
           {"Select window to share"}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <div className={'col'}>
-              {
-                props.sources &&
-                <>
+          <div className={'col'}>
+            {
+              props.sources &&
+              props.sources.map((source, index) => {
+              return <div key={index}>
                   <img
-                    onClick={() => props.selectSourceHandler(props.sources[0])}
-                    src={props.sources[0].thumbnailUrl}
+                    onClick={() => props.selectSourceHandler(source)}
+                    src={source.thumbnailUrl}
                     alt={""}
                   />
-                  <p>{props.sources[0].name}</p>
-                </>
-              }
-            </div>
-          </DialogContentText>
+                  <p style={{ marginTop: '8px' }}>{source.name}</p>
+                </div>;
+              })
+            }
+          </div>
         </DialogContent>
         <DialogActions>
           <Button

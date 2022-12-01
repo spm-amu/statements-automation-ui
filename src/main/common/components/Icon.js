@@ -45,7 +45,8 @@ import {
   Reply,
   Videocam,
   VideocamOff,
-  Warning
+  History,
+  Warning, FiberManualRecord
 } from '@material-ui/icons';
 
 class Icon extends Component {
@@ -59,6 +60,8 @@ class Icon extends Component {
       return <AddIcon/>
     } else if (this.props.id === 'EDIT') {
       return <EditIcon/>
+    } else if (this.props.id === 'RECORD') {
+      return <FiberManualRecord/>
     } else if (this.props.id === 'NOTIFICATIONS') {
       return <Notifications/>
     } else if (this.props.id === 'CANCEL') {

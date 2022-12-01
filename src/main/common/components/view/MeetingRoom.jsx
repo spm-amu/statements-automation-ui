@@ -18,6 +18,7 @@ import appManager from "../../../common/service/AppManager";
 import MeetingRoomSummary from "../vc/MeetingRoomSummary";
 import {get, host, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
+import { createFFmpeg } from '@ffmpeg/ffmpeg';
 const { electron } = window;
 
 const StyledDialog = withStyles({
@@ -75,10 +76,14 @@ const MeetingRoom = (props) => {
   const [handRaised, setHandRaised] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
   const [screenSources, setScreenSources] = useState();
   const [viewOpen, setViewOpen] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [eventHandler] = useState({});
+
+  const recordedChunks = [];
 
   const userVideo = useRef();
   const screenTrack = useRef();
@@ -137,6 +142,22 @@ const MeetingRoom = (props) => {
     callerUser
   } = props;
 
+  const recordMeeting = () => {
+    console.log('\n\n\n recordMeeting: ', mediaRecorder);
+    if (mediaRecorder != null) {
+      mediaRecorder.start();
+      setIsRecording(true);
+    }
+  };
+
+  const stopRecordingMeeting = () => {
+    console.log('\n\n\n stopRecordingMeeting: ', mediaRecorder);
+    if (mediaRecorder != null) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+  };
+
   const raiseHand = () => {
     let userDetails = appManager.getUserDetails();
 
@@ -176,33 +197,9 @@ const MeetingRoom = (props) => {
     }
   };
 
-  const onScreenChoose = useCallback(
-    async (sourceId, cb) => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        mandatory: {
-          chromeMediaSource: 'desktop',
-          chromeMediaSourceId: sourceId,
-        },
-      },
-    });
-
-    const track = stream.getVideoTracks()[0];
-    setScreenSharePopupVisible(false);
-    cb?.();
-  },
-  []
-);
-
   const handleScreenShareStream = (stream) => {
-    console.log('\n\n\n stream.getVideoTracks(): ', stream.getVideoTracks());
-    console.log('\n\n\n currentUserStream.getVideoTracks(): ', currentUserStream.getVideoTracks());
-
     tmpVideoTrack.current = currentUserStream.getVideoTracks()[0];
     currentUserStream.addTrack(stream.getVideoTracks()[0])
-
-    console.log('\n\n\n new currentUserStream.getVideoTracks(): ', currentUserStream.getVideoTracks());
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
@@ -214,6 +211,48 @@ const MeetingRoom = (props) => {
 
     currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0])
     userVideo.current.srcObject = currentUserStream;
+
+    const options = { mimeType: "video/webm; codecs=vp9" };
+    const recorder = new MediaRecorder(stream, options);
+    recorder.ondataavailable = handleDataAvailable;
+    recorder.onstop = handleStop;
+
+    setMediaRecorder(recorder);
+  }
+
+  const handleDataAvailable = (e) => {
+    recordedChunks.push(e.data);
+  };
+
+  const handleStop = async (e) => {
+    const blob = new Blob(recordedChunks, {
+      type: "video/webm",
+    });
+
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onload = function(evt) {
+      const result = evt.target.result;
+      const data = {
+        meetingId: selectedMeeting.id,
+        name: selectedMeeting.title,
+        type: blob.type,
+        size: blob.size,
+        payload: result
+      }
+
+      post(
+        `${host}/api/v1/document/saveToFile`,
+        (response) => {
+          console.log('\n\n\nVIDEO SAVED!!!!')
+        },
+        (e) => {
+        },
+        data,
+        '',
+        false
+      );
+    }
   }
 
   const stopShareScreen = () => {
@@ -234,6 +273,8 @@ const MeetingRoom = (props) => {
   };
 
   const selectSourceHandler = (selectedSource) => {
+    setScreenSharePopupVisible(false);
+
     if (screenSources && selectedSource) {
       setScreenShared(true);
       navigator.mediaDevices
@@ -260,13 +301,7 @@ const MeetingRoom = (props) => {
     }
   }
 
-  const turnScreenSharingOn = () => {
-    //TODO Modal to select screen to share
-  }
-
   const shareScreen = () => {
-    turnScreenSharingOn();
-
     electron.ipcRenderer.getSources()
       .then(sources => {
         console.log('\n\n\n sources: ', sources);
@@ -476,7 +511,9 @@ const MeetingRoom = (props) => {
             },
             (e) => {
             },
-            chat
+            chat,
+            '',
+            false
           );
         }
       }
@@ -678,6 +715,7 @@ const MeetingRoom = (props) => {
                     audioMuted={audioMuted}
                     videoMuted={videoMuted}
                     handRaised={handRaised}
+                    isRecording={isRecording}
                     displayState={displayState}
                     step={step}
                     toolbarEventHandler={
@@ -687,6 +725,12 @@ const MeetingRoom = (props) => {
                         },
                         onMuteAudio: (muted) => {
                           setAudioMuted(muted);
+                        },
+                        recordMeeting: () => {
+                          recordMeeting();
+                        },
+                        stopRecording: () => {
+                          stopRecordingMeeting();
                         },
                         endCall: () => {
                           if (isDirectCall && participants.length === 0) {
@@ -705,8 +749,6 @@ const MeetingRoom = (props) => {
                           }
                         },
                         shareScreen: () => {
-                          console.log('SHARE!!!!: ', currentUserStream);
-
                           if (currentUserStream) {
                             if (screenShared) {
                               stopShareScreen();
