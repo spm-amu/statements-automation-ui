@@ -18,7 +18,6 @@ import appManager from "../../../common/service/AppManager";
 import MeetingRoomSummary from "../vc/MeetingRoomSummary";
 import {get, host, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
-import { createFFmpeg } from '@ffmpeg/ffmpeg';
 const { electron } = window;
 
 const StyledDialog = withStyles({
