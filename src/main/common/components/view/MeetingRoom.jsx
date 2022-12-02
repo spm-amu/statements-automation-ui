@@ -279,7 +279,11 @@ const MeetingRoom = (props) => {
       navigator.mediaDevices
         .getUserMedia({
           cursor: true,
-          audio: false,
+          audio: {
+            mandatory: {
+              chromeMediaSource: 'desktop',
+            },
+          },
           video: {
             mandatory: {
               chromeMediaSource: 'desktop',

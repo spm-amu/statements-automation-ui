@@ -37,7 +37,7 @@ let deeplinkingUrl: string | undefined;
 
 ipcMain.handle('get-sources', () => {
   return desktopCapturer
-    .getSources({ types: ['window', 'screen'] })
+    .getSources({ types: ['window', 'screen', 'audio'] })
     .then(async sources => {
       if (mainWindow) {
         return sources.map((source) => ({
@@ -61,7 +61,6 @@ ipcMain.on('ipc-armscor', async (event, arg) => {
 });
 
 ipcMain.on('downloadFile', async (_event, { payload }) => {
-  console.log('PAYLOAD: ', payload);
   mainWindow?.webContents.downloadURL(payload.fileURL)
 });
 
