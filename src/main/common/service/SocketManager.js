@@ -253,14 +253,14 @@ class SocketManager {
   };
 
   endCall = (isDirect = false, caller = null) => {
-    console.log("\n\n\n\nENDING CALL FROM ", caller);
     if(this.socket) {
       this.emitEvent(MessageType.END_CALL, {callerID: isDirect && caller ? caller.socketId : this.socket.id, direct: isDirect});
     }
   };
 
-  declineDirectCall = (callerSocketId) => {
-    this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId, direct: true, reject: true});
+  declineDirectCall = (callerSocketId, callRoom) => {
+    alert("REJ : " + callRoom)
+    this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId, roomID: callRoom, direct: true, reject: true});
   }
 }
 

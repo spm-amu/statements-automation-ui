@@ -30,13 +30,16 @@ import Close from '@material-ui/icons/Close';
 import Link from "@material-ui/icons/Link";
 import React, {Component} from "react";
 import {
-  CallMissed,
-  Notifications,
+  Cancel,
   Call,
   CallEnd,
+  CallMissed,
+  CallReceived,
   CancelPresentation,
   ChatBubbleOutline,
   Done,
+  History,
+  Notifications,
   People,
   PresentToAll,
   Reply,
@@ -61,6 +64,8 @@ class Icon extends Component {
       return <FiberManualRecord/>
     } else if (this.props.id === 'NOTIFICATIONS') {
       return <Notifications/>
+    } else if (this.props.id === 'CANCEL') {
+      return <Cancel/>
     } else if (this.props.id === 'REPLY') {
       return <Reply/>
     } else if (this.props.id === 'CLOSE') {
@@ -131,6 +136,8 @@ class Icon extends Component {
       return <CallEnd/>
     } else if (this.props.id === 'CALL_MISSED') {
       return <CallMissed/>
+    } else if (this.props.id === 'CALL_RECEIVED') {
+      return <CallReceived/>
     } else if (this.props.id === 'PEOPLE') {
       return <People/>
     } else if (this.props.id === 'UPLOAD') {

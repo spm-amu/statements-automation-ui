@@ -21,6 +21,7 @@
 .activity-card-wrapper-root .activity-card-unread,
 .activity-card-wrapper-root .activity-card-selected {
   width: 100%;
+  padding: 8px;
 }
 
 .activity-card-wrapper-child .activity-card,
