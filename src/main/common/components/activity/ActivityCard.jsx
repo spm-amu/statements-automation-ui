@@ -18,13 +18,20 @@ const ActivityCardComponent = React.memo(React.forwardRef((props, ref) => {
 
   const resolveIcon = (activityType) => {
     switch (activityType) {
+      case 'START_CHAT':
+        return <Icon id={'CHAT_BUBBLE'}/>;
       case 'START_CALL':
         return <Icon id={'CALL'}/>;
       case 'REJECT_CALL':
         return <Icon id={'CANCEL'}/>;
+      case 'START_MEETING':
+      case 'JOIN_MEETING':
+        return <Icon id={'VIDEOCAM'}/>;
       case 'MISSED_CALL':
       case 'UN_ANSWERED_CALL':
         return <Icon id={'CALL_MISSED'}/>;
+      case 'END_MEETING':
+        return <Icon id={'VIDEOCAM_OFF'}/>;
       case 'END_CALL':
         return <Icon id={'CALL_END'}/>;
       case 'ANSWER_CALL':
@@ -73,15 +80,15 @@ const ActivityCardComponent = React.memo(React.forwardRef((props, ref) => {
                 html={activity.description.replace('<@u>You</@u>', 'You').replace('<@u>', '<span style="font-weight: 600">').replace('</@u>', '</span>')}/>
             </div>
           </div>
+          {
+            activity.vcActivityTitle &&
+            <div className={'row'} style={{fontWeight: 600, marginLeft: '0px', marginRight: '0px'}}>
+              {
+                activity.vcActivityTitle
+              }
+            </div>
+          }
         </div>
-        {
-          activity.vcActivityTitle &&
-          <div className={'row'} style={{fontWeight: 500}}>
-            {
-              activity.vcActivityTitle
-            }
-          </div>
-        }
       </div>
     </div>
   );

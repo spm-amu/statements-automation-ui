@@ -3,6 +3,7 @@
   max-width: 100%;
   padding: 8px;
   display: flex;
+  margin-bottom: 2px;
 }
 
 .activity-card-wrapper-root {

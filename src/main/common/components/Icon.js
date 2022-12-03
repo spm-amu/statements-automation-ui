@@ -30,14 +30,16 @@ import Close from '@material-ui/icons/Close';
 import Link from "@material-ui/icons/Link";
 import React, {Component} from "react";
 import {
-  Cancel,
+  MeetingRoom,
   Call,
   CallEnd,
   CallMissed,
   CallReceived,
+  Cancel,
   CancelPresentation,
   ChatBubbleOutline,
   Done,
+  FiberManualRecord,
   History,
   Notifications,
   People,
@@ -45,8 +47,7 @@ import {
   Reply,
   Videocam,
   VideocamOff,
-  History,
-  Warning, FiberManualRecord
+  Warning
 } from '@material-ui/icons';
 
 class Icon extends Component {
@@ -138,6 +139,8 @@ class Icon extends Component {
       return <CallMissed/>
     } else if (this.props.id === 'CALL_RECEIVED') {
       return <CallReceived/>
+    } else if (this.props.id === 'MEETING_ROOM') {
+      return <MeetingRoom/>
     } else if (this.props.id === 'PEOPLE') {
       return <People/>
     } else if (this.props.id === 'UPLOAD') {
