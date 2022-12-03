@@ -49,6 +49,7 @@ import {
   VideocamOff,
   Warning
 } from '@material-ui/icons';
+import SendIcon from "./chat/ChatRoom";
 
 class Icon extends Component {
 
@@ -106,7 +107,7 @@ class Icon extends Component {
     } else if (this.props.id === 'WORK') {
       return <Work/>
     } else if (this.props.id === 'ATTACH_FILE') {
-      return <AttachFile/>
+      return <AttachFile style={{fontSize: '24px'}}/>
     } else if (this.props.id === 'NOTIFICATIONS') {
       return <Notifications/>
     } else if (this.props.id === 'HOME') {

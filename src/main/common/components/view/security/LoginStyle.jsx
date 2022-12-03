@@ -17,7 +17,8 @@ const styles = {
     textAlign: "center"
   },
   inputAdornmentIcon: {
-    color: '#AAAAAA'
+    color: '#AAAAAA',
+    marginTop: '-24px'
   },
   paper: {
     padding: 20,

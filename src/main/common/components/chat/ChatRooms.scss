@@ -1,7 +1,6 @@
 .chatrooms {
     display: flex;
     flex-direction: column;
-    border-right: 1px solid #c9c9c9;
 
     .chatrooms__rooms {
         max-height: 84.7vh;
@@ -17,7 +16,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-        border-bottom: 1px solid #c9c9c9;
+        border-bottom: 1px solid #e1e1e1;
     }
 
     .header__left {
@@ -49,7 +48,7 @@
     .chatroom__item {
         display: flex;
         flex-direction: row;
-        border-bottom: 1px solid #c9c9c9;
+        border-bottom: 1px solid #e1e1e1;
         padding: 10px;
 
         .MuiAvatar-root {
@@ -96,7 +95,7 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
-    max-height: 93.8vh;
+    max-height: 100%;
 
     .image__text {
         padding: 0 9%;
@@ -111,7 +110,7 @@
         justify-content: space-between;
         padding: 0 4%;
         padding-right: 7%;
-        border-bottom: 1px solid #c9c9c9;
+        border-bottom: 1px solid #e1e1e1;
         width: 100%;
 
         .chatroom__headerleft {
@@ -130,7 +129,7 @@
     }
 
     .chatroom__body {
-        height: 75vh;
+        height: 95%;
         overflow: auto;
         padding: 0 15px;
     }

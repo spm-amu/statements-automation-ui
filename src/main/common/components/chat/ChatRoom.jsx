@@ -1,23 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import CreateIcon from '@material-ui/icons/Create';
-import { Avatar, IconButton } from '@material-ui/core';
-import FileBase from 'react-file-base64';
+import React, {useEffect, useRef, useState} from 'react';
+import {Avatar, IconButton} from '@material-ui/core';
 import SendIcon from '@material-ui/icons/Send';
 import CallIcon from '@material-ui/icons/Call';
 import Tooltip from '@material-ui/core/Tooltip';
-import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
-import { Link, useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import './ChatRooms.scss';
 import moment from 'moment';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import { Face, Message } from '@material-ui/icons';
 import styles from '../view/security/LoginStyle';
 import CustomInput from '../customInput/CustomInput';
 import LottieIcon from '../LottieIcon';
-import { Calendar } from 'react-feather';
+import {Calendar} from 'react-feather';
 import Utils from '../../Utils';
 import socketManager from '../../service/SocketManager';
-import { MessageType } from '../../types';
+import {MessageType} from '../../types';
 import uuid from 'react-uuid';
 import appManager from "../../../common/service/AppManager";
 import Files from '../customInput/Files';
@@ -58,8 +54,8 @@ const ChatRoom = (props) => {
   // };
 
   const onMessage = (payload) => {
-    if(selectedChat && selectedChat.id === payload.roomId) {
-      if(props.onMessage) {
+    if (selectedChat && selectedChat.id === payload.roomId) {
+      if (props.onMessage) {
         props.onMessage(payload.chatMessage, selectedChat);
       }
 
@@ -104,7 +100,7 @@ const ChatRoom = (props) => {
   }, []);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
   };
 
   const handleChange = (e) => {
@@ -194,14 +190,14 @@ const ChatRoom = (props) => {
   };
 
   const renderFileThumbnail = (message) => {
-    const { document } = message;
+    const {document} = message;
     if (document.type.includes('image')) {
       return (
         <>
           <img
             src={document.payload}
             alt=""
-            style={{ width: 250, height: 'auto' }}
+            style={{width: 250, height: 'auto'}}
           />
         </>
       )
@@ -213,7 +209,7 @@ const ChatRoom = (props) => {
           <img
             src={require('../../assets/img/files/pdf.png')}
             alt=""
-            style={{ width: 80, height: 80 }}
+            style={{width: 80, height: 80}}
           />
           <p>{document.name}</p>
         </div>
@@ -226,7 +222,7 @@ const ChatRoom = (props) => {
           <img
             src={require('../../assets/img/files/doc.png')}
             alt=""
-            style={{ width: 80, height: 80 }}
+            style={{width: 80, height: 80}}
           />
           <p>{document.name}</p>
         </div>
@@ -239,7 +235,7 @@ const ChatRoom = (props) => {
           <img
             src={require('../../assets/img/files/word.png')}
             alt=""
-            style={{ width: 80, height: 80 }}
+            style={{width: 80, height: 80}}
           />
           <p>{document.name}</p>
         </div>
@@ -252,7 +248,7 @@ const ChatRoom = (props) => {
           <img
             src={require('../../assets/img/files/xls.png')}
             alt=""
-            style={{ width: 80, height: 80 }}
+            style={{width: 80, height: 80}}
           />
           <p>{document.name}</p>
         </div>
@@ -264,7 +260,7 @@ const ChatRoom = (props) => {
         <img
           src={require('../../assets/img/files/php.png')}
           alt=""
-          style={{ width: 80, height: 80 }}
+          style={{width: 80, height: 80}}
         />
         <p>{document.name}</p>
       </div>
@@ -338,14 +334,14 @@ const ChatRoom = (props) => {
           <div className="chatroom__headerleft">
             <Avatar>
               {selectedChat.type === 'CALENDAR_MEETING' || selectedChat.participants.length > 2 ? (
-                <Calendar />
+                <Calendar/>
               ) : (
                 Utils.getInitials(selectedChat.participants.find(p => p.userId !== currentUser.userId).name)
               )}
             </Avatar>
 
             <h5>
-              { selectedChat.type === 'CALENDAR_MEETING' ? selectedChat.title : Utils.getChatMeetingTitle(selectedChat.participants, currentUser.userId, 58) }
+              {selectedChat.type === 'CALENDAR_MEETING' ? selectedChat.title : Utils.getChatMeetingTitle(selectedChat.participants, currentUser.userId, 58)}
             </h5>
           </div>
           <div className="chatroom__headerright">
@@ -356,7 +352,7 @@ const ChatRoom = (props) => {
                     callNow(e);
                   }}
                 >
-                  <CallIcon />
+                  <CallIcon/>
                 </IconButton>
               </Tooltip>
             </Link>
@@ -367,12 +363,12 @@ const ChatRoom = (props) => {
             messages
               .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate))?.map(renderMessages)
           }
-          <div ref={messagesEndRef} />
+          <div ref={messagesEndRef}/>
         </div>
         <div>
           <form className="chatroom__sendMessage">
             <div
-              className="message__imageSelector"
+              className="message__imageSelector" style={{width: '48px'}}
             >
               <Files
                 enableFile={true}
@@ -387,7 +383,7 @@ const ChatRoom = (props) => {
             <CustomInput
               labelText="Type a new message"
               id="message"
-              formControlProps={{ fullWidth: true }}
+              formControlProps={{fullWidth: true}}
               autoFocus
               inputProps={{
                 endAdornment: (
@@ -399,7 +395,7 @@ const ChatRoom = (props) => {
                         sendMessage(e);
                       }}
                     >
-                      <SendIcon />
+                      <SendIcon style={{fontSize: '24px'}}/>
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -414,18 +410,19 @@ const ChatRoom = (props) => {
         <p className="image__text">{confirm}</p>
       </div>
     );
-  } else if(!loading && selectedChat){
+  } else if (!loading && selectedChat) {
     return (
       <div className={'centered-flex-box'}>
         <div className="emptychat">
-          <p className={'centered-flex-box'} style={{fontSize: '20px', fontWeight: 'bold'}}>You're starting a new conversation</p>
+          <p className={'centered-flex-box'} style={{fontSize: '20px', fontWeight: 'bold'}}>You're starting a new
+            conversation</p>
           <p className={'centered-flex-box'} style={{fontSize: '16px'}}>Type your first message below</p>
-          <LottieIcon id={'chat'} />
+          <LottieIcon id={'chat'}/>
         </div>
       </div>
     );
   } else {
-        return null;
+    return null;
   }
 };
 
