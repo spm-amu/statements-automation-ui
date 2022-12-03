@@ -2,13 +2,27 @@ import React, {useEffect, useState} from 'react';
 import "./ActivityCard.css"
 import HTMLRenderer from "react-html-renderer";
 import Icon from "../Icon";
+import moment from 'moment';
 
 const ActivityCardComponent = React.memo(React.forwardRef((props, ref) => {
 
   const {activity, selected} = props;
   const [read, setRead] = useState(props.activity.read);
+  const [time, setTime] = useState("");
 
   useEffect(() => {
+    let createdDate = moment(activity.createdDate.split('.')[0]);
+    let now = moment(new Date());
+
+    if(now.year() === createdDate.year() && now.month() === createdDate.month() && now.day() === createdDate.day()) {
+      setTime(createdDate.format('HH:mm'));
+    } else if(now.year() === createdDate.year() && (now.month() !== createdDate.month() || now.day() !== createdDate.day())) {
+      setTime(createdDate.format('DD/MM, HH:mm'));
+    } else {
+      setTime(createdDate.format('YY/DD/MM, HH:mm'))
+    }
+
+    console.log()
   }, []);
 
   useEffect(() => {
@@ -60,11 +74,7 @@ const ActivityCardComponent = React.memo(React.forwardRef((props, ref) => {
                 marginBottom: '0'
               }}
             >
-              {new Date(activity.createdDate).toLocaleString('en-US', {
-                hour12: true,
-                hour: 'numeric',
-                minute: 'numeric',
-              })}
+              <span>{time}</span>
             </div>
           </div>
         </div>
