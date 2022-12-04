@@ -56,10 +56,13 @@ const ChatRoom = (props) => {
   const onMessage = (payload) => {
     if (selectedChat && selectedChat.id === payload.roomId) {
       if (props.onMessage) {
+        console.log('if');
         props.onMessage(payload.chatMessage, selectedChat);
+      } else {
+        console.log('Else');
+        selectedChat.messages.push(payload.chatMessage);
       }
 
-      selectedChat.messages.push(payload.chatMessage);
       loadMessages();
     }
   };

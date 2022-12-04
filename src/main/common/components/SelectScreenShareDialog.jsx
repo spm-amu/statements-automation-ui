@@ -9,6 +9,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Slide from "@material-ui/core/Slide";
 import './AlertDialog.css'
 import ActivityCard from './activity/ActivityCard';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
 
 export default function SelectScreenShareDialog(props) {
 
@@ -29,21 +31,22 @@ export default function SelectScreenShareDialog(props) {
           {"Select window to share"}
         </DialogTitle>
         <DialogContent>
-          <div className={'col'}>
-            {
-              props.sources &&
-              props.sources.map((source, index) => {
-              return <div key={index}>
-                  <img
-                    onClick={() => props.selectSourceHandler(source)}
-                    src={source.thumbnailUrl}
-                    alt={""}
-                  />
-                  <p style={{ marginTop: '8px' }}>{source.name}</p>
-                </div>;
-              })
-            }
-          </div>
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid className={'spacing-xs-2'} container columns={{ xs: 4, sm: 8, md: 12 }}>
+              {
+                props.sources &&
+                props.sources.map((source, index) => (
+                  <Grid style={{ padding: '8px' }} item xs={2} sm={4} md={4} key={index}>
+                    <img
+                      onClick={() => props.selectSourceHandler(source)}
+                      src={source.thumbnailUrl}
+                      alt={""}
+                    />
+                    <p style={{ marginTop: '8px' }}>{source.name}</p>
+                  </Grid>
+              ))}
+            </Grid>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button
