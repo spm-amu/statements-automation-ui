@@ -3,7 +3,7 @@ import {LARGE} from 'material-ui/utils/withWidth';
 import PropTypes from 'prop-types';
 import Utils from '../../common/Utils'
 import ViewPort from "../../common/components/layout/ViewPort";
-import {Route, useNavigate} from "react-router-dom";
+import { Route, useLocation, useNavigate } from 'react-router-dom';
 import PerfectScrollbar from "perfect-scrollbar";
 import Sidebar from './components/blackDashboard/sidebar/Sidebar';
 import HomeNavbar from "../../common/components/navbars/HomeNavbar";
@@ -48,6 +48,7 @@ const BasicBusinessAppDashboard = (props) => {
   const [socketEventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const navigate = useNavigate();
+  const location = useLocation();
 
   //const dispatch = useDispatch();
 
@@ -281,6 +282,12 @@ const BasicBusinessAppDashboard = (props) => {
     if (!tokenRefreshMonitorStarted) {
       tokenManager.startTokenRefreshMonitor(`${host}/api/v1/auth/refresh`, response.username);
       setTokenRefreshMonitorStarted(true);
+    }
+
+    console.log('#### location.state: ', location.state);
+
+    if (location.state) {
+      redirectToMeeting(location.state);
     }
   }
 

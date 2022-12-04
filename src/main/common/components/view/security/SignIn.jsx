@@ -146,11 +146,9 @@ const SignIn = (props) => {
           electron.ipcRenderer.on('tokensSaved', args => {
             electron.ipcRenderer.removeAllListeners("tokensSaved");
 
-            if (redirectData) {
-              redirectToMeeting(redirectData.meetingId)
-            } else {
-              navigate('/dashboard');
-            }
+            navigate('/dashboard', {
+              state: redirectData
+            });
           });
         },
         (e) => {
