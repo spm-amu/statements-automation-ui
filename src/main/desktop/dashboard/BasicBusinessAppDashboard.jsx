@@ -396,7 +396,7 @@ const BasicBusinessAppDashboard = (props) => {
       console.log('\n\n\njoinMeetingEvent: ', args);
 
       post(
-        `${host}/vc/api/v1/auth/validateMeetingToken`,
+        `${host}/api/v1/auth/validateMeetingToken`,
         (response) => {
           if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
             navigate('/login', {

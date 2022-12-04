@@ -84,31 +84,6 @@ const SignIn = (props) => {
     }
   }, []);
 
-  const redirectToMeeting = (meetingId) => {
-    get(`${host}/api/v1/meeting/fetch/${meetingId}`, (response) => {
-      let userDetails = appManager.getUserDetails();
-      let isHost = false;
-      response.extendedProps.attendees.forEach(att => {
-        if (att.userId === userDetails.userId) {
-          isHost = att.type === 'HOST';
-        }
-      });
-
-      navigate("/view/meetingRoom", {
-        state: {
-          displayMode: 'window',
-          selectedMeeting: {
-            id: response.id
-          },
-          videoMuted: true,
-          audioMuted: true,
-          isHost
-        }
-      })
-    }, (e) => {
-    }, '', false);
-  }
-
   const fireLogin = () => {
     clearErrorStates();
 
