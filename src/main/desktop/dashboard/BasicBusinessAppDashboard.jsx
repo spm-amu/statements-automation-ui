@@ -9,7 +9,7 @@ import Sidebar from './components/blackDashboard/sidebar/Sidebar';
 import HomeNavbar from "../../common/components/navbars/HomeNavbar";
 import "../../common/assets/scss/black-dashboard-react.scss";
 import "./BasicBusinessAppDashboard.css"
-import {get, host} from "../../common/service/RestService";
+import { get, host, post } from '../../common/service/RestService';
 import socketManager from "../../common/service/SocketManager";
 import appManager from "../../common/service/AppManager";
 import tokenManager, {
@@ -312,6 +312,31 @@ const BasicBusinessAppDashboard = (props) => {
     }
   }
 
+  const redirectToMeeting = (params) => {
+    get(`${host}/api/v1/meeting/fetch/${params.meetingId}`, (response) => {
+      let userDetails = appManager.getUserDetails();
+      let isHost = false;
+      response.extendedProps.attendees.forEach(att => {
+        if (att.userId === userDetails.userId) {
+          isHost = att.type === 'HOST';
+        }
+      });
+
+      navigate("/view/meetingRoom", {
+        state: {
+          displayMode: 'window',
+          selectedMeeting: {
+            id: response.id
+          },
+          videoMuted: true,
+          audioMuted: true,
+          isHost
+        }
+      })
+    }, (e) => {
+    }, '', false);
+  }
+
   React.useEffect(() => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL, SystemEventType.API_ERROR, SystemEventType.API_SUCCESS);
 
@@ -358,28 +383,42 @@ const BasicBusinessAppDashboard = (props) => {
     });
 
     electron.ipcRenderer.on('joinMeetingEvent', args => {
-      get(`${host}/api/v1/meeting/fetch/${args.payload.params.meetingId}`, (response) => {
-        let userDetails = appManager.getUserDetails();
-        let isHost = false;
-        response.extendedProps.attendees.forEach(att => {
-          if (att.userId === userDetails.userId) {
-            isHost = att.type === 'HOST';
-          }
-        });
+      let accessToken = appManager.get(ACCESS_TOKEN_PROPERTY);
+      let refreshToken = appManager.get(REFRESH_TOKEN_PROPERTY);
 
-        navigate("/view/meetingRoom", {
-          state: {
-            displayMode: 'window',
-            selectedMeeting: {
-              id: response.id
-            },
-            videoMuted: true,
-            audioMuted: true,
-            isHost
+      console.log('\n\n\njoinMeetingEvent: ', args);
+
+      post(
+        `${host}/vc/api/v1/auth/validateMeetingToken`,
+        (response) => {
+          if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
+            navigate('/login', {
+              state: {
+                meetingId: args.payload.params.meetingId,
+                tokenUserId: response.userId
+              }
+            });
+          } else {
+            let userDetails = appManager.getUserDetails();
+            if (response.userId === userDetails.userId) {
+              redirectToMeeting(args.payload.params);
+            } else {
+              appManager.fireEvent(SystemEventType.API_ERROR, {
+                message: `Please login in as ${response.userId} to join this meeting. Please avoid sharing private meetings with uninvited guests!`
+              });
+            }
           }
-        })
-      }, (e) => {
-      }, '', false);
+        },
+        (e) => {
+          appManager.fireEvent(SystemEventType.API_ERROR, {
+            message: 'Invalid meeting link.'
+          });
+        },
+        {
+          token: args.payload.params.accessToken
+        },
+        ''
+      );
     });
 
     electron.ipcRenderer.on('declineCall', args => {

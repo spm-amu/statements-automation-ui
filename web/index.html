@@ -148,19 +148,28 @@
     <script src="./assets/js/app.js"></script>
 
     <script>
-      $.urlParam = function(name){
-        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-        if (results==null) {
-          return null;
+      $(function() {
+        $.urlParam = function(name){
+          const results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+          if (results==null) {
+            return null;
+          }
+          return decodeURI(results[1]) || 0;
         }
-        return decodeURI(results[1]) || 0;
-      }
 
-      $( "#open-app" ).click(function() {
-        console.log($.urlParam('meetingId'));
-        const meetingId = $.urlParam('meetingId');
+        $( "#open-app" ).click(function() {
+          const meetingId = $.urlParam('meetingId');
+          const accessToken = $.urlParam('accessToken');
 
-        window.location.href = `armscor-connect://${meetingId}`;
+          window.location.href = `armscor-connect://meetingId=${meetingId}&accessToken=${accessToken}`;
+        });
+
+        $( window ).on( "load", function() {
+          const meetingId = $.urlParam('meetingId');
+          const accessToken = $.urlParam('accessToken');
+
+          window.location.href = `armscor-connect://meetingId=${meetingId}&accessToken=${accessToken}`;
+        });
       });
     </script>
   </body>

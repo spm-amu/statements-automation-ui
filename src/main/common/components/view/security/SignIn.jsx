@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {CardText, CardTitle, Col, Row,} from 'reactstrap';
 import '../../../assets/scss/page-authentication.scss';
 import Button from '../../RegularButton';
@@ -7,7 +7,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import {host, post} from '../../../service/RestService';
+import { get, host, post } from '../../../service/RestService';
 import styles from './LoginStyle';
 import CustomInput from '../../customInput/CustomInput';
 import {Face} from '@material-ui/icons';
@@ -15,6 +15,9 @@ import {Alert} from '@material-ui/lab';
 import appManager from "../../../../common/service/AppManager";
 import Utils from "../../../Utils";
 import {ACCESS_TOKEN_PROPERTY, REFRESH_TOKEN_PROPERTY} from "../../../service/TokenManager";
+import { SystemEventType } from '../../../types';
+
+const {electron} = window;
 
 const SignIn = (props) => {
   const [usernameError, setUsernameError] = useState(false);
@@ -23,11 +26,14 @@ const SignIn = (props) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isMeetingRedirect, setIsMeetingRedirect] = React.useState(false);
+  const [redirectData, setRedirectData] = React.useState(null);
   const [usernameState, setUsernameState] = React.useState('');
   const [passwordState, setPasswordState] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -44,8 +50,64 @@ const SignIn = (props) => {
   };
 
   useEffect(() => {
-    clearErrorStates()
+    clearErrorStates();
+
+    electron.ipcRenderer.on('joinMeetingEvent', args => {
+      if (args.payload.params.redirect) {
+        post(
+          `${host}/api/v1/auth/validateMeetingToken`,
+          (response) => {
+            setUsername(response.userId);
+            setRedirectData({
+              meetingId: response.meetingID,
+              tokenUserId: response.userId
+            })
+            setIsMeetingRedirect(true);
+          },
+          (e) => {
+            console.log('ERR: ', e);
+          },
+          {
+            token: args.payload.params.accessToken
+          },
+          null,
+          false,
+          false
+        );
+      }
+    })
+
+    if (location.state) {
+      setUsername(location.state.tokenUserId);
+      setRedirectData(location.state)
+      setIsMeetingRedirect(true);
+    }
   }, []);
+
+  const redirectToMeeting = (meetingId) => {
+    get(`${host}/api/v1/meeting/fetch/${meetingId}`, (response) => {
+      let userDetails = appManager.getUserDetails();
+      let isHost = false;
+      response.extendedProps.attendees.forEach(att => {
+        if (att.userId === userDetails.userId) {
+          isHost = att.type === 'HOST';
+        }
+      });
+
+      navigate("/view/meetingRoom", {
+        state: {
+          displayMode: 'window',
+          selectedMeeting: {
+            id: response.id
+          },
+          videoMuted: true,
+          audioMuted: true,
+          isHost
+        }
+      })
+    }, (e) => {
+    }, '', false);
+  }
 
   const fireLogin = () => {
     clearErrorStates();
@@ -83,7 +145,12 @@ const SignIn = (props) => {
 
           electron.ipcRenderer.on('tokensSaved', args => {
             electron.ipcRenderer.removeAllListeners("tokensSaved");
-            navigate('/dashboard');
+
+            if (redirectData) {
+              redirectToMeeting(redirectData.meetingId)
+            } else {
+              navigate('/dashboard');
+            }
           });
         },
         (e) => {
@@ -148,26 +215,29 @@ const SignIn = (props) => {
             </CardText>
 
             <form className="auth-login-form mt-2">
-              <div className="mb-1">
-                <CustomInput
-                  labelText="Username"
-                  id="username"
-                  formControlProps={{ fullWidth: true }}
-                  success={usernameState === 'success'}
-                  error={usernameState === 'error'}
-                  inputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Face style={styles.inputAdornmentIcon} />
-                      </InputAdornment>
-                    ),
-                    value: username,
-                    onChange: (e) => {
-                      setUsername(e.target.value);
-                    },
-                  }}
-                />
-              </div>
+              {
+                !isMeetingRedirect &&
+                  <div className="mb-1">
+                    <CustomInput
+                      labelText="Username"
+                      id="username"
+                      formControlProps={{ fullWidth: true }}
+                      success={usernameState === 'success'}
+                      error={usernameState === 'error'}
+                      inputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <Face style={styles.inputAdornmentIcon} />
+                          </InputAdornment>
+                        ),
+                        value: username,
+                        onChange: (e) => {
+                          setUsername(e.target.value);
+                        },
+                      }}
+                    />
+                  </div>
+              }
               <div className="mb-1">
                 <CustomInput
                   labelText="Password"

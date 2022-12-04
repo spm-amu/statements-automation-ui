@@ -455,11 +455,16 @@ if (process.env.NODE_ENV === 'development' && process.platform === 'win32') {
 app.on('open-url', function (event, url) {
   event.preventDefault();
   deeplinkingUrl = url;
-  let meetingId = '';
+  let meetingId = null;
+  let accessToken = null;
 
   if (deeplinkingUrl) {
     const lastIndex = deeplinkingUrl.lastIndexOf('/');
-    meetingId = deeplinkingUrl.slice(lastIndex + 1);
+    const query = deeplinkingUrl.slice(lastIndex + 1);
+
+    const params = new URLSearchParams(query);
+    meetingId = params.get('meetingId');
+    accessToken = params.get('accessToken');
   }
 
   if (mainWindow) {
@@ -469,7 +474,9 @@ app.on('open-url', function (event, url) {
     mainWindow.webContents.send('joinMeetingEvent', {
       payload: {
         params: {
-          meetingId: meetingId
+          meetingId: meetingId,
+          accessToken: accessToken,
+          redirect: true
         }
       }
     });
