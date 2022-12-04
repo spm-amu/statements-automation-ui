@@ -284,9 +284,10 @@ const BasicBusinessAppDashboard = (props) => {
       setTokenRefreshMonitorStarted(true);
     }
 
-    console.log('#### location.state: ', location.state);
 
+    console.log('#### location.state: ', location.state);
     if (location.state) {
+      window.history.replaceState({}, document.title); // clear location.state
       redirectToMeeting(location.state);
     }
   }
@@ -406,6 +407,7 @@ const BasicBusinessAppDashboard = (props) => {
               }
             });
           } else {
+            console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@');
             let userDetails = appManager.getUserDetails();
             if (response.userId === userDetails.userId) {
               redirectToMeeting(args.payload.params);

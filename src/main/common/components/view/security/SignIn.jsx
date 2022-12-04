@@ -120,6 +120,7 @@ const SignIn = (props) => {
 
           electron.ipcRenderer.on('tokensSaved', args => {
             electron.ipcRenderer.removeAllListeners("tokensSaved");
+            electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
 
             navigate('/dashboard', {
               state: redirectData
