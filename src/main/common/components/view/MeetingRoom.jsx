@@ -142,7 +142,6 @@ const MeetingRoom = (props) => {
   } = props;
 
   const recordMeeting = () => {
-    console.log('\n\n\n recordMeeting: ', mediaRecorder);
     if (mediaRecorder != null) {
       mediaRecorder.start();
       setIsRecording(true);
@@ -150,7 +149,6 @@ const MeetingRoom = (props) => {
   };
 
   const stopRecordingMeeting = () => {
-    console.log('\n\n\n stopRecordingMeeting: ', mediaRecorder);
     if (mediaRecorder != null) {
       mediaRecorder.stop();
       setIsRecording(false);
@@ -279,10 +277,19 @@ const MeetingRoom = (props) => {
       navigator.mediaDevices
         .getUserMedia({
           cursor: true,
-          audio: false,
+          audio: {
+            mandatory: {
+              chromeMediaSource: 'desktop',
+            },
+          },
           video: {
             mandatory: {
-              chromeMediaSource: 'desktop'
+              chromeMediaSource: 'desktop',
+              chromeMediaSourceId: selectedSource.id,
+              minWidth: 1280,
+              maxWidth: 1280,
+              minHeight: 720,
+              maxHeight: 720
             }
           }
         })
