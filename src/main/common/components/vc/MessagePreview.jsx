@@ -39,6 +39,12 @@ const MessagePreview = (props) => {
     });
   }
 
+  const close = () => {
+    electron.ipcRenderer.sendMessage('hideMessagePreview', {
+      chatId: messenger.roomId
+    });
+  }
+
   return (
     messenger &&
     <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
@@ -52,7 +58,7 @@ const MessagePreview = (props) => {
         <div className={'avatar'} data-label={initials}/>
       </div>
       <div className={'centered-flex-box '} style={{marginTop: '24px'}}>
-        <div className="w-100">
+        <div style={{ padding: '8px' }}>
           <Button
             onClick={() => reply()}
             variant="contained"
@@ -61,6 +67,18 @@ const MessagePreview = (props) => {
             style={{ float: 'right', backgroundColor: '#01476C' }}
           >
             REPLY
+          </Button>
+        </div>
+
+        <div style={{ padding: '8px' }}>
+          <Button
+            onClick={() => close()}
+            variant="contained"
+            color="primary"
+            fullWidth={true}
+            style={{ float: 'right', backgroundColor: 'red' }}
+          >
+            CLOSE
           </Button>
         </div>
       </div>

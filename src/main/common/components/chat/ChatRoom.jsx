@@ -84,6 +84,8 @@ const ChatRoom = (props) => {
   }, [props.selectedChat]);
 
   useEffect(() => {
+    setMessage('');
+    setDocument(null)
     loadMessages();
   }, [selectedChat]);
 

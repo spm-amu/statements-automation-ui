@@ -350,6 +350,8 @@ ipcMain.on("replyMessage", async (_event, args) => {
   }
 
   mainWindow.webContents.send('replyMessage', args);
+  mainWindow.show();
+  mainWindow.focus();
 
   messageWindow?.hide();
 });
