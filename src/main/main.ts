@@ -460,6 +460,8 @@ app.on('open-url', function (event, url) {
   let meetingId = null;
   let accessToken = null;
 
+  log.info('Opening Link...');
+
   if (deeplinkingUrl) {
     const lastIndex = deeplinkingUrl.lastIndexOf('/');
     const query = deeplinkingUrl.slice(lastIndex + 1);
@@ -470,6 +472,8 @@ app.on('open-url', function (event, url) {
   }
 
   if (mainWindow) {
+    log.info('Sending joinMeetingEvent...');
+
     if (mainWindow.isMinimized()) mainWindow.restore();
     mainWindow.focus();
 
