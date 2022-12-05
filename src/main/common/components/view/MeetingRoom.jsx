@@ -18,6 +18,7 @@ import appManager from "../../../common/service/AppManager";
 import MeetingRoomSummary from "../vc/MeetingRoomSummary";
 import {get, host, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
+import { osName } from "react-device-detect";
 const { electron } = window;
 
 const StyledDialog = withStyles({
@@ -274,25 +275,34 @@ const MeetingRoom = (props) => {
 
     if (screenSources && selectedSource) {
       setScreenShared(true);
-      navigator.mediaDevices
-        .getUserMedia({
-          cursor: true,
-          audio: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-            },
+
+      const videoConstraints = {
+        cursor: true,
+        audio: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
           },
-          video: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-              chromeMediaSourceId: selectedSource.id,
-              minWidth: 1280,
-              maxWidth: 1280,
-              minHeight: 720,
-              maxHeight: 720
-            }
+        },
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: selectedSource.id,
+            minWidth: 1280,
+            maxWidth: 1280,
+            minHeight: 720,
+            maxHeight: 720
           }
-        })
+        }
+      };
+
+      if (osName === 'Mac OS') {
+        videoConstraints.audio = false;
+      }
+
+      console.log('#### videoConstraints: ', videoConstraints);
+
+      navigator.mediaDevices
+        .getUserMedia(videoConstraints)
         .then((stream) => {
           handleScreenShareStream(stream);
         })
