@@ -500,14 +500,43 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.on('second-instance', (e, argv) => {
+    let meetingId = null;
+    let accessToken = null;
+
     if (process.platform !== 'darwin') {
       // Find the arg that is our custom protocol url and store it
       deeplinkingUrl = argv.find((arg) => arg.startsWith('armscor-connect://'));
+
+
+
+      if (deeplinkingUrl) {
+        const lastIndex = deeplinkingUrl.lastIndexOf('/');
+        const query = deeplinkingUrl.slice(lastIndex + 1);
+
+        const params = new URLSearchParams(query);
+        meetingId = params.get('meetingId');
+        accessToken = params.get('accessToken');
+
+        log.info('.... meetingId: ', meetingId);
+        log.info('.... accessToken: ', accessToken);
+      }
     }
 
     if (mainWindow) {
+      log.info('Sending joinMeetingEvent...');
+
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
+
+      mainWindow.webContents.send('joinMeetingEvent', {
+        payload: {
+          params: {
+            meetingId: meetingId,
+            accessToken: accessToken,
+            redirect: true
+          }
+        }
+      });
     }
   });
 }
