@@ -394,40 +394,41 @@ const BasicBusinessAppDashboard = (props) => {
       let accessToken = appManager.get(ACCESS_TOKEN_PROPERTY);
       let refreshToken = appManager.get(REFRESH_TOKEN_PROPERTY);
 
-      console.log('\n\n\njoinMeetingEvent: ', args);
-
-      post(
-        `${host}/api/v1/auth/validateMeetingToken`,
-        (response) => {
-          if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
-            navigate('/login', {
-              state: {
-                meetingId: args.payload.params.meetingId,
-                tokenUserId: response.userId
-              }
-            });
-          } else {
-            console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-            let userDetails = appManager.getUserDetails();
-            if (response.userId === userDetails.userId) {
-              redirectToMeeting(args.payload.params);
-            } else {
-              appManager.fireEvent(SystemEventType.API_ERROR, {
-                message: `Please login in as ${response.userId} to join this meeting. Please avoid sharing private meetings with uninvited guests!`
+      if (args.payload.params.redirect) {
+        post(
+          `${host}/api/v1/auth/validateMeetingToken`,
+          (response) => {
+            if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
+              navigate('/login', {
+                state: {
+                  meetingId: args.payload.params.meetingId,
+                  tokenUserId: response.userId
+                }
               });
+            } else {
+              let userDetails = appManager.getUserDetails();
+              if (response.userId === userDetails.userId) {
+                redirectToMeeting(args.payload.params);
+              } else {
+                appManager.fireEvent(SystemEventType.API_ERROR, {
+                  message: `Please login in as ${response.userId} to join this meeting. Please avoid sharing private meetings with uninvited guests!`
+                });
+              }
             }
-          }
-        },
-        (e) => {
-          appManager.fireEvent(SystemEventType.API_ERROR, {
-            message: 'Invalid meeting link.'
-          });
-        },
-        {
-          token: args.payload.params.accessToken
-        },
-        ''
-      );
+          },
+          (e) => {
+            appManager.fireEvent(SystemEventType.API_ERROR, {
+              message: 'Invalid meeting link.'
+            });
+          },
+          {
+            token: args.payload.params.accessToken
+          },
+          ''
+        );
+      } else {
+        redirectToMeeting(args.payload.params);
+      }
     });
 
     electron.ipcRenderer.on('declineCall', args => {

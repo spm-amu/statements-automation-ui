@@ -20,7 +20,8 @@ const store = new Store();
 
 class AppUpdater {
   constructor() {
-    log.transports.file.level = 'info';
+    log.transports.file.resolvePath = () => path.join('/Users/nsovongobeni/Work/Armscore/ui', '/logsmain.log');
+    log.transports.file.level = 'debug';
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
   }
