@@ -7,8 +7,8 @@ import {ACCESS_TOKEN_PROPERTY, LAST_LOGIN, REFRESH_TOKEN_PROPERTY} from "./Token
 const {electron} = window;
 
 //export const host = window.location.protocol + "//" + window.location.hostname + "/vc";
-//export const host = "http://svn.agilemotion.co.za/vc";
-export const host = "http://localhost:8080/vc";
+export const host = "http://svn.agilemotion.co.za/vc";
+// export const host = "http://localhost:8080/vc";
 const status = (response: any) => {
   if (response.ok) {
     return Promise.resolve(response);
