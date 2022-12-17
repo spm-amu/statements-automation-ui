@@ -85,7 +85,7 @@ const ChatRoom = (props) => {
 
   useEffect(() => {
     setMessage('');
-    setDocument(null)
+    setDocument(null);
     loadMessages();
   }, [selectedChat]);
 
@@ -117,7 +117,7 @@ const ChatRoom = (props) => {
       .participants
       .filter(user => user.userId !== currentUser.userId)
       .map(user => user.userId);
-  }
+  };
 
   const sendMessage = (e, finalMessage = null) => {
     e.preventDefault();
@@ -270,7 +270,7 @@ const ChatRoom = (props) => {
         <p>{document.name}</p>
       </div>
     )
-  }
+  };
 
   const renderMessages = (message, index) => {
     if (message.type === 'FILE') {
