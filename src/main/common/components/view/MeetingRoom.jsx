@@ -216,7 +216,7 @@ const MeetingRoom = (props) => {
     recorder.onstop = handleStop;
 
     setMediaRecorder(recorder);
-  }
+  };
 
   const handleDataAvailable = (e) => {
     recordedChunks.push(e.data);
@@ -237,7 +237,7 @@ const MeetingRoom = (props) => {
         type: blob.type,
         size: blob.size,
         payload: result
-      }
+      };
 
       post(
         `${host}/api/v1/document/saveToFile`,
@@ -251,7 +251,7 @@ const MeetingRoom = (props) => {
         false
       );
     }
-  }
+  };
 
   const stopShareScreen = () => {
     setScreenShared(false);

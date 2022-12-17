@@ -39,9 +39,9 @@ class SocketManager {
   };
 
   init = () => {
-    // let socket = io.connect('http://svn.agilemotion.co.za');
+    //let socket = io.connect('http://svn.agilemotion.co.za');
     let socket = io.connect('http://localhost:8000');
-    // let socket = io.connect('http://100.72.124.104:8000');
+    //let socket = io.connect('http://100.72.124.104:8000');
     let userDetails = appManager.getUserDetails();
 
     for (const value of Object.keys(MessageType)) {
@@ -259,7 +259,6 @@ class SocketManager {
   };
 
   declineDirectCall = (callerSocketId, callRoom) => {
-    alert("REJ : " + callRoom)
     this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId, roomID: callRoom, direct: true, reject: true});
   }
 }

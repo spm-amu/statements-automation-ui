@@ -61,7 +61,7 @@ const SignIn = (props) => {
             setRedirectData({
               meetingId: response.meetingID,
               tokenUserId: response.userId
-            })
+            });
             setIsMeetingRedirect(true);
           },
           (e) => {
@@ -75,11 +75,11 @@ const SignIn = (props) => {
           false
         );
       }
-    })
+    });
 
     if (location.state) {
       setUsername(location.state.tokenUserId);
-      setRedirectData(location.state)
+      setRedirectData(location.state);
       setIsMeetingRedirect(true);
     }
   }, []);
