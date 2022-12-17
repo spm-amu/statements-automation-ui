@@ -22,7 +22,7 @@
 
 .fc-popover-body .fc-event-time {
   color: white;
-  margin-bottom: unset;
+  margin-bottom: unset !important;
 }
 
 .fc-popover-body .fc-event-title {
