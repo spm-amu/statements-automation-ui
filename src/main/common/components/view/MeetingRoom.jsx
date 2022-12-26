@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import './Calendar.css';
 import './MeetingRoom.css';
@@ -18,8 +18,9 @@ import appManager from "../../../common/service/AppManager";
 import MeetingRoomSummary from "../vc/MeetingRoomSummary";
 import {get, host, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
-import { osName } from "react-device-detect";
-const { electron } = window;
+import {osName} from "react-device-detect";
+
+const {electron} = window;
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -197,7 +198,7 @@ const MeetingRoom = (props) => {
 
   const handleScreenShareStream = (stream) => {
     tmpVideoTrack.current = currentUserStream.getVideoTracks()[0];
-    currentUserStream.addTrack(stream.getVideoTracks()[0])
+    currentUserStream.addTrack(stream.getVideoTracks()[0]);
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
@@ -207,10 +208,10 @@ const MeetingRoom = (props) => {
       );
     });
 
-    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0])
+    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
     userVideo.current.srcObject = currentUserStream;
 
-    const options = { mimeType: "video/webm; codecs=vp9" };
+    const options = {mimeType: "video/webm; codecs=vp9"};
     const recorder = new MediaRecorder(stream, options);
     recorder.ondataavailable = handleDataAvailable;
     recorder.onstop = handleStop;
@@ -229,7 +230,7 @@ const MeetingRoom = (props) => {
 
     const reader = new FileReader();
     reader.readAsDataURL(blob);
-    reader.onload = function(evt) {
+    reader.onload = function (evt) {
       const result = evt.target.result;
       const data = {
         meetingId: selectedMeeting.id,
@@ -416,7 +417,7 @@ const MeetingRoom = (props) => {
   };
 
   const addUserToLobby = (data) => {
-    permitAudio.play();
+    //permitAudio.play();
     let item = {
       user: data.userAlias,
       socketId: data.id
@@ -436,6 +437,7 @@ const MeetingRoom = (props) => {
   };
 
   const join = () => {
+    console.log("\n\n\n\nSELECTED MEETING : ", selectedMeeting);
     let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
@@ -535,7 +537,6 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     fetchChats();
-
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     navigator.mediaDevices
       .getUserMedia({video: true, audio: true})
@@ -588,10 +589,11 @@ const MeetingRoom = (props) => {
       socketManager.endCall(isDirectCall, callerUser);
     }
 
+    closeStreams();
     props.onEndCall();
   };
 
-  const onCallEnded = () => {
+  const closeStreams = () => {
     if (currentUserStream) {
       hangUpAudio.play();
       currentUserStream
@@ -607,6 +609,11 @@ const MeetingRoom = (props) => {
       currentUserStream.getTracks()[0].enabled = false;
       currentUserStream.getTracks()[0].stop();
     }
+
+  };
+
+  const onCallEnded = () => {
+    closeStreams();
 
     socketManager.removeSubscriptions(eventHandler);
     socketManager.clearUserToPeerMap();
@@ -680,7 +687,11 @@ const MeetingRoom = (props) => {
   }, [audioMuted]);
 
   return (
-    <div className={'row meeting-container'}>
+    <div className={'row meeting-container'} style={{
+      height: displayState === 'MAXIMIZED' ? '100%' : '90%',
+      maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
+      overflow: displayState === 'MAXIMIZED' ? 'auto' : 'hidden',
+    }}>
       <div className={'col'} style={{paddingLeft: '0', paddingRight: '0'}}>
         <div style={{height: '100%'}}>
           <div style={{
@@ -744,7 +755,7 @@ const MeetingRoom = (props) => {
                           stopRecordingMeeting();
                         },
                         endCall: () => {
-                          if (isDirectCall && participants.length === 0) {
+                          if (userToCall && isDirectCall && participants.length === 0) {
                             console.log("USER TO CALL : ", userToCall);
                             socketManager.emitEvent(MessageType.CANCEL_CALL, {
                               userId: userToCall.userId,
@@ -792,7 +803,13 @@ const MeetingRoom = (props) => {
       </div>
       {
         sideBarOpen && sideBarTab &&
-        <div style={{width: '320px'}}>
+        <div style={displayState === 'MAXIMIZED' ? {
+          width: '320px',
+          margin: '0 8px'
+        } : {
+          width: '100%',
+          height: '100%'
+        }}>
           <ClosablePanel
             closeHandler={(e) => setSideBarOpen(false)}
             title={sideBarTab}
@@ -811,12 +828,14 @@ const MeetingRoom = (props) => {
 
       {
         screenSharePopupVisible &&
-          <SelectScreenShareDialog
-            handleCloseHandler={() => { setScreenSharePopupVisible(false) }}
-            open={screenSharePopupVisible}
-            sources={screenSources}
-            selectSourceHandler={(selectedSource) => selectSourceHandler(selectedSource)}
-          />
+        <SelectScreenShareDialog
+          handleCloseHandler={() => {
+            setScreenSharePopupVisible(false)
+          }}
+          open={screenSharePopupVisible}
+          sources={screenSources}
+          selectSourceHandler={(selectedSource) => selectSourceHandler(selectedSource)}
+        />
       }
     </div>
   );

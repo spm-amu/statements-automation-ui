@@ -1,6 +1,8 @@
 .closable-panel {
   border: 1px solid #e1e1e1;
   border-radius: 4px;
+  background-color: white;
+  margin: 0 8px;
 }
 
 .closable-panel-header {
@@ -26,5 +28,4 @@
 }
 
 .closable-panel-content {
-  height: 95%;
 }

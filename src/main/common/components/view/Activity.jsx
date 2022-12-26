@@ -54,7 +54,7 @@ const Activity = (props) => {
       }}>
         <ActivityList selectionHandler={(selected) => {
           setSelectedChat(null);
-          if (selected.data.chatId) {
+          if (selected.data && selected.data.chatId) {
             get(`${host}/api/v1/chat/fetch/${selected.data.chatId}`, (response) => {
               setSelectedChat(response);
               setSelected(selected);

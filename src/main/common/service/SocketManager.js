@@ -40,6 +40,7 @@ class SocketManager {
 
   init = () => {
     //let socket = io.connect('http://svn.agilemotion.co.za');
+    //let socket = io.connect('http://DEVHOVC03:8000');
     let socket = io.connect('http://localhost:8000');
     //let socket = io.connect('http://100.72.124.104:8000');
     let userDetails = appManager.getUserDetails();
@@ -136,6 +137,9 @@ class SocketManager {
       initiator: true,
       trickle: false,
       stream,
+      config: {
+        iceServers: []
+      }
     });
 
     peer.on('signal', (signal) => {
@@ -164,7 +168,10 @@ class SocketManager {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream
+      stream,
+      config: {
+        iceServers: []
+      }
     });
 
     peer.on("signal", (signal) => {
@@ -186,6 +193,9 @@ class SocketManager {
       initiator: false,
       trickle: false,
       stream,
+      config: {
+        iceServers: []
+      }
     });
 
     peer.on('signal', (signal) => {

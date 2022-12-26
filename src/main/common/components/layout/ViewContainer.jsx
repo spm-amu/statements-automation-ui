@@ -27,6 +27,7 @@ const ViewContainer = (props) => {
   });
 
   const [windowOpen, setWindowOpen] = useState(null);
+  const [refresher, setRefresher] = useState(false);
 
   const navigate = useNavigate();
 
@@ -129,6 +130,8 @@ const ViewContainer = (props) => {
             if (attributes.currentView === 'joinMeetingSettings') {
               navigate('/view/calendar');
             }
+
+            setRefresher(!refresher);
           }
         }>
           <MeetingRoom

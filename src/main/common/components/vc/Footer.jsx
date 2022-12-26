@@ -45,12 +45,12 @@ const Footer = (props) => {
                    userStream={userStream}
                    videoMuted={videoMuted}
                    audioMuted={audioMuted}
+                   displayState={displayState}
                    step={step}
           />
         </div>
         {
-          displayState === 'MAXIMIZED' &&
-          <div className={'col video'}>
+          <div className={'col video'} style={displayState === 'MAXIMIZED' ? null : {display: 'none'}}>
             <div
               style={{display: 'flex', justifyContent: 'flex-end'}}
             >

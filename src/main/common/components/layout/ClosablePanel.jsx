@@ -29,7 +29,7 @@ const ClosablePanel = (props) => {
           </IconButton>
         </div>
       </div>
-      <div className={'closable-panel-content'}>
+      <div className={'closable-panel-content'} style={{height: 'calc(93% - 72px)', maxHeight: 'calc(93% - 72px)', overflowY: 'auto'}}>
         {
           children
         }

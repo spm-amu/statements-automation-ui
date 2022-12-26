@@ -14,6 +14,7 @@ const Toolbar = (props) => {
   const {
     userStream,
     userVideo,
+    displayState,
     eventHandler,
     handRaised,
     step
@@ -128,28 +129,31 @@ const Toolbar = (props) => {
           )}
         </IconButton>
         {" "}
-        <IconButton
-          onClick={() => {
+        {
+          step === 'SESSION' && displayState === 'MAXIMIZED' &&
+          <IconButton
+            onClick={() => {
               if (screenShared) {
                 stopShareScreen();
               } else {
                 shareScreen();
               }
-          }}
-          style={{
-            backgroundColor: screenShared ? '#8eb2f5' : '#404239',
-            color: 'white',
-            marginRight: '4px'
-          }}
-        >
-          {screenShared ? (
-            <Icon id={'CANCEL_PRESENTATION'}/>
-          ) : (
-            <Icon id={'PRESENT_TO_ALL'}/>
-          )}
-        </IconButton>
+            }}
+            style={{
+              backgroundColor: screenShared ? '#8eb2f5' : '#404239',
+              color: 'white',
+              marginRight: '4px'
+            }}
+          >
+            {screenShared ? (
+              <Icon id={'CANCEL_PRESENTATION'}/>
+            ) : (
+              <Icon id={'PRESENT_TO_ALL'}/>
+            )}
+          </IconButton>
+        }
         {
-          step === 'SESSION' &&
+          step === 'SESSION' && displayState === 'MAXIMIZED' &&
           <IconButton
             style={{
               backgroundColor: '#404239',
@@ -173,7 +177,7 @@ const Toolbar = (props) => {
           <Icon id={'CALL_END'}/>
         </IconButton>
         {
-          step === 'SESSION' &&
+          step === 'SESSION' && displayState === 'MAXIMIZED' &&
           <IconButton
             onClick={(e) => showPeople()}
             style={{

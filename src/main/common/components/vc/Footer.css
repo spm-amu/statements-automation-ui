@@ -3,7 +3,7 @@
   grid-template-rows: auto auto;
   gap: 20px;
   padding: 16px 0;
-  height: 180px;
+  max-height: 180px;
 }
 
 .vc-footer .toolbar-container {
@@ -17,7 +17,6 @@
 .vc-footer .video,
 .vc-footer .time {
   display: flex;
-  min-width: 280px;
   max-width: 280px;
 }
 
@@ -25,7 +24,6 @@
 @media screen and (max-width:800px) {
   .vc-footer .video,
   .vc-footer .time {
-    min-width: 100%;
     max-width: 100%;
     align-items: center;
     justify-content: center;

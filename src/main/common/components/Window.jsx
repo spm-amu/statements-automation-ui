@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import "./SearchBar.css"
+import "./Window.css"
 import withStyles from "@material-ui/core/styles/withStyles";
 import Dialog from "@material-ui/core/Dialog";
 import Draggable from "react-draggable";

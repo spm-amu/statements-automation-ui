@@ -6,98 +6,60 @@ import Icon from '../Icon';
 import {useNavigate} from 'react-router-dom';
 import Utils from '../../Utils';
 import appManager from "../../../common/service/AppManager";
+import {Stream} from "../../service/Stream";
 
 const MeetingSettingsComponent = (props) => {
-  const userStream = useRef();
   const userVideo = useRef();
-  const audioTrack = useRef();
-  const videoTrack = useRef();
+  const [stream, setStream] = useState();
+  const [videoOptionDisabled, setVideoOptionDisabled] = useState(false);
   const [videoMuted, setVideoMuted] = useState(false);
   const [audioMuted, setAudioMuted] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState('');
   const {selectedMeeting} = props;
   const navigate = useNavigate();
 
-  const localVideoStream = () => {
-    let userMedia = navigator.mediaDevices
-      .getUserMedia({
-        audio: true,
-        video: {
-          width: 240,
-          height: 240,
-        },
-      });
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.close();
+      }
+    };
+  }, []);
 
-    if (userMedia && userVideo.current) {
-      userMedia
-        .then((myStream) => {
-          userStream.current = myStream;
-          videoTrack.current = userStream.current.getTracks()[1];
-          audioTrack.current = userStream.current.getTracks()[0];
 
-          if (userVideo.current) {
-            userVideo.current.srcObject = myStream;
-          }
-        });
-    }
+  const setupStream = () => {
+    let videoStream = new Stream();
+    videoStream.init(true, false, (stream) => {
+      userVideo.current.srcObject = stream;
+      setVideoOptionDisabled(false);
+    }, (e) => {
+      setVideoOptionDisabled(true);
+    });
+    setStream(videoStream);
   };
 
   useEffect(() => {
-    if (userVideo.current) {
-      userVideo.current.srcObject = userStream.current;
-    }
-  }, [userStream.current]);
-
-  useEffect(() => {
-    if (userVideo.current) {
-      userVideo.current.srcObject = userStream.current;
-    }
-  }, [userVideo.current]);
-
-  useEffect(() => {
-    localVideoStream();
+    setupStream();
     let userDetails = appManager.getUserDetails();
     setLoggedInUser(userDetails.name)
   }, []);
 
   const muteVideo = () => {
-    if (userVideo.current.srcObject) {
-      videoTrack.current.enabled = !videoTrack.current.enabled;
-    }
-
+    stream.close();
     setVideoMuted((prevStatus) => !prevStatus);
+    setupStream();
   };
 
   const muteAudio = () => {
-    if (userVideo.current.srcObject) {
-      audioTrack.current.enabled = !audioTrack.current.enabled;
-    }
-
     setAudioMuted((prevStatus) => !prevStatus);
   };
 
+  const closeStreams = () => {
+    stream.close();
+  };
+
   const close = () => {
-
-    // stop all tracks - audio and video
-    if (userStream.current) {
-      userStream.current
-        .getTracks()
-        .forEach((track) => {
-          track.enabled = false;
-          track.stop()
-        });
-    }
-
-    if (videoTrack.current) {
-      videoTrack.enabled = false;
-      videoTrack.current.stop();
-    }
-
-    if (audioTrack.current) {
-      audioTrack.current.enabled = false;
-      audioTrack.current.stop();
-    }
-
+    closeStreams();
     navigate("/view/calendar");
   };
 
@@ -157,10 +119,9 @@ const MeetingSettingsComponent = (props) => {
               )}
               <Switch
                 onChange={(e, value) => {
-                  if (userStream.current) {
-                    muteVideo();
-                  }
+                  muteVideo();
                 }}
+                disabled={videoOptionDisabled}
                 value={videoMuted}
                 defaultChecked
                 color="primary"
