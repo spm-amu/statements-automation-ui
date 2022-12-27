@@ -73,8 +73,8 @@ const MeetingRoom = (props) => {
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
   const [currentUserStream, setCurrentUserStream] = useState(null);
-  const [videoMuted, setVideoMuted] = useState(props.videoMuted);
-  const [audioMuted, setAudioMuted] = useState(props.audioMuted);
+  const [videoMuted, setVideoMuted] = useState(null);
+  const [audioMuted, setAudioMuted] = useState(null);
   const [handRaised, setHandRaised] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
@@ -536,9 +536,9 @@ const MeetingRoom = (props) => {
   };
 
   const setupStream = () => {
-    let videoStream = new Stream();
-    videoStream.init(true, true, (stream) => {
-      setCurrentUserStream(videoStream);
+    let currentStream = new Stream();
+    currentStream.init(!videoMuted, !audioMuted, (stream) => {
+      setCurrentUserStream(currentStream);
     }, (e) => {
     });
   };
@@ -554,12 +554,14 @@ const MeetingRoom = (props) => {
     if (userVideo.current && !userVideo.current.srcObject) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
-
-    if (currentUserStream && userVideo.current && userVideo.current.srcObject) {
-      toggleAudio();
-      toggleVideo();
-    }
   }, [userVideo.current, currentUserStream]);
+
+  useEffect(() => {
+    if (currentUserStream) {
+      setAudioMuted(props.audioMuted);
+      setVideoMuted(props.videoMuted);
+    }
+  }, [currentUserStream]);
 
   const handleSidebarToggle = (e) => {
     let paper = document.getElementById('meetingDialogPaper');
@@ -655,21 +657,21 @@ const MeetingRoom = (props) => {
       if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         if (!screenShared) {
           currentUserStream.enableVideo(!videoMuted);
-          emitAVSettingsChange();
         }
       }
     }
   }
 
   useEffect(() => {
-    toggleVideo();
-  }, [videoMuted]);
+    if(audioMuted !== null && videoMuted !== null) {
+      toggleVideo();
+      toggleAudio();
+
+      emitAVSettingsChange();
+    }
+  }, [audioMuted, videoMuted]);
 
   function toggleAudio() {
-    if(currentUserStream) {
-      console.log("\n\n\nAudio tracks : ", currentUserStream.getAudioTracks());
-    }
-
     if (currentUserStream && currentUserStream.getAudioTracks() && currentUserStream.getAudioTracks().length > 0) {
       let audioTrack = currentUserStream.getAudioTracks()[0];
       if (audioTrack && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
@@ -678,10 +680,6 @@ const MeetingRoom = (props) => {
       }
     }
   }
-
-  useEffect(() => {
-    toggleAudio();
-  }, [audioMuted]);
 
   return (
     <div className={'row meeting-container'} style={{

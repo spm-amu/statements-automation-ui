@@ -9,11 +9,9 @@ const Toolbar = (props) => {
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [isRecording, setIsRecording] = useState(false);
-  const [screenShared, setScreenShared] = useState(false);
+  const [screenShared] = useState(false);
 
   const {
-    userStream,
-    userVideo,
     displayState,
     eventHandler,
     handRaised,
@@ -39,6 +37,14 @@ const Toolbar = (props) => {
   useEffect(() => {
     eventHandler.onMuteVideo(videoMuted);
   }, [videoMuted]);
+
+  useEffect(() => {
+    setVideoMuted(props.videoMuted);
+  }, [props.videoMuted]);
+
+  useEffect(() => {
+    setAudioMuted(props.audioMuted);
+  }, [props.audioMuted]);
 
   useEffect(() => {
     eventHandler.onMuteAudio(audioMuted);
