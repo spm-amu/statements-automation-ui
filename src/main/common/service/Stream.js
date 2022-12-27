@@ -47,8 +47,12 @@ export class Stream {
     this.obj.removeTrack(track);
   };
 
-  getVideoTracks = (track) => {
-    this.obj.getVideoTracks();
+  getVideoTracks = () => {
+    return this.obj.getVideoTracks();
+  };
+
+  getAudioTracks = () => {
+    return this.obj.getAudioTracks();
   };
 
   getTracks = () => {

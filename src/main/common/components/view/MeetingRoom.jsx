@@ -244,7 +244,6 @@ const MeetingRoom = (props) => {
       post(
         `${host}/api/v1/document/saveToFile`,
         (response) => {
-          console.log('\n\n\nVIDEO SAVED!!!!')
         },
         (e) => {
         },
@@ -538,7 +537,7 @@ const MeetingRoom = (props) => {
 
   const setupStream = () => {
     let videoStream = new Stream();
-    videoStream.init(true, false, (stream) => {
+    videoStream.init(true, true, (stream) => {
       setCurrentUserStream(videoStream);
     }, (e) => {
     });
@@ -667,9 +666,13 @@ const MeetingRoom = (props) => {
   }, [videoMuted]);
 
   function toggleAudio() {
-    if (currentUserStream) {
-      let audioTrack = currentUserStream.getTracks()[0];
-      if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
+    if(currentUserStream) {
+      console.log("\n\n\nAudio tracks : ", currentUserStream.getAudioTracks());
+    }
+
+    if (currentUserStream && currentUserStream.getAudioTracks() && currentUserStream.getAudioTracks().length > 0) {
+      let audioTrack = currentUserStream.getAudioTracks()[0];
+      if (audioTrack && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         audioTrack.enabled = !audioMuted;
         emitAVSettingsChange();
       }

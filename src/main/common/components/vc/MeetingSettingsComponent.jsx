@@ -27,7 +27,7 @@ const MeetingSettingsComponent = (props) => {
   }, []);
 
   useEffect(() => {
-    if(stream) {
+    if (stream) {
       stream.enableVideo(!videoMuted);
     }
   }, [videoMuted]);
@@ -139,9 +139,7 @@ const MeetingSettingsComponent = (props) => {
               )}
               <Switch
                 onChange={(e, value) => {
-                  if (userStream.current) {
-                    muteAudio();
-                  }
+                  muteAudio();
                 }}
                 value={audioMuted}
                 defaultChecked
