@@ -19,6 +19,7 @@ import MeetingRoomSummary from "../vc/MeetingRoomSummary";
 import {get, host, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
 import {osName} from "react-device-detect";
+import {Stream} from "../../service/Stream";
 
 const {electron} = window;
 
@@ -209,7 +210,7 @@ const MeetingRoom = (props) => {
     });
 
     currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
-    userVideo.current.srcObject = currentUserStream;
+    userVideo.current.srcObject = currentUserStream.obj;
 
     const options = {mimeType: "video/webm; codecs=vp9"};
     const recorder = new MediaRecorder(stream, options);
@@ -268,7 +269,7 @@ const MeetingRoom = (props) => {
     });
 
     currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
-    userVideo.current.srcObject = currentUserStream;
+    userVideo.current.srcObject = currentUserStream.obj;
   };
 
   const selectSourceHandler = (selectedSource) => {
@@ -344,7 +345,7 @@ const MeetingRoom = (props) => {
   }, [allUserParticipantsLeft]);
 
   const addUser = (payload) => {
-    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED);
+    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream.obj, MessageType.USER_JOINED);
     joinInAudio.play();
 
     let user = {
@@ -379,7 +380,7 @@ const MeetingRoom = (props) => {
     } else {
       let userPeerMap = [];
       users.forEach((user) => {
-        userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS))
+        userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream.obj, MessageType.ALL_USERS))
       });
 
       let participants = [];
@@ -417,7 +418,7 @@ const MeetingRoom = (props) => {
   };
 
   const addUserToLobby = (data) => {
-    //permitAudio.play();
+    permitAudio.play();
     let item = {
       user: data.userAlias,
       socketId: data.id
@@ -535,19 +536,24 @@ const MeetingRoom = (props) => {
     })
   };
 
+  const setupStream = () => {
+    let videoStream = new Stream();
+    videoStream.init(true, false, (stream) => {
+      setCurrentUserStream(videoStream);
+    }, (e) => {
+    });
+  };
+
   useEffect(() => {
     fetchChats();
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
-    navigator.mediaDevices
-      .getUserMedia({video: true, audio: true})
-      .then((myStream) => {
-        setCurrentUserStream(myStream);
-      });
+    setupStream();
   }, []);
+
 
   useEffect(() => {
     if (userVideo.current && !userVideo.current.srcObject) {
-      userVideo.current.srcObject = currentUserStream;
+      userVideo.current.srcObject = currentUserStream.obj;
     }
 
     if (currentUserStream && userVideo.current && userVideo.current.srcObject) {
@@ -596,18 +602,7 @@ const MeetingRoom = (props) => {
   const closeStreams = () => {
     if (currentUserStream) {
       hangUpAudio.play();
-      currentUserStream
-        .getTracks()
-        .forEach((track) => {
-          track.enabled = false;
-          track.stop()
-        });
-
-      currentUserStream.getTracks()[1].enabled = false;
-      currentUserStream.getTracks()[1].stop();
-
-      currentUserStream.getTracks()[0].enabled = false;
-      currentUserStream.getTracks()[0].stop();
+      currentUserStream.close();
     }
 
   };
@@ -658,10 +653,9 @@ const MeetingRoom = (props) => {
 
   function toggleVideo() {
     if (currentUserStream) {
-      let videoTrack = currentUserStream.getTracks()[1];
       if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         if (!screenShared) {
-          videoTrack.enabled = !videoMuted;
+          currentUserStream.enableVideo(!videoMuted);
           emitAVSettingsChange();
         }
       }
@@ -731,9 +725,9 @@ const MeetingRoom = (props) => {
             }
           </div>
           {
-            currentUserStream &&
+            currentUserStream && currentUserStream.obj &&
             <Footer userVideo={userVideo}
-                    userStream={currentUserStream}
+                    userStream={currentUserStream.obj}
                     audioMuted={audioMuted}
                     videoMuted={videoMuted}
                     handRaised={handRaised}
@@ -825,7 +819,6 @@ const MeetingRoom = (props) => {
           </ClosablePanel>
         </div>
       }
-
       {
         screenSharePopupVisible &&
         <SelectScreenShareDialog

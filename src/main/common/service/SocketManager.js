@@ -202,8 +202,8 @@ class SocketManager {
       this.socket.emit(MessageType.RETURNING_SIGNAL, {
         signal,
         callerID: callerId,
-        audioMuted: !stream.getTracks()[1].enabled,
-        videoMuted: !stream.getTracks()[0].enabled
+        audioMuted: stream.getAudioTracks().length === 0 || !stream.getAudioTracks()[0].enabled,
+        videoMuted: stream.getVideoTracks().length === 0 || !stream.getVideoTracks()[0].enabled
       });
     });
 

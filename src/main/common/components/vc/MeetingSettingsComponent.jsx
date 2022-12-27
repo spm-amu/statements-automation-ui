@@ -26,6 +26,11 @@ const MeetingSettingsComponent = (props) => {
     };
   }, []);
 
+  useEffect(() => {
+    if(stream) {
+      stream.enableVideo(!videoMuted);
+    }
+  }, [videoMuted]);
 
   const setupStream = () => {
     let videoStream = new Stream();
@@ -33,8 +38,9 @@ const MeetingSettingsComponent = (props) => {
       userVideo.current.srcObject = stream;
       setVideoOptionDisabled(false);
     }, (e) => {
-      setVideoOptionDisabled(true);
+      //setVideoOptionDisabled(true);
     });
+
     setStream(videoStream);
   };
 
@@ -45,9 +51,7 @@ const MeetingSettingsComponent = (props) => {
   }, []);
 
   const muteVideo = () => {
-    stream.close();
     setVideoMuted((prevStatus) => !prevStatus);
-    setupStream();
   };
 
   const muteAudio = () => {

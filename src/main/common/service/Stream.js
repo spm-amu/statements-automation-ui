@@ -4,37 +4,32 @@ export class Stream {
 
   init = (video = true, audio = true, successHandler, errorhandler) => {
     let userMedia = navigator.mediaDevices
-      .getUserMedia({
+      .getUserMedia(video ? {
         audio: audio,
-        video: video ? {
+        video: {
           width: 240,
           height: 240,
-        } : null
+        }
+      } : {
+        audio: audio,
+        video: false
       });
 
     userMedia
       .then((stream) => {
-        if(audio) {
-          this.audioTrack = stream.getTracks()[0];
-        }
-
-        if(video) {
-          this.videoTrack = stream.getTracks()[1];
-        }
-
         this.obj = stream;
-        if(successHandler) {
+        if (successHandler) {
           successHandler(this.obj);
         }
       }).catch((e) => {
-        if(errorhandler) {
-          errorhandler(e);
-        }
+      if (errorhandler) {
+        errorhandler(e);
+      }
     });
   };
 
   close = () => {
-    if(this.obj) {
+    if (this.obj) {
       this.obj
         .getTracks()
         .forEach((track) => {
@@ -42,22 +37,45 @@ export class Stream {
           track.stop()
         });
     }
+  };
 
-    if (this.audioTrack) {
-      this.audioTrack.enabled = false;
-      this.audioTrack.stop();
-    }
+  addTrack = (track) => {
+    this.obj.addTrack(track);
+  };
 
-    if (this.videoTrack) {
-      this.videoTrack.enabled = false;
-      this.videoTrack.stop();
-    }
+  removeTrack = (track) => {
+    this.obj.removeTrack(track);
+  };
+
+  getVideoTracks = (track) => {
+    this.obj.getVideoTracks();
+  };
+
+  getTracks = () => {
+    return this.obj.getTracks();
   };
 
   enableVideo = (enabled) => {
-    if(this.videoTrack) {
-      this.videoTrack.enabled = enabled;
-      this.videoTrack.stop();
+    if (!enabled) {
+      this.obj
+        .getVideoTracks()
+        .forEach((track) => {
+          track.enabled = false;
+          track.stop();
+          this.obj.removeTrack(track);
+        });
+    } else {
+      let userMedia = navigator.mediaDevices
+        .getUserMedia(
+          {
+            audio: false,
+            video: true
+          });
+      userMedia
+        .then((stream) => {
+          this.videoTrack = stream.getTracks()[0];
+          this.obj.addTrack(this.videoTrack);
+        });
     }
   }
 }
