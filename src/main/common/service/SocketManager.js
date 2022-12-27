@@ -130,7 +130,7 @@ class SocketManager {
     this.subscriptions.splice(0, this.subscriptions.length);
   };
 
-  createPeer = (userToSignal, stream) => {
+  createPeer = (userToSignal, stream, audioMuted, videoMuted) => {
     let userDetails = appManager.getUserDetails();
 
     const peer = new Peer({
@@ -150,8 +150,8 @@ class SocketManager {
         name: userDetails.name,
         userAlias: userDetails.userId,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
-        audioMuted: !stream.getTracks()[1].enabled,
-        videoMuted: !stream.getTracks()[0].enabled
+        audioMuted: audioMuted,
+        videoMuted: videoMuted
       });
     });
 
@@ -188,7 +188,7 @@ class SocketManager {
     return  peer;
   };
 
-  addPeer(callerId, stream) {
+  addPeer(callerId, stream, audioMuted, videoMuted) {
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -202,8 +202,8 @@ class SocketManager {
       this.socket.emit(MessageType.RETURNING_SIGNAL, {
         signal,
         callerID: callerId,
-        audioMuted: stream.getAudioTracks().length === 0 || !stream.getAudioTracks()[0].enabled,
-        videoMuted: stream.getVideoTracks().length === 0 || !stream.getVideoTracks()[0].enabled
+        audioMuted: audioMuted,
+        videoMuted: videoMuted
       });
     });
 
@@ -249,9 +249,9 @@ class SocketManager {
     item.peer.signal(payload.signal);
   };
 
-  mapUserToPeer = (payload, stream, eventType) => {
-    const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.id, stream) :
-      this.addPeer(payload.callerID, stream);
+  mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted) => {
+    const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.id, stream, audioMuted, videoMuted) :
+      this.addPeer(payload.callerID, stream, audioMuted, videoMuted);
 
     let item = {
       peer: peer,

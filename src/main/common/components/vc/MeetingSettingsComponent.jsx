@@ -11,8 +11,8 @@ import {Stream} from "../../service/Stream";
 const MeetingSettingsComponent = (props) => {
   const userVideo = useRef();
   const [stream, setStream] = useState();
-  const [videoOptionDisabled, setVideoOptionDisabled] = useState(false);
-  const [videoMuted, setVideoMuted] = useState(false);
+  const [videoOptionDisabled, setVideoOptionDisabled] = useState(true);
+  const [videoMuted, setVideoMuted] = useState(true);
   const [audioMuted, setAudioMuted] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState('');
   const {selectedMeeting} = props;
@@ -37,8 +37,10 @@ const MeetingSettingsComponent = (props) => {
     videoStream.init(true, false, (stream) => {
       userVideo.current.srcObject = stream;
       setVideoOptionDisabled(false);
+      setVideoMuted(false);
     }, (e) => {
-      //setVideoOptionDisabled(true);
+      console.log(e);
+      setVideoOptionDisabled(true);
     });
 
     setStream(videoStream);
@@ -61,6 +63,7 @@ const MeetingSettingsComponent = (props) => {
   const closeStreams = () => {
     stream.close();
   };
+
 
   const close = () => {
     closeStreams();
@@ -127,7 +130,7 @@ const MeetingSettingsComponent = (props) => {
                 }}
                 disabled={videoOptionDisabled}
                 value={videoMuted}
-                defaultChecked
+                checked={!videoMuted}
                 color="primary"
               />
             </td>

@@ -73,8 +73,8 @@ const MeetingRoom = (props) => {
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
   const [currentUserStream, setCurrentUserStream] = useState(null);
-  const [videoMuted, setVideoMuted] = useState(null);
-  const [audioMuted, setAudioMuted] = useState(null);
+  const [videoMuted, setVideoMuted] = useState(props.videoMuted);
+  const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
@@ -88,7 +88,6 @@ const MeetingRoom = (props) => {
   const recordedChunks = [];
 
   const userVideo = useRef();
-  const screenTrack = useRef();
   const tmpVideoTrack = useRef();
 
   const handler = () => {
@@ -311,7 +310,7 @@ const MeetingRoom = (props) => {
           console.log(e)
         });
     }
-  }
+  };
 
   const shareScreen = () => {
     electron.ipcRenderer.getSources()
@@ -344,9 +343,10 @@ const MeetingRoom = (props) => {
   }, [allUserParticipantsLeft]);
 
   const addUser = (payload) => {
-    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream.obj, MessageType.USER_JOINED);
+    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream.obj, MessageType.USER_JOINED, audioMuted, videoMuted);
     joinInAudio.play();
 
+    console.log("ADD USER : ", payload);
     let user = {
       peerID: userToPeerItem.user.callerID,
       userId: userToPeerItem.user.userAlias,
@@ -379,7 +379,8 @@ const MeetingRoom = (props) => {
     } else {
       let userPeerMap = [];
       users.forEach((user) => {
-        userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream.obj, MessageType.ALL_USERS))
+        console.log("\n\n\nADDING PART : ", user);
+        userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream.obj, MessageType.ALL_USERS, audioMuted, videoMuted))
       });
 
       let participants = [];
@@ -438,6 +439,8 @@ const MeetingRoom = (props) => {
 
   const join = () => {
     console.log("\n\n\n\nSELECTED MEETING : ", selectedMeeting);
+    console.log("Video muted : ", videoMuted);
+
     let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
@@ -537,7 +540,7 @@ const MeetingRoom = (props) => {
 
   const setupStream = () => {
     let currentStream = new Stream();
-    currentStream.init(!videoMuted, !audioMuted, (stream) => {
+    currentStream.init(!videoMuted, true, (stream) => {
       setCurrentUserStream(currentStream);
     }, (e) => {
     });
@@ -555,13 +558,6 @@ const MeetingRoom = (props) => {
       userVideo.current.srcObject = currentUserStream.obj;
     }
   }, [userVideo.current, currentUserStream]);
-
-  useEffect(() => {
-    if (currentUserStream) {
-      setAudioMuted(props.audioMuted);
-      setVideoMuted(props.videoMuted);
-    }
-  }, [currentUserStream]);
 
   const handleSidebarToggle = (e) => {
     let paper = document.getElementById('meetingDialogPaper');

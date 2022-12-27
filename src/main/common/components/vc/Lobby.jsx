@@ -7,7 +7,6 @@ import Utils from '../../Utils';
 const WAITING_FOR_OTHERS_TO_JOIN_MESSAGE = 'Waiting for others to join';
 const ATTENDEE_WAITING_FOR_PERMISION_MESSAGE = 'Waiting for the meeting host to let you in';
 
-
 const Lobby = (props) => {
   const {
     meetingTitle,
