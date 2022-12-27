@@ -658,7 +658,6 @@ const MeetingRoom = (props) => {
     }
   }
 
-
   useEffect(() => {
     if(audioMuted !== null && videoMuted !== null) {
       toggleVideo();
