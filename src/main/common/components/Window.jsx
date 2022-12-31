@@ -73,7 +73,7 @@ const Window = (props) => {
         paper.style.color = '#FFFFFF';
         paper.style.backgroundColor = '#000000';
         paper.style.width = '700px';
-        paper.style.height = '350px';
+        paper.style.height = '400px';
         paper.style.margin = '0 16px 16px 16px';
 
         let header = document.getElementsByClassName('dialogHeader')[0];

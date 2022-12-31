@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 
 import './Calendar.css';
 import './MeetingRoom.css';
@@ -20,6 +20,11 @@ import {get, host, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
 import {osName} from "react-device-detect";
 import {Stream} from "../../service/Stream";
+import {Checkbox} from "@material-ui/core";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import Radio from "@material-ui/core/Radio";
 
 const {electron} = window;
 
@@ -89,6 +94,7 @@ const MeetingRoom = (props) => {
 
   const userVideo = useRef();
   const tmpVideoTrack = useRef();
+  const timeRemaining = useRef();
 
   const handler = () => {
     return {
@@ -659,7 +665,7 @@ const MeetingRoom = (props) => {
   }
 
   useEffect(() => {
-    if(audioMuted !== null && videoMuted !== null) {
+    if (audioMuted !== null && videoMuted !== null) {
       toggleVideo();
       toggleAudio();
 
@@ -678,156 +684,202 @@ const MeetingRoom = (props) => {
   }
 
   return (
-    <div className={'row meeting-container'} style={{
-      height: displayState === 'MAXIMIZED' ? '100%' : '90%',
-      maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
-      overflow: displayState === 'MAXIMIZED' ? 'auto' : 'hidden',
-    }}>
-      <div className={'col'} style={{paddingLeft: '0', paddingRight: '0'}}>
-        <div style={{height: '100%'}}>
-          <div style={{
-            height: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null,
-            maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null, overflow: 'hidden'
-          }}>
-            {
-              step === Steps.LOBBY ?
-                <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
-                       meetingTitle={selectedMeeting.title}
-                       acceptUserHandler={
-                         (item) => {
-                           acceptUser(item);
-                         }}
-                       rejectUserHandler={
-                         (item) => {
-                           rejectUser(item);
-                         }}
-                       displayState={displayState}
-                       allUserParticipantsLeft={allUserParticipantsLeft}
-                />
-                :
-                displayState === 'MAXIMIZED' ?
-                  <MeetingParticipantGrid participants={participants}
-                                          waitingList={lobbyWaitingList}
-                                          acceptUserHandler={
-                                            (item) => {
-                                              acceptUser(item);
-                                            }}
-                                          rejectUserHandler={
-                                            (item) => {
-                                              rejectUser(item);
-                                            }}
-                  />
-                  :
-                  <MeetingRoomSummary participants={participants} participantsRaisedHands={participantsRaisedHands}/>
-            }
-          </div>
-          {
-            currentUserStream && currentUserStream.obj &&
-            <Footer userVideo={userVideo}
-                    userStream={currentUserStream.obj}
-                    audioMuted={audioMuted}
-                    videoMuted={videoMuted}
-                    handRaised={handRaised}
-                    isRecording={isRecording}
-                    displayState={displayState}
-                    step={step}
-                    toolbarEventHandler={
-                      {
-                        onMuteVideo: (muted) => {
-                          setVideoMuted(muted);
-                        },
-                        onMuteAudio: (muted) => {
-                          setAudioMuted(muted);
-                        },
-                        recordMeeting: () => {
-                          recordMeeting();
-                        },
-                        stopRecording: () => {
-                          stopRecordingMeeting();
-                        },
-                        endCall: () => {
-                          if (userToCall && isDirectCall && participants.length === 0) {
-                            console.log("USER TO CALL : ", userToCall);
-                            socketManager.emitEvent(MessageType.CANCEL_CALL, {
-                              userId: userToCall.userId,
-                              userDescription: userToCall.name,
-                              callerId: appManager.getUserDetails().userId,
-                              callerDescription: appManager.getUserDetails().name,
-                              meetingId: selectedMeeting.id
-                            });
-                            onCallEnded();
-                          } else {
-                            endCall();
-                            props.closeHandler();
-                          }
-                        },
-                        shareScreen: () => {
-                          if (currentUserStream) {
-                            if (screenShared) {
-                              stopShareScreen();
-                            } else {
-                              shareScreen();
-                            }
-                          }
-                        },
-                        stopShareScreen: () => {
-                        },
-                        showPeople: () => {
-                          setSideBarTab('People');
-                          setSideBarOpen(true);
-                        },
-                        showChat: () => {
-                          setSideBarTab('Chat');
-                          setSideBarOpen(true);
-                        },
-                        raiseHand: () => {
-                          raiseHand();
-                        },
-                        lowerHand: () => {
-                          lowerHand();
-                        },
-                      }
-                    }
-            />
-          }
+    <Fragment>
+      <div style={{
+        border: '1px solid rgb(235, 63, 33)',
+        borderRadius: '4px',
+        padding: '8px',
+        margin: '4px',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'rgb(235, 63, 33)'
+        }} className={'row'}>
+          There are 5 minutes remaining. Do you want to automatically extend the meeting?
+        </div>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'rgb(235, 63, 33)'
+        }} className={'row'}>
+          <FormControl>
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              row
+              defaultValue={'NO'}
+              name="radio-buttons-group"
+              onChange={(e, val) => {
+                alert(val);
+              }}
+            >
+              <FormControlLabel
+                value="YES"
+                control={<Radio />}
+                label="Yes"
+              />
+              <FormControlLabel
+                value="NO"
+                control={<Radio />}
+                label="No"
+              />
+            </RadioGroup>
+          </FormControl>
         </div>
       </div>
-      {
-        sideBarOpen && sideBarTab &&
-        <div style={displayState === 'MAXIMIZED' ? {
-          width: '320px',
-          margin: '0 8px'
-        } : {
-          width: '100%',
-          height: '100%'
-        }}>
-          <ClosablePanel
-            closeHandler={(e) => setSideBarOpen(false)}
-            title={sideBarTab}
-          >
-            <MeetingRoomSideBarContent
-              meetingChat={meetingChat}
-              tab={sideBarTab}
-              meetingId={selectedMeeting.id}
-              participantsRaisedHands={participantsRaisedHands}
-              participants={participants}
-              onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
-            />
-          </ClosablePanel>
+      <div className={'row meeting-container'} style={{
+        height: displayState === 'MAXIMIZED' ? '100%' : '90%',
+        maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
+        overflow: displayState === 'MAXIMIZED' ? null : 'hidden',
+      }}>
+        <div className={'col'} style={{paddingLeft: '0', paddingRight: '0'}}>
+          <div style={{height: '100%'}}>
+            <div style={{
+              height: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null,
+              maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null, overflow: 'hidden'
+            }}>
+              {
+                step === Steps.LOBBY ?
+                  <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
+                         meetingTitle={selectedMeeting.title}
+                         acceptUserHandler={
+                           (item) => {
+                             acceptUser(item);
+                           }}
+                         rejectUserHandler={
+                           (item) => {
+                             rejectUser(item);
+                           }}
+                         displayState={displayState}
+                         allUserParticipantsLeft={allUserParticipantsLeft}
+                  />
+                  :
+                  displayState === 'MAXIMIZED' ?
+                    <MeetingParticipantGrid participants={participants}
+                                            waitingList={lobbyWaitingList}
+                                            acceptUserHandler={
+                                              (item) => {
+                                                acceptUser(item);
+                                              }}
+                                            rejectUserHandler={
+                                              (item) => {
+                                                rejectUser(item);
+                                              }}
+                    />
+                    :
+                    <MeetingRoomSummary participants={participants} participantsRaisedHands={participantsRaisedHands}/>
+              }
+            </div>
+            {
+              currentUserStream && currentUserStream.obj &&
+              <Footer userVideo={userVideo}
+                      userStream={currentUserStream.obj}
+                      audioMuted={audioMuted}
+                      videoMuted={videoMuted}
+                      handRaised={handRaised}
+                      isRecording={isRecording}
+                      displayState={displayState}
+                      step={step}
+                      toolbarEventHandler={
+                        {
+                          onMuteVideo: (muted) => {
+                            setVideoMuted(muted);
+                          },
+                          onMuteAudio: (muted) => {
+                            setAudioMuted(muted);
+                          },
+                          recordMeeting: () => {
+                            recordMeeting();
+                          },
+                          stopRecording: () => {
+                            stopRecordingMeeting();
+                          },
+                          endCall: () => {
+                            if (userToCall && isDirectCall && participants.length === 0) {
+                              console.log("USER TO CALL : ", userToCall);
+                              socketManager.emitEvent(MessageType.CANCEL_CALL, {
+                                userId: userToCall.userId,
+                                userDescription: userToCall.name,
+                                callerId: appManager.getUserDetails().userId,
+                                callerDescription: appManager.getUserDetails().name,
+                                meetingId: selectedMeeting.id
+                              });
+                              onCallEnded();
+                            } else {
+                              endCall();
+                              props.closeHandler();
+                            }
+                          },
+                          shareScreen: () => {
+                            if (currentUserStream) {
+                              if (screenShared) {
+                                stopShareScreen();
+                              } else {
+                                shareScreen();
+                              }
+                            }
+                          },
+                          stopShareScreen: () => {
+                          },
+                          showPeople: () => {
+                            setSideBarTab('People');
+                            setSideBarOpen(true);
+                          },
+                          showChat: () => {
+                            setSideBarTab('Chat');
+                            setSideBarOpen(true);
+                          },
+                          raiseHand: () => {
+                            raiseHand();
+                          },
+                          lowerHand: () => {
+                            lowerHand();
+                          },
+                        }
+                      }
+              />
+            }
+          </div>
         </div>
-      }
-      {
-        screenSharePopupVisible &&
-        <SelectScreenShareDialog
-          handleCloseHandler={() => {
-            setScreenSharePopupVisible(false)
-          }}
-          open={screenSharePopupVisible}
-          sources={screenSources}
-          selectSourceHandler={(selectedSource) => selectSourceHandler(selectedSource)}
-        />
-      }
-    </div>
+        {
+          sideBarOpen && sideBarTab &&
+          <div style={displayState === 'MAXIMIZED' ? {
+            width: '320px',
+            margin: '0 8px'
+          } : {
+            width: '100%',
+            height: '100%'
+          }}>
+            <ClosablePanel
+              closeHandler={(e) => setSideBarOpen(false)}
+              title={sideBarTab}
+            >
+              <MeetingRoomSideBarContent
+                meetingChat={meetingChat}
+                tab={sideBarTab}
+                meetingId={selectedMeeting.id}
+                participantsRaisedHands={participantsRaisedHands}
+                participants={participants}
+                onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
+              />
+            </ClosablePanel>
+          </div>
+        }
+        {
+          screenSharePopupVisible &&
+          <SelectScreenShareDialog
+            handleCloseHandler={() => {
+              setScreenSharePopupVisible(false)
+            }}
+            open={screenSharePopupVisible}
+            sources={screenSources}
+            selectSourceHandler={(selectedSource) => selectSourceHandler(selectedSource)}
+          />
+        }
+      </div>
+    </Fragment>
   );
 };
 
