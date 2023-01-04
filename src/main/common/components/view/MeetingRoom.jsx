@@ -20,11 +20,8 @@ import {get, host, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
 import {osName} from "react-device-detect";
 import {Stream} from "../../service/Stream";
-import {Checkbox} from "@material-ui/core";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Radio from "@material-ui/core/Radio";
+import Button from '@material-ui/core/Button';
+import Timer from "../vc/Timer";
 
 const {electron} = window;
 
@@ -86,7 +83,8 @@ const MeetingRoom = (props) => {
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [screenSources, setScreenSources] = useState();
-  const [viewOpen, setViewOpen] = useState(false);
+  const [started, setStarted] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(10);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [eventHandler] = useState({});
 
@@ -94,7 +92,6 @@ const MeetingRoom = (props) => {
 
   const userVideo = useRef();
   const tmpVideoTrack = useRef();
-  const timeRemaining = useRef();
 
   const handler = () => {
     return {
@@ -634,6 +631,10 @@ const MeetingRoom = (props) => {
     removeFromLobbyWaiting(item);
   };
 
+  const startMeeting = (e) => {
+    setStarted(true);
+  };
+
   const rejectUser = (item) => {
     socketManager.emitEvent(MessageType.PERMIT_STATUS, {
       allowed: false,
@@ -685,50 +686,43 @@ const MeetingRoom = (props) => {
 
   return (
     <Fragment>
-      <div style={{
-        border: '1px solid rgb(235, 63, 33)',
-        borderRadius: '4px',
-        padding: '8px',
-        margin: '4px',
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'rgb(235, 63, 33)'
-        }} className={'row'}>
-          There are 5 minutes remaining. Do you want to automatically extend the meeting?
-        </div>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'rgb(235, 63, 33)'
-        }} className={'row'}>
-          <FormControl>
-            <RadioGroup
-              aria-labelledby="demo-radio-buttons-group-label"
-              row
-              defaultValue={'NO'}
-              name="radio-buttons-group"
-              onChange={(e, val) => {
-                alert(val);
-              }}
+      {
+        /*!started && step === 'SESSION' && isHost &&
+        <div className={'row'} style={{margin: '0 0 16px 16px'}}>
+          <Button
+            variant={'contained'}
+            size="large"
+            color={'primary'}
+            onClick={(e) => startMeeting(e)}
+          >
+            START MEETING
+          </Button>
+        </div>*/
+      }
+      {
+        //started && step === 'SESSION' && isHost &&
+        <div className={'row'} style={{margin: '0 0 16px 16px'}}>
+          <div className={'col no-margin'}>
+            <Button
+              variant={'contained'}
+              size="large"
+              color={'primary'}
+              onClick={(e) => endMeeting(e)}
             >
-              <FormControlLabel
-                value="YES"
-                control={<Radio />}
-                label="Yes"
-              />
-              <FormControlLabel
-                value="NO"
-                control={<Radio />}
-                label="No"
-              />
-            </RadioGroup>
-          </FormControl>
+              END MEETING
+            </Button>
+          </div>
+          <div className={'col no-margin'}>
+            <Timer onTimeLapse={
+              (extend) => {
+                if (!extend) {
+                  // TODO : End meeting
+                }
+              }
+            } time={remainingTime}/>
+          </div>
         </div>
-      </div>
+      }
       <div className={'row meeting-container'} style={{
         height: displayState === 'MAXIMIZED' ? '100%' : '90%',
         maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',

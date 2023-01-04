@@ -1,0 +1,29 @@
+.timer-container {
+  min-height: 48px;
+  min-width: 160px;
+  overflow: hidden;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.digit,
+.time-label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.digit {
+  font-size: 20px;
+  border-radius: 4px;
+  border: 1px solid #d1d1d1;
+  background-color: #f1f1f1;
+  margin-right: 2px !important;
+  margin-left: 0 !important;
+}
+
+.time-label {
+  font-size: 12px;
+}

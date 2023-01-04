@@ -714,7 +714,7 @@ const Meeting = (props) => {
                       id="endDate"
                       hasError={errors.endDate}
                       value={value.endDate}
-                      required={recurrenceRepetition === 'NONE'}
+                      required={recurrenceRepetition !== 'NONE'}
                       valueChangeHandler={(date, id) =>
                         handleFormValueChange(date, id, true)
                       }
