@@ -16,6 +16,7 @@ import '../../assets/scss/flatpickr/flatpickr.scss';
 import {get, host} from "../../service/RestService";
 import Utils from '../../Utils';
 import {useNavigate} from 'react-router-dom';
+import moment from "moment";
 
 const eventTemplate = {
   id: '',
@@ -86,6 +87,7 @@ const CalendarComponent = (props) => {
      //  };
      //
      //  setEvents(myEvent.events);
+      console.log("\n\n\n\n\n\nEVENTS : ", response);
       setEvents(response);
     }, (e) => {
 
@@ -104,6 +106,18 @@ const CalendarComponent = (props) => {
     }
 
   }, [selectedEvent]);
+
+  const getEndDate = (event) => {
+    if(event.end) {
+      return new Date(event.end);
+    } else if(event.extendedProps.schedule.rrule) {
+      let startDate = new Date(event.start);
+      return moment(startDate).add("minutes", event.extendedProps.duration).toDate();
+    }
+
+
+    new Date();
+  };
 
   const calendarOptions = {
     events: events,
@@ -161,6 +175,10 @@ const CalendarComponent = (props) => {
     },
 
     eventClick({event: clickedEvent}) {
+      console.log("\n\n\nSTART : ", clickedEvent.start);
+      console.log("EV : ", clickedEvent);
+      let end = getEndDate(clickedEvent);
+
       let value = {
         id: clickedEvent.id,
         title: clickedEvent.title,
@@ -169,10 +187,10 @@ const CalendarComponent = (props) => {
         attendees: clickedEvent.extendedProps.attendees,
         privacyType: clickedEvent.extendedProps.privacyType,
         documents: clickedEvent.extendedProps.documents,
-        startDate: new Date(clickedEvent.start),
-        startTime: new Date(clickedEvent.start),
-        endDate: new Date(clickedEvent.end ? clickedEvent.end : new Date(clickedEvent.extendedProps.schedule.rrule.until)),
-        endTime: new Date(clickedEvent.end ? clickedEvent.end : new Date(clickedEvent.extendedProps.schedule.rrule.until)),
+        startDate: clickedEvent.start,
+        startTime: clickedEvent.start,
+        endDate: end,
+        endTime: end,
         scheduleId: clickedEvent.extendedProps.schedule.id,
         recurringFreq: clickedEvent.extendedProps.schedule.rrule.freq,
         recurringInterval: clickedEvent.extendedProps.schedule.rrule.interval,

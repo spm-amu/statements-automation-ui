@@ -21,7 +21,7 @@ const Timer = (props) => {
   const setupInterval = () => {
     interval.current = setInterval(function () {
       if (minutes === 0) {
-        if (hours === 1) {
+        if (hours > 0) {
           setMinutes(59);
         }
       } else {

@@ -1,5 +1,4 @@
-import React, {useState} from 'react';
-import {X} from 'react-feather';
+import React, {Fragment, useState} from 'react';
 import {components} from 'react-select';
 import {Form} from 'reactstrap';
 import Button from '@material-ui/core/Button';
@@ -132,7 +131,7 @@ const Meeting = (props) => {
         }
       }
 
-      if(props.selectedEvent.recurringFreq) {
+      if (props.selectedEvent.recurringFreq) {
         setRecurrenceRepetition(props.selectedEvent.recurringFreq);
       }
 
@@ -144,14 +143,14 @@ const Meeting = (props) => {
           !Utils.isNull(props.selectedEvent.startDate)
             ? props.selectedEvent.startDate
             : now,
-        recurringStartDate: now,
+        recurringDtstart: now,
         startTime: now,
         endDate:
           !Utils.isNull(props.selectedEvent) &&
           !Utils.isNull(props.selectedEvent.endDate)
             ? props.selectedEvent.endDate
             : now,
-        recurringEndDate: now,
+        recurringUntil: now,
         endTime: now,
         attendees: [],
         locations: [],
@@ -231,21 +230,21 @@ const Meeting = (props) => {
       privacyType: value.privacyType,
       schedule: {
         id: props.selectedEvent ? props.selectedEvent.scheduleId : null,
-        startDate: Utils.getFormattedDate(value.startDate),
+        startDate: recurrenceRepetition !== 'NONE' ? Utils.getFormattedDate(value.recurringDtstart) : Utils.getFormattedDate(value.startDate),
         startTime: value.startTime.toLocaleTimeString('it-IT'),
-        endDate: Utils.getFormattedDate(value.endDate),
+        endDate: recurrenceRepetition !== 'NONE' ? Utils.getFormattedDate(value.recurringUntil) : Utils.getFormattedDate(value.endDate),
         endTime: value.endTime.toLocaleTimeString('it-IT')
       },
     };
 
     if (recurrenceRepetition !== 'NONE') {
-      let recEndDate = new Date(Utils.getFormattedDate(value.endDate));
-      recEndDate.setDate(recEndDate.getDate() + 1);
+      let recEndDate = new Date(Utils.getFormattedDate(value.recurringUntil));
+      //recEndDate.setDate(recEndDate.getDate() + 1);
 
       eventData.schedule.rrule = {
         freq: recurrenceRepetition,
         interval: recurrence.numberOfOccurences,
-        dtstart: new Date(Utils.getFormattedDate(value.startDate) + " " + value.startTime.toLocaleTimeString('it-IT')),
+        dtstart: new Date(Utils.getFormattedDate(value.recurringDtstart)),
         until: recEndDate
       };
 
@@ -535,7 +534,7 @@ const Meeting = (props) => {
       >
         <div style={{marginRight: '4px'}}>
           {
-            !appManager.get('CURRENT_MEETING') &&
+            !appManager.get('CURRENT_MEETING') && !edited &&
             <Button
               variant={'contained'}
               size="large"
@@ -667,110 +666,277 @@ const Meeting = (props) => {
                 />
               </RadioGroup>
             </FormControl>
+            <div style={{margin: '0'}}>
+              <div className={'col-*-*'} style={{width: '20%'}}>
+                <SelectItem
+                  select
+                  style={{width: '100%'}}
+                  id="setEventRecurrenceSelect"
+                  value={recurrenceRepetition}
+                  variant={'outlined'}
+                  margin="dense"
+                  size="small"
+                  label="Repeats"
+                  disabled={readOnly}
+                  valueChangeHandler={handleEventRecurring}
+                  options={recurrenceOptions}
+                />
+              </div>
+              {
+                recurrenceRepetition !== 'NONE' &&
+                <div style={{width: '100%'}}>
+                  <div className={'row no-margin'}>
+                    <div className={'col-*-*'}>
+                      <DatePicker
+                        label="From"
+                        id="recurringDtstart"
+                        disabled={readOnly}
+                        hasError={errors.recurringDtstart}
+                        value={value.recurringDtstart}
+                        required={true}
+                        valueChangeHandler={(date, id) =>
+                          handleFormValueChange(date, id, true)
+                        }
+                        errorMessage={
+                          'A recurring start date is required. Please select a value'
+                        }
+                      />
+                    </div>
+                    <div className={'col-*-*'}
+                         style={{paddingLeft: '8px'}}>
+                      <TimePicker
+                        label={"At"}
+                        disabled={readOnly}
+                        id="startTime"
+                        hasError={errors.startTime}
+                        value={value.startTime}
+                        required={true}
+                        valueChangeHandler={(date, id) =>
+                          handleFormValueChange(date, id, true)
+                        }
+                        errorMessage={
+                          'A recurring end time is required. Please select a value'
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className={'row no-margin'}>
+                    <div style={{marginRight: '8px'}}>
+                      <TextField
+                        style={{width: '100%'}}
+                        disabled={readOnly}
+                        label="Repeat every"
+                        id="numberOfOccurencesId"
+                        type={'number'}
+                        value={recurrence.numberOfOccurences}
+                        required={true}
+                        valueChangeHandler={(e) => {
+                          console.log(e.target.value);
+                          // if(e.target.value > 0 && e.target.value < 100) {
+                          recurrence.numberOfOccurences = e.target.value;
+                          validateRecurrence();
+                          // }
+                        }}
+                        errorMessage={
+                          'Specify number of occurences required. Please enter a number'
+                        }
+                      />
+                    </div>
+                    <div>
+                      <SelectItem
+                        style={{width: '100%'}}
+                        labelId="event-recurrence-label"
+                        id="setEventRecurrenceSelect"
+                        value={recurrenceRepetition}
+                        disabled={readOnly}
+                        valueChangeHandler={handleEventRecurring}
+                        options={recurrenceIntervalOptions}
+                      />
+                    </div>
+                    {recurrenceRepetition === 'WEEKLY' ? (
+                      <div className={'col-*-*'} style={{margin: '8px 0 0 8px'}}>
+                        <FormGroup row>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={recurrence.weekDays.includes('MO')}
+                                onChange={handleWeekdayChange}
+                                value={'MO'}
+                              />
+                            }
+                            label="Mon"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={recurrence.weekDays.includes('TU')}
+                                onChange={handleWeekdayChange}
+                                value={'TU'}
+                              />
+                            }
+                            label="Tue"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={recurrence.weekDays.includes('WE')}
+                                onChange={handleWeekdayChange}
+                                value={'WE'}
+                              />
+                            }
+                            label="Wed"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={recurrence.weekDays.includes('TH')}
+                                onChange={handleWeekdayChange}
+                                value={'TH'}
+                              />
+                            }
+                            label="Thur"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={recurrence.weekDays.includes('FR')}
+                                onChange={handleWeekdayChange}
+                                value={'FR'}
+                              />
+                            }
+                            label="Fri"
+                          />
+                        </FormGroup>
+                      </div>
+                    ) : null}
+                  </div>
+                  {recurrenceRepetition === 'MONTHLY' ? (
+                    <div className={'col-*-*'}>
+                      <RadioGroup
+                        aria-labelledby="radio-monthly-day-type-label"
+                        row
+                        disabled={readOnly}
+                        value={recurrence.monthlyDayType}
+                        name="radio-buttons-group"
+                        onChange={(e, val) => {
+                          recurrence.monthlyDayType = val;
+                          validateRecurrence();
+                        }}
+                      >
+                        <div className={'row no-margin'}>
+                          <div className={'col-*-*'}>
+                            <FormControlLabel
+                              value="monthlyCalendarDay"
+                              control={<Radio/>}
+                              label="On day"
+                            />
+                          </div>
+                          <div className={'col-*-*'} style={{marginRight: '8px'}}>
+                            <TextField
+                              style={{width: '100%'}}
+                              disabled={recurrence.monthlyDayType !== 'monthlyCalendarDay'}
+                              label="On day"
+                              id="byMonthDay"
+                              type={'number'}
+                              value={recurrence.byMonthDay}
+                              required={true}
+                              valueChangeHandler={(e) => {
+                                recurrence.byMonthDay = e.target.value;
+                                validateRecurrence();
+                              }}
+                              errorMessage={'Please enter a number'}
+                            />
+                          </div>
+                        </div>
+                        <div className={'row no-margin'}>
+                          <div className={'col-*-*'}>
+                            <FormControlLabel
+                              value="monthlyWeekDay"
+                              control={<Radio/>}
+                              label="On the"
+                            />
+                          </div>
+                          <div className={'col-*-*'} style={{marginRight: '8px'}}>
+                            <SelectItem
+                              style={{width: '100%'}}
+                              labelId="bysetpos-label"
+                              id="bySetPosSelect"
+                              value={bysetpos}
+                              disabled={recurrence.monthlyDayType !== 'monthlyWeekDay'}
+                              valueChangeHandler={handleBysetpos}
+                              options={bySetPosOptions}
+                            />
+                          </div>
+                          <div className={'col-*-*'}>
+                            <SelectItem
+                              style={{width: '100%'}}
+                              labelId="byWeek-day-label"
+                              id="byWeekDaySelect"
+                              value={byWeekDay}
+                              disabled={recurrence.monthlyDayType !== 'monthlyWeekDay'}
+                              valueChangeHandler={handleByWeekDay}
+                              options={byWeekDayOptions}
+                            />
+                          </div>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  ) : null}
 
+                  <div className={'row no-margin'}>
+                    <div className={'col-*-*'}>
+                      <DatePicker
+                        label="Until"
+                        id="recurringUntil"
+                        disabled={readOnly}
+                        hasError={errors.recurringUntil}
+                        value={value.recurringUntil}
+                        required={true}
+                        valueChangeHandler={(date, id) =>
+                          handleFormValueChange(date, id, true)
+                        }
+                        errorMessage={
+                          'A recurring end date is required. Please select a value'
+                        }
+                      />
+                    </div>
+                    <div className={'col-*-*'}
+                         style={{paddingLeft: '8px'}}>
+                      <TimePicker
+                        label={"At"}
+                        disabled={readOnly}
+                        id="endTime"
+                        hasError={errors.endTime}
+                        value={value.endTime}
+                        required={true}
+                        valueChangeHandler={(date, id) =>
+                          handleFormValueChange(date, id, true)
+                        }
+                        errorMessage={
+                          'A recurring start time is required. Please select a value'
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
             <div>
               <div>
                 <div className={'row no-margin'}>
-                  <div className={'col-*-*'}>
-                    <DatePicker
-                      label={'Start date'}
-                      id="startDate"
-                      disabled={readOnly || recurrenceRepetition !== 'NONE'}
-                      hasError={errors.startDate}
-                      value={value.startDate}
-                      required={true}
-                      valueChangeHandler={(date, id) =>
-                        handleFormValueChange(date, id, true)
-                      }
-                      errorMessage={
-                        'A start date is required. Please select a value'
-                      }
-                    />
-                  </div>
-                  <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
-                    <TimePicker
-                      label="Start time"
-                      id="startTime"
-                      disabled={readOnly}
-                      hasError={errors.startTime}
-                      value={value.startTime}
-                      required={true}
-                      valueChangeHandler={(date, id) =>
-                        handleFormValueChange(date, id, true)
-                      }
-                      errorMessage={
-                        'A start time is required. Please select a value'
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className={'row no-margin'}>
-                  <div className={'col-*-*'}>
-                    <DatePicker
-                      label={'End date'}
-                      disabled={readOnly || recurrenceRepetition !== 'NONE'}
-                      id="endDate"
-                      hasError={errors.endDate}
-                      value={value.endDate}
-                      required={recurrenceRepetition !== 'NONE'}
-                      valueChangeHandler={(date, id) =>
-                        handleFormValueChange(date, id, true)
-                      }
-                      errorMessage={
-                        'An end date is required. Please select a value'
-                      }
-                    />
-                  </div>
-
-                  <div className={'col-*-*'} style={{paddingLeft: '8px'}}>
-                    <TimePicker
-                      label="End time"
-                      disabled={readOnly}
-                      id="endTime"
-                      hasError={errors.endTime}
-                      value={value.endTime}
-                      required={true}
-                      valueChangeHandler={(date, id) =>
-                        handleFormValueChange(date, id, true)
-                      }
-                      errorMessage={
-                        'A end time is required. Please select a value'
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div style={{margin: '8px 0 16px 0'}}>
-              <fieldset className="border p-2">
-                <legend className="w-auto">Recurrence</legend>
-                <div className={'col-*-*'} style={{width: '20%'}}>
-                  <SelectItem
-                    select
-                    style={{width: '100%'}}
-                    id="setEventRecurrenceSelect"
-                    value={recurrenceRepetition}
-                    variant={'outlined'}
-                    margin="dense"
-                    size="small"
-                    label="Repeats"
-                    disabled={readOnly}
-                    valueChangeHandler={handleEventRecurring}
-                    options={recurrenceOptions}
-                  />
-                </div>
-                {
-                  recurrenceRepetition !== 'NONE' &&
-                  <div style={{width: '100%'}}>
-                    <div className={'row no-margin'}>
+                  {
+                    (!Utils.isStringEmpty(props.selectedEvent.id) || recurrenceRepetition === 'NONE') &&
+                    <Fragment>
                       <div className={'col-*-*'}>
                         <DatePicker
-                          label="Recurring Start date"
+                          label={'Start date'}
                           id="startDate"
-                          disabled={readOnly}
+                          disabled={readOnly || recurrenceRepetition !== 'NONE'}
                           hasError={errors.startDate}
                           value={value.startDate}
                           required={true}
@@ -778,202 +944,80 @@ const Meeting = (props) => {
                             handleFormValueChange(date, id, true)
                           }
                           errorMessage={
-                            'A recurring start date is required. Please select a value'
+                            'A start date is required. Please select a value'
                           }
                         />
                       </div>
-                    </div>
-                    <div className={'row no-margin'}>
-                      <div style={{marginRight: '8px'}}>
-                        <TextField
-                          style={{width: '100%'}}
-                          disabled={readOnly}
-                          label="Repeat every"
-                          id="numberOfOccurencesId"
-                          type={'number'}
-                          value={recurrence.numberOfOccurences}
-                          required={true}
-                          valueChangeHandler={(e) => {
-                            console.log(e.target.value);
-                            // if(e.target.value > 0 && e.target.value < 100) {
-                            recurrence.numberOfOccurences = e.target.value;
-                            validateRecurrence();
-                            // }
-                          }}
-                          errorMessage={
-                            'Specify number of occurences required. Please enter a number'
-                          }
-                        />
-                      </div>
-                      <div>
-                        <SelectItem
-                          style={{width: '100%'}}
-                          labelId="event-recurrence-label"
-                          id="setEventRecurrenceSelect"
-                          value={recurrenceRepetition}
-                          disabled={readOnly}
-                          valueChangeHandler={handleEventRecurring}
-                          options={recurrenceIntervalOptions}
-                        />
-                      </div>
-                      {recurrenceRepetition === 'WEEKLY' ? (
-                        <div className={'col-*-*'} style={{margin: '8px 0 0 8px'}}>
-                          <FormGroup row>
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  size="small"
-                                  checked={recurrence.weekDays.includes('MO')}
-                                  onChange={handleWeekdayChange}
-                                  value={'MO'}
-                                />
-                              }
-                              label="Mon"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  size="small"
-                                  checked={recurrence.weekDays.includes('TU')}
-                                  onChange={handleWeekdayChange}
-                                  value={'TU'}
-                                />
-                              }
-                              label="Tue"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  size="small"
-                                  checked={recurrence.weekDays.includes('WE')}
-                                  onChange={handleWeekdayChange}
-                                  value={'WE'}
-                                />
-                              }
-                              label="Wed"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  size="small"
-                                  checked={recurrence.weekDays.includes('TH')}
-                                  onChange={handleWeekdayChange}
-                                  value={'TH'}
-                                />
-                              }
-                              label="Thur"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  size="small"
-                                  checked={recurrence.weekDays.includes('FR')}
-                                  onChange={handleWeekdayChange}
-                                  value={'FR'}
-                                />
-                              }
-                              label="Fri"
-                            />
-                          </FormGroup>
+                      {
+                        recurrenceRepetition === 'NONE' &&
+                        <div className={'col-*-*'}
+                             style={{paddingLeft: !Utils.isStringEmpty(props.selectedEvent.id) || recurrenceRepetition === 'NONE' ? '8px' : '0'}}>
+                          <TimePicker
+                            label={"Start time"}
+                            id="startTime"
+                            disabled={readOnly}
+                            hasError={errors.startTime}
+                            value={value.startTime}
+                            required={true}
+                            valueChangeHandler={(date, id) =>
+                              handleFormValueChange(date, id, true)
+                            }
+                            errorMessage={
+                              'A start time is required. Please select a value'
+                            }
+                          />
                         </div>
-                      ) : null}
-                    </div>
-                    {recurrenceRepetition === 'MONTHLY' ? (
-                      <div className={'col-*-*'}>
-                        <RadioGroup
-                          aria-labelledby="radio-monthly-day-type-label"
-                          row
-                          disabled={readOnly}
-                          value={recurrence.monthlyDayType}
-                          name="radio-buttons-group"
-                          onChange={(e, val) => {
-                            recurrence.monthlyDayType = val;
-                            validateRecurrence();
-                          }}
-                        >
-                          <div className={'row no-margin'}>
-                            <div className={'col-*-*'}>
-                              <FormControlLabel
-                                value="monthlyCalendarDay"
-                                control={<Radio/>}
-                                label="On day"
-                              />
-                            </div>
-                            <div className={'col-*-*'} style={{marginRight: '8px'}}>
-                              <TextField
-                                style={{width: '100%'}}
-                                disabled={recurrence.monthlyDayType !== 'monthlyCalendarDay'}
-                                label="On day"
-                                id="byMonthDay"
-                                type={'number'}
-                                value={recurrence.byMonthDay}
-                                required={true}
-                                valueChangeHandler={(e) => {
-                                  recurrence.byMonthDay = e.target.value;
-                                  validateRecurrence();
-                                }}
-                                errorMessage={'Please enter a number'}
-                              />
-                            </div>
-                          </div>
-                          <div className={'row no-margin'}>
-                            <div className={'col-*-*'}>
-                              <FormControlLabel
-                                value="monthlyWeekDay"
-                                control={<Radio/>}
-                                label="On the"
-                              />
-                            </div>
-                            <div className={'col-*-*'} style={{marginRight: '8px'}}>
-                              <SelectItem
-                                style={{width: '100%'}}
-                                labelId="bysetpos-label"
-                                id="bySetPosSelect"
-                                value={bysetpos}
-                                disabled={recurrence.monthlyDayType !== 'monthlyWeekDay'}
-                                valueChangeHandler={handleBysetpos}
-                                options={bySetPosOptions}
-                              />
-                            </div>
-                            <div className={'col-*-*'}>
-                              <SelectItem
-                                style={{width: '100%'}}
-                                labelId="byWeek-day-label"
-                                id="byWeekDaySelect"
-                                value={byWeekDay}
-                                disabled={recurrence.monthlyDayType !== 'monthlyWeekDay'}
-                                valueChangeHandler={handleByWeekDay}
-                                options={byWeekDayOptions}
-                              />
-                            </div>
-                          </div>
-                        </RadioGroup>
-                      </div>
-                    ) : null}
-
-                    <div className={'row no-margin'}>
+                      }
+                    </Fragment>
+                  }
+                </div>
+              </div>
+              <div>
+                <div className={'row no-margin'}>
+                  {
+                    (!Utils.isStringEmpty(props.selectedEvent.id) || recurrenceRepetition === 'NONE') &&
+                    <Fragment>
                       <div className={'col-*-*'}>
                         <DatePicker
-                          label="Recurring End date"
+                          label={'End date'}
+                          disabled={readOnly || recurrenceRepetition !== 'NONE'}
                           id="endDate"
-                          disabled={readOnly}
                           hasError={errors.endDate}
                           value={value.endDate}
-                          required={true}
+                          required={recurrenceRepetition !== 'NONE'}
                           valueChangeHandler={(date, id) =>
                             handleFormValueChange(date, id, true)
                           }
                           errorMessage={
-                            'A recurring end date is required. Please select a value'
+                            'An end date is required. Please select a value'
                           }
                         />
                       </div>
-                    </div>
-                  </div>
-                }
-              </fieldset>
+                      {
+                        recurrenceRepetition === 'NONE' &&
+                        <div className={'col-*-*'}
+                             style={{paddingLeft: !Utils.isStringEmpty(props.selectedEvent.id) || recurrenceRepetition === 'NONE' ? '8px' : '0'}}>
+                          <TimePicker
+                            label={"End time"}
+                            disabled={readOnly || recurrenceRepetition !== 'NONE'}
+                            id="endTime"
+                            hasError={errors.endTime}
+                            value={value.endTime}
+                            required={true}
+                            valueChangeHandler={(date, id) =>
+                              handleFormValueChange(date, id, true)
+                            }
+                            errorMessage={
+                              'A end time is required. Please select a value'
+                            }
+                          />
+                        </div>
+                      }
+                    </Fragment>
+                  }
+                </div>
+              </div>
             </div>
-
             <div style={{marginTop: '8px'}}>
               <AutoComplete
                 id="attendees"

@@ -538,7 +538,7 @@ const MeetingRoom = (props) => {
       }
     }, (e) => {
 
-    })
+    }, '', false)
   };
 
   const setupStream = () => {
@@ -637,10 +637,24 @@ const MeetingRoom = (props) => {
   };
 
   const startMeeting = (e) => {
-    get(`${host}/api/v1/meeting/start/${selectedMeeting.id}`, (response) => {
-      setRemainingTime(response.remainingTime);
-    }, (e) => {
-    });
+
+
+    const data = {
+      meetingId: selectedMeeting.id,
+      end: selectedMeeting.endDate
+    };
+
+    post(
+      `${host}/api/v1/meeting/start`,
+      (response) => {
+        setRemainingTime(response.remainingTime);
+      },
+      (e) => {
+      },
+      data,
+      '',
+      true
+    );
   };
 
   const rejectUser = (item) => {
