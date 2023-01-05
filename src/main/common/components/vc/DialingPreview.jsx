@@ -99,8 +99,14 @@ const DialingPreview = (props) => {
       <div className={'centered-flex-box w-100'} style={{height: 'calc(100% - 180px)'}}>
         {
           systemAlert ?
-            <div className={'avatar'} data-label={initials}>
-              <Icon id={'CALENDAR'} style={{color: '#FFFFFF'}} fontSize={'large'}/>
+            <div>
+              <div className={'avatar'} data-label={initials}>
+                <Icon id={'CALENDAR'} style={{color: '#FFFFFF'}} fontSize={'large'}/>
+              </div>
+              <div className={'centered-flex-box w-100'}
+                   style={{marginTop: '8px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
+                {systemAlert.params.meetingTitle}
+              </div>
             </div>
             :
             <div className={'avatar'} data-label={initials}/>
@@ -117,7 +123,7 @@ const DialingPreview = (props) => {
                   color="success"
                   fullWidth={true}
                 >
-                  <span>JOIN</span>
+                  <span>JOIN--</span>
                 </Button>
               </div>
               <div style={{paddingLeft: '0'}} className={'col no-margin'}>
@@ -130,7 +136,8 @@ const DialingPreview = (props) => {
                   <span>CLOSE</span>
                 </Button>
               </div>
-            </div> :
+            </div>
+            :
             <>
               <IconButton
                 onClick={onAnswerCall}

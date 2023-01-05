@@ -84,7 +84,7 @@ const MeetingRoom = (props) => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [screenSources, setScreenSources] = useState();
   const [started, setStarted] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(10);
+  const [remainingTime, setRemainingTime] = useState();
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [eventHandler] = useState({});
 
@@ -555,6 +555,11 @@ const MeetingRoom = (props) => {
     setupStream();
   }, []);
 
+  useEffect(() => {
+    if(remainingTime) {
+      setStarted(true);
+    }
+  }, [remainingTime]);
 
   useEffect(() => {
     if (userVideo.current && !userVideo.current.srcObject) {
@@ -632,7 +637,10 @@ const MeetingRoom = (props) => {
   };
 
   const startMeeting = (e) => {
-    setStarted(true);
+    get(`${host}/api/v1/meeting/start/${selectedMeeting.id}`, (response) => {
+      setRemainingTime(response.remainingTime);
+    }, (e) => {
+    });
   };
 
   const rejectUser = (item) => {
@@ -687,7 +695,7 @@ const MeetingRoom = (props) => {
   return (
     <Fragment>
       {
-        /*!started && step === 'SESSION' && isHost &&
+        !started && step === 'SESSION' && isHost &&
         <div className={'row'} style={{margin: '0 0 16px 16px'}}>
           <Button
             variant={'contained'}
@@ -697,10 +705,10 @@ const MeetingRoom = (props) => {
           >
             START MEETING
           </Button>
-        </div>*/
+        </div>
       }
       {
-        //started && step === 'SESSION' && isHost &&
+        started && step === 'SESSION' && isHost &&
         <div className={'row'} style={{margin: '0 0 16px 16px'}}>
           <div className={'col no-margin'}>
             <Button
