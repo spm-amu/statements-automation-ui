@@ -175,8 +175,6 @@ const CalendarComponent = (props) => {
     },
 
     eventClick({event: clickedEvent}) {
-      console.log("\n\n\nSTART : ", clickedEvent.start);
-      console.log("EV : ", clickedEvent);
       let end = getEndDate(clickedEvent);
 
       let value = {

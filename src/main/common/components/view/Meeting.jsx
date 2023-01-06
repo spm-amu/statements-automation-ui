@@ -59,6 +59,7 @@ const Meeting = (props) => {
   const now = new Date();
   const [url, setUrl] = useState('');
   const [hostAttendee, setHostAttendee] = useState(null);
+  const [lapsed, setLapsed] = useState(false);
   const [attendees, setAttendees] = useState([]);
   const [readOnly, setReadOnly] = useState(true);
   const {selectedEvent: selectedMeeting} = props;
@@ -136,6 +137,7 @@ const Meeting = (props) => {
       }
 
       setValue(getInitialValue(props.selectedEvent));
+      setLapsed(props.selectedEvent.startDate < new Date());
     } else {
       setValue({
         startDate:
@@ -509,7 +511,7 @@ const Meeting = (props) => {
           </Button>*/}
         </div>
         {
-          !appManager.get('CURRENT_MEETING') &&
+          !appManager.get('CURRENT_MEETING') && !lapsed &&
           <Button
             variant={'contained'}
             size="large"
@@ -534,7 +536,7 @@ const Meeting = (props) => {
       >
         <div style={{marginRight: '4px'}}>
           {
-            !appManager.get('CURRENT_MEETING') && !edited &&
+            !appManager.get('CURRENT_MEETING') && !lapsed && !edited &&
             <Button
               variant={'contained'}
               size="large"
@@ -545,27 +547,32 @@ const Meeting = (props) => {
             </Button>
           }
         </div>
-        {edited ? (
+        {
+          edited ? (
+            <div style={{marginRight: '4px'}}>
+              <Button
+                variant={'contained'}
+                size="large"
+                color={'primary'}
+                onClick={(e) => handleUpdate(e)}
+              >
+                SEND UPDATE
+              </Button>
+            </div>
+          ) : null
+        }
+        {
+          !lapsed &&
           <div style={{marginRight: '4px'}}>
             <Button
-              variant={'contained'}
+              variant={'text'}
               size="large"
-              color={'primary'}
-              onClick={(e) => handleUpdate(e)}
+              onClick={(e) => handleDelete(e)}
             >
-              SEND UPDATE
+              CANCEL MEETING
             </Button>
           </div>
-        ) : null}
-        <div style={{marginRight: '4px'}}>
-          <Button
-            variant={'text'}
-            size="large"
-            onClick={(e) => handleDelete(e)}
-          >
-            CANCEL MEETING
-          </Button>
-        </div>
+        }
         <Button variant={'text'} size="large" onClick={(e) => handleClose(e)}>
           CLOSE
         </Button>
