@@ -441,9 +441,6 @@ const MeetingRoom = (props) => {
   };
 
   const join = () => {
-    console.log("\n\n\n\nSELECTED MEETING : ", selectedMeeting);
-    console.log("Video muted : ", videoMuted);
-
     let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
@@ -553,6 +550,7 @@ const MeetingRoom = (props) => {
     fetchChats();
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     setupStream();
+    appManager.add('CURRENT_MEETING', selectedMeeting);
   }, []);
 
   useEffect(() => {
@@ -593,6 +591,13 @@ const MeetingRoom = (props) => {
 
   const onLowerHand = (payload) => {
     setParticipantsRaisedHands(participantsRaisedHands.filter((p) => p.userId !== payload.userId));
+  };
+
+  const endMeeting = () => {
+    socketManager.emitEvent(MessageType.END_MEETING, {
+      meetingId: selectedMeeting.id,
+      userId: appManager.getUserDetails().userId
+    })
   };
 
   const endCall = () => {
@@ -729,7 +734,7 @@ const MeetingRoom = (props) => {
               variant={'contained'}
               size="large"
               color={'primary'}
-              onClick={(e) => endMeeting(e)}
+              onClick={(e) => endMeeting()}
             >
               END MEETING
             </Button>
@@ -738,7 +743,7 @@ const MeetingRoom = (props) => {
             <Timer onTimeLapse={
               (extend) => {
                 if (!extend) {
-                  // TODO : End meeting
+                  endMeeting();
                 }
               }
             } time={remainingTime}/>

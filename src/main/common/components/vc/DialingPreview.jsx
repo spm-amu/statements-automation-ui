@@ -123,7 +123,7 @@ const DialingPreview = (props) => {
                   color="success"
                   fullWidth={true}
                 >
-                  <span>JOIN--</span>
+                  <span>JOIN</span>
                 </Button>
               </div>
               <div style={{paddingLeft: '0'}} className={'col no-margin'}>

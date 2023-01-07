@@ -306,13 +306,15 @@ ipcMain.on("receivingCall", async (_event, args) => {
 });
 
 ipcMain.on("systemAlert", async (_event, args) => {
-  if (!dialWindow) {
-    throw new Error('"dialingWindow" is not defined');
-  }
+  if(!(args.currentMeetingId && args.payload.type === 'MEETING_STARTED_ALERT')) {
+    if (!dialWindow) {
+      throw new Error('"dialingWindow" is not defined');
+    }
 
-  dialWindow.webContents.send('dialingViewContent', args);
-  dialWindow.show();
-  dialWindow.focus();
+    dialWindow.webContents.send('dialingViewContent', args);
+    dialWindow.show();
+    dialWindow.focus();
+  }
 });
 
 ipcMain.on("receivingMessage", async (_event, args) => {

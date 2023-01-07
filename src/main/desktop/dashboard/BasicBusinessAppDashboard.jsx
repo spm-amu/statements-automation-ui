@@ -256,9 +256,15 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   const onSystemAlert = (payload) => {
-    electron.ipcRenderer.sendMessage('systemAlert', {
+    let args = {
       payload: payload
-    });
+    };
+
+    if(appManager.get('CURRENT_MEETING')) {
+      args.currentMeetingId = appManager.get('CURRENT_MEETING').id;
+    }
+
+    electron.ipcRenderer.sendMessage('systemAlert', args);
   };
 
   const receiveCall = (payload) => {

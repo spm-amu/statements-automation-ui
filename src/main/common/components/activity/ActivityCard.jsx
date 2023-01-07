@@ -14,6 +14,10 @@ const ActivityCardComponent = React.memo(React.forwardRef((props, ref) => {
     let createdDate = moment(activity.createdDate.split('.')[0]);
     let now = moment(new Date());
 
+    if(!activity.description) {
+      activity.description = "";
+    }
+
     if(now.year() === createdDate.year() && now.month() === createdDate.month() && now.day() === createdDate.day()) {
       setTime(createdDate.format('HH:mm'));
     } else if(now.year() === createdDate.year() && (now.month() !== createdDate.month() || now.day() !== createdDate.day())) {
@@ -56,6 +60,7 @@ const ActivityCardComponent = React.memo(React.forwardRef((props, ref) => {
   };
 
   return (
+    activity && activity.description &&
     <div className={activity.rootEvent ? 'activity-card-wrapper-root' : activity.description.includes('<@u>You</@u>') ? 'activity-card-wrapper-child self' : 'activity-card-wrapper-child'}>
       <div
         className={selected && (selected.id === activity.id) ? 'activity-card-selected' : read ? 'activity-card' : 'activity-card-unread'}
