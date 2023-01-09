@@ -116,7 +116,7 @@ const Chats = (props) => {
             <div style={{width: "70%", height: '100%'}}>
               {
                 selectedChat && <ChatRoom onMessage={(message, chat) => onChatRoomMessage(message, chat)}
-                                          selectedChat={selectedChat}
+                                          selectedChat={selectedChat} addedPeopleHandler={() => { loadChats(); }}
                 />
               }
             </div>

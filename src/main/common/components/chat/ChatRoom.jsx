@@ -17,6 +17,14 @@ import {MessageType} from '../../types';
 import uuid from 'react-uuid';
 import appManager from "../../../common/service/AppManager";
 import Files from '../customInput/Files';
+import { GroupAdd } from '@material-ui/icons';
+import ChatForm from './ChatForm';
+import AutoComplete from '../customInput/AutoComplete';
+import { host, post } from '../../service/RestService';
+import { Form } from 'reactstrap';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import Button from '@material-ui/core/Button';
 
 const ChatRoom = (props) => {
   const navigate = useNavigate();
@@ -26,10 +34,11 @@ const ChatRoom = (props) => {
   const [selectedChat, setSelectedChat] = useState(props.selectedChat);
   const [document, setDocument] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [newParticipants, setNewParticipants] = useState([]);
   const [confirm, setImgUploadConfirm] = useState('');
   const messagesEndRef = useRef(null);
-  const [roomId, setRoomId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [openAddPeople, setOpenAddPeople] = useState(false);
   const [socketEventHandler] = useState({});
 
   const socketEventHandlerApi = () => {
@@ -71,9 +80,14 @@ const ChatRoom = (props) => {
     scrollToBottom();
 
     if (selectedChat) {
-      // const newMessages = messages.concat(selectedChat.messages);
       const newMessages = [].concat(selectedChat.messages);
-      setMessages(newMessages);
+
+      const dateAddedToChat = selectedChat.participants.find(p => p.userId === currentUser.userId).dateAddedToChat;
+
+      const filteredMessages = newMessages
+        .filter(txt => dateAddedToChat === null || new Date(dateAddedToChat) < new Date(txt.createdDate));
+
+      setMessages(filteredMessages);
     }
 
     setLoading(false);
@@ -193,6 +207,38 @@ const ChatRoom = (props) => {
       }
     })
   };
+
+  const addPeople = (e) => {
+    if (newParticipants.length > 0) {
+      newParticipants.forEach((participant) => {
+        selectedChat.participants.push(participant);
+      });
+
+      post(
+        `${host}/api/v1/chat/addParticipants`,
+        (response) => {
+          sendMessage(e, newParticipants[0].name + ' has join the conversation.');
+          setNewParticipants([]);
+          setOpenAddPeople(false);
+          props.addedPeopleHandler();
+        },
+        (e) => {},
+        {
+          chatId: selectedChat.id,
+          participants: newParticipants
+        }
+      );
+    }
+  }
+
+  const handleClose = (e) => {
+    setNewParticipants([]);
+    setOpenAddPeople(false)
+  }
+
+  const openAddPeopleDialog = (e) => {
+    setOpenAddPeople(true)
+  }
 
   const renderFileThumbnail = (message) => {
     const {document} = message;
@@ -335,6 +381,54 @@ const ChatRoom = (props) => {
   if (selectedChat && messages) {
     return (
       <div className="chatroom">
+
+        <Dialog open={openAddPeople} onClose={handleClose}>
+          <div style={{
+            width: '560px',
+            height: '100%',
+            maxHeight: '100%',
+            overflowX: 'hidden',
+            overflowY: 'auto',
+            padding: '32px',
+            backgroundColor: '#FFFFFF',
+            marginTop: '2px',
+          }}>
+            <h5 style={{ fontSize: '24px' }}>Add People</h5>
+            <Form>
+              <div>
+                <div style={{ marginTop: '8px' }}>
+                  <AutoComplete
+                    id="participants"
+                    label={'Participants'}
+                    invalidText={'invalid participants'}
+                    value={newParticipants}
+                    multiple={true}
+                    showImages={true}
+                    searchAttribute={'emailAddress'}
+                    validationRegex={/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/}
+                    valueChangeHandler={(value, id) => {
+                      setNewParticipants(value);
+                    }}
+                    optionsUrl={`${host}/api/v1/auth/search`}
+                    fullWidth
+                  />
+                </div>
+              </div>
+            </Form>
+          </div>
+          <DialogActions>
+            <Button onClick={handleClose}>CANCEL</Button>
+            <Button
+              onClick={addPeople}
+              variant={'contained'}
+              size="large"
+              color={'primary'}
+            >
+              ADD
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         <div className="chatroom__header">
           <div className="chatroom__headerleft">
             <Avatar>
@@ -350,17 +444,25 @@ const ChatRoom = (props) => {
             </h5>
           </div>
           <div className="chatroom__headerright">
-            <Link to={`/room/${roomId}/1`} target="_blank">
-              <Tooltip title="Call">
-                <IconButton
-                  onClick={(e) => {
-                    callNow(e);
-                  }}
-                >
-                  <CallIcon/>
-                </IconButton>
-              </Tooltip>
-            </Link>
+            <Tooltip title="Call">
+              <IconButton
+                onClick={(e) => {
+                  callNow(e);
+                }}
+              >
+                <CallIcon/>
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Add People">
+              <IconButton
+                onClick={(e) => {
+                  openAddPeopleDialog(e);
+                }}
+              >
+                <GroupAdd/>
+              </IconButton>
+            </Tooltip>
           </div>
         </div>
         <div id="messages" className="chatroom__body">
