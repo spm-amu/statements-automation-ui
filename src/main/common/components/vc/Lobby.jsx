@@ -51,7 +51,7 @@ const Lobby = (props) => {
               </div>
               <div style={props.displayState === 'MINIMIZED' ? {margin: '0 8px', fontSize: '20px'} : null}>
                 {
-                  props.isHost || props.allUserParticipantsLeft ?
+                  props.isHost || props.allUserParticipantsLeft || props.askToJoin === false ?
                     WAITING_FOR_OTHERS_TO_JOIN_MESSAGE
                     :
                     ATTENDEE_WAITING_FOR_PERMISION_MESSAGE

@@ -87,7 +87,6 @@ const CalendarComponent = (props) => {
      //  };
      //
      //  setEvents(myEvent.events);
-      console.log("\n\n\n\n\n\nEVENTS : ", response);
       setEvents(response);
     }, (e) => {
 
@@ -196,7 +195,8 @@ const CalendarComponent = (props) => {
         recurringUntil: new Date(clickedEvent.extendedProps.schedule.rrule.until),
         recurringByweekday: clickedEvent.extendedProps.schedule.rrule.byweekday,
         recurringBysetpos: clickedEvent.extendedProps.schedule.rrule.bysetpos,
-        recurringBymonthday: clickedEvent.extendedProps.schedule.rrule.bymonthday
+        recurringBymonthday: clickedEvent.extendedProps.schedule.rrule.bymonthday,
+        askToJoin: clickedEvent.extendedProps.askToJoin
       };
 
       setSelectedEvent(value);

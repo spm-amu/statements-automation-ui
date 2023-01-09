@@ -141,6 +141,7 @@ const MeetingRoom = (props) => {
   const {
     selectedMeeting,
     isHost,
+    askToJoin,
     userToCall,
     isDirectCall,
     callerUser
@@ -485,7 +486,7 @@ const MeetingRoom = (props) => {
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
         MessageType.AUDIO_VISUAL_SETTINGS_CHANGED);
 
-      if (isHost || isDirectCall) {
+      if (isHost || isDirectCall || askToJoin === false) {
         join();
       } else {
         askForPermission();
@@ -764,6 +765,7 @@ const MeetingRoom = (props) => {
               {
                 step === Steps.LOBBY ?
                   <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
+                         askToJoin={askToJoin}
                          meetingTitle={selectedMeeting.title}
                          acceptUserHandler={
                            (item) => {

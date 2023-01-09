@@ -7,6 +7,9 @@ import {useNavigate} from 'react-router-dom';
 import Utils from '../../Utils';
 import appManager from "../../../common/service/AppManager";
 import {Stream} from "../../service/Stream";
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import { host, post } from '../../service/RestService';
 
 const MeetingSettingsComponent = (props) => {
   const userVideo = useRef();
@@ -14,6 +17,8 @@ const MeetingSettingsComponent = (props) => {
   const [videoOptionDisabled, setVideoOptionDisabled] = useState(true);
   const [videoMuted, setVideoMuted] = useState(true);
   const [audioMuted, setAudioMuted] = useState(false);
+  const [askToJoin, setAskToJoin] = useState(true);
+  const [isHost, setIsHost] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState('');
   const {selectedMeeting} = props;
   const navigate = useNavigate();
@@ -49,7 +54,15 @@ const MeetingSettingsComponent = (props) => {
   useEffect(() => {
     setupStream();
     let userDetails = appManager.getUserDetails();
-    setLoggedInUser(userDetails.name)
+    setLoggedInUser(userDetails.name);
+
+    setAskToJoin(selectedMeeting.askToJoin);
+
+    selectedMeeting.attendees.forEach(att => {
+      if (att.userId === userDetails.userId) {
+        setIsHost(att.type === 'HOST');
+      }
+    });
   }, []);
 
   const muteVideo = () => {
@@ -58,6 +71,23 @@ const MeetingSettingsComponent = (props) => {
 
   const muteAudio = () => {
     setAudioMuted((prevStatus) => !prevStatus);
+  };
+
+  const toggleAskToJoin = () => {
+    setAskToJoin((prevStatus) => !prevStatus);
+  };
+
+  const persistMeetingSettings = () => {
+    post(
+      `${host}/api/v1/meeting/settings`,
+      (response) => {
+      },
+      (e) => {},
+      {
+        meetingId: selectedMeeting.id,
+        askToJoin: askToJoin
+      }
+    );
   };
 
   const closeStreams = () => {
@@ -149,21 +179,36 @@ const MeetingSettingsComponent = (props) => {
                 color="primary"
               />
             </td>
+
+            {
+              isHost &&
+              <td style={{paddingTop: '8px', textAlign: 'left'}}>
+                <FormGroup>
+                  <FormControlLabel control={
+                    <Switch
+                      checked={askToJoin}
+                      value={askToJoin}
+                      color="primary"
+                      onChange={(e, value) => {
+                        toggleAskToJoin();
+                      }}
+                    />
+                  } label="Ask To Join" />
+                </FormGroup>
+              </td>
+            }
+
             <td style={{paddingTop: '8px', textAlign: 'right'}}>
               <Button
                 variant={'contained'}
                 size="large"
                 color={'primary'}
                 onClick={(e) => {
-                  let userDetails = appManager.getUserDetails();
-                  let isHost = false;
-                  selectedMeeting.attendees.forEach(att => {
-                    if (att.userId === userDetails.userId) {
-                      isHost = att.type === 'HOST';
-                    }
-                  });
-
                   close();
+
+                  if (isHost && selectedMeeting.askToJoin !== askToJoin) {
+                    persistMeetingSettings();
+                  }
 
                   navigate("/view/meetingRoom", {
                     state: {
@@ -171,7 +216,8 @@ const MeetingSettingsComponent = (props) => {
                       selectedMeeting: selectedMeeting,
                       videoMuted: videoMuted,
                       audioMuted: audioMuted,
-                      isHost
+                      isHost,
+                      askToJoin: selectedMeeting.askToJoin
                     }
                   })
                 }}
