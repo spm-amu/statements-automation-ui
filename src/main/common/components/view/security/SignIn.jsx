@@ -16,6 +16,7 @@ import appManager from "../../../../common/service/AppManager";
 import Utils from "../../../Utils";
 import {ACCESS_TOKEN_PROPERTY, REFRESH_TOKEN_PROPERTY} from "../../../service/TokenManager";
 import { SystemEventType } from '../../../types';
+import { isSafari, isChrome, isIE } from 'react-device-detect';
 
 const {electron} = window;
 
@@ -52,30 +53,32 @@ const SignIn = (props) => {
   useEffect(() => {
     clearErrorStates();
 
-    electron.ipcRenderer.on('joinMeetingEvent', args => {
-      if (args.payload.params.redirect) {
-        post(
-          `${host}/api/v1/auth/validateMeetingToken`,
-          (response) => {
-            setUsername(response.userId);
-            setRedirectData({
-              meetingId: response.meetingID,
-              tokenUserId: response.userId
-            });
-            setIsMeetingRedirect(true);
-          },
-          (e) => {
-            console.log('ERR: ', e);
-          },
-          {
-            token: args.payload.params.accessToken
-          },
-          null,
-          false,
-          false
-        );
-      }
-    });
+    if (!isSafari && !isChrome) {
+      electron.ipcRenderer.on('joinMeetingEvent', args => {
+        if (args.payload.params.redirect) {
+          post(
+            `${host}/api/v1/auth/validateMeetingToken`,
+            (response) => {
+              setUsername(response.userId);
+              setRedirectData({
+                meetingId: response.meetingID,
+                tokenUserId: response.userId
+              });
+              setIsMeetingRedirect(true);
+            },
+            (e) => {
+              console.log('ERR: ', e);
+            },
+            {
+              token: args.payload.params.accessToken
+            },
+            null,
+            false,
+            false
+          );
+        }
+      });
+    }
 
     if (location.state) {
       setUsername(location.state.tokenUserId);
@@ -110,22 +113,30 @@ const SignIn = (props) => {
           appManager.add("refreshToken", response.refresh_token);
           appManager.add("lastLogin", lastLogin);
 
-          console.log("SIGN IN SAVING TOKENS");
-          electron.ipcRenderer.sendMessage('saveTokens', {
-            accessToken: response.access_token,
-            refreshToken: response.refresh_token,
-            lastLogin: lastLogin
-          });
-
-
-          electron.ipcRenderer.on('tokensSaved', args => {
-            electron.ipcRenderer.removeAllListeners("tokensSaved");
-            electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
-
-            navigate('/dashboard', {
-              state: redirectData
+          if (!isSafari && !isChrome) {
+            electron.ipcRenderer.sendMessage('saveTokens', {
+              accessToken: response.access_token,
+              refreshToken: response.refresh_token,
+              lastLogin: lastLogin
             });
-          });
+
+            electron.ipcRenderer.on('tokensSaved', args => {
+              electron.ipcRenderer.removeAllListeners("tokensSaved");
+              electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
+
+              navigate('/dashboard', {
+                state: redirectData
+              });
+            });
+          } else {
+            navigate('/dashboard', {
+              state: {
+                accessToken: response.access_token,
+                refreshToken: response.refresh_token,
+                lastLogin
+              }
+            });
+          }
         },
         (e) => {
           console.log('#### ERROR: ' + JSON.stringify(e));

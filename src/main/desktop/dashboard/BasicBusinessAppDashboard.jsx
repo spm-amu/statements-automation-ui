@@ -21,6 +21,7 @@ import {MessageType, SystemEventType} from '../../common/types';
 import LottieIcon from "../../common/components/LottieIcon";
 import LoadingIndicator from "../../common/components/LoadingIndicator";
 import Alert from "react-bootstrap/Alert";
+import { isChrome, isSafari, osName } from "react-device-detect";
 
 const {electron} = window;
 
@@ -354,97 +355,113 @@ const BasicBusinessAppDashboard = (props) => {
   React.useEffect(() => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL, SystemEventType.API_ERROR, SystemEventType.API_SUCCESS);
 
-    electron.ipcRenderer.on('tokensRead', args => {
-      if(args.accessToken && args.refreshToken) {
-        appManager.add(ACCESS_TOKEN_PROPERTY, args.accessToken);
-        appManager.add(REFRESH_TOKEN_PROPERTY, args.refreshToken);
-        appManager.add(LAST_LOGIN, args.lastLogin);
+    if (!isSafari && !isChrome) {
+      electron.ipcRenderer.on('tokensRead', args => {
+        if(args.accessToken && args.refreshToken) {
+          appManager.add(ACCESS_TOKEN_PROPERTY, args.accessToken);
+          appManager.add(REFRESH_TOKEN_PROPERTY, args.refreshToken);
+          appManager.add(LAST_LOGIN, args.lastLogin);
+
+          load();
+        } else {
+          navigate('/login');
+        }
+
+        electron.ipcRenderer.removeAllListeners("tokensRead");
+      });
+
+      electron.ipcRenderer.on('tokensRemoved', args => {
+        // TODO : Call backend and revoke access and refresh token
+      });
+
+      electron.ipcRenderer.on('replyMessage', args => {
+        navigate("/view/chats", {
+          state: {
+            chatId: args.chatId,
+          }
+        })
+      });
+
+      electron.ipcRenderer.on('answerCall', args => {
+        console.log("\n\n\n\nANSWERING CALLL.....", args);
+        navigate("/view/meetingRoom", {
+          state: {
+            displayMode: 'window',
+            selectedMeeting: {
+              id: args.payload.roomId
+            },
+            videoMuted: true,
+            audioMuted: false,
+            isDirectCall: true,
+            callerUser: args.payload.callerUser
+          }
+        })
+      });
+
+      electron.ipcRenderer.on('joinMeetingEvent', args => {
+        let accessToken = appManager.get(ACCESS_TOKEN_PROPERTY);
+        let refreshToken = appManager.get(REFRESH_TOKEN_PROPERTY);
+
+        if (args.payload.params.redirect) {
+          post(
+            `${host}/api/v1/auth/validateMeetingToken`,
+            (response) => {
+              if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
+                navigate('/login', {
+                  state: {
+                    meetingId: args.payload.params.meetingId,
+                    tokenUserId: response.userId
+                  }
+                });
+              } else {
+                let userDetails = appManager.getUserDetails();
+                if (response.userId === userDetails.userId) {
+                  redirectToMeeting(args.payload.params);
+                } else {
+                  appManager.fireEvent(SystemEventType.API_ERROR, {
+                    message: `Please login in as ${response.userId} to join this meeting. Please avoid sharing private meetings with uninvited guests!`
+                  });
+                }
+              }
+            },
+            (e) => {
+              appManager.fireEvent(SystemEventType.API_ERROR, {
+                message: 'Invalid meeting link.'
+              });
+            },
+            {
+              token: args.payload.params.accessToken
+            },
+            ''
+          );
+        } else {
+          redirectToMeeting(args.payload.params);
+        }
+      });
+
+      electron.ipcRenderer.on('declineCall', args => {
+        console.log(args.payload);
+        if (args.payload.callerId) {
+          socketManager.declineDirectCall(args.payload.callerId, args.payload.callPayload.roomId);
+        }
+      });
+
+      electron.ipcRenderer.sendMessage('readTokens', {});
+    } else {
+      console.log('#### web location.state: ', location.state);
+
+      const loginTokens = location.state;
+
+      if (loginTokens && loginTokens.accessToken && loginTokens.refreshToken) {
+        appManager.add(ACCESS_TOKEN_PROPERTY, loginTokens.accessToken);
+        appManager.add(REFRESH_TOKEN_PROPERTY, loginTokens.refreshToken);
+        appManager.add(LAST_LOGIN, loginTokens.lastLogin);
 
         load();
       } else {
         navigate('/login');
       }
-
-      electron.ipcRenderer.removeAllListeners("tokensRead");
-    });
-
-    electron.ipcRenderer.on('tokensRemoved', args => {
-      // TODO : Call backend and revoke access and refresh token
-    });
-
-    electron.ipcRenderer.on('replyMessage', args => {
-      navigate("/view/chats", {
-        state: {
-          chatId: args.chatId,
-        }
-      })
-    });
-
-    electron.ipcRenderer.on('answerCall', args => {
-      console.log("\n\n\n\nANSWERING CALLL.....", args);
-      navigate("/view/meetingRoom", {
-        state: {
-          displayMode: 'window',
-          selectedMeeting: {
-            id: args.payload.roomId
-          },
-          videoMuted: true,
-          audioMuted: false,
-          isDirectCall: true,
-          callerUser: args.payload.callerUser
-        }
-      })
-    });
-
-    electron.ipcRenderer.on('joinMeetingEvent', args => {
-      let accessToken = appManager.get(ACCESS_TOKEN_PROPERTY);
-      let refreshToken = appManager.get(REFRESH_TOKEN_PROPERTY);
-
-      if (args.payload.params.redirect) {
-        post(
-          `${host}/api/v1/auth/validateMeetingToken`,
-          (response) => {
-            if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
-              navigate('/login', {
-                state: {
-                  meetingId: args.payload.params.meetingId,
-                  tokenUserId: response.userId
-                }
-              });
-            } else {
-              let userDetails = appManager.getUserDetails();
-              if (response.userId === userDetails.userId) {
-                redirectToMeeting(args.payload.params);
-              } else {
-                appManager.fireEvent(SystemEventType.API_ERROR, {
-                  message: `Please login in as ${response.userId} to join this meeting. Please avoid sharing private meetings with uninvited guests!`
-                });
-              }
-            }
-          },
-          (e) => {
-            appManager.fireEvent(SystemEventType.API_ERROR, {
-              message: 'Invalid meeting link.'
-            });
-          },
-          {
-            token: args.payload.params.accessToken
-          },
-          ''
-        );
-      } else {
-        redirectToMeeting(args.payload.params);
-      }
-    });
-
-    electron.ipcRenderer.on('declineCall', args => {
-      console.log(args.payload);
-      if (args.payload.callerId) {
-        socketManager.declineDirectCall(args.payload.callerId, args.payload.callPayload.roomId);
-      }
-    });
-
-    electron.ipcRenderer.sendMessage('readTokens', {});
+    }
   }, []);
 
   React.useEffect(() => {
@@ -453,10 +470,12 @@ const BasicBusinessAppDashboard = (props) => {
       socketManager.clearAllEventListeners();
       socketManager.disconnectSocket();
 
-      electron.ipcRenderer.removeAllListeners("tokensRemoved");
-      electron.ipcRenderer.removeAllListeners("answerCall");
-      electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
-      electron.ipcRenderer.removeAllListeners("declineCall");
+      if (!isSafari && !isChrome) {
+        electron.ipcRenderer.removeAllListeners("tokensRemoved");
+        electron.ipcRenderer.removeAllListeners("answerCall");
+        electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
+        electron.ipcRenderer.removeAllListeners("declineCall");
+      }
     };
   }, []);
 

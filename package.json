@@ -15,6 +15,7 @@
   "license": "MIT",
   "main": "./src/main/main.ts",
   "scripts": {
+    "web:dev": "cross-env TARGET=web NODE_ENV=development webpack-dev-server --hot --open --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
@@ -129,7 +130,9 @@
     "simple-peer": "^9.6.2",
     "socket.io-client": "^4.5.2",
     "styled-components": "^5.3.6",
-    "url": "^0.11.0"
+    "url": "^0.11.0",
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "@fullcalendar/core": "^5.11.0",
