@@ -77,7 +77,7 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       post(`${props.optionsUrl}`, (response) => {
           if (response.records.length > 0) {
             let userDetails = appManager.getUserDetails();
-            setOptions(response.records.filter(option => option.userId !== userDetails.userId))
+            setOptions(response.records.filter(option => option.userId !== userDetails.userId));
           } else {
             if(validateInput(newInputValue) && !value.find((val) => val.name === newInputValue)) {
               let emptyOptions = [];
@@ -109,6 +109,9 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
           "pageSize": 2000,
           "currentPage": 0
         }, null, false, true)
+    } else {
+      let userDetails = appManager.getUserDetails();
+      setOptions(props.optionsData.filter(option => option.userId !== userDetails.userId))
     }
   };
 

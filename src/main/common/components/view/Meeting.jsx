@@ -59,6 +59,7 @@ const Meeting = (props) => {
   const now = new Date();
   const [url, setUrl] = useState('');
   const [hostAttendee, setHostAttendee] = useState(null);
+  const [newHostAttendee, setNewHostAttendee] = useState([]);
   const [lapsed, setLapsed] = useState(false);
   const [attendees, setAttendees] = useState([]);
   const [readOnly, setReadOnly] = useState(true);
@@ -172,6 +173,7 @@ const Meeting = (props) => {
       for (const attendee of props.selectedEvent.attendees) {
         if (attendee.type === 'HOST') {
           setHostAttendee(attendee);
+          setNewHostAttendee([].concat(attendee));
           if (userDetails.userId === attendee.userId) {
             setReadOnly(false);
           }
@@ -305,7 +307,7 @@ const Meeting = (props) => {
         };
       }
 
-      saveMeetingObject(_hostAttendee).then((data) => {
+      saveMeetingObject(_hostAttendee, isUpdate).then((data) => {
         post(
           `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
           (response) => {
@@ -322,10 +324,24 @@ const Meeting = (props) => {
     }
   };
 
-  const saveMeetingObject = (hostAttendee) => {
+  const saveMeetingObject = (hostAttendee, isUpdate) => {
     return new Promise((resolve, reject) => {
 
       let data = createMeetingObject(hostAttendee);
+
+      if (isUpdate) {
+        const updatedHost = newHostAttendee[0];
+        const userDetails = appManager.getUserDetails();
+
+        if (userDetails.userId !== updatedHost.userId) {
+          let currentHost = data.attendees.find((attendee) => attendee.type === 'HOST');
+          currentHost.type = 'REQUIRED';
+
+          let newHost = data.attendees.find((attendee) => attendee.userId === updatedHost.userId);
+          newHost.type = 'HOST';
+        }
+      }
+
       let externalAttendees = data.attendees.filter((attendee) => attendee.external === true);
 
       if (data.documents && data.documents.length > 0) {
@@ -401,6 +417,10 @@ const Meeting = (props) => {
       setEdited(true);
     }
   };
+
+  const changeHost = () => {
+
+  }
 
   const formValueChangeHandler = (e) => {
     handleFormValueChange(e.target.value, e.target.id, e.target.required);
@@ -1049,6 +1069,31 @@ const Meeting = (props) => {
                 optionsUrl={`${host}/api/v1/auth/search`}
               />
             </div>
+
+            {
+              !readOnly &&
+              <div style={{marginTop: '8px'}}>
+                <AutoComplete
+                  id="host"
+                  label={'Host'}
+                  invalidText={'invalid attendee'}
+                  value={newHostAttendee}
+                  multiple={true}
+                  showImages={true}
+                  searchAttribute={'emailAddress'}
+                  validationRegex={/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/}
+                  valueChangeHandler={(value, id) => {
+                    console.log('_______: ', value);
+
+                    setNewHostAttendee([].concat(value[1]));
+
+                    handleFormValueChange(value, id, false);
+                  }}
+                  optionsData={value.attendees}
+                />
+              </div>
+            }
+
             <div style={{marginTop: '12px'}}>
               <AutoComplete
                 id="locations"
