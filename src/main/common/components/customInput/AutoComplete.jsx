@@ -109,7 +109,10 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
           "pageSize": 2000,
           "currentPage": 0
         }, null, false, true)
-    } else {
+    }
+
+    // TODO : Nsovo filter where the options are passed
+    if(props.optionsData){
       let userDetails = appManager.getUserDetails();
       setOptions(props.optionsData.filter(option => option.userId !== userDetails.userId))
     }

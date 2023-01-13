@@ -14,14 +14,15 @@ const MeetingParticipantGrid = (props) => {
   const [grid, setGrid] = React.useState(null);
   const [sideGrid, setSideGrid] = React.useState(null);
   const {
-    waitingList
+    waitingList,
+    mode
   } = props;
 
   useEffect(() => {
     let gridData = createGrid();
     setGrid(gridData.mainGrid);
     setSideGrid(gridData.sideGrid);
-  }, [participants]);
+  }, [participants, mode]);
 
   const createColumn = (index) => {
     let col = [];
@@ -43,13 +44,15 @@ const MeetingParticipantGrid = (props) => {
     let maxGridSize = MAX_COLS * MAX_ROWS;
     let numCols = participants.length < MAX_COLS ? participants.length : MAX_COLS;
 
-    for (let i = 0; i < numCols; i++) {
-      itemGrid.mainGrid.push([]);
+    if(mode === 'AUTO_ADJUST') {
+      for (let i = 0; i < numCols; i++) {
+        itemGrid.mainGrid.push([]);
+      }
     }
 
     let currentColIndex = 0;
     for (let i = 0; i < participants.length; i++) {
-      if (i < MAX_TILES) {
+      if (i < MAX_TILES && mode === 'AUTO_ADJUST') {
         itemGrid.mainGrid[currentColIndex].push(participants[i]);
         if (currentColIndex++ === MAX_COLS - 1) {
           currentColIndex = 0;
@@ -68,7 +71,7 @@ const MeetingParticipantGrid = (props) => {
         {col.map((participant, index) => {
           return <div style={{width: '100%', height: ((100 / col.length)) + '%', maxHeight: ((100 / col.length)) + '%'}} key={index}>
             <MeetingParticipant data={participant} showName={true} videoMuted={participant.videoMuted}
-                                audioMuted={participant.audioMuted}/>
+                                audioMuted={participant.audioMuted} />
           </div>
         })}
       </div>
@@ -77,20 +80,22 @@ const MeetingParticipantGrid = (props) => {
 
   return (
     grid !== null ?
-      <div className={'row grid'} style={{height: 'calc(100% - 16px)'}}>
-        <div className={'col h-100'}>
-          <div className={'row h-100'}>
-            {grid.map((col, index) => {
-              return <Fragment key={index}>
-                {
-                  renderColumn(col, index)
-                }
-              </Fragment>
-            })}
+      <div className={'row grid'} style={{height: 'calc(100% - 16px)', width: mode === 'AUTO_ADJUST' ? '100%' : '320px'}}>
+        {grid && grid.length > 0 &&
+          <div className={'col h-100'}>
+            <div className={'row h-100'}>
+              {grid.map((col, index) => {
+                return <Fragment key={index}>
+                  {
+                    renderColumn(col, index)
+                  }
+                </Fragment>
+              })}
+            </div>
           </div>
-        </div>
+        }
         {
-          (sideGrid && sideGrid.length > 0) || (waitingList && waitingList.length > 0) &&
+          ((sideGrid && sideGrid.length > 0) || (waitingList && waitingList.length > 0)) &&
           <div className={'no-side-margin no-side-padding grid-side-bar'} style={{backgroundColor: 'transparent'}}>
             {
               waitingList && waitingList.length > 0 &&
@@ -105,7 +110,7 @@ const MeetingParticipantGrid = (props) => {
                   sideGrid.map((participant, index) => {
                     return <div key={index} className={'side-grid-item'}>
                       <MeetingParticipant data={participant} videoMuted={participant.videoMuted}
-                                          audioMuted={participant.audioMuted} showName={true} padding={'0'}/>
+                                          audioMuted={participant.audioMuted} showName={true} padding={'0'} height={'320px'} />
                     </div>
                   })
                 }

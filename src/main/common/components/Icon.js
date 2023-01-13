@@ -47,7 +47,8 @@ import {
   Reply,
   Videocam,
   VideocamOff,
-  Warning
+  Warning,
+  Note
 } from '@material-ui/icons';
 import SendIcon from "./chat/ChatRoom";
 
@@ -166,6 +167,8 @@ class Icon extends Component {
       return <Folder/>
     } else if (this.props.id === 'HISTORY') {
       return <History/>
+    } else if (this.props.id === 'NOTE') {
+      return <Note/>
     } else if (this.props.id === 'SIGN') {
       return <i className="fas fa-pen-nib" style={{color: this.props.color}}/>
     } else if (this.props.id === 'ERROR') {

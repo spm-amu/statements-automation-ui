@@ -15,7 +15,7 @@ const MeetingParticipant = forwardRef((props, ref) => {
 
   return (
     <div className={'col-*-* meeting-participant-container'}
-         style={props.showName ? {padding: props.padding ? props.padding : '4px 4px 12px 12px'} : null}>
+         style={{padding: props.padding ? props.padding : '4px 4px 12px 12px', height: props.height ? props.height : null}}>
       <div style={{width: '100%', height: '100%'}}>
         {
           showVideo ?

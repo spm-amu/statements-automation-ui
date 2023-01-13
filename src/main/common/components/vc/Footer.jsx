@@ -13,7 +13,8 @@ const Footer = (props) => {
     userStream,
     userVideo,
     handRaised,
-    step
+    step,
+    isHost
   } = props;
 
   return (
@@ -47,6 +48,7 @@ const Footer = (props) => {
                    audioMuted={audioMuted}
                    displayState={displayState}
                    step={step}
+                   isHost={isHost}
           />
         </div>
         {
@@ -65,6 +67,7 @@ const Footer = (props) => {
                   audioMuted={audioMuted}
                   displayName={false}
                   ref={userVideo}
+                  padding={'0'}
                 />
               </section>
             </div>

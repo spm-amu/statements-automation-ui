@@ -15,7 +15,8 @@ const Toolbar = (props) => {
     displayState,
     eventHandler,
     handRaised,
-    step
+    step,
+    isHost
   } = props;
 
   const muteVideo = () => {
@@ -68,6 +69,10 @@ const Toolbar = (props) => {
 
   const showPeople = () => {
     eventHandler.showPeople()
+  };
+
+  const showWhiteboard = () => {
+    eventHandler.showWhiteboard()
   };
 
   const showChat = () => {
@@ -212,6 +217,19 @@ const Toolbar = (props) => {
         >
           <Icon id={'PAN_TOOL'}/>
         </IconButton>
+        {
+          step === 'SESSION' && displayState === 'MAXIMIZED' && isHost &&
+          <IconButton
+            onClick={(e) => showWhiteboard()}
+            style={{
+              backgroundColor: '#404239',
+              color: 'white',
+              marginRight: '4px'
+            }}
+          >
+            <Icon id={'NOTE'}/>
+          </IconButton>
+        }
       </div>
     </div>
   );

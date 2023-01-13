@@ -22,6 +22,7 @@ import {osName} from "react-device-detect";
 import {Stream} from "../../service/Stream";
 import Button from '@material-ui/core/Button';
 import Timer from "../vc/Timer";
+import WhiteBoard from "../vc/WhiteBoard";
 
 const {electron} = window;
 
@@ -85,6 +86,8 @@ const MeetingRoom = (props) => {
   const [screenSources, setScreenSources] = useState();
   const [started, setStarted] = useState(false);
   const [remainingTime, setRemainingTime] = useState();
+  const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('AUTO_ADJUST');
+  const [showWhiteBoard, setShowWhiteBoard] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [eventHandler] = useState({});
 
@@ -555,7 +558,7 @@ const MeetingRoom = (props) => {
   }, []);
 
   useEffect(() => {
-    if(remainingTime) {
+    if (remainingTime) {
       setStarted(true);
     }
   }, [remainingTime]);
@@ -780,17 +783,28 @@ const MeetingRoom = (props) => {
                   />
                   :
                   displayState === 'MAXIMIZED' ?
-                    <MeetingParticipantGrid participants={participants}
-                                            waitingList={lobbyWaitingList}
-                                            acceptUserHandler={
-                                              (item) => {
-                                                acceptUser(item);
-                                              }}
-                                            rejectUserHandler={
-                                              (item) => {
-                                                rejectUser(item);
-                                              }}
-                    />
+                    <div className={'row'} style={{height: '100%'}}>
+                      {
+                        showWhiteBoard && meetingParticipantGridMode === 'SIDE_ONLY' &&
+                        <div className={'col'}>
+                          <WhiteBoard />
+                        </div>
+                      }
+                      <div className={meetingParticipantGridMode === 'AUTO_ADJUST' ? 'col' : null}>
+                        <MeetingParticipantGrid participants={participants}
+                                                waitingList={lobbyWaitingList}
+                                                mode={meetingParticipantGridMode}
+                                                acceptUserHandler={
+                                                  (item) => {
+                                                    acceptUser(item);
+                                                  }}
+                                                rejectUserHandler={
+                                                  (item) => {
+                                                    rejectUser(item);
+                                                  }}
+                        />
+                      </div>
+                    </div>
                     :
                     <MeetingRoomSummary participants={participants} participantsRaisedHands={participantsRaisedHands}/>
               }
@@ -804,6 +818,7 @@ const MeetingRoom = (props) => {
                       handRaised={handRaised}
                       isRecording={isRecording}
                       displayState={displayState}
+                      isHost={isHost}
                       step={step}
                       toolbarEventHandler={
                         {
@@ -849,6 +864,15 @@ const MeetingRoom = (props) => {
                           showPeople: () => {
                             setSideBarTab('People');
                             setSideBarOpen(true);
+                          },
+                          showWhiteboard: () => {
+                            if (meetingParticipantGridMode === 'AUTO_ADJUST') {
+                              setMeetingParticipantGridMode('SIDE_ONLY');
+                              setShowWhiteBoard(true);
+                            } else {
+                              setMeetingParticipantGridMode('AUTO_ADJUST');
+                              setShowWhiteBoard(false);
+                            }
                           },
                           showChat: () => {
                             setSideBarTab('Chat');
