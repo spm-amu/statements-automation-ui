@@ -16,7 +16,7 @@ import appManager from "../../../../common/service/AppManager";
 import Utils from "../../../Utils";
 import {ACCESS_TOKEN_PROPERTY, REFRESH_TOKEN_PROPERTY} from "../../../service/TokenManager";
 import { SystemEventType } from '../../../types';
-import { isSafari, isChrome, isIE } from 'react-device-detect';
+import { isSafari, isChrome, isIE, isEdge } from 'react-device-detect';
 
 const {electron} = window;
 
@@ -53,7 +53,7 @@ const SignIn = (props) => {
   useEffect(() => {
     clearErrorStates();
 
-    if (!isSafari && !isChrome) {
+    if (!isSafari && !isChrome && !isIE && !isEdge) {
       electron.ipcRenderer.on('joinMeetingEvent', args => {
         if (args.payload.params.redirect) {
           post(
@@ -113,7 +113,7 @@ const SignIn = (props) => {
           appManager.add("refreshToken", response.refresh_token);
           appManager.add("lastLogin", lastLogin);
 
-          if (!isSafari && !isChrome) {
+          if (!isSafari && !isChrome && !isIE && !isEdge) {
             electron.ipcRenderer.sendMessage('saveTokens', {
               accessToken: response.access_token,
               refreshToken: response.refresh_token,

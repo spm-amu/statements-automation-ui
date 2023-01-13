@@ -21,7 +21,7 @@ import {MessageType, SystemEventType} from '../../common/types';
 import LottieIcon from "../../common/components/LottieIcon";
 import LoadingIndicator from "../../common/components/LoadingIndicator";
 import Alert from "react-bootstrap/Alert";
-import { isChrome, isSafari, osName } from "react-device-detect";
+import { isChrome, isEdge, isIE, isSafari, osName } from 'react-device-detect';
 
 const {electron} = window;
 
@@ -355,7 +355,7 @@ const BasicBusinessAppDashboard = (props) => {
   React.useEffect(() => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL, SystemEventType.API_ERROR, SystemEventType.API_SUCCESS);
 
-    if (!isSafari && !isChrome) {
+    if (!isSafari && !isChrome && !isIE && !isEdge) {
       electron.ipcRenderer.on('tokensRead', args => {
         if(args.accessToken && args.refreshToken) {
           appManager.add(ACCESS_TOKEN_PROPERTY, args.accessToken);
@@ -470,7 +470,7 @@ const BasicBusinessAppDashboard = (props) => {
       socketManager.clearAllEventListeners();
       socketManager.disconnectSocket();
 
-      if (!isSafari && !isChrome) {
+      if (!isSafari && !isChrome && !isIE && !isEdge) {
         electron.ipcRenderer.removeAllListeners("tokensRemoved");
         electron.ipcRenderer.removeAllListeners("answerCall");
         electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
