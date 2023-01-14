@@ -306,8 +306,6 @@ const MeetingRoom = (props) => {
         videoConstraints.audio = false;
       }
 
-      console.log('#### videoConstraints: ', videoConstraints);
-
       navigator.mediaDevices
         .getUserMedia(videoConstraints)
         .then((stream) => {
@@ -435,7 +433,7 @@ const MeetingRoom = (props) => {
       socketId: data.id
     };
 
-    if (isHost && autoPermit) {
+    if (isHost && autoPermit === false) {
       acceptUser(item);
     } else {
       setLobbyWaitingList(lobbyWaitingList.concat([item]));
@@ -497,7 +495,7 @@ const MeetingRoom = (props) => {
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
         MessageType.AUDIO_VISUAL_SETTINGS_CHANGED);
 
-      if (isHost || isDirectCall || autoPermit === false) {
+      if (isHost || isDirectCall) {
         join();
       } else {
         askForPermission();
@@ -560,6 +558,7 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     fetchChats();
+    persistMeetingSettings();
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     setupStream();
     appManager.add('CURRENT_MEETING', selectedMeeting);
@@ -576,6 +575,19 @@ const MeetingRoom = (props) => {
       userVideo.current.srcObject = currentUserStream.obj;
     }
   }, [userVideo.current, currentUserStream]);
+
+  const persistMeetingSettings = () => {
+    post(
+      `${host}/api/v1/meeting/settings`,
+      (response) => {
+      },
+      (e) => {},
+      {
+        meetingId: selectedMeeting.id,
+        askToJoin: autoPermit
+      }
+    );
+  };
 
   const handleSidebarToggle = (e) => {
     let paper = document.getElementById('meetingDialogPaper');
@@ -776,7 +788,6 @@ const MeetingRoom = (props) => {
               {
                 step === Steps.LOBBY ?
                   <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
-                         autoPermit={autoPermit}
                          meetingTitle={selectedMeeting.title}
                          acceptUserHandler={
                            (item) => {
@@ -894,16 +905,7 @@ const MeetingRoom = (props) => {
                             lowerHand();
                           },
                           toggleAutoPermit: () => {
-                            post(
-                              `${host}/api/v1/meeting/settings`,
-                              (response) => {
-                              },
-                              (e) => {},
-                              {
-                                meetingId: selectedMeeting.id,
-                                askToJoin: !autoPermit
-                              }
-                            );
+                            persistMeetingSettings()
                           },
                         }
                       }

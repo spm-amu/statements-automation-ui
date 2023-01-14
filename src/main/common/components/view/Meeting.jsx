@@ -1071,7 +1071,7 @@ const Meeting = (props) => {
             </div>
 
             {
-              !readOnly &&
+              !readOnly && !Utils.isStringEmpty(props.selectedEvent.id) &&
               <div style={{marginTop: '8px'}}>
                 <AutoComplete
                   id="host"

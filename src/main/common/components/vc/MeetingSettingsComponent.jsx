@@ -81,19 +81,6 @@ const MeetingSettingsComponent = (props) => {
     setAutoPermit((prevStatus) => !prevStatus);
   };
 
-  const persistMeetingSettings = () => {
-    post(
-      `${host}/api/v1/meeting/settings`,
-      (response) => {
-      },
-      (e) => {},
-      {
-        meetingId: selectedMeeting.id,
-        askToJoin: autoPermit
-      }
-    );
-  };
-
   const closeStreams = () => {
     stream.close();
   };
@@ -190,7 +177,7 @@ const MeetingSettingsComponent = (props) => {
                 <FormGroup>
                   <FormControlLabel control={
                     <Switch
-                      checked={!autoPermit}
+                      checked={autoPermit}
                       value={autoPermit}
                       color="primary"
                       onChange={(e, value) => {
@@ -210,9 +197,9 @@ const MeetingSettingsComponent = (props) => {
                 onClick={(e) => {
                   close();
 
-                  if (isHost && selectedMeeting.askToJoin !== autoPermit) {
-                    persistMeetingSettings();
-                  }
+                  // if (isHost && selectedMeeting.askToJoin !== autoPermit) {
+                  //   persistMeetingSettings();
+                  // }
 
                   navigate("/view/meetingRoom", {
                     state: {
