@@ -4,11 +4,17 @@ import './Toolbar.css';
 import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
 import Utils from "../../Utils";
+import Tooltip from '@material-ui/core/Tooltip';
+import { ListItemIcon, Menu, MenuItem } from '@material-ui/core';
+import { Note, PersonAdd, Settings } from '@material-ui/icons';
 
 const Toolbar = (props) => {
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [isRecording, setIsRecording] = useState(false);
+  const [autoPermit, setAutoPermit] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMoreActions = Boolean(anchorEl);
   const [screenShared] = useState(false);
 
   const {
@@ -18,6 +24,13 @@ const Toolbar = (props) => {
     step,
     isHost
   } = props;
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const muteVideo = () => {
     setVideoMuted((prevStatus) => !prevStatus);
@@ -34,6 +47,10 @@ const Toolbar = (props) => {
       eventHandler.recordMeeting(isRecording)
     }
   }, [isRecording]);
+
+  useEffect(() => {
+    setAutoPermit(props.autoPermit);
+  }, [props.autoPermit]);
 
   useEffect(() => {
     eventHandler.onMuteVideo(videoMuted);
@@ -85,6 +102,11 @@ const Toolbar = (props) => {
 
   const lowerHand = () => {
     eventHandler.lowerHand()
+  };
+
+  const toggleAutoPermit = () => {
+    setAutoPermit(prevAutoPermit => !prevAutoPermit);
+    eventHandler.toggleAutoPermit()
   };
 
 	return (
@@ -230,7 +252,85 @@ const Toolbar = (props) => {
             <Icon id={'NOTE'}/>
           </IconButton>
         }
+        <Tooltip title="More Actions">
+          <IconButton
+            onClick={handleClick}
+            sx={{ ml: 2 }}
+            aria-controls={openMoreActions ? 'account-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={openMoreActions ? 'true' : undefined}
+            style={{
+              backgroundColor: '#404239',
+              color: 'white',
+              marginRight: '4px'
+            }}
+          >
+            <Icon id={'MORE'}/>
+          </IconButton>
+        </Tooltip>
       </div>
+
+      <Menu
+        anchorEl={anchorEl}
+        id="account-menu"
+        open={openMoreActions}
+        onClose={handleClose}
+        onClick={handleClose}
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            overflow: 'visible',
+            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+            mt: 1.5,
+            '& .MuiList-root': {
+              border: '1px solid red',
+            },
+            '& .MuiAvatar-root': {
+              width: 32,
+              height: 32,
+              ml: -0.5,
+              mr: 1,
+            },
+            '&:before': {
+              content: '""',
+              display: 'block',
+              position: 'absolute',
+              top: 0,
+              right: 14,
+              width: 10,
+              height: 10,
+              bgcolor: 'primary',
+              transform: 'translateY(-50%) rotate(45deg)',
+              zIndex: 0,
+            },
+          },
+        }}
+        transformOrigin={{ horizontal: 20, vertical: 136 }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+      >
+        <MenuItem disabled={!isHost} onClick={toggleAutoPermit}>
+          <ListItemIcon>
+            <PersonAdd fontSize="small" />
+          </ListItemIcon>
+          {
+            autoPermit ? 'Do Not Auto Permit' : 'Auto Permit'
+          }
+        </MenuItem>
+        <MenuItem disabled={!isHost} >
+          <ListItemIcon>
+            <Settings fontSize="small" />
+          </ListItemIcon>
+          Change Meeting Host
+        </MenuItem>
+        <MenuItem
+          disabled={true}
+        >
+          <ListItemIcon>
+            <Note fontSize="small" />
+          </ListItemIcon>
+          Open Whiteboard
+        </MenuItem>
+      </Menu>
     </div>
   );
 };

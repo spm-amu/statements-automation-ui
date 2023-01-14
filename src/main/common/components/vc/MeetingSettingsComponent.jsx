@@ -9,7 +9,7 @@ import appManager from "../../../common/service/AppManager";
 import {Stream} from "../../service/Stream";
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import { host, post } from '../../service/RestService';
+import { get, host, post } from '../../service/RestService';
 
 const MeetingSettingsComponent = (props) => {
   const userVideo = useRef();
@@ -17,7 +17,7 @@ const MeetingSettingsComponent = (props) => {
   const [videoOptionDisabled, setVideoOptionDisabled] = useState(true);
   const [videoMuted, setVideoMuted] = useState(true);
   const [audioMuted, setAudioMuted] = useState(false);
-  const [askToJoin, setAskToJoin] = useState(true);
+  const [autoPermit, setAutoPermit] = useState(true);
   const [isHost, setIsHost] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState('');
   const {selectedMeeting} = props;
@@ -56,7 +56,11 @@ const MeetingSettingsComponent = (props) => {
     let userDetails = appManager.getUserDetails();
     setLoggedInUser(userDetails.name);
 
-    setAskToJoin(selectedMeeting.askToJoin);
+    get(`${host}/api/v1/meeting/settings/${selectedMeeting.id}`,
+      (response) => {
+        setAutoPermit(response.askToJoin);
+    }, (e) => {
+    });
 
     selectedMeeting.attendees.forEach(att => {
       if (att.userId === userDetails.userId) {
@@ -74,7 +78,7 @@ const MeetingSettingsComponent = (props) => {
   };
 
   const toggleAskToJoin = () => {
-    setAskToJoin((prevStatus) => !prevStatus);
+    setAutoPermit((prevStatus) => !prevStatus);
   };
 
   const persistMeetingSettings = () => {
@@ -85,7 +89,7 @@ const MeetingSettingsComponent = (props) => {
       (e) => {},
       {
         meetingId: selectedMeeting.id,
-        askToJoin: askToJoin
+        askToJoin: autoPermit
       }
     );
   };
@@ -186,14 +190,14 @@ const MeetingSettingsComponent = (props) => {
                 <FormGroup>
                   <FormControlLabel control={
                     <Switch
-                      checked={askToJoin}
-                      value={askToJoin}
+                      checked={!autoPermit}
+                      value={autoPermit}
                       color="primary"
                       onChange={(e, value) => {
                         toggleAskToJoin();
                       }}
                     />
-                  } label="Ask To Join" />
+                  } label="Auto Permit" />
                 </FormGroup>
               </td>
             }
@@ -206,7 +210,7 @@ const MeetingSettingsComponent = (props) => {
                 onClick={(e) => {
                   close();
 
-                  if (isHost && selectedMeeting.askToJoin !== askToJoin) {
+                  if (isHost && selectedMeeting.askToJoin !== autoPermit) {
                     persistMeetingSettings();
                   }
 
@@ -217,7 +221,7 @@ const MeetingSettingsComponent = (props) => {
                       videoMuted: videoMuted,
                       audioMuted: audioMuted,
                       isHost,
-                      askToJoin: selectedMeeting.askToJoin
+                      autoPermit: autoPermit
                     }
                   })
                 }}

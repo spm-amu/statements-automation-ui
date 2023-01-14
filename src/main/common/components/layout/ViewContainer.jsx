@@ -155,7 +155,7 @@ const ViewContainer = (props) => {
             videoMuted={attributes.data.videoMuted}
             audioMuted={attributes.data.audioMuted}
             isHost={attributes.data.isHost}
-            askToJoin={attributes.data.askToJoin}
+            autoPermit={attributes.data.autoPermit}
             isDirectCall={attributes.data.isDirectCall}
             userToCall={attributes.data.userToCall}
           />

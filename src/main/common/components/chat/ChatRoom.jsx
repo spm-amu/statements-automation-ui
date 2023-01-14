@@ -106,9 +106,6 @@ const ChatRoom = (props) => {
   }
 
   const submitPollVote = (poll, chatParticipant) => {
-    console.log('_______ poll: ', poll);
-    console.log('_______ chatParticipant: ', chatParticipant);
-
     const date = {
       pollId: poll.id,
       optionId: currentVote,

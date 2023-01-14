@@ -80,6 +80,7 @@ const MeetingRoom = (props) => {
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
+  const [autoPermit, setAutoPermit] = useState(false);
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -144,7 +145,6 @@ const MeetingRoom = (props) => {
   const {
     selectedMeeting,
     isHost,
-    askToJoin,
     userToCall,
     isDirectCall,
     callerUser
@@ -338,6 +338,10 @@ const MeetingRoom = (props) => {
   }, [props.displayState]);
 
   useEffect(() => {
+    setAutoPermit(props.autoPermit);
+  }, [props.autoPermit]);
+
+  useEffect(() => {
     if (allUserParticipantsLeft) {
       if (!isDirectCall) {
         // TODO : Introduce a new step for this
@@ -431,7 +435,11 @@ const MeetingRoom = (props) => {
       socketId: data.id
     };
 
-    setLobbyWaitingList(lobbyWaitingList.concat([item]));
+    if (isHost && autoPermit) {
+      acceptUser(item);
+    } else {
+      setLobbyWaitingList(lobbyWaitingList.concat([item]));
+    }
   };
 
   const askForPermission = () => {
@@ -489,7 +497,7 @@ const MeetingRoom = (props) => {
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
         MessageType.AUDIO_VISUAL_SETTINGS_CHANGED);
 
-      if (isHost || isDirectCall || askToJoin === false) {
+      if (isHost || isDirectCall || autoPermit === false) {
         join();
       } else {
         askForPermission();
@@ -768,7 +776,7 @@ const MeetingRoom = (props) => {
               {
                 step === Steps.LOBBY ?
                   <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
-                         askToJoin={askToJoin}
+                         autoPermit={autoPermit}
                          meetingTitle={selectedMeeting.title}
                          acceptUserHandler={
                            (item) => {
@@ -820,6 +828,7 @@ const MeetingRoom = (props) => {
                       displayState={displayState}
                       isHost={isHost}
                       step={step}
+                      autoPermit={autoPermit}
                       toolbarEventHandler={
                         {
                           onMuteVideo: (muted) => {
@@ -883,6 +892,18 @@ const MeetingRoom = (props) => {
                           },
                           lowerHand: () => {
                             lowerHand();
+                          },
+                          toggleAutoPermit: () => {
+                            post(
+                              `${host}/api/v1/meeting/settings`,
+                              (response) => {
+                              },
+                              (e) => {},
+                              {
+                                meetingId: selectedMeeting.id,
+                                askToJoin: !autoPermit
+                              }
+                            );
                           },
                         }
                       }
