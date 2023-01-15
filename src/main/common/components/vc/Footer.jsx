@@ -14,7 +14,8 @@ const Footer = (props) => {
     userVideo,
     handRaised,
     step,
-    isHost
+    isHost,
+    autoPermit
   } = props;
 
   return (
@@ -49,6 +50,7 @@ const Footer = (props) => {
                    displayState={displayState}
                    step={step}
                    isHost={isHost}
+                   autoPermit={autoPermit}
           />
         </div>
         {

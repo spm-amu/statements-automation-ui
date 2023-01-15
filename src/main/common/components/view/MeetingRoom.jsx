@@ -80,6 +80,7 @@ const MeetingRoom = (props) => {
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
+  const [autoPermit, setAutoPermit] = useState(false);
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -144,7 +145,6 @@ const MeetingRoom = (props) => {
   const {
     selectedMeeting,
     isHost,
-    askToJoin,
     userToCall,
     isDirectCall,
     callerUser
@@ -306,8 +306,6 @@ const MeetingRoom = (props) => {
         videoConstraints.audio = false;
       }
 
-      console.log('#### videoConstraints: ', videoConstraints);
-
       navigator.mediaDevices
         .getUserMedia(videoConstraints)
         .then((stream) => {
@@ -336,6 +334,10 @@ const MeetingRoom = (props) => {
       setDisplayState(props.displayState);
     }
   }, [props.displayState]);
+
+  useEffect(() => {
+    setAutoPermit(props.autoPermit);
+  }, [props.autoPermit]);
 
   useEffect(() => {
     if (allUserParticipantsLeft) {
@@ -431,7 +433,11 @@ const MeetingRoom = (props) => {
       socketId: data.id
     };
 
-    setLobbyWaitingList(lobbyWaitingList.concat([item]));
+    if (isHost && autoPermit === false) {
+      acceptUser(item);
+    } else {
+      setLobbyWaitingList(lobbyWaitingList.concat([item]));
+    }
   };
 
   const askForPermission = () => {
@@ -489,7 +495,7 @@ const MeetingRoom = (props) => {
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
         MessageType.AUDIO_VISUAL_SETTINGS_CHANGED);
 
-      if (isHost || isDirectCall || askToJoin === false) {
+      if (isHost || isDirectCall) {
         join();
       } else {
         askForPermission();
@@ -552,6 +558,7 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     fetchChats();
+    persistMeetingSettings();
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     setupStream();
     appManager.add('CURRENT_MEETING', selectedMeeting);
@@ -568,6 +575,19 @@ const MeetingRoom = (props) => {
       userVideo.current.srcObject = currentUserStream.obj;
     }
   }, [userVideo.current, currentUserStream]);
+
+  const persistMeetingSettings = () => {
+    post(
+      `${host}/api/v1/meeting/settings`,
+      (response) => {
+      },
+      (e) => {},
+      {
+        meetingId: selectedMeeting.id,
+        askToJoin: autoPermit
+      }
+    );
+  };
 
   const handleSidebarToggle = (e) => {
     let paper = document.getElementById('meetingDialogPaper');
@@ -767,7 +787,6 @@ const MeetingRoom = (props) => {
               {
                 step === Steps.LOBBY ?
                   <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
-                         askToJoin={askToJoin}
                          meetingTitle={selectedMeeting.title}
                          acceptUserHandler={
                            (item) => {
@@ -819,6 +838,7 @@ const MeetingRoom = (props) => {
                       displayState={displayState}
                       isHost={isHost}
                       step={step}
+                      autoPermit={autoPermit}
                       toolbarEventHandler={
                         {
                           onMuteVideo: (muted) => {
@@ -882,6 +902,9 @@ const MeetingRoom = (props) => {
                           },
                           lowerHand: () => {
                             lowerHand();
+                          },
+                          toggleAutoPermit: () => {
+                            persistMeetingSettings()
                           },
                         }
                       }

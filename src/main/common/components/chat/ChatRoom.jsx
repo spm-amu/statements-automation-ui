@@ -17,7 +17,7 @@ import {MessageType} from '../../types';
 import uuid from 'react-uuid';
 import appManager from "../../../common/service/AppManager";
 import Files from '../customInput/Files';
-import { GroupAdd } from '@material-ui/icons';
+import { GroupAdd, Poll } from '@material-ui/icons';
 import ChatForm from './ChatForm';
 import AutoComplete from '../customInput/AutoComplete';
 import { host, post } from '../../service/RestService';
@@ -25,6 +25,12 @@ import { Form } from 'reactstrap';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
+import ChatPoll from './ChatPoll';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import Radio from '@material-ui/core/Radio';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import PollResult from './PollResult';
 
 const ChatRoom = (props) => {
   const navigate = useNavigate();
@@ -38,6 +44,8 @@ const ChatRoom = (props) => {
   const [confirm, setImgUploadConfirm] = useState('');
   const messagesEndRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState('CHAT');
+  const [currentVote, setCurrentVote] = useState('');
   const [openAddPeople, setOpenAddPeople] = useState(false);
   const [socketEventHandler] = useState({});
 
@@ -55,6 +63,66 @@ const ChatRoom = (props) => {
       }
     }
   };
+
+  const calculatePercentage = (poll, option) => {
+    if (poll.totalVotes === 0) {
+      return 0;
+    }
+    return (option.voteCount * 100) / (poll.totalVotes);
+  };
+
+  const winningOptions = (options) => {
+    return options.reduce((prevOption, currentOption) =>
+        currentOption.voteCount > prevOption.voteCount ? currentOption : prevOption,
+      {voteCount: -Infinity}
+    );
+  }
+
+  const pollRemainingTime = (expirationDateTime) => {
+    const expirationTime = new Date(expirationDateTime).getTime();
+    const currentTime = new Date().getTime();
+
+    const difference_ms = expirationTime - currentTime;
+    const seconds = Math.floor( (difference_ms/1000) % 60 );
+    const minutes = Math.floor( (difference_ms/1000/60) % 60 );
+    const hours = Math.floor( (difference_ms/(1000*60*60)) % 24 );
+    const days = Math.floor( difference_ms/(1000*60*60*24) );
+
+    let timeRemaining;
+
+    if(days > 0) {
+      timeRemaining = days + " days left";
+    } else if (hours > 0) {
+      timeRemaining = hours + " hours left";
+    } else if (minutes > 0) {
+      timeRemaining = minutes + " minutes left";
+    } else if(seconds > 0) {
+      timeRemaining = seconds + " seconds left";
+    } else {
+      timeRemaining = "less than a second left";
+    }
+
+    return timeRemaining;
+  }
+
+  const submitPollVote = (poll, chatParticipant) => {
+    const date = {
+      pollId: poll.id,
+      optionId: currentVote,
+      chatParticipant: chatParticipant
+    }
+
+    post(
+      `${host}/api/v1/poll/vote`,
+      (response) => {
+        console.log('______ RES: ', response);
+
+        props.addedPeopleHandler();
+      },
+      (e) => {},
+      date
+    );
+  }
 
   // const onChatMessage = () => {
   //   if (be.payload.message.participant.userId !== currentUser.userId) {
@@ -133,14 +201,24 @@ const ChatRoom = (props) => {
       .map(user => user.userId);
   };
 
-  const sendMessage = (e, finalMessage = null) => {
-    e.preventDefault();
+  const sendMessage = (e, finalMessage = null, poll = null) => {
+    if (e) {
+      e.preventDefault();
+    }
 
-    if (message || document || finalMessage) {
+    if (message || document || finalMessage || poll) {
+
+      let mType = 'TEXT';
+
+      if (document && document.length > 0) {
+        mType = 'FILE';
+      } else if (poll) {
+        mType = 'POLL';
+      }
 
       const msg = {
         createdDate: new Date(),
-        type: document && document.length > 0 ? 'FILE' : 'TEXT',
+        type: mType,
         active: true,
         content: finalMessage ? finalMessage : message,
         participant: currentUser
@@ -148,6 +226,10 @@ const ChatRoom = (props) => {
 
       if (document && document.length > 0) {
         msg.document = document[0];
+      }
+
+      if (poll) {
+        msg.poll = poll;
       }
 
       msg.participant.active = true;
@@ -350,7 +432,7 @@ const ChatRoom = (props) => {
           </div>
         </div>
       );
-    } else {
+    } else if (message.type === 'TEXT') {
       if (message.participant.userId === currentUser.userId) {
         return (
           <div key={index} className="chatroom__message">
@@ -375,13 +457,108 @@ const ChatRoom = (props) => {
           </div>
         </div>
       );
+    } else {
+      const poll = message.poll;
+
+      console.log('_______ P: ', poll);
+
+      if (!currentVote && poll.selectedOption) {
+        setCurrentVote(poll.selectedOption);
+      }
+
+      const pollOptions = [];
+
+      if (poll.isExpired) {
+        const winningOpt = winningOptions(message.poll.options);
+
+        poll.options.forEach(option => {
+          pollOptions.push(
+            <PollResult
+              key={option.id}
+              option={option}
+              isWinner={winningOpt && option.id === winningOpt.id}
+              isSelected={ poll.selectedOption === option.id }
+              percentVote={calculatePercentage(poll, option)}
+            />
+          );
+        });
+      } else {
+        poll.options.forEach(option => {
+          pollOptions.push(
+            <FormControlLabel
+              key={option.id}
+              className="poll-choice-radio"
+              value={option.id}
+              control={
+                <Radio />
+              }
+              label={option.text}
+            />
+          )
+        })
+      }
+
+      return (
+        <div className="poll-content">
+          <div className="poll-header">
+            <div className="poll-creator-info">
+              <div>
+                <Avatar
+                  className="poll-creator-avatar"
+                  style={{ backgroundColor: Utils.getAvatarColor(message.participant.name)}} >
+                  { message.participant.name.toUpperCase() }
+                </Avatar>
+                <span className="poll-creator-name">
+                    { message.participant.name }
+                </span>
+                <span className="poll-creation-date">
+                    {Utils.formatDateTime(message.createdDate)}
+                </span>
+              </div>
+            </div>
+            <div className="poll-question">
+              { poll.question }
+            </div>
+          </div>
+          <div className="poll-choices">
+            <FormControl style={{ width: '100%' }}>
+              <RadioGroup
+                className="poll-choice-radio-group"
+                value={currentVote}
+                onChange={(e) => {
+                  setCurrentVote(e.target.value)
+                }}
+              >
+                { pollOptions }
+              </RadioGroup>
+            </FormControl>
+          </div>
+          <div className="poll-footer">
+            <Button
+              className="vote-button"
+              disabled={!currentVote}
+              onClick={() => {
+                let currentParticipant = selectedChat.participants.find(p => p.userId === currentUser.userId);
+                submitPollVote(poll, currentParticipant);
+              }}
+            >
+              Submit Vote
+            </Button>
+
+            <span className="time-left" style={{ marginLeft: '16px' }}>
+                {
+                  pollRemainingTime(poll.expirationDateTime)
+                }
+            </span>
+          </div>
+        </div>
+      )
     }
   };
 
   if (selectedChat && messages) {
     return (
       <div className="chatroom">
-
         <Dialog open={openAddPeople} onClose={handleClose}>
           <div style={{
             width: '560px',
@@ -463,58 +640,85 @@ const ChatRoom = (props) => {
                 <GroupAdd/>
               </IconButton>
             </Tooltip>
+
+            <Tooltip title="Poll">
+              <IconButton
+                onClick={(e) => {
+                  setMode('POLL');
+                }}
+              >
+                <Poll/>
+              </IconButton>
+            </Tooltip>
           </div>
         </div>
-        <div id="messages" className="chatroom__body">
-          {
-            messages
-              .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate))?.map(renderMessages)
-          }
-          <div ref={messagesEndRef}/>
-        </div>
-        <div>
-          <form className="chatroom__sendMessage">
-            <div
-              className="message__imageSelector" style={{width: '48px'}}
-            >
-              <Files
-                enableFile={true}
-                id={'documents'}
-                value={document}
-                valueChangeHandler={(value, id) => {
-                  setDocument(value);
-                  setImgUploadConfirm('File is selected and will be displayed after sending the message!');
+
+        {
+          mode === 'POLL' ?
+            <ChatPoll
+              participants={selectedChat.participants}
+              createPollHandler={(pollData) => {
+                sendMessage(null, null, pollData);
+                setMode('CHAT');
+              }}
+              cancelPollHandler={() => {
+                setMode('CHAT');
+              }}
+            /> :
+            <div id="messages" className="chatroom__body">
+              {
+                messages
+                  .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate))?.map(renderMessages)
+              }
+              <div ref={messagesEndRef}/>
+            </div>
+        }
+
+        {
+          mode === 'CHAT' &&
+          <div>
+            <form className="chatroom__sendMessage">
+              <div
+                className="message__imageSelector" style={{width: '48px'}}
+              >
+                <Files
+                  enableFile={true}
+                  id={'documents'}
+                  value={document}
+                  valueChangeHandler={(value, id) => {
+                    setDocument(value);
+                    setImgUploadConfirm('File is selected and will be displayed after sending the message!');
+                  }}
+                />
+              </div>
+              <CustomInput
+                labelText="Type a new message"
+                id="message"
+                formControlProps={{fullWidth: true}}
+                autoFocus
+                inputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        style={styles.inputAdornmentIcon}
+                        type="submit"
+                        onClick={(e) => {
+                          sendMessage(e);
+                        }}
+                      >
+                        <SendIcon style={{fontSize: '24px'}}/>
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                  value: message,
+                  onChange: (e) => {
+                    handleChange(e);
+                  },
                 }}
               />
-            </div>
-            <CustomInput
-              labelText="Type a new message"
-              id="message"
-              formControlProps={{fullWidth: true}}
-              autoFocus
-              inputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      style={styles.inputAdornmentIcon}
-                      type="submit"
-                      onClick={(e) => {
-                        sendMessage(e);
-                      }}
-                    >
-                      <SendIcon style={{fontSize: '24px'}}/>
-                    </IconButton>
-                  </InputAdornment>
-                ),
-                value: message,
-                onChange: (e) => {
-                  handleChange(e);
-                },
-              }}
-            />
-          </form>
-        </div>
-        <p className="image__text">{confirm}</p>
+            </form>
+          </div>
+        }
       </div>
     );
   } else if (!loading && selectedChat) {
