@@ -22,7 +22,7 @@ import {osName} from "react-device-detect";
 import {Stream} from "../../service/Stream";
 import Button from '@material-ui/core/Button';
 import Timer from "../vc/Timer";
-import WhiteBoard from "../vc/WhiteBoard";
+import WhiteBoard from "../whiteboard/WhiteBoard";
 
 const {electron} = window;
 
@@ -646,8 +646,7 @@ const MeetingRoom = (props) => {
   };
 
   const startMeeting = (e) => {
-
-
+    
     const data = {
       meetingId: selectedMeeting.id,
       end: selectedMeeting.endDate
