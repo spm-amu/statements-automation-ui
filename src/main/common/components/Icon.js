@@ -48,7 +48,7 @@ import {
   Videocam,
   VideocamOff,
   Warning,
-  TextFields
+  TextFields,
   Note, MoreHoriz
 } from '@material-ui/icons';
 import SendIcon from "./chat/ChatRoom";
