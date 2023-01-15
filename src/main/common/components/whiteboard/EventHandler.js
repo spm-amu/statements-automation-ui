@@ -1,3 +1,7 @@
+import appManager from "../../../common/service/AppManager";
+import socketManager from '../../service/SocketManager';
+import {MessageType} from "../../types";
+
 const parse = (val) => {
   return parseFloat(val.replace('px', ''));
 };
@@ -23,7 +27,7 @@ export default class EventHandler {
       let parentLeft = event.target.parentElement.offsetLeft;
       let parentTop = event.target.parentElement.offsetTop;
 
-      console.log("\n\n\n\n====================================");
+      console.log("\n====================================");
       console.log(event.clientY );
       console.log(parentTop);
       console.log(event.target.style.top);
@@ -41,10 +45,10 @@ export default class EventHandler {
   initDragAndDrop = (selectionHandler, container) => {
     this.dragOffset = {};
     setTimeout(() => {
-      let elements = document.getElementsByClassName("dropTarget");
-      for (const element of elements) {
-        element.addEventListener("dragstart", this.dragStart, false);
-        element.addEventListener("dragover", this.dragOver, false);
+      let dropTarget = document.getElementsByClassName('dropTarget')[0];
+      if(dropTarget) {
+        dropTarget.addEventListener("dragstart", this.dragStart, false);
+        dropTarget.addEventListener("dragover", this.dragOver, false);
       }
     }, 2000);
 
@@ -52,12 +56,10 @@ export default class EventHandler {
     container.addEventListener("mouseup", (event) => this.handleMouseUp(event, selectionHandler));
     container.addEventListener("mousemove", this.handleMouseMove);
 
-    let parent = document.getElementsByClassName('__sys_placeholders')[0];
     let placeHolders = document.getElementsByClassName('_draggable_');
-    let dropTarget = this.getDropTarget(parent);
 
     for (const placeHolder of placeHolders) {
-      placeHolder.addEventListener('mousemove', (event) => this.handleItemMouseMove(event, parent), false);
+      placeHolder.addEventListener('mousemove', (event) => this.handleItemMouseMove(event, document.getElementsByClassName('dropTarget')[0]), false);
       placeHolder.addEventListener('mouseout', this.handleItemMouseOut, false);
       placeHolder.addEventListener('mouseup', (event) => this.handleItemMouseClick(placeHolder, placeHolder.id, selectionHandler), false);
       placeHolder.addEventListener('dragend', (event) => this.handleItemDrop(event, document.getElementsByClassName('dropTarget')[0]), false);
@@ -85,49 +87,96 @@ export default class EventHandler {
       selectionHandler(null);
     }
 
-    this.tableItemPreResizeWidth = null;
-    this.tableItemPreResizeHeight = null;
-    this.lastColItemPreResizeWidth = null;
-    this.firstColItemPreResizeWidth = null;
-    this.firstRowItemPreResizeHeight = null;
     this.resizingTableColumn = false;
+  };
+
+  updateInputItemValue(metadata) {
+    let elementById = document.getElementById(metadata.id + "-test");
+    elementById.value = metadata.value;
+  }
+
+  handleInputValueChange = (event) => {
+    let metadata = {
+      id: event.target.id,
+      value: event.target.value
+    };
+
+    socketManager.emitEvent(MessageType.WHITEBOARD_EVENT, {
+      userId: appManager.getUserDetails().userId,
+      metadata: metadata,
+      eventType: "INPUT_VALUE_CHANGE"
+    })
+  };
+
+  createNode = (metaData, selectionHandler, test) => {
+    let dropTarget = document.getElementsByClassName('dropTarget')[0];
+    if (dropTarget) {
+      let node = document.createElement(metaData.type);
+      const properties = Object.getOwnPropertyNames(metaData);
+      for (const property of properties) {
+        if(property !== 'style' && property !== 'attributes') {
+          node[property] = metaData[property];
+        }
+      }
+
+      if(metaData.style) {
+        const properties = Object.getOwnPropertyNames(metaData.style);
+        for (const property of properties) {
+            node.style[property] = metaData.style[property];
+        }
+      }
+
+      if(metaData.attributes) {
+        const properties = Object.getOwnPropertyNames(metaData.attributes);
+        for (const property of properties) {
+            node.setAttribute(property, metaData.attributes[property]);
+        }
+      }
+
+      if(!test) {
+        node.addEventListener('dragend', (event) => this.handleItemDrop(event, dropTarget), false);
+        node.addEventListener('mousemove', (event) => this.handleItemMouseMove(event, dropTarget), false);
+        node.addEventListener('mouseout', this.handleItemMouseOut, false);
+        node.addEventListener('mouseup', (event) => this.handleItemMouseClick(node, metaData.id, selectionHandler), false);
+        node.addEventListener('keyup', (event) => this.handleInputValueChange(event), false);
+      }
+
+      dropTarget.appendChild(node);
+
+      return node;
+    }
   };
 
   handleGrabRelease = (event, props, selectionHandler) => {
     let width = props.width;
     let height = props.height;
 
-    let parent = event.target;
-    let dropTarget = document.getElementsByClassName('dropTarget')[0];//this.getDropTarget(parent);
+    let nodeMetadata = {
+      type: "input",
+      id: props.id,
+      innerText: props.description,
+      className: "_draggable_",
+      style: {
+        lineHeight: event.target.style.lineHeight,
+        left: event.clientX + 'px',
+        top: event.clientY + 'px',
+        position: "absolute",
+        height: height + 'px',
+        width: width + 'px',
+      },
+      attributes: {
+        draggable: true
+      }
+    };
 
-    if (dropTarget) {
-      let container = document.getElementById('templateContainer');
-      let node = document.createElement("input");
+    this.selectedNode = this.createNode(nodeMetadata, selectionHandler);
+    this.setSelectedInitNodePos();
 
-      node.id = props.id;
-      node.style.lineHeight = event.target.style.lineHeight;
-      node.style.left = event.clientX + 'px';
-      node.style.top = event.clientY + 'px';
-      //node.style.padding = '4px';
-      //node.style.border = '2px dashed green';
-      node.className = "_draggable_";
-      node.style.position = "absolute";
-      node.setAttribute("draggable", true);
-      node.style.height = height + 'px';
-      node.style.width = width + 'px';
-      node.innerText = props.description;
-      //node.innerHTML = "<input onkeyup='(e) => alert(e)' style='width: 100%; height: 100%'></input>";
-      node.addEventListener('dragend', (event) => this.handleItemDrop(event, dropTarget), false);
-
-      let placeHolders = dropTarget.getElementsByClassName('__sys_placeholders')[0];
-      node.addEventListener('mousemove', (event) => this.handleItemMouseMove(event, placeHolders), false);
-      node.addEventListener('mouseout', this.handleItemMouseOut, false);
-      node.addEventListener('mouseup', (event) => this.handleItemMouseClick(node, props.id, selectionHandler), false);
-
-      placeHolders.appendChild(node);
-      this.selectedNode = node;
-      this.setSelectedInitNodePos();
-    }
+    socketManager.emitEvent(MessageType.WHITEBOARD_EVENT, {
+      userId: appManager.getUserDetails().userId,
+      metadata: nodeMetadata,
+      eventType: "ADD_INPUT_FIELD"
+    });
 
     if (typeof event.target.className === 'string' && !event.target.className.includes("paletteButton")
       && !event.target.className.includes("paletteButtonLabel")
@@ -151,121 +200,47 @@ export default class EventHandler {
     return dropTarget;
   }
 
+  moveItem = (item, metaData) => {
+    item.style.left = ((metaData.clientX - metaData.offsetLeft) - this.dragOffset.x) + 'px';
+    item.style.top = ((metaData.clientY - metaData.offsetTop) - this.dragOffset.y) + 'px';
+  };
+
   handleItemDrop = (event, target) => {
-    console.log("\n\n\n\nclientY : " + event.clientY + " offsetTop : " + target.offsetTop + " dragOffset.y : " + this.dragOffset.y);
-    event.target.style.left = ((event.clientX - target.offsetLeft) - this.dragOffset.x) + 'px';
-    event.target.style.top = ((event.clientY - target.offsetTop) - this.dragOffset.y) + 'px';
+    //console.log("\n\n\n\nclientY : " + event.clientY + " offsetTop : " + target.offsetTop + " dragOffset.y : " + this.dragOffset.y + " BY : " + event.target.id);
+
+    let metadata = {
+      id: event.target.id,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      offsetLeft: target.offsetLeft,
+      offsetTop: target.offsetTop
+    };
+
+    this.moveItem(event.target, metadata);
+
+    //event.target.style.left = ((event.clientX - target.offsetLeft) - this.dragOffset.x) + 'px';
+    //event.target.style.top = ((event.clientY - target.offsetTop) - this.dragOffset.y) + 'px';
     event.preventDefault();
+    event.stopImmediatePropagation();
 
     this.currentResizeNode = null;
     this.mouseDown = false;
-
     document.body.style.cursor = "default";
     this.resetBorders();
     //event.target.style.border = '2px dashed green';
     this.selectedNode = event.target;
+
+    socketManager.emitEvent(MessageType.WHITEBOARD_EVENT, {
+      userId: appManager.getUserDetails().userId,
+      metadata: metadata,
+      eventType: "MOVE_ITEM"
+    });
   };
-
-  resizeTables(node, spec) {
-    let tables = node.getElementsByClassName('_item_table');
-    let table = tables && tables.length > 0 ? tables[0] : null;
-
-    if (!this.tableItemPreResizeWidth && table) {
-      this.tableItemPreResizeWidth = parse(table.style.width);
-    }
-
-    if (!this.tableItemPreResizeHeight && table) {
-      this.tableItemPreResizeHeight = parse(table.style.height);
-    }
-
-    if (table) {
-      if (spec.rightOffset !== 0) {
-        let numCols = table['data-num-cols'];
-        let lastCols = node.getElementsByClassName(`_item_table_col_${numCols - 1}`);
-        let newWidth;
-        let resized = true;
-
-        for (const lastCol of lastCols) {
-          if (!this.lastColItemPreResizeWidth) {
-            this.lastColItemPreResizeWidth = parse(lastCol.style.width);
-          }
-
-          newWidth = (this.lastColItemPreResizeWidth + spec.rightOffset);
-          //console.log(spec.leftOffset + " : " + spec.rightOffset + " : " + this.lastColItemPreResizeWidth);
-
-          if (newWidth >= 32) {
-            lastCol.style.width = newWidth + 'px';
-          } else {
-            resized = false;
-            break;
-          }
-        }
-
-        if (resized) {
-          table.style.width = (this.tableItemPreResizeWidth + spec.rightOffset) + 'px';
-        }
-      }
-
-      if (spec.leftOffset !== 0) {
-        let newWidth;
-        let firstCols = node.getElementsByClassName('_item_table_col_0');
-        let resized = true;
-
-        for (const firstCol of firstCols) {
-          if (!this.firstColItemPreResizeWidth) {
-            this.firstColItemPreResizeWidth = parse(firstCol.style.width);
-          }
-
-          newWidth = (this.firstColItemPreResizeWidth + (spec.leftOffset * -1));
-          if (newWidth >= 32) {
-            firstCol.style.width = newWidth + 'px';
-          } else {
-            resized = false;
-            break;
-          }
-        }
-
-        if (resized) {
-          table.style.width = (this.tableItemPreResizeWidth + (spec.leftOffset * -1)) + 'px';
-        }
-      }
-
-      if (spec.topOffset !== 0 || spec.bottomOffset !== 0) {
-        let newHeight;
-        let rows = node.getElementsByClassName('_item_table_tr');
-
-        if (!this.firstRowItemPreResizeHeight) {
-          this.firstRowItemPreResizeHeight = parse(rows[0].style.height);
-        }
-
-        if (spec.topOffset !== 0) {
-          newHeight = this.firstRowItemPreResizeHeight - spec.topOffset / rows.length;
-        } else if (spec.bottomOffset !== 0) {
-          newHeight = this.firstRowItemPreResizeHeight + spec.bottomOffset / rows.length;
-        }
-
-        for (const row of rows) {
-          row.style.height = newHeight + 'px';
-        }
-
-        if (spec.topOffset !== 0) {
-          table.style.height = (this.tableItemPreResizeHeight - spec.topOffset) + 'px';
-        }
-
-        if (spec.bottomOffset !== 0) {
-          table.style.height = (this.tableItemPreResizeHeight + spec.bottomOffset) + 'px';
-        }
-
-        table.style.height = (this.tableItemPreResizeHeight +
-          (spec.topOffset !== 0 ? spec.topOffset : spec.bottomOffset)) + 'px';
-      }
-    }
-  }
 
   resizeNode = (event, node) => {
     //console.log(this.mouseDown + " : " + node + " : " + this.resizingTableColumn);
     if (this.mouseDown && node) {
-      let container = document.getElementById('templateContainer');
+      let container = document.getElementById('workspaceContainer');
       if (container) {
         let mouseX = event.clientX - this.resizingItemParent.offsetLeft + container.scrollLeft;
         let mouseY = event.clientY - this.resizingItemParent.offsetTop + container.scrollTop;
@@ -323,15 +298,13 @@ export default class EventHandler {
 
           resizeSpec.bottomResized = true;
         }
-
-        this.resizeTables(node, resizeSpec);
       }
     }
   };
 
   updateCursor = (node, event, itemParent) => {
     if (!this.mouseDown && this.selectedNode) {
-      let container = document.getElementById('templateContainer');
+      let container = document.getElementById('workspaceContainer');
 
       let left = parse(node.style.left) + container.offsetLeft;
       let right = left + parse(node.style.width);

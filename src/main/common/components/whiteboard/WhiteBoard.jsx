@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './WhiteBoard.css';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import EventHandler from "./EventHandler";
 import Utils from "../../Utils";
 import Button from '@material-ui/core/Button';
+import appManager from "../../../common/service/AppManager";
+import {SystemEventType} from "../../types";
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -72,11 +74,8 @@ const location = window.location.protocol + "//" + window.location.hostname;
 
 const WhiteBoard = (props) => {
   const classes = useStyles();
-  const [initializing, setInitializing] = React.useState(true);
-  const [loading, setLoading] = React.useState(true);
-  const [value, setValue] = React.useState(null);
-  const [fileDialogOpen, setFileDialogOpen] = React.useState(false);
-  const [templateType, setTemplateType] = React.useState(null);
+  const idCounter = useRef(0);
+  const [systemEventHandler] = useState({});
   const [designData, setDesignData] = React.useState({
     items: [
       {
@@ -89,12 +88,55 @@ const WhiteBoard = (props) => {
   const [templateDoc, setTemplateDoc] = React.useState(null);
   const [grabbedItem, setGrabbedItem] = React.useState(null);
   const [selectedItem, setSelectedItem] = React.useState(null);
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'whiteboard-system-event-handler-api';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.WHITEBOARD_EVENT_ARRIVED:
+            handleEvent(be);
+            break;
+        }
+      }
+    }
+  };
 
-  React.useEffect(() => {
+  const handleEvent = (data) => {
+    switch (data.eventType) {
+      case "INPUT_VALUE_CHANGE":
+        eventHandler.updateInputItemValue(data.metadata);
+        break;
+      case "ADD_INPUT_FIELD":
+        data.metadata.id = data.metadata.id + '-test';
+        data.metadata.style.top = (50 + parseFloat(data.metadata.style.top.replace('px', ''))) + 'px';
+        eventHandler.createNode(data.metadata, (id) => {
+          setSelectedItem(id);
+        }, true);
+        break;
+      case "MOVE_ITEM":
+        data.metadata.id = data.metadata.id + '-test';
+        data.metadata.clientY = data.metadata.clientY + 50;
+        let item = document.getElementById(data.metadata.id);
+        eventHandler.moveItem(item, data.metadata);
+        break;
+    }
+  };
+
+  useEffect(() => {
+    systemEventHandler.api = systemEventHandlerApi();
   });
 
+  React.useEffect(() => {
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.WHITEBOARD_EVENT_ARRIVED);
+    return () => {
+      appManager.removeSubscriptions(systemEventHandler);
+    };
+  }, []);
+
   const setup = () => {
-    let container = document.getElementById('templateContainer');
+    let container = document.getElementById('workspaceContainer');
     if (!Utils.isNull(container)) {
       eventHandler.initDragAndDrop((id, node) => {
         setSelectedItem(id);
@@ -130,28 +172,6 @@ const WhiteBoard = (props) => {
     };
   }
 
-  const api = () => {
-    return {
-      get id() {
-        return props.config.id;
-      },
-      loadData: (actionConfig) => {
-        setLoading(true);
-        setLoading(false);
-      },
-      get model() {
-        return value;
-      },
-      get value() {
-        return value;
-      }
-    }
-  };
-
-  const handleOpen = () => {
-    setFileDialogOpen(true);
-  };
-
   const handleDelete = () => {
     let element = document.getElementById(selectedItem);
     element.parentElement.removeChild(element);
@@ -160,81 +180,6 @@ const WhiteBoard = (props) => {
   };
 
   const handleSave = () => {
-    let payload = document.getElementById("templateContainer").innerHTML.replace("<div name=\"replaced_html\", '<html'")
-      .replace('</div>', '</html>').replace("<div name=\"replaced_body\"", '<body')
-      .replace('</div>', '</body>').replace('2px dashed green', 'none');
-
-    let templateData = {};
-    templateData.templateType = templateType;
-    templateData.payloadBase64 = btoa(payload);
-
-    let fetchConfig = getFetchConfig(JSON.stringify(templateData), 'POST', 'application/json');
-    let url = location + applicationContext.getBaseApiUrl() + props.config.templateStorageUrl;
-
-    trackPromise(
-      fetch(encodeURI(url), fetchConfig)
-        .then(status)
-        .then(json)
-        .then((data) => {
-          //alert('SAVE RESULT : ' + JSON.stringify(data));
-        }).catch((e) => {
-        if (e.code === 401) {
-          applicationContext.clear();
-          applicationContext.getApplicationHistory().push('/login');
-        }
-      })
-    )
-  };
-
-  const handleOk = () => {
-    let fetchConfig = getFetchConfig(null, 'GET');
-    setFileDialogOpen(false);
-    trackPromise(
-      fetch(encodeURI(location + applicationContext.getBaseApiUrl() + props.config.metaDataUrl + '/' + templateType.id), fetchConfig)
-        .then(status)
-        .then(json)
-        .then((data) => {
-          let designData = JSON.parse(data);
-          setDesignData(designData);
-          setTemplateDoc(atob(designData.template.payloadBase64));
-        }).catch(
-        (e) => {
-          if (e.code === 401) {
-            applicationContext.clear();
-            applicationContext.getApplicationHistory().push('/login');
-          }
-        })
-    );
-  };
-
-  const handleClose = () => {
-    setFileDialogOpen(false);
-  };
-
-  const loadDoc = (file) => {
-    setTemplateDoc(null);
-
-    let data = new FormData();
-    data.append("sourceType", "PDF");
-    data.append("targetType", "HTML");
-    data.append("file", file);
-
-    let fetchConfig = getFetchConfig(data, 'POST');
-    let url = location + applicationContext.getBaseApiUrl() + props.config.documentConverterUrl;
-
-    trackPromise(
-      fetch(encodeURI(url), fetchConfig)
-        .then(status)
-        .then(json)
-        .then((data) => {
-          setTemplateDoc(data);
-        }).catch((e) => {
-        if (e.code === 401) {
-          applicationContext.clear();
-          applicationContext.getApplicationHistory().push('/login');
-        }
-      })
-    )
   };
 
   let mouseClickHandler = function (event) {
@@ -242,7 +187,7 @@ const WhiteBoard = (props) => {
       setSelectedItem(grabbedItem.id);
       eventHandler.handleGrabRelease(event,
         {
-          id: grabbedItem.id,
+          id: window.btoa(appManager.getUserDetails().userId) + "-" + idCounter.current++,
           width: 400,
           height: 48,
           description: grabbedItem.description,
@@ -283,12 +228,13 @@ const WhiteBoard = (props) => {
                     minWidth: '280px',
                   }} className={'col-*-*'}>
                     {
-                      designData.items.map((placeHolder) => {
+                      designData.items.map((placeHolder, index) => {
                         return <div>
                           <Button
                             variant={'contained'}
                             size="large"
                             style={{width: '100%'}}
+                            key={index}
                             className={grabbedItem && grabbedItem.placeHolder === placeHolder.placeHolder ? classes.paletteButtonSelected : classes.paletteButton}
                             onClick={() => grabPalleteItem(placeHolder)}
                           >
@@ -308,10 +254,10 @@ const WhiteBoard = (props) => {
                     width: "calc(100% - 288px)"
                   }} className={'col-*-* dropTarget'}
                        onClick={(e) => mouseClickHandler(e)}>
-                    <div style={{height: "100%", width: '100%', border: '8px solid red', overflow: "auto"}}
-                         className={'col-*-* __sys_placeholders'} id={"templateContainer"}
+                    <canvas style={{height: "100%", width: '100%', border: '8px solid red', overflow: "auto"}}
+                         className={'col-*-*'} id={"workspaceContainer"}
                     >
-                    </div>
+                    </canvas>
                   </div>
                 </div>
                 :

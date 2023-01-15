@@ -279,6 +279,13 @@ const BasicBusinessAppDashboard = (props) => {
     systemEventHandler.api = systemEventHandlerApi();
   });
 
+  useEffect(() => {
+    return () => {
+      socketManager.removeSubscriptions(socketEventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
+    };
+  }, []);
+
   function setup(response) {
     appManager.setUserDetails(response);
     setUserDetails(response);
@@ -350,7 +357,7 @@ const BasicBusinessAppDashboard = (props) => {
       })
     }, (e) => {
     }, '', false);
-  }
+  };
 
   React.useEffect(() => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL, SystemEventType.API_ERROR, SystemEventType.API_SUCCESS);
