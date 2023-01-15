@@ -6,7 +6,10 @@ import EventHandler from "./EventHandler";
 import Utils from "../../Utils";
 import Button from '@material-ui/core/Button';
 import appManager from "../../../common/service/AppManager";
-import {SystemEventType} from "../../types";
+import {MessageType, SystemEventType} from "../../types";
+import IconButton from "@material-ui/core/IconButton";
+import Icon from "../Icon";
+import socketManager from "../../service/SocketManager";
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -121,6 +124,9 @@ const WhiteBoard = (props) => {
         let item = document.getElementById(data.metadata.id);
         eventHandler.moveItem(item, data.metadata);
         break;
+      case "DELETE_ITEM":
+        deleteItem(data.metadata.id + '-test');
+        break;
     }
   };
 
@@ -162,7 +168,7 @@ const WhiteBoard = (props) => {
       'idToken': idToken
     };
 
-    if(contentType) {
+    if (contentType) {
       headers['Content-Type'] = contentType;
     }
     return {
@@ -172,18 +178,29 @@ const WhiteBoard = (props) => {
     };
   }
 
-  const handleDelete = () => {
-    let element = document.getElementById(selectedItem);
+  const deleteItem = (id) => {
+    let element = document.getElementById(id);
     element.parentElement.removeChild(element);
+  };
 
+  const handleDelete = () => {
+    deleteItem(selectedItem);
     setSelectedItem(null);
+
+    socketManager.emitEvent(MessageType.WHITEBOARD_EVENT, {
+      userId: appManager.getUserDetails().userId,
+      metadata: {
+        id: selectedItem
+      },
+      eventType: "DELETE_ITEM"
+    })
   };
 
   const handleSave = () => {
   };
 
   let mouseClickHandler = function (event) {
-    if(grabbedItem) {
+    if (grabbedItem) {
       setSelectedItem(grabbedItem.id);
       eventHandler.handleGrabRelease(event,
         {
@@ -214,9 +231,26 @@ const WhiteBoard = (props) => {
   return (
     <div>
       {
-          <div>
-            {
-              designData ?
+        <div>
+          {
+            designData ?
+              <>
+                <IconButton component="span"
+                            disabled={selectedItem === null}
+                            variant={'contained'}
+                            size="large"
+                            onClick={handleDelete}
+                >
+                  <Icon id={'DELETE'}/>
+                </IconButton>
+                <IconButton component="span"
+                            disabled={!templateDoc}
+                            variant={'contained'}
+                            size="large"
+                            onClick={handleSave}
+                >
+                  <Icon id={'SAVE'}/>
+                </IconButton>
                 <div className={"row"} style={{
                   width: '100%',
                   height: '72vh',
@@ -255,15 +289,16 @@ const WhiteBoard = (props) => {
                   }} className={'col-*-* dropTarget'}
                        onClick={(e) => mouseClickHandler(e)}>
                     <canvas style={{height: "100%", width: '100%', border: '8px solid red', overflow: "auto"}}
-                         className={'col-*-*'} id={"workspaceContainer"}
+                            className={'col-*-*'} id={"workspaceContainer"}
                     >
                     </canvas>
                   </div>
                 </div>
-                :
-                null
-            }
-          </div>
+              </>
+              :
+              null
+          }
+        </div>
       }
     </div>
   );
