@@ -110,22 +110,25 @@ const WhiteBoard = (props) => {
     switch (data.eventType) {
       case "INPUT_VALUE_CHANGE":
         eventHandler.updateInputItemValue(data.metadata);
+        props.eventHandler.onUpdateItem(data.metadata);
         break;
       case "ADD_INPUT_FIELD":
-        data.metadata.id = data.metadata.id + '-test';
-        data.metadata.style.top = (50 + parseFloat(data.metadata.style.top.replace('px', ''))) + 'px';
+        //data.metadata.style.top = (50 + parseFloat(data.metadata.style.top.replace('px', ''))) + 'px';
         eventHandler.createNode(data.metadata, (id) => {
           setSelectedItem(id);
-        }, true);
+        }, false);
+
+        props.eventHandler.onAddItem(data.metadata);
         break;
       case "MOVE_ITEM":
-        data.metadata.id = data.metadata.id + '-test';
-        data.metadata.clientY = data.metadata.clientY + 50;
+        //data.metadata.clientY = data.metadata.clientY + 50;
         let item = document.getElementById(data.metadata.id);
         eventHandler.moveItem(item, data.metadata);
+        props.eventHandler.onUpdateItem(data.metadata);
         break;
       case "DELETE_ITEM":
-        deleteItem(data.metadata.id + '-test');
+        deleteItem(data.metadata.id);
+        props.eventHandler.onDeleteItem(data.metadata);
         break;
     }
   };
@@ -136,6 +139,13 @@ const WhiteBoard = (props) => {
 
   React.useEffect(() => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.WHITEBOARD_EVENT_ARRIVED);
+
+    for (const item of props.items) {
+      eventHandler.createNode(item, (id) => {
+        setSelectedItem(id);
+      }, false);
+    }
+
     return () => {
       appManager.removeSubscriptions(systemEventHandler);
     };
@@ -180,7 +190,9 @@ const WhiteBoard = (props) => {
 
   const deleteItem = (id) => {
     let element = document.getElementById(id);
-    element.parentElement.removeChild(element);
+    if(element) {
+      element.parentElement.removeChild(element);
+    }
   };
 
   const handleDelete = () => {
@@ -212,6 +224,8 @@ const WhiteBoard = (props) => {
           table: grabbedItem.table
         }, (id) => {
           setSelectedItem(id);
+        }, (item) => {
+          props.eventHandler.onAddItem(item);
         });
     }
 
@@ -288,7 +302,7 @@ const WhiteBoard = (props) => {
                     width: "calc(100% - 288px)"
                   }} className={'col-*-* dropTarget'}
                        onClick={(e) => mouseClickHandler(e)}>
-                    <canvas style={{height: "100%", width: '100%', border: '8px solid red', overflow: "auto"}}
+                    <canvas style={{height: "100%", width: '100%', overflow: "auto"}}
                             className={'col-*-*'} id={"workspaceContainer"}
                     >
                     </canvas>
