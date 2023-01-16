@@ -91,7 +91,7 @@ export default class EventHandler {
   };
 
   updateInputItemValue(metadata) {
-    let elementById = document.getElementById(metadata.id + "-test");
+    let elementById = document.getElementById(metadata.id);
     elementById.value = metadata.value;
   }
 
@@ -108,28 +108,28 @@ export default class EventHandler {
     })
   };
 
-  createNode = (metaData, selectionHandler, test) => {
+  createNode = (metadata, selectionHandler, test) => {
     let dropTarget = document.getElementsByClassName('dropTarget')[0];
     if (dropTarget) {
-      let node = document.createElement(metaData.type);
-      const properties = Object.getOwnPropertyNames(metaData);
+      let node = document.createElement(metadata.type);
+      const properties = Object.getOwnPropertyNames(metadata);
       for (const property of properties) {
-        if(property !== 'style' && property !== 'attributes') {
-          node[property] = metaData[property];
+        if(property !== 'style' && property !== 'attributes' && property !== 'offsetLeft' && property !== 'offsetTop') {
+          node[property] = metadata[property];
         }
       }
 
-      if(metaData.style) {
-        const properties = Object.getOwnPropertyNames(metaData.style);
+      if(metadata.style) {
+        const properties = Object.getOwnPropertyNames(metadata.style);
         for (const property of properties) {
-            node.style[property] = metaData.style[property];
+            node.style[property] = metadata.style[property];
         }
       }
 
-      if(metaData.attributes) {
-        const properties = Object.getOwnPropertyNames(metaData.attributes);
+      if(metadata.attributes) {
+        const properties = Object.getOwnPropertyNames(metadata.attributes);
         for (const property of properties) {
-            node.setAttribute(property, metaData.attributes[property]);
+            node.setAttribute(property, metadata.attributes[property]);
         }
       }
 
@@ -137,7 +137,7 @@ export default class EventHandler {
         node.addEventListener('dragend', (event) => this.handleItemDrop(event, dropTarget), false);
         node.addEventListener('mousemove', (event) => this.handleItemMouseMove(event, dropTarget), false);
         node.addEventListener('mouseout', this.handleItemMouseOut, false);
-        node.addEventListener('mouseup', (event) => this.handleItemMouseClick(node, metaData.id, selectionHandler), false);
+        node.addEventListener('mouseup', (event) => this.handleItemMouseClick(node, metadata.id, selectionHandler), false);
         node.addEventListener('keyup', (event) => this.handleInputValueChange(event), false);
       }
 
@@ -147,7 +147,7 @@ export default class EventHandler {
     }
   };
 
-  handleGrabRelease = (event, props, selectionHandler) => {
+  handleGrabRelease = (event, props, selectionHandler, successHandler) => {
     let width = props.width;
     let height = props.height;
 
@@ -183,6 +183,8 @@ export default class EventHandler {
       && !event.target.className.includes("paletteButtonSelected")) {
       document.getElementsByTagName("body")[0].style.cursor = 'default';
     }
+
+    successHandler(nodeMetadata);
   };
 
   getDropTarget(node) {
@@ -201,8 +203,9 @@ export default class EventHandler {
   }
 
   moveItem = (item, metaData) => {
-    item.style.left = ((metaData.clientX - metaData.offsetLeft) - this.dragOffset.x) + 'px';
-    item.style.top = ((metaData.clientY - metaData.offsetTop) - this.dragOffset.y) + 'px';
+    console.log("DO : ", this.dragOffset);
+    item.style.left = ((metaData.clientX - metaData.offsetLeft) - metaData.dragOffset.x) + 'px';
+    item.style.top = ((metaData.clientY - metaData.offsetTop) - metaData.dragOffset.y) + 'px';
   };
 
   handleItemDrop = (event, target) => {
@@ -213,7 +216,11 @@ export default class EventHandler {
       clientX: event.clientX,
       clientY: event.clientY,
       offsetLeft: target.offsetLeft,
-      offsetTop: target.offsetTop
+      offsetTop: target.offsetTop,
+      dragOffset: {
+        x: this.dragOffset.x,
+        y: this.dragOffset.y
+      }
     };
 
     this.moveItem(event.target, metadata);
