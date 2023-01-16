@@ -69,6 +69,7 @@ const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/wai
 const MeetingRoom = (props) => {
   const [sideBarOpen, setSideBarOpen] = useState(false);
   const [sideBarTab, setSideBarTab] = useState('');
+  const [isHost, setIsHost] = useState(false);
   const [displayState, setDisplayState] = useState(props.displayState);
   const [participants, setParticipants] = useState([]);
   const [meetingChat, setMeetingChat] = useState(null);
@@ -144,7 +145,6 @@ const MeetingRoom = (props) => {
 
   const {
     selectedMeeting,
-    isHost,
     userToCall,
     isDirectCall,
     callerUser
@@ -259,6 +259,23 @@ const MeetingRoom = (props) => {
       );
     }
   };
+
+  const changeHost = (participant) => {
+    post(
+      `${host}/api/v1/meeting/changeHost`,
+      (response) => {
+        setIsHost(!isHost);
+      },
+      (e) => {
+      },
+      {
+        meetingId: selectedMeeting.id,
+        userId: participant.userId
+      },
+      '',
+      false
+    );
+  }
 
   const stopShareScreen = () => {
     setScreenShared(false);
@@ -557,6 +574,7 @@ const MeetingRoom = (props) => {
   };
 
   useEffect(() => {
+    setIsHost(props.isHost);
     fetchChats();
     persistMeetingSettings();
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
@@ -666,7 +684,7 @@ const MeetingRoom = (props) => {
   };
 
   const startMeeting = (e) => {
-    
+
     const data = {
       meetingId: selectedMeeting.id,
       end: selectedMeeting.endDate
@@ -933,6 +951,15 @@ const MeetingRoom = (props) => {
                 participantsRaisedHands={participantsRaisedHands}
                 participants={participants}
                 onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
+                onChangeMeetingHostHandler={(newHost) => {
+                  console.log('_____ NEW HOST: ', newHost);
+
+                  console.log('_______ PARTICPANTS: ', participants);
+
+                  console.log('________ SELECTED MEETING: ', selectedMeeting);
+
+                  changeHost(newHost);
+                }}
               />
             </ClosablePanel>
           </div>

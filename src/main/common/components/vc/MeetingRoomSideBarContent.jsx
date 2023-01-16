@@ -113,7 +113,12 @@ const MeetingRoomSideBarContent = (props) => {
       <div className={'list'}>
         {
           tab === 'People' ?
-            <InCall isHost={isHost} participants={participants} participantsRaisedHands={participantsRaisedHands} /> :
+            <InCall
+              onChangeMeetingHostHandler={(e) => props.onChangeMeetingHostHandler(e)}
+              isHost={isHost}
+              participants={participants}
+              participantsRaisedHands={participantsRaisedHands}
+            /> :
             <ChatRoom chatTab={true} selectedChat={meetingChat} meetingId={meetingId}/>
         }
       </div>

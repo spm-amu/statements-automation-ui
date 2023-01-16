@@ -137,7 +137,7 @@ const InCall = (props) => {
               anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
             >
 
-              <MenuItem >
+              <MenuItem onClick={() => props.onChangeMeetingHostHandler(participant)}>
                 <ListItemIcon>
                   <PersonAdd fontSize="small" />
                 </ListItemIcon>
