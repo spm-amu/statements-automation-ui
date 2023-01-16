@@ -68,11 +68,13 @@ const WebLinkLanding = (props) => {
       `${host}/api/v1/auth/validateMeetingToken`,
       (response) => {
         if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
+          let _user = response.meetingAttendee.external ? response.meetingAttendee.emailAddress : response.userId;
           navigate('/login', {
             state: {
               meetingId: meetingId,
-              tokenUserId: response.userId,
-              token: urlToken
+              tokenUserId: _user,
+              token: urlToken,
+              meetingExternal: response.meetingAttendee.external
             }
           });
         } else {

@@ -12,6 +12,7 @@ import '../main/@fake-db';
 import SignIn from '../main/common/components/view/security/SignIn';
 import DialingPreview from '../main/common/components/vc/DialingPreview';
 import MessagePreview from '../main/common/components/vc/MessagePreview';
+import ExternalMeetingAttendee from "../main/common/components/view/security/ExternalMeetingAttendee";
 import WebLinkLanding from '../main/common/components/view/WebLinkLanding';
 
 const armscorTheme = createTheme({
@@ -61,6 +62,14 @@ const WebLink = () => {
   );
 };
 
+const ExternalAttendee = () => {
+  return (
+    <div style={{width: '99vw', height: '100vh', backgroundColor: '#E5E5E5', overflow: 'hidden'}}>
+      <ExternalMeetingAttendee />
+    </div>
+  );
+};
+
 const Dashboard = () => {
   return (
     <div style={{width: '100%'}}>
@@ -82,12 +91,13 @@ export default function App() {
       <ThemeProvider theme={armscorTheme}>
         <Router>
           <Routes>
-            <Route path="*" element={<Dashboard/>}/>
-            <Route path="/dashboard/*" element={<Dashboard/>}/>
-            <Route path="/login" element={<Login/>}/>
+            <Route path="*" element={<Dashboard />}/>
+            <Route path="/dashboard/*" element={<Dashboard />}/>
+            <Route path="/login" element={<Login />}/>
             <Route path="/dialingPreview" element={<Dialing />}/>
             <Route path="/messagePreview" element={<Message />}/>
             <Route path="/webLink" element={<WebLink />}/>
+            <Route path="/externalAttendeeView" element={<ExternalAttendee />}/>
           </Routes>
         </Router>
       </ThemeProvider>

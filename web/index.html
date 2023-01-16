@@ -118,7 +118,7 @@
                       <p class="card-text">
                         No download or installation required.
                       </p>
-                      <a href="#" class="btn btn-outline-primary">Continue</a>
+                      <button id='open-web' onc="http://localhost:1212/" class="btn btn-outline-primary">Continue</button>
                     </div>
                   </div>
 
@@ -158,6 +158,7 @@
         }
 
         $( "#open-app" ).click(function() {
+
           const meetingId = $.urlParam('meetingId');
           const accessToken = $.urlParam('accessToken');
 
@@ -165,11 +166,26 @@
         });
 
         $( window ).on( "load", function() {
+
+          console.log("on load app ...");
           const meetingId = $.urlParam('meetingId');
           const accessToken = $.urlParam('accessToken');
 
+          console.log("meetingId", meetingId);
+          console.log("accessToken", accessToken);
+
           window.location.href = `armscor-connect://meetingId=${meetingId}&accessToken=${accessToken}`;
         });
+
+        $( "#open-web" ).click(function() {
+
+          const meetingId = $.urlParam('meetingId');
+          const accessToken = $.urlParam('accessToken');
+          <!-- /#/webView -->
+          const webUrl = `http://localhost:1212/#/?meetingId=${meetingId}&accessToken=${accessToken}`;
+          window.open(webUrl);
+        });
+
       });
     </script>
   </body>

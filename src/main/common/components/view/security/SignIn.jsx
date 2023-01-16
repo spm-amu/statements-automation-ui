@@ -101,8 +101,10 @@ const SignIn = (props) => {
     if (username && password) {
       setIsLoading(true);
 
+      let loginUrl = location.state.meetingExternal ? 'meetingLogin' : 'login';
+
       post(
-        `${host}/api/v1/auth/login`,
+        `${host}/api/v1/auth/${loginUrl}`,
         (response) => {
           setIsLoading(false);
 
