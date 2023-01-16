@@ -952,12 +952,6 @@ const MeetingRoom = (props) => {
                 participants={participants}
                 onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
                 onChangeMeetingHostHandler={(newHost) => {
-                  console.log('_____ NEW HOST: ', newHost);
-
-                  console.log('_______ PARTICPANTS: ', participants);
-
-                  console.log('________ SELECTED MEETING: ', selectedMeeting);
-
                   changeHost(newHost);
                 }}
               />
