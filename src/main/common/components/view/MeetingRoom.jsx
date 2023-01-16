@@ -927,6 +927,7 @@ const MeetingRoom = (props) => {
             >
               <MeetingRoomSideBarContent
                 meetingChat={meetingChat}
+                isHost={isHost}
                 tab={sideBarTab}
                 meetingId={selectedMeeting.id}
                 participantsRaisedHands={participantsRaisedHands}

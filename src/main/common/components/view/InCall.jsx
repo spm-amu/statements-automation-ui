@@ -22,7 +22,7 @@ const InCall = (props) => {
         <div className={'people-content row'}>
           <h3 className={'header-panel'}>In call</h3>
           {participants.map((participant, index) => {
-            return <InCallCard key={index} participant={participant} raisedHands={participantsRaisedHands.filter((p) => p.userId === participant.userId).length > 0}/>
+            return <InCallCard key={index} isHost={props.isHost} participant={participant} raisedHands={participantsRaisedHands.filter((p) => p.userId === participant.userId).length > 0}/>
           })}
         </div>
       }

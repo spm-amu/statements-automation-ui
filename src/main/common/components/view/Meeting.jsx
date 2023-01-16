@@ -1083,10 +1083,7 @@ const Meeting = (props) => {
                   searchAttribute={'emailAddress'}
                   validationRegex={/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/}
                   valueChangeHandler={(value, id) => {
-                    console.log('_______: ', value);
-
                     setNewHostAttendee([].concat(value[1]));
-
                     handleFormValueChange(value, id, false);
                   }}
                   optionsData={value.attendees}

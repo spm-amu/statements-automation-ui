@@ -53,33 +53,6 @@ const SignIn = (props) => {
   useEffect(() => {
     clearErrorStates();
 
-    if (!isSafari && !isChrome && !isIE && !isEdge) {
-      electron.ipcRenderer.on('joinMeetingEvent', args => {
-        if (args.payload.params.redirect) {
-          post(
-            `${host}/api/v1/auth/validateMeetingToken`,
-            (response) => {
-              setUsername(response.userId);
-              setRedirectData({
-                meetingId: response.meetingID,
-                tokenUserId: response.userId
-              });
-              setIsMeetingRedirect(true);
-            },
-            (e) => {
-              console.log('ERR: ', e);
-            },
-            {
-              token: args.payload.params.accessToken
-            },
-            null,
-            false,
-            false
-          );
-        }
-      });
-    }
-
     if (location.state) {
       setUsername(location.state.tokenUserId);
       setRedirectData(location.state);
@@ -122,11 +95,23 @@ const SignIn = (props) => {
 
             electron.ipcRenderer.on('tokensSaved', args => {
               electron.ipcRenderer.removeAllListeners("tokensSaved");
-              electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
+              // electron.ipcRenderer.removeAllListeners("joinMeetingEvent");
 
-              navigate('/dashboard', {
-                state: redirectData
-              });
+              if (location.state) {
+                electron.ipcRenderer.sendMessage('joinMeetingEvent', {
+                  payload: {
+                    params: {
+                      meetingId: location.state.meetingId,
+                      accessToken: location.state.token,
+                      redirect: true
+                    }
+                  }
+                })
+              } else {
+                navigate('/dashboard', {
+                  state: redirectData
+                });
+              }
             });
           } else {
             navigate('/dashboard', {

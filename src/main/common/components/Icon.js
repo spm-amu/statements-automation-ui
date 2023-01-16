@@ -49,7 +49,7 @@ import {
   VideocamOff,
   Warning,
   TextFields,
-  Note, MoreHoriz
+  Note, MoreHoriz, PersonAdd
 } from '@material-ui/icons';
 import SendIcon from "./chat/ChatRoom";
 
@@ -174,6 +174,8 @@ class Icon extends Component {
       return <Note/>
     } else if (this.props.id === 'TEXT_FIELDS') {
       return <TextFields/>
+    } else if (this.props.id === 'PERSON_ADD') {
+      return <PersonAdd/>
     } else if (this.props.id === 'SIGN') {
       return <i className="fas fa-pen-nib" style={{color: this.props.color}}/>
     } else if (this.props.id === 'ERROR') {

@@ -41,6 +41,7 @@ const MeetingRoomSideBarContent = (props) => {
   const [peopleDialogOpen, setPeopleDialogOpen] = useState(false);
   const {
     tab,
+    isHost,
     meetingId,
     participants,
     participantsRaisedHands,
@@ -112,7 +113,7 @@ const MeetingRoomSideBarContent = (props) => {
       <div className={'list'}>
         {
           tab === 'People' ?
-            <InCall participants={participants} participantsRaisedHands={participantsRaisedHands} /> :
+            <InCall isHost={isHost} participants={participants} participantsRaisedHands={participantsRaisedHands} /> :
             <ChatRoom chatTab={true} selectedChat={meetingChat} meetingId={meetingId}/>
         }
       </div>
