@@ -105,6 +105,19 @@ const ChatRoom = (props) => {
     return timeRemaining;
   }
 
+  const closePoll = (pollId) => {
+    post(
+      `${host}/api/v1/poll/close`,
+      (response) => {
+        props.addedPeopleHandler();
+      },
+      (e) => {},
+      {
+        id: pollId
+      }
+    );
+  }
+
   const submitPollVote = (poll, chatParticipant) => {
     const date = {
       pollId: poll.id,
@@ -115,8 +128,6 @@ const ChatRoom = (props) => {
     post(
       `${host}/api/v1/poll/vote`,
       (response) => {
-        console.log('______ RES: ', response);
-
         props.addedPeopleHandler();
       },
       (e) => {},
@@ -468,7 +479,9 @@ const ChatRoom = (props) => {
 
       const pollOptions = [];
 
-      if (poll.isExpired) {
+      const pollClosed = poll.isExpired || !poll.open;
+
+      if (pollClosed) {
         const winningOpt = winningOptions(message.poll.options);
 
         poll.options.forEach(option => {
@@ -533,24 +546,43 @@ const ChatRoom = (props) => {
               </RadioGroup>
             </FormControl>
           </div>
-          <div className="poll-footer">
-            <Button
-              className="vote-button"
-              disabled={!currentVote}
-              onClick={() => {
-                let currentParticipant = selectedChat.participants.find(p => p.userId === currentUser.userId);
-                submitPollVote(poll, currentParticipant);
-              }}
-            >
-              Submit Vote
-            </Button>
 
-            <span className="time-left" style={{ marginLeft: '16px' }}>
+          {
+            !pollClosed &&
+            <div className="poll-footer">
+              <Button
+                className="vote-button"
+                variant={'outlined'}
+                disabled={!currentVote}
+                onClick={() => {
+                  let currentParticipant = selectedChat.participants.find(p => p.userId === currentUser.userId);
+                  submitPollVote(poll, currentParticipant);
+                }}
+              >
+                Submit Vote
+              </Button>
+
+              {
+                currentUser.userId === message.participant.userId &&
+                <Button
+                  className="vote-button"
+                  variant={'outlined'}
+                  onClick={() => {
+                    closePoll(poll.id);
+                  }}
+                  style={{ marginLeft: '8px' }}
+                >
+                  Close Poll
+                </Button>
+              }
+
+              <span className="time-left" style={{ marginLeft: '16px' }}>
                 {
                   pollRemainingTime(poll.expirationDateTime)
                 }
             </span>
-          </div>
+            </div>
+          }
         </div>
       )
     }
