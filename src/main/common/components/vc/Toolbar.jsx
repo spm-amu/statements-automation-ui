@@ -316,12 +316,6 @@ const Toolbar = (props) => {
             autoPermit ? 'Do Not Auto Permit' : 'Auto Permit'
           }
         </MenuItem>
-        <MenuItem disabled={!isHost} >
-          <ListItemIcon>
-            <Settings fontSize="small" />
-          </ListItemIcon>
-          Change Meeting Host
-        </MenuItem>
         <MenuItem
           disabled={true}
         >

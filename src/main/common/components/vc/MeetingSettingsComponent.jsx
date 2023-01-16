@@ -177,7 +177,7 @@ const MeetingSettingsComponent = (props) => {
                 <FormGroup>
                   <FormControlLabel control={
                     <Switch
-                      checked={autoPermit}
+                      checked={!autoPermit}
                       value={autoPermit}
                       color="primary"
                       onChange={(e, value) => {
