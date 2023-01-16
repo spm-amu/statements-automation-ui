@@ -417,7 +417,8 @@ const BasicBusinessAppDashboard = (props) => {
                 navigate('/login', {
                   state: {
                     meetingId: args.payload.params.meetingId,
-                    tokenUserId: response.userId
+                    tokenUserId: response.userId,
+                    token: args.payload.params.accessToken
                   }
                 });
               } else {
