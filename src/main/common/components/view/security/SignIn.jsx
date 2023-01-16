@@ -141,12 +141,18 @@ const SignIn = (props) => {
               });
             });
           } else {
+            const data = {
+              accessToken: response.access_token,
+              refreshToken: response.refresh_token,
+              lastLogin
+            };
+
+            if (redirectData) {
+              data.meetingId = redirectData.meetingId;
+            }
+
             navigate('/dashboard', {
-              state: {
-                accessToken: response.access_token,
-                refreshToken: response.refresh_token,
-                lastLogin
-              }
+              state: data
             });
           }
         },

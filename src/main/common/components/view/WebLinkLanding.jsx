@@ -1,15 +1,106 @@
-import React, { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { CardBody, CardText, CardTitle, Col, Row } from 'reactstrap';
 import Button from '@material-ui/core/Button';
 import './WebLinkLanding.css'
+import { get, host, post } from '../../service/RestService';
+import Utils from '../../Utils';
+import appManager from '../../service/AppManager';
+import { SystemEventType } from '../../types';
+import { ACCESS_TOKEN_PROPERTY, REFRESH_TOKEN_PROPERTY } from '../../service/TokenManager';
 
 const WebLinkLanding = (props) => {
-  let { meetingId, accessToken } = useParams();
+  const navigate = useNavigate();
+
+  const [meetingId, setMeetingId] = useState('');
+  const [urlToken, setUrlToken] = useState('');
+
+  const [ queryParameters ] = useSearchParams()
 
   useEffect(() => {
-    window.location.replace(`armscor-connect://meetingId=${meetingId}&accessToken=${accessToken}`);
+    if (urlToken && meetingId) {
+      window.location.replace(`armscor-connect://meetingId=${meetingId}&accessToken=${urlToken}`);
+    }
+  }, [urlToken, meetingId]);
+
+  useEffect(() => {
+    const _meetingId = queryParameters.get("meetingId");
+    const _urlToken = queryParameters.get("accessToken");
+
+    setMeetingId(_meetingId);
+    setUrlToken(_urlToken);
   }, []);
+
+  const openApp = () => {
+    window.location.replace(`armscor-connect://meetingId=${meetingId}&accessToken=${accessToken}`);
+  }
+
+  const redirectToMeeting = (params) => {
+    get(`${host}/api/v1/meeting/fetch/${params.meetingId}`, (response) => {
+      let userDetails = appManager.getUserDetails();
+      let isHost = false;
+      response.extendedProps.attendees.forEach(att => {
+        if (att.userId === userDetails.userId) {
+          isHost = att.type === 'HOST';
+        }
+      });
+
+      navigate("/view/meetingRoom", {
+        state: {
+          displayMode: 'window',
+          selectedMeeting: {
+            id: response.id
+          },
+          videoMuted: true,
+          audioMuted: true,
+          isHost
+        }
+      })
+    }, (e) => {
+    }, '', false);
+  };
+
+  const continueOnBrowser = () => {
+    let accessToken = appManager.get(ACCESS_TOKEN_PROPERTY);
+    let refreshToken = appManager.get(REFRESH_TOKEN_PROPERTY);
+
+    post(
+      `${host}/api/v1/auth/validateMeetingToken`,
+      (response) => {
+        if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
+          navigate('/login', {
+            state: {
+              meetingId: meetingId,
+              tokenUserId: response.userId,
+              token: urlToken
+            }
+          });
+        } else {
+          let userDetails = appManager.getUserDetails();
+          if (response.userId === userDetails.userId) {
+            redirectToMeeting({
+              meetingId: meetingId
+            });
+          } else {
+            appManager.fireEvent(SystemEventType.API_ERROR, {
+              message: `Please login in as ${response.userId} to join this meeting. Please avoid sharing private meetings with uninvited guests!`
+            });
+          }
+        }
+      },
+      (e) => {
+        appManager.fireEvent(SystemEventType.API_ERROR, {
+          message: 'Invalid meeting link.'
+        });
+      },
+      {
+        token: urlToken
+      },
+      '',
+      true,
+      false
+    );
+  }
 
   return (
     <div className="auth-wrapper auth-cover">
@@ -49,6 +140,7 @@ const WebLinkLanding = (props) => {
                   No download or installation required.
                 </CardText>
                 <Button
+                  onClick={() => continueOnBrowser()}
                   style={{ marginTop: '0.75rem' }}
                   color={'primary'}
                   variant={'outlined'}
@@ -67,6 +159,7 @@ const WebLinkLanding = (props) => {
                   Already have it? Go right to your meeting.
                 </CardText>
                 <Button
+                  onClick={() => openApp()}
                   style={{ marginTop: '0.75rem' }}
                   color={'primary'}
                   variant={'outlined'}
