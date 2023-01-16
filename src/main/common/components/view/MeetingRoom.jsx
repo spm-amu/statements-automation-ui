@@ -138,6 +138,9 @@ const MeetingRoom = (props) => {
           case MessageType.AUDIO_VISUAL_SETTINGS_CHANGED:
             onAVSettingsChange(be.payload);
             break;
+          case MessageType.MEETING_ENDED:
+            onCallEnded();
+            break;
         }
       }
     }
@@ -275,7 +278,7 @@ const MeetingRoom = (props) => {
       '',
       false
     );
-  }
+  };
 
   const stopShareScreen = () => {
     setScreenShared(false);
@@ -510,7 +513,7 @@ const MeetingRoom = (props) => {
     if (currentUserStream) {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
-        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED);
+        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED);
 
       if (isHost || isDirectCall) {
         join();
@@ -636,10 +639,12 @@ const MeetingRoom = (props) => {
   };
 
   const endMeeting = () => {
-    socketManager.emitEvent(MessageType.END_MEETING, {
-      meetingId: selectedMeeting.id,
-      userId: appManager.getUserDetails().userId
-    })
+    if(isHost) {
+      socketManager.emitEvent(MessageType.END_MEETING, {
+        meetingId: selectedMeeting.id,
+        userId: appManager.getUserDetails().userId
+      })
+    }
   };
 
   const endCall = () => {
