@@ -67,16 +67,26 @@ const WebLinkLanding = (props) => {
     post(
       `${host}/api/v1/auth/validateMeetingToken`,
       (response) => {
+        console.log('_______ RES: ', response);
+
         if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
-          let _user = response.meetingAttendee.external ? response.meetingAttendee.emailAddress : response.userId;
-          navigate('/login', {
-            state: {
-              meetingId: meetingId,
-              tokenUserId: _user,
-              token: urlToken,
-              meetingExternal: response.meetingAttendee.external
-            }
-          });
+          if (response.privacyType === 'PUBLIC') {
+            navigate('/guest', {
+              state: {
+                meetingId: meetingId
+              }
+            });
+          } else {
+            let _user = response.meetingAttendee.external ? response.meetingAttendee.emailAddress : response.userId;
+            navigate('/login', {
+              state: {
+                meetingId: meetingId,
+                tokenUserId: _user,
+                token: urlToken,
+                meetingExternal: response.meetingAttendee.external
+              }
+            });
+          }
         } else {
           let userDetails = appManager.getUserDetails();
           if (response.userId === userDetails.userId) {

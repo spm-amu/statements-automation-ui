@@ -14,6 +14,7 @@ import DialingPreview from '../main/common/components/vc/DialingPreview';
 import MessagePreview from '../main/common/components/vc/MessagePreview';
 import ExternalMeetingAttendee from "../main/common/components/view/security/ExternalMeetingAttendee";
 import WebLinkLanding from '../main/common/components/view/WebLinkLanding';
+import Guest from '../main/common/components/view/security/Guest';
 
 const armscorTheme = createTheme({
     palette: {
@@ -62,6 +63,14 @@ const WebLink = () => {
   );
 };
 
+const GuestLink = () => {
+  return (
+    <div style={{width: '99vw', height: '100vh', backgroundColor: '#E5E5E5', overflow: 'hidden'}}>
+      <Guest />
+    </div>
+  );
+};
+
 const ExternalAttendee = () => {
   return (
     <div style={{width: '99vw', height: '100vh', backgroundColor: '#E5E5E5', overflow: 'hidden'}}>
@@ -97,6 +106,7 @@ export default function App() {
             <Route path="/dialingPreview" element={<Dialing />}/>
             <Route path="/messagePreview" element={<Message />}/>
             <Route path="/webLink" element={<WebLink />}/>
+            <Route path="/guest" element={<GuestLink />}/>
             <Route path="/externalAttendeeView" element={<ExternalAttendee />}/>
           </Routes>
         </Router>

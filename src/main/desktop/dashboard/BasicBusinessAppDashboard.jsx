@@ -299,7 +299,6 @@ const BasicBusinessAppDashboard = (props) => {
     }
 
 
-    console.log('#### location.state: ', location.state);
     if (location.state) {
       window.history.replaceState({}, document.title); // clear location.state
       redirectToMeeting(location.state);
@@ -465,7 +464,11 @@ const BasicBusinessAppDashboard = (props) => {
         appManager.add(REFRESH_TOKEN_PROPERTY, loginTokens.refreshToken);
         appManager.add(LAST_LOGIN, loginTokens.lastLogin);
 
-        load();
+        if (loginTokens.guest) {
+          setup(loginTokens.guest);
+        } else {
+          load();
+        }
       } else {
         navigate('/login');
       }
@@ -626,12 +629,6 @@ const BasicBusinessAppDashboard = (props) => {
     document.documentElement.classList.remove("nav-open");
   };
 
-  function launcDashboard() {
-    applicationContext.closeCurrentView(false);
-    applicationContext.getViewPortHistory().push("/switch");
-    applicationContext.getViewPortHistory().push("/view/dashboard");
-  }
-
   return (
     loading || !userDetails ?
       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
@@ -681,7 +678,10 @@ const BasicBusinessAppDashboard = (props) => {
 
                     tokenManager.stopTokenRefreshMonitor();
 
-                    electron.ipcRenderer.sendMessage('removeTokens', {});
+                    if (!isSafari && !isChrome && !isIE && !isEdge) {
+                      electron.ipcRenderer.sendMessage('removeTokens', {});
+                    }
+
                     navigate("/login");
                   }}
                 />{" "}

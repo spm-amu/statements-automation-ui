@@ -101,7 +101,7 @@ const SignIn = (props) => {
     if (username && password) {
       setIsLoading(true);
 
-      let loginUrl = location.state.meetingExternal ? 'meetingLogin' : 'login';
+      let loginUrl = location.state && location.state.meetingExternal ? `meetingLogin/${location.state.meetingId}` : 'login';
 
       post(
         `${host}/api/v1/auth/${loginUrl}`,
@@ -216,7 +216,9 @@ const SignIn = (props) => {
               Welcome to Armscor.
             </CardTitle>
             <CardText style={{ color: '#00476a' }}>
-              Please sign-in to your account and start connecting...
+              {
+                location.state && location.state.meetingExternal ? 'Please enter the passcode sent to your email.' : 'Please sign-in to your account and start connecting...'
+              }
             </CardText>
 
             <form className="auth-login-form mt-2">
@@ -245,7 +247,7 @@ const SignIn = (props) => {
               }
               <div className="mb-1">
                 <CustomInput
-                  labelText="Password"
+                  labelText={ location.state && location.state.meetingExternal ? 'Passcode' : 'Password'}
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   success={passwordState === 'success'}
