@@ -85,7 +85,6 @@ const MeetingSettingsComponent = (props) => {
     stream.close();
   };
 
-
   const close = () => {
     closeStreams();
     navigate("/view/calendar");
@@ -107,17 +106,17 @@ const MeetingSettingsComponent = (props) => {
         <table>
           <tbody>
           <tr>
-            <td className={'title'} colSpan={3}>
+            <td className={'title'} colSpan={4}>
               {selectedMeeting.title}
             </td>
           </tr>
           <tr>
-            <td style={{paddingBottom: '16px'}} colSpan={3}>
+            <td style={{paddingBottom: '16px'}} colSpan={4}>
               Please select your audio and video settings
             </td>
           </tr>
           <tr>
-            <td className={'lobby-settings'} colSpan={3}>
+            <td className={'lobby-settings'} colSpan={4}>
               <div
                 style={{
                   width: '100%',
@@ -170,12 +169,11 @@ const MeetingSettingsComponent = (props) => {
                 color="primary"
               />
             </td>
-
             {
               isHost &&
               <td style={{paddingTop: '8px', textAlign: 'left'}}>
                 <FormGroup>
-                  <FormControlLabel control={
+                  <FormControlLabel style={{paddingTop: '10px'}} control={
                     <Switch
                       checked={!autoPermit}
                       value={autoPermit}
