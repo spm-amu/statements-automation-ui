@@ -12,6 +12,7 @@ import '../main/@fake-db';
 import SignIn from '../main/common/components/view/security/SignIn';
 import DialingPreview from '../main/common/components/vc/DialingPreview';
 import MessagePreview from '../main/common/components/vc/MessagePreview';
+import WebLinkLanding from '../main/common/components/view/WebLinkLanding';
 
 const armscorTheme = createTheme({
     palette: {
@@ -52,6 +53,14 @@ const Message = () => {
   );
 };
 
+const WebLink = () => {
+  return (
+    <div style={{width: '99vw', height: '100vh', backgroundColor: '#E5E5E5', overflow: 'hidden'}}>
+      <WebLinkLanding />
+    </div>
+  );
+};
+
 const Dashboard = () => {
   return (
     <div style={{width: '100%'}}>
@@ -78,6 +87,7 @@ export default function App() {
             <Route path="/login" element={<Login/>}/>
             <Route path="/dialingPreview" element={<Dialing />}/>
             <Route path="/messagePreview" element={<Message />}/>
+            <Route path="/webLink" element={<WebLink />}/>
           </Routes>
         </Router>
       </ThemeProvider>
