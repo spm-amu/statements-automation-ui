@@ -143,6 +143,7 @@ const SignIn = (props) => {
               });
             });
           } else {
+
             const data = {
               accessToken: response.access_token,
               refreshToken: response.refresh_token,
@@ -153,9 +154,16 @@ const SignIn = (props) => {
               data.meetingId = redirectData.meetingId;
             }
 
-            navigate('/dashboard', {
-              state: data
-            });
+            if(location.state && location.state.meetingExternal) {
+              navigate('/externalAttendeeView', {
+                state: data
+              });
+            } else {
+              navigate('/dashboard', {
+                state: data
+              });
+            }
+
           }
         },
         (e) => {
