@@ -154,16 +154,9 @@ const SignIn = (props) => {
               data.meetingId = redirectData.meetingId;
             }
 
-            if(location.state && location.state.meetingExternal) {
-              navigate('/externalAttendeeView', {
-                state: data
-              });
-            } else {
-              navigate('/dashboard', {
-                state: data
-              });
-            }
-
+            navigate('/dashboard', {
+              state: data
+            });
           }
         },
         (e) => {

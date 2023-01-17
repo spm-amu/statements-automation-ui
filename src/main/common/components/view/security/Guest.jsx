@@ -28,6 +28,7 @@ const Guest = (props) => {
   const [passcode, setPasscode] = useState('');
   const [showPassword, setShowPassword] = useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [privateExternal, setPrivateExternal] = React.useState(false);
   const [emailState, setEmailState] = React.useState('');
   const [nameState, setNameState] = React.useState('');
   const [passcodeState, setPasscodeState] = React.useState('');
@@ -51,6 +52,12 @@ const Guest = (props) => {
     setErrorMessage('');
   };
 
+  useEffect(() => {
+    if (location.state && location.state.tokenUserId) {
+      setEmail(location.state.tokenUserId);
+      setPrivateExternal(true);
+    }
+  }, [])
 
   const fireJoinMeeting = () => {
     clearErrorStates();
@@ -64,9 +71,11 @@ const Guest = (props) => {
     }
 
     post(
-      `${host}/api/v1/auth/meetingLogin`,
+      `${host}/api/v1/auth/meetingLogin/${location.state.meetingId}`,
       (response) => {
         setIsLoading(false);
+
+        console.log('____ RES: ', response);
 
         let lastLogin = new Date().getTime();
         appManager.add("accessToken", response.access_token);
@@ -152,26 +161,30 @@ const Guest = (props) => {
             </CardText>
 
             <form className="auth-login-form mt-2">
-              <div className="mb-1">
-                <CustomInput
-                  labelText="Email"
-                  id="email"
-                  formControlProps={{ fullWidth: true }}
-                  success={emailState === 'success'}
-                  error={emailState === 'error'}
-                  inputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Email style={styles.inputAdornmentIcon} />
-                      </InputAdornment>
-                    ),
-                    value: email,
-                    onChange: (e) => {
-                      setEmail(e.target.value);
-                    },
-                  }}
-                />
-              </div>
+              {
+                !privateExternal &&
+                <div className="mb-1">
+                  <CustomInput
+                    labelText="Email"
+                    id="email"
+                    formControlProps={{ fullWidth: true }}
+                    success={emailState === 'success'}
+                    error={emailState === 'error'}
+                    inputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Email style={styles.inputAdornmentIcon} />
+                        </InputAdornment>
+                      ),
+                      value: email,
+                      onChange: (e) => {
+                        setEmail(e.target.value);
+                      },
+                    }}
+                  />
+                </div>
+              }
+
               <div className="mb-1">
                 <CustomInput
                   labelText="Name"
