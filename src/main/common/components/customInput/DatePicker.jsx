@@ -71,6 +71,7 @@ const CustomDatePickerComponent = React.memo(React.forwardRef((props, ref) => {
           value={props.value ? props.value : null}
           className={props.className}
           error={props.hasError}
+          helperText={props.hasError ? props.errorMessage : ''}
           margin="dense"
           inputVariant="outlined"
           style={props.style}
