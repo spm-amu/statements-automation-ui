@@ -287,11 +287,6 @@ const Meeting = (props) => {
     const meetingEndDateTime = !Utils.isNull(value.endDate) && !Utils.isNull(value.endTime) ?
       moment(Utils.getFormattedDate(value.endDate) + " " + value.endTime.toLocaleTimeString()) : null;
 
-    if(!Utils.isNull(meetingEndDateTime) && !Utils.isNull(meetingStartDateTime)) {
-      console.log("\n\n\n\nET ", meetingEndDateTime);
-      console.log("ST ", meetingStartDateTime);
-    }
-
     let errorState = {
       title: Utils.isNull(value.title),
       startDate: Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
