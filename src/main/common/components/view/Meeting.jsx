@@ -282,14 +282,22 @@ const Meeting = (props) => {
   };
 
   const handleAdd = () => {
-    const meetingDateTime = moment(Utils.getFormattedDate(value.startDate) + " " + value.startTime.toLocaleTimeString());
+    const meetingStartDateTime = !Utils.isNull(value.startDate) && !Utils.isNull(value.startTime) ?
+      moment(Utils.getFormattedDate(value.startDate) + " " + value.startTime.toLocaleTimeString()) : null;
+    const meetingEndDateTime = !Utils.isNull(value.endDate) && !Utils.isNull(value.endTime) ?
+      moment(Utils.getFormattedDate(value.endDate) + " " + value.endTime.toLocaleTimeString()) : null;
+
+    if(!Utils.isNull(meetingEndDateTime) && !Utils.isNull(meetingStartDateTime)) {
+      console.log("\n\n\n\nET ", meetingEndDateTime);
+      console.log("ST ", meetingStartDateTime);
+    }
 
     let errorState = {
       title: Utils.isNull(value.title),
-      startDate: Utils.isNull(value.startDate) || meetingDateTime.isBefore(moment()),
-      startTime: Utils.isNull(value.startTime) || meetingDateTime.isBefore(moment()),
-      endDate: Utils.isNull(value.endDate),
-      endTime: Utils.isNull(value.endTime),
+      startDate: Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
+      startTime: Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
+      endDate: Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime,
+      endTime: Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= (meetingStartDateTime),
     };
 
     setErrors(errorState);
@@ -315,34 +323,6 @@ const Meeting = (props) => {
       }
 
       saveMeetingObject(_hostAttendee, isUpdate).then((data) => {
-        let startDate = new Date(data.schedule.startDate + ":" + data.schedule.startTime);
-        let endDate = new Date(data.schedule.endDate + ":" + data.schedule.endTime);
-        let now = new Date();
-
-        if(startDate < now) {
-          appManager.fireEvent(SystemEventType.API_ERROR, {
-            message: "Start date must be a future date"
-          });
-
-          return;
-        }
-
-        if(endDate < now) {
-          appManager.fireEvent(SystemEventType.API_ERROR, {
-            message: "End date must be a future date"
-          });
-
-          return;
-        }
-
-        if(startDate >= endDate) {
-          appManager.fireEvent(SystemEventType.API_ERROR, {
-            message: "Start date must be after the end date"
-          });
-
-          return;
-        }
-
         post(
           `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
           (response) => {
@@ -509,6 +489,15 @@ const Meeting = (props) => {
     if (!Utils.isNull(props.selectedEvent)) {
       setEdited(true);
     }
+  };
+
+  const validateStartAndEndtime = () => {
+    const meetingStartDateTime = !Utils.isNull(value.startDate) && !Utils.isNull(value.startTime) ?
+      moment(Utils.getFormattedDate(value.startDate) + " " + value.startTime.toLocaleTimeString()) : null;
+    const meetingEndDateTime = !Utils.isNull(value.endDate) && !Utils.isNull(value.endTime) ?
+      moment(Utils.getFormattedDate(value.endDate) + " " + value.endTime.toLocaleTimeString()) : null;
+
+    return meetingStartDateTime !== null && meetingEndDateTime !== null && meetingStartDateTime.isBefore(meetingEndDateTime);
   };
 
   // ** Event Action buttons
@@ -1004,9 +993,9 @@ const Meeting = (props) => {
                           valueChangeHandler={(date, id) =>
                             handleFormValueChange(date, id, true)
                           }
-                          errorMessage={
-                            'A start date is required and should not be in the past.'
-                          }
+                          errorMessage={() => {
+                            return Utils.isNull(value.startDate) ?'A start date is required' : 'Start date should not be in the past'
+                          }}
                         />
                       </div>
                       {
@@ -1023,9 +1012,9 @@ const Meeting = (props) => {
                             valueChangeHandler={(date, id) =>
                               handleFormValueChange(date, id, true)
                             }
-                            errorMessage={
-                              'A start time is required and should not be in the past.'
-                            }
+                            errorMessage={() => {
+                              return Utils.isNull(value.startTime) ?'A start time is required' : 'Start time should not be in the past'
+                            }}
                           />
                         </div>
                       }
@@ -1049,9 +1038,10 @@ const Meeting = (props) => {
                           valueChangeHandler={(date, id) =>
                             handleFormValueChange(date, id, true)
                           }
-                          errorMessage={
-                            'An end date is required. Please select a value'
-                          }
+                          errorMessage={() => {
+                            return Utils.isNull(value.endDate) ?'An end date is required' : !validateStartAndEndtime() ?
+                              'The end date must be after the start time' : 'End date should not be in the past'
+                          }}
                         />
                       </div>
                       {
@@ -1068,9 +1058,10 @@ const Meeting = (props) => {
                             valueChangeHandler={(date, id) =>
                               handleFormValueChange(date, id, true)
                             }
-                            errorMessage={
-                              'A end time is required. Please select a value'
-                            }
+                            errorMessage={() => {
+                              return Utils.isNull(value.endTime) ?'A end time is required' : !validateStartAndEndtime() ?
+                                'The end time must be after the start time' : 'End time should not be in the past'
+                            }}
                           />
                         </div>
                       }

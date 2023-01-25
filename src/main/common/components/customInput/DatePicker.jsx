@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+  KeyboardDatePicker, KeyboardTimePicker,
 } from '@material-ui/pickers';
 
 const CustomDatePickerComponent = React.memo(React.forwardRef((props, ref) => {
@@ -71,7 +71,7 @@ const CustomDatePickerComponent = React.memo(React.forwardRef((props, ref) => {
           value={props.value ? props.value : null}
           className={props.className}
           error={props.hasError}
-          helperText={props.hasError ? props.errorMessage : ''}
+          helperText={props.hasError ? typeof props.errorMessage === 'function' ? props.errorMessage() : props.errorMessage : ''}
           margin="dense"
           inputVariant="outlined"
           style={props.style}

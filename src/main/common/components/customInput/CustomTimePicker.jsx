@@ -28,7 +28,7 @@ const CustomTimePickerComponent = React.memo(React.forwardRef((props, ref) => {
                     value={props.value}
                     className={props.className}
                     error={props.hasError}
-                    helperText={props.hasError ? props.errorMessage : ''}
+                    helperText={props.hasError ? typeof props.errorMessage === 'function' ? props.errorMessage() : props.errorMessage : ''}
                     margin="dense"
                     inputVariant="outlined"
                     style={{textAlign: 'left'}}
