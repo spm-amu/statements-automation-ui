@@ -24,6 +24,7 @@ import appManager from "../../../common/service/AppManager";
 import AlertDialog from "../AlertDialog";
 import SelectItem from "../customInput/SelectItem";
 import {SystemEventType} from "../../types";
+import moment from 'moment';
 
 const options = ['NONE', 'TEST'];
 const recurrenceOptions = [
@@ -281,10 +282,12 @@ const Meeting = (props) => {
   };
 
   const handleAdd = () => {
+    const meetingDateTime = moment(Utils.getFormattedDate(value.startDate) + " " + value.startTime.toLocaleTimeString());
+
     let errorState = {
       title: Utils.isNull(value.title),
-      startDate: Utils.isNull(value.startDate),
-      startTime: Utils.isNull(value.startTime),
+      startDate: Utils.isNull(value.startDate) || meetingDateTime.isBefore(moment()),
+      startTime: Utils.isNull(value.startTime) || meetingDateTime.isBefore(moment()),
       endDate: Utils.isNull(value.endDate),
       endTime: Utils.isNull(value.endTime),
     };
@@ -449,10 +452,6 @@ const Meeting = (props) => {
       setEdited(true);
     }
   };
-
-  const changeHost = () => {
-
-  }
 
   const formValueChangeHandler = (e) => {
     handleFormValueChange(e.target.value, e.target.id, e.target.required);
@@ -1006,7 +1005,7 @@ const Meeting = (props) => {
                             handleFormValueChange(date, id, true)
                           }
                           errorMessage={
-                            'A start date is required. Please select a value'
+                            'A start date is required and should not be in the past.'
                           }
                         />
                       </div>
@@ -1025,7 +1024,7 @@ const Meeting = (props) => {
                               handleFormValueChange(date, id, true)
                             }
                             errorMessage={
-                              'A start time is required. Please select a value'
+                              'A start time is required and should not be in the past.'
                             }
                           />
                         </div>
