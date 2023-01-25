@@ -9,7 +9,7 @@ import Draggable from "react-draggable";
 import Lobby from "../vc/Lobby";
 import Footer from "../vc/Footer";
 import socketManager from "../../service/SocketManager";
-import {MessageType} from "../../types";
+import {MessageType, SystemEventType} from "../../types";
 import Utils from "../../Utils";
 import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
 import ClosablePanel from "../layout/ClosablePanel";
@@ -91,6 +91,7 @@ const MeetingRoom = (props) => {
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('AUTO_ADJUST');
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
+  const [whiteboardItems] = useState([]);
   const [eventHandler] = useState({});
 
   const recordedChunks = [];
@@ -140,6 +141,9 @@ const MeetingRoom = (props) => {
             break;
           case MessageType.MEETING_ENDED:
             onCallEnded();
+            break;
+          case MessageType.WHITEBOARD_EVENT:
+            appManager.fireEvent(SystemEventType.WHITEBOARD_EVENT_ARRIVED, be.payload);
             break;
         }
       }
@@ -513,7 +517,7 @@ const MeetingRoom = (props) => {
     if (currentUserStream) {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
-        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED);
+        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT);
 
       if (isHost || isDirectCall) {
         join();
@@ -774,8 +778,8 @@ const MeetingRoom = (props) => {
       }
       {
         started && step === 'SESSION' && isHost &&
-        <div className={'row'} style={{margin: '0 0 16px 16px'}}>
-          <div className={'col no-margin'}>
+        <div className={'row'} style={{margin: '0 0 0 16px'}}>
+          <div className={'col no-margin no-padding'}>
             <Button
               variant={'contained'}
               size="large"
@@ -828,7 +832,30 @@ const MeetingRoom = (props) => {
                       {
                         showWhiteBoard && meetingParticipantGridMode === 'SIDE_ONLY' &&
                         <div className={'col'}>
-                          <WhiteBoard />
+                          <WhiteBoard  items={whiteboardItems} eventHandler={
+                            {
+                              onAddItem: (item) => {
+                                whiteboardItems.push(item);
+                              },
+                              onDeleteItem: (item) => {
+                                let filtered = whiteboardItems.filter((i) => i.id !== item.id);
+                                whiteboardItems.splice(0, whiteboardItems.length);
+
+                                for (const filteredElement of filtered) {
+                                  whiteboardItems.push(filteredElement);
+                                }
+                              },
+                              onUpdateItem: (item) => {
+                                let filtered = whiteboardItems.filter((i) => i.id === item.id);
+                                if(filtered.length > 0) {
+                                  const properties = Object.getOwnPropertyNames(item);
+                                  for (const property of properties) {
+                                    filtered[0][property] = item[property];
+                                  }
+                                }
+                              }
+                            }
+                          }/>
                         </div>
                       }
                       <div className={meetingParticipantGridMode === 'AUTO_ADJUST' ? 'col' : null}>

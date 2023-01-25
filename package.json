@@ -92,6 +92,7 @@
     "@syncfusion/ej2-react-popups": "^19.4.52",
     "@syncfusion/ej2-react-richtexteditor": "^19.4.50",
     "@syncfusion/ej2-react-schedule": "^19.4.50",
+    "body-parser": "^1.20.1",
     "bootstrap": "^5.2.2",
     "classnames": "^2.3.1",
     "date-fns": "^2.29.2",
@@ -99,6 +100,7 @@
     "electron-log": "^4.4.7",
     "electron-store": "^8.1.0",
     "electron-updater": "^5.0.3",
+    "express": "^4.18.2",
     "fs": "0.0.1-security",
     "jquery": "^3.6.1",
     "material-ui": "^0.20.2",
@@ -130,9 +132,7 @@
     "simple-peer": "^9.6.2",
     "socket.io-client": "^4.5.2",
     "styled-components": "^5.3.6",
-    "url": "^0.11.0",
-    "body-parser": "^1.20.1",
-    "express": "^4.18.2"
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "@fullcalendar/core": "^5.11.0",

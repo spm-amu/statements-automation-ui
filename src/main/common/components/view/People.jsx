@@ -20,9 +20,9 @@ const People = (props) => {
   const {meetingId, exclusions} = props;
 
   useEffect(() => {
-    if (meetingId) {
+    //if (meetingId) {
       search(null, true);
-    }
+    //}
   }, []);
 
   const search = (searchValue, searchNullValue = false) => {

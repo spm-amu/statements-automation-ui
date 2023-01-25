@@ -182,7 +182,7 @@ const MeetingSettingsComponent = (props) => {
                         toggleAskToJoin();
                       }}
                     />
-                  } label="Auto Permit" />
+                  } label="Auto permit" />
                 </FormGroup>
               </td>
             }

@@ -103,7 +103,6 @@ const CalendarComponent = (props) => {
     if (!Utils.isNull(selectedEvent) && !Utils.isNull(selectedEvent.id) && !Utils.isStringEmpty(selectedEvent.id)) {
       navigate("/view/meeting", {state: selectedEvent})
     }
-
   }, [selectedEvent]);
 
   const getEndDate = (event) => {
@@ -220,16 +219,19 @@ const CalendarComponent = (props) => {
 
     dateClick(info) {
 
+      let date = new Date(info.dateStr);
       const event = {
         ...eventTemplate,
-        "startDate": new Date(info.dateStr),
-        "endDate": new Date(info.dateStr),
-        "recurringStartDate": new Date(info.dateStr),
-        "recurringEndDate": new Date(info.dateStr)
+        "startDate": date,
+        "endDate": date,
+        "recurringStartDate": date,
+        "recurringEndDate": date
       };
 
-      setSelectedEvent(event);
-      navigate("/view/meeting", {state: event});
+      if(moment(new Date()).startOf('day') <= moment(date).startOf('day')) {
+        setSelectedEvent(event);
+        navigate("/view/meeting", {state: event});
+      }
     },
 
     /*

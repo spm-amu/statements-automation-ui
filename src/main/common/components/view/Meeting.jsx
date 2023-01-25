@@ -4,7 +4,7 @@ import {Form} from 'reactstrap';
 import Button from '@material-ui/core/Button';
 import TextField from '../customInput/TextField';
 import DatePicker from '../customInput/DatePicker';
-import TimePicker from '../customInput/TimePicker';
+import CustomTimePicker from '../customInput/CustomTimePicker';
 import AutoComplete from '../customInput/AutoComplete';
 import Files from '../customInput/Files';
 import Utils from '../../Utils';
@@ -23,6 +23,7 @@ import {Checkbox} from '@material-ui/core';
 import appManager from "../../../common/service/AppManager";
 import AlertDialog from "../AlertDialog";
 import SelectItem from "../customInput/SelectItem";
+import {SystemEventType} from "../../types";
 
 const options = ['NONE', 'TEST'];
 const recurrenceOptions = [
@@ -69,6 +70,7 @@ const Meeting = (props) => {
   const [edited, setEdited] = useState(false);
   const [bysetpos, setBysetpos] = React.useState(1);
   const [byWeekDay, setByWeekDay] = React.useState('MO');
+  const [refresher, setRefresher] = React.useState(false);
   const [recurrenceRepetition, setRecurrenceRepetition] = useState('NONE');
   const [recurrence] = React.useState({
     repeatingEvery: '',
@@ -161,9 +163,7 @@ const Meeting = (props) => {
         privacyType: 'PRIVATE',
       });
     }
-  }, []);
 
-  React.useEffect(() => {
     let isUpdate =
       !Utils.isNull(props.selectedEvent) &&
       !Utils.isNull(props.selectedEvent.id) &&
@@ -185,6 +185,10 @@ const Meeting = (props) => {
 
     if (!isUpdate) {
       setReadOnly(false);
+    }
+
+    if(props.selectedEvent.startDate < new Date()) {
+      setReadOnly(true);
     }
   }, []);
 
@@ -308,6 +312,34 @@ const Meeting = (props) => {
       }
 
       saveMeetingObject(_hostAttendee, isUpdate).then((data) => {
+        let startDate = new Date(data.schedule.startDate + ":" + data.schedule.startTime);
+        let endDate = new Date(data.schedule.endDate + ":" + data.schedule.endTime);
+        let now = new Date();
+
+        if(startDate < now) {
+          appManager.fireEvent(SystemEventType.API_ERROR, {
+            message: "Start date must be a future date"
+          });
+
+          return;
+        }
+
+        if(endDate < now) {
+          appManager.fireEvent(SystemEventType.API_ERROR, {
+            message: "End date must be a future date"
+          });
+
+          return;
+        }
+
+        if(startDate >= endDate) {
+          appManager.fireEvent(SystemEventType.API_ERROR, {
+            message: "Start date must be after the end date"
+          });
+
+          return;
+        }
+
         post(
           `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
           (response) => {
@@ -467,6 +499,8 @@ const Meeting = (props) => {
       recurrence.weekDays = recurrence.weekDays.filter((weekDay) => weekDay !== event.target.value);
     }
 
+
+    setRefresher(!refresher);
     validateRecurrence();
   };
 
@@ -731,7 +765,7 @@ const Meeting = (props) => {
                     </div>
                     <div className={'col-*-*'}
                          style={{paddingLeft: '8px'}}>
-                      <TimePicker
+                      <CustomTimePicker
                         label={"At"}
                         disabled={readOnly}
                         id="startTime"
@@ -853,20 +887,21 @@ const Meeting = (props) => {
                         onChange={(e, val) => {
                           recurrence.monthlyDayType = val;
                           validateRecurrence();
+                          setRefresher(!refresher);
                         }}
                       >
                         <div className={'row no-margin'}>
                           <div className={'col-*-*'}>
                             <FormControlLabel
                               value="monthlyCalendarDay"
-                              control={<Radio/>}
+                              control={<Radio disabled={readOnly}/>}
                               label="On day"
                             />
                           </div>
                           <div className={'col-*-*'} style={{marginRight: '8px'}}>
                             <TextField
                               style={{width: '100%'}}
-                              disabled={recurrence.monthlyDayType !== 'monthlyCalendarDay'}
+                              disabled={recurrence.monthlyDayType !== 'monthlyCalendarDay' || readOnly}
                               label="On day"
                               id="byMonthDay"
                               type={'number'}
@@ -884,7 +919,7 @@ const Meeting = (props) => {
                           <div className={'col-*-*'}>
                             <FormControlLabel
                               value="monthlyWeekDay"
-                              control={<Radio/>}
+                              control={<Radio disabled={readOnly}/>}
                               label="On the"
                             />
                           </div>
@@ -894,7 +929,7 @@ const Meeting = (props) => {
                               labelId="bysetpos-label"
                               id="bySetPosSelect"
                               value={bysetpos}
-                              disabled={recurrence.monthlyDayType !== 'monthlyWeekDay'}
+                              disabled={recurrence.monthlyDayType !== 'monthlyWeekDay' || readOnly}
                               valueChangeHandler={handleBysetpos}
                               options={bySetPosOptions}
                             />
@@ -905,7 +940,7 @@ const Meeting = (props) => {
                               labelId="byWeek-day-label"
                               id="byWeekDaySelect"
                               value={byWeekDay}
-                              disabled={recurrence.monthlyDayType !== 'monthlyWeekDay'}
+                              disabled={recurrence.monthlyDayType !== 'monthlyWeekDay' || readOnly}
                               valueChangeHandler={handleByWeekDay}
                               options={byWeekDayOptions}
                             />
@@ -934,7 +969,7 @@ const Meeting = (props) => {
                     </div>
                     <div className={'col-*-*'}
                          style={{paddingLeft: '8px'}}>
-                      <TimePicker
+                      <CustomTimePicker
                         label={"At"}
                         disabled={readOnly}
                         id="endTime"
@@ -979,7 +1014,7 @@ const Meeting = (props) => {
                         recurrenceRepetition === 'NONE' &&
                         <div className={'col-*-*'}
                              style={{paddingLeft: !Utils.isStringEmpty(props.selectedEvent.id) || recurrenceRepetition === 'NONE' ? '8px' : '0'}}>
-                          <TimePicker
+                          <CustomTimePicker
                             label={"Start time"}
                             id="startTime"
                             disabled={readOnly}
@@ -1024,7 +1059,7 @@ const Meeting = (props) => {
                         recurrenceRepetition === 'NONE' &&
                         <div className={'col-*-*'}
                              style={{paddingLeft: !Utils.isStringEmpty(props.selectedEvent.id) || recurrenceRepetition === 'NONE' ? '8px' : '0'}}>
-                          <TimePicker
+                          <CustomTimePicker
                             label={"End time"}
                             disabled={readOnly || recurrenceRepetition !== 'NONE'}
                             id="endTime"

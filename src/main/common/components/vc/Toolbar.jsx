@@ -313,7 +313,7 @@ const Toolbar = (props) => {
             <PersonAdd fontSize="small" />
           </ListItemIcon>
           {
-            autoPermit ? 'Do Not Auto Permit' : 'Auto Permit'
+            autoPermit ? 'Do not auto permit' : 'Auto permit'
           }
         </MenuItem>
         <MenuItem

@@ -1,10 +1,10 @@
-﻿﻿import React from 'react';
+﻿import React from 'react';
 import 'date-fns';
 import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
 import {
     MuiPickersUtilsProvider,
-    KeyboardTimePicker,
+    KeyboardTimePicker
 } from '@material-ui/pickers';
 
 const CustomTimePickerComponent = React.memo(React.forwardRef((props, ref) => {
@@ -44,7 +44,7 @@ const CustomTimePickerComponent = React.memo(React.forwardRef((props, ref) => {
     );
 }));
 
-const TimePicker = React.memo(React.forwardRef((props, ref) => {
+const CustomTimePicker = React.memo(React.forwardRef((props, ref) => {
     return (
       <CustomTimePickerComponent
         ref={ref}
@@ -53,4 +53,4 @@ const TimePicker = React.memo(React.forwardRef((props, ref) => {
     );
 }));
 
-export default TimePicker;
+export default CustomTimePicker;
