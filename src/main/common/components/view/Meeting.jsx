@@ -187,10 +187,6 @@ const Meeting = (props) => {
     if (!isUpdate) {
       setReadOnly(false);
     }
-
-    if(props.selectedEvent.startDate < new Date()) {
-      setReadOnly(true);
-    }
   }, []);
 
   // ** Custom select components
