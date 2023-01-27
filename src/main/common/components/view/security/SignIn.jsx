@@ -108,6 +108,11 @@ const SignIn = (props) => {
         (response) => {
           setIsLoading(false);
 
+          if(!response.access_token) {
+            setErrorMessage('Invalid username or password');
+            return;
+          }
+
           // TODO : Set expiry date for desktop app in line with the user's AD password change. DO NOT SET expiry date for web all so that the cookie dies with the browser
 
           let lastLogin = new Date().getTime();
@@ -162,7 +167,7 @@ const SignIn = (props) => {
         (e) => {
           console.log('#### ERROR: ' + JSON.stringify(e));
           setIsLoading(false);
-          setErrorMessage('Invalid username or password');
+          setErrorMessage('A system error has occurred. Please contact your system administrator or try again later');
         },
         {
           username: username,

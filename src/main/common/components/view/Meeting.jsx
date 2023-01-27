@@ -360,7 +360,8 @@ const Meeting = (props) => {
         }
 
         if (shouldWarn) {
-          setSavePromiseContext({
+          setSavePromiseC
+          ontext({
             reject,
             resolve,
             data
