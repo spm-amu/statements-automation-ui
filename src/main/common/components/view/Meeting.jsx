@@ -9,7 +9,7 @@ import AutoComplete from '../customInput/AutoComplete';
 import Files from '../customInput/Files';
 import Utils from '../../Utils';
 import Avatar from '../avatar';
-import {host, get, post} from '../../service/RestService';
+import {get, host, post} from '../../service/RestService';
 
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
