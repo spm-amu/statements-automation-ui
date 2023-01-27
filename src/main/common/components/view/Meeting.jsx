@@ -23,7 +23,6 @@ import {Checkbox} from '@material-ui/core';
 import appManager from "../../../common/service/AppManager";
 import AlertDialog from "../AlertDialog";
 import SelectItem from "../customInput/SelectItem";
-import {SystemEventType} from "../../types";
 import moment from 'moment';
 
 const options = ['NONE', 'TEST'];
@@ -84,6 +83,7 @@ const Meeting = (props) => {
   });
 
   const [savePromiseContext, setSavePromiseContext] = useState(null);
+  const [cancelPromiseContext, setCancelPromiseContext] = useState(null);
   const navigate = useNavigate();
 
   const getInitialValue = (propsValue) => {
@@ -186,6 +186,10 @@ const Meeting = (props) => {
 
     if (!isUpdate) {
       setReadOnly(false);
+    }
+
+    if (props.selectedEvent.startDate < moment(new Date()).startOf('day')) {
+      setReadOnly(true);
     }
   }, []);
 
@@ -360,8 +364,7 @@ const Meeting = (props) => {
         }
 
         if (shouldWarn) {
-          setSavePromiseC
-          ontext({
+          setSavePromiseContext({
             reject,
             resolve,
             data
@@ -384,15 +387,28 @@ const Meeting = (props) => {
   };
 
   const handleDelete = (e) => {
-    get(
-      `${host}/api/v1/meeting/cancel/${value.id}`,
-      (response) => {
-        handleClose();
-      },
-      (e) => {
-      },
-      "The meeting has been cancelled successfully"
-    );
+    cancelMeeting().then((data) => {
+      get(
+        `${host}/api/v1/meeting/cancel/${value.id}`,
+        (response) => {
+          handleClose();
+        },
+        (e) => {
+        },
+        "The meeting has been cancelled successfully"
+      );
+    }, () => {
+    });
+  };
+
+  const cancelMeeting = () => {
+    return new Promise((resolve, reject) => {
+      setCancelPromiseContext({
+        reject,
+        resolve,
+        value
+      });
+    });
   };
 
   const handleJoin = (e) => {
@@ -644,6 +660,24 @@ const Meeting = (props) => {
                        showRight={true}
                        btnTextLeft={'CANCEL'}
                        btnTextRight={'PROCEED'}
+          />
+        }
+        {
+          cancelPromiseContext &&
+          <AlertDialog title={'Warning'}
+                       message={'Are you sure you want to cancel the selected meeting?'}
+                       onLeft={() => {
+                         cancelPromiseContext.reject();
+                         setCancelPromiseContext(null);
+                       }}
+                       onRight={() => {
+                         setCancelPromiseContext(null);
+                         cancelPromiseContext.resolve(cancelPromiseContext.data)
+                       }}
+                       showLeft={true}
+                       showRight={true}
+                       btnTextLeft={'NO'}
+                       btnTextRight={'YES'}
           />
         }
         <h5 className="modal-title">
@@ -986,7 +1020,7 @@ const Meeting = (props) => {
                             handleFormValueChange(date, id, true)
                           }
                           errorMessage={() => {
-                            return Utils.isNull(value.startDate) ?'A start date is required' : 'Start date should not be in the past'
+                            return Utils.isNull(value.startDate) ? 'A start date is required' : 'Start date should not be in the past'
                           }}
                         />
                       </div>
@@ -1005,7 +1039,7 @@ const Meeting = (props) => {
                               handleFormValueChange(date, id, true)
                             }
                             errorMessage={() => {
-                              return Utils.isNull(value.startTime) ?'A start time is required' : 'Start time should not be in the past'
+                              return Utils.isNull(value.startTime) ? 'A start time is required' : 'Start time should not be in the past'
                             }}
                           />
                         </div>
@@ -1031,7 +1065,7 @@ const Meeting = (props) => {
                             handleFormValueChange(date, id, true)
                           }
                           errorMessage={() => {
-                            return Utils.isNull(value.endDate) ?'An end date is required' : !validateStartAndEndtime() ?
+                            return Utils.isNull(value.endDate) ? 'An end date is required' : !validateStartAndEndtime() ?
                               'The end date must be after the start time' : 'End date should not be in the past'
                           }}
                         />
@@ -1051,7 +1085,7 @@ const Meeting = (props) => {
                               handleFormValueChange(date, id, true)
                             }
                             errorMessage={() => {
-                              return Utils.isNull(value.endTime) ?'A end time is required' : !validateStartAndEndtime() ?
+                              return Utils.isNull(value.endTime) ? 'A end time is required' : !validateStartAndEndtime() ?
                                 'The end time must be after the start time' : 'End time should not be in the past'
                             }}
                           />
