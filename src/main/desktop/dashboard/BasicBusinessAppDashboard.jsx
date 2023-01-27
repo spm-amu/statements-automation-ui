@@ -166,7 +166,12 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute.isParent = true;
     utilsRoutes.push(newRoute);
 
-    setRoutes(newRoutes);
+    if ((isSafari || isChrome || isIE || isEdge)  && location.state && location.state.guest) {
+      setRoutes([]);
+    } else {
+      setRoutes(newRoutes);
+    }
+
     setUtilsRoutes(utilsRoutes);
 
     //props.settings.dashboardMenu = createNewMenu.items.length > 0 ? dashboardMenu : null;
@@ -455,8 +460,6 @@ const BasicBusinessAppDashboard = (props) => {
 
       electron.ipcRenderer.sendMessage('readTokens', {});
     } else {
-      console.log('#### web location.state: ', location.state);
-
       const loginTokens = location.state;
 
       if (loginTokens && loginTokens.accessToken && loginTokens.refreshToken) {
