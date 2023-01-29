@@ -17,11 +17,15 @@ export class Stream {
 
     userMedia
       .then((stream) => {
+        console.log("STREAM SUCCESS");
+        console.log(stream);
         this.obj = stream;
         if (successHandler) {
           successHandler(this.obj);
         }
       }).catch((e) => {
+      console.log("STREAM FAILED");
+      console.log(e);
       if (errorhandler) {
         errorhandler(e);
       }

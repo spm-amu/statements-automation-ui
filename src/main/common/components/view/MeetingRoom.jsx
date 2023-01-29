@@ -574,9 +574,14 @@ const MeetingRoom = (props) => {
 
   const setupStream = () => {
     let currentStream = new Stream();
+    setCurrentUserStream(currentStream);
+    console.log("INITIALIZING STREAMS...");
     currentStream.init(!videoMuted, true, (stream) => {
-      setCurrentUserStream(currentStream);
+      console.log("STREAM CREATED");
+      console.log(stream);
     }, (e) => {
+      console.log("STREAM ERROR");
+      console.log(e);
     });
   };
 
@@ -878,7 +883,7 @@ const MeetingRoom = (props) => {
               }
             </div>
             {
-              currentUserStream && currentUserStream.obj &&
+              currentUserStream &&
               <Footer userVideo={userVideo}
                       userStream={currentUserStream.obj}
                       audioMuted={audioMuted}
