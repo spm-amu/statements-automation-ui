@@ -298,7 +298,7 @@ const WhiteBoard = (props) => {
                     border: "1px solid #e1e1e1",
                     borderRadius: "4px",
                     marginLeft: "8px",
-                    height: "100%",
+                    height: "79%",
                     width: "calc(100% - 288px)"
                   }} className={'col-*-* dropTarget'}
                        onClick={(e) => mouseClickHandler(e)}>
