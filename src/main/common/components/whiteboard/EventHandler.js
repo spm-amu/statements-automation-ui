@@ -14,6 +14,10 @@ export default class EventHandler {
   constructor() {
   }
 
+  setId = (id) => {
+    this.id = id;
+  };
+
   dragStart = (event) => {
     if (this.selectedNode === event.target) {
       if (document.body.style.cursor !== "move" || this.resizingTableColumn) {
@@ -104,12 +108,14 @@ export default class EventHandler {
     socketManager.emitEvent(MessageType.WHITEBOARD_EVENT, {
       userId: appManager.getUserDetails().userId,
       metadata: metadata,
-      eventType: "INPUT_VALUE_CHANGE"
+      eventType: "INPUT_VALUE_CHANGE",
+      whiteboardId: this.id
     })
   };
 
   createNode = (metadata, selectionHandler, test) => {
     let dropTarget = document.getElementsByClassName('dropTarget')[0];
+
     if (dropTarget) {
       let node = document.createElement(metadata.type);
       const properties = Object.getOwnPropertyNames(metadata);
@@ -175,7 +181,8 @@ export default class EventHandler {
     socketManager.emitEvent(MessageType.WHITEBOARD_EVENT, {
       userId: appManager.getUserDetails().userId,
       metadata: nodeMetadata,
-      eventType: "ADD_INPUT_FIELD"
+      eventType: "ADD_INPUT_FIELD",
+      whiteboardId: this.id
     });
 
     if (typeof event.target.className === 'string' && !event.target.className.includes("paletteButton")
@@ -240,7 +247,8 @@ export default class EventHandler {
     socketManager.emitEvent(MessageType.WHITEBOARD_EVENT, {
       userId: appManager.getUserDetails().userId,
       metadata: metadata,
-      eventType: "MOVE_ITEM"
+      eventType: "MOVE_ITEM",
+      whiteboardId: this.id
     });
   };
 

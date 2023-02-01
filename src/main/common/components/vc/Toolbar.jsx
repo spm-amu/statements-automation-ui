@@ -239,19 +239,6 @@ const Toolbar = (props) => {
         >
           <Icon id={'PAN_TOOL'}/>
         </IconButton>
-        {
-          step === 'SESSION' && displayState === 'MAXIMIZED' && isHost &&
-          <IconButton
-            onClick={(e) => showWhiteboard()}
-            style={{
-              backgroundColor: '#404239',
-              color: 'white',
-              marginRight: '4px'
-            }}
-          >
-            <Icon id={'NOTE'}/>
-          </IconButton>
-        }
         <Tooltip title="More Actions">
           <IconButton
             onClick={handleClick}
@@ -317,12 +304,12 @@ const Toolbar = (props) => {
           }
         </MenuItem>
         <MenuItem
-          disabled={true}
+          onClick={showWhiteboard}
         >
           <ListItemIcon>
             <Note fontSize="small" />
           </ListItemIcon>
-          Open Whiteboard
+          Whiteboard
         </MenuItem>
       </Menu>
     </div>

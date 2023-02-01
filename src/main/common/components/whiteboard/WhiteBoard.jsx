@@ -140,6 +140,8 @@ const WhiteBoard = (props) => {
   React.useEffect(() => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.WHITEBOARD_EVENT_ARRIVED);
 
+    eventHandler.setId(props.id);
+
     for (const item of props.items) {
       eventHandler.createNode(item, (id) => {
         setSelectedItem(id);

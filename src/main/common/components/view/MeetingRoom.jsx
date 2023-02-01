@@ -144,6 +144,7 @@ const MeetingRoom = (props) => {
             onCallEnded();
             break;
           case MessageType.WHITEBOARD_EVENT:
+            updateWhiteboardEvents(be.payload);
             appManager.fireEvent(SystemEventType.WHITEBOARD_EVENT_ARRIVED, be.payload);
             break;
         }
@@ -162,6 +163,18 @@ const MeetingRoom = (props) => {
     if (mediaRecorder != null) {
       mediaRecorder.start();
       setIsRecording(true);
+    }
+  };
+
+  const updateWhiteboardEvents = (e) => {
+    let find = whiteboardItems.find((i) => i.id === e.metadata.id);
+    if(find) {
+      const properties = Object.getOwnPropertyNames(e.metadata);
+      for (const property of properties) {
+        find[property] = e.metadata[property];
+      }
+    } else {
+      whiteboardItems.push(e.metadata);
     }
   };
 
@@ -832,7 +845,7 @@ const MeetingRoom = (props) => {
                       {
                         showWhiteBoard && meetingParticipantGridMode === 'SIDE_ONLY' &&
                         <div className={'col'}>
-                          <WhiteBoard  items={whiteboardItems} eventHandler={
+                          <WhiteBoard id={selectedMeeting.id} items={whiteboardItems} eventHandler={
                             {
                               onAddItem: (item) => {
                                 whiteboardItems.push(item);
