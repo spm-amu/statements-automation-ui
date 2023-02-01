@@ -118,6 +118,7 @@ export default class EventHandler {
 
     if (dropTarget) {
       let node = document.createElement(metadata.type);
+
       const properties = Object.getOwnPropertyNames(metadata);
       for (const property of properties) {
         if(property !== 'style' && property !== 'attributes' && property !== 'offsetLeft' && property !== 'offsetTop') {

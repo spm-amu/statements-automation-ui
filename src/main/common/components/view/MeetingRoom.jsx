@@ -92,7 +92,7 @@ const MeetingRoom = (props) => {
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('AUTO_ADJUST');
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
-  const [whiteboardItems] = useState([]);
+  const [whiteboardItems, setWhiteboardItems] = useState([]);
   const [eventHandler] = useState({});
 
   const recordedChunks = [];
@@ -146,6 +146,11 @@ const MeetingRoom = (props) => {
           case MessageType.WHITEBOARD_EVENT:
             updateWhiteboardEvents(be.payload);
             appManager.fireEvent(SystemEventType.WHITEBOARD_EVENT_ARRIVED, be.payload);
+            break;
+          case MessageType.WHITEBOARD:
+            if(be.payload) {
+              setWhiteboardItems(be.payload.items);
+            }
             break;
         }
       }
@@ -530,7 +535,7 @@ const MeetingRoom = (props) => {
     if (currentUserStream.obj) {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
-        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT);
+        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD);
 
       if (isHost || isDirectCall) {
         join();
