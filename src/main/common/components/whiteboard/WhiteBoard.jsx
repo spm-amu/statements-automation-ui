@@ -79,7 +79,7 @@ const WhiteBoard = (props) => {
   const classes = useStyles();
   const idCounter = useRef(0);
   const [systemEventHandler] = useState({});
-  const [designData, setDesignData] = React.useState({
+  const [designData] = React.useState({
     items: [
       {
         placeHolder: 'TEXT_FIELD',
@@ -88,7 +88,6 @@ const WhiteBoard = (props) => {
       }
     ]
   });
-  const [templateDoc, setTemplateDoc] = React.useState(null);
   const [grabbedItem, setGrabbedItem] = React.useState(null);
   const [selectedItem, setSelectedItem] = React.useState(null);
   const systemEventHandlerApi = () => {
@@ -166,10 +165,6 @@ const WhiteBoard = (props) => {
     setup()
   });
 
-  React.useEffect(() => {
-    setup()
-  }, [templateDoc]);
-
   function getFetchConfig(data, method, contentType = null) {
     const accessToken = sessionStorage.getItem("accessToken");
     const idToken = sessionStorage.getItem("idToken");
@@ -211,6 +206,7 @@ const WhiteBoard = (props) => {
   };
 
   const handleSave = () => {
+    alert(props.items.length);
   };
 
   let mouseClickHandler = function (event) {
@@ -260,7 +256,7 @@ const WhiteBoard = (props) => {
                   <Icon id={'DELETE'}/>
                 </IconButton>
                 <IconButton component="span"
-                            disabled={!templateDoc}
+                            disabled={props.items.length === 0}
                             variant={'contained'}
                             size="large"
                             onClick={handleSave}
