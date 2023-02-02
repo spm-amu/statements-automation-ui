@@ -850,7 +850,7 @@ const MeetingRoom = (props) => {
                       {
                         showWhiteBoard && meetingParticipantGridMode === 'SIDE_ONLY' &&
                         <div className={'col'}>
-                          <WhiteBoard id={selectedMeeting.id} items={whiteboardItems} eventHandler={
+                          <WhiteBoard isHost={isHost} id={selectedMeeting.id} items={whiteboardItems} eventHandler={
                             {
                               onAddItem: (item) => {
                                 whiteboardItems.push(item);

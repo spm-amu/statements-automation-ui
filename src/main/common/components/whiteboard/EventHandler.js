@@ -113,7 +113,7 @@ export default class EventHandler {
     })
   };
 
-  createNode = (metadata, selectionHandler, test) => {
+  createNode = (metadata, selectionHandler, readOnly = false, test = false) => {
     let dropTarget = document.getElementsByClassName('dropTarget')[0];
 
     if (dropTarget) {
@@ -141,7 +141,15 @@ export default class EventHandler {
         }
       }
 
-      if(!test) {
+      if(readOnly) {
+        node.setAttribute("readOnly", true);
+        node.setAttribute("disabled", true);
+        node.style.backgroundColor = '#FFFFFF';
+        node.style.outline = 'none';
+        node.style.border = 'none';
+      }
+
+      if(!test && !readOnly) {
         node.addEventListener('dragend', (event) => this.handleItemDrop(event, dropTarget), false);
         node.addEventListener('mousemove', (event) => this.handleItemMouseMove(event, dropTarget), false);
         node.addEventListener('mouseout', this.handleItemMouseOut, false);

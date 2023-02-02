@@ -10,6 +10,7 @@ import {MessageType, SystemEventType} from "../../types";
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "../Icon";
 import socketManager from "../../service/SocketManager";
+import {host, post} from '../../service/RestService';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -115,7 +116,7 @@ const WhiteBoard = (props) => {
         //data.metadata.style.top = (50 + parseFloat(data.metadata.style.top.replace('px', ''))) + 'px';
         eventHandler.createNode(data.metadata, (id) => {
           setSelectedItem(id);
-        }, false);
+        }, props.readOnly, false);
 
         props.eventHandler.onAddItem(data.metadata);
         break;
@@ -144,7 +145,7 @@ const WhiteBoard = (props) => {
     for (const item of props.items) {
       eventHandler.createNode(item, (id) => {
         setSelectedItem(id);
-      }, false);
+      }, props.readOnly, false);
     }
 
     return () => {
@@ -154,7 +155,7 @@ const WhiteBoard = (props) => {
 
   const setup = () => {
     let container = document.getElementById('workspaceContainer');
-    if (!Utils.isNull(container)) {
+    if (!Utils.isNull(container) && !props.readOnly) {
       eventHandler.initDragAndDrop((id, node) => {
         setSelectedItem(id);
       }, container);
@@ -187,7 +188,7 @@ const WhiteBoard = (props) => {
 
   const deleteItem = (id) => {
     let element = document.getElementById(id);
-    if(element) {
+    if (element) {
       element.parentElement.removeChild(element);
     }
   };
@@ -206,7 +207,21 @@ const WhiteBoard = (props) => {
   };
 
   const handleSave = () => {
-    alert(props.items.length);
+    post(
+      `${host}/api/v1/meeting/whiteboard/save`,
+      (response) => {
+      },
+      (e) => {
+      },
+      {
+        data: JSON.stringify({
+          items: props.items
+        }),
+        id: props.id
+      },
+      'Whiteboard data saved successfully',
+      false
+    );
   };
 
   let mouseClickHandler = function (event) {
@@ -248,21 +263,24 @@ const WhiteBoard = (props) => {
             designData ?
               <>
                 <IconButton component="span"
-                            disabled={selectedItem === null}
+                            disabled={selectedItem === null || props.readOnly}
                             variant={'contained'}
                             size="large"
                             onClick={handleDelete}
                 >
                   <Icon id={'DELETE'}/>
                 </IconButton>
-                <IconButton component="span"
-                            disabled={props.items.length === 0}
-                            variant={'contained'}
-                            size="large"
-                            onClick={handleSave}
-                >
-                  <Icon id={'SAVE'}/>
-                </IconButton>
+                {
+                  props.isHost && !props.readOnly &&
+                  <IconButton component="span"
+                              disabled={props.items.length === 0}
+                              variant={'contained'}
+                              size="large"
+                              onClick={handleSave}
+                  >
+                    <Icon id={'SAVE'}/>
+                  </IconButton>
+                }
                 <div className={"row"} style={{
                   width: '100%',
                   height: '72vh',
@@ -278,6 +296,7 @@ const WhiteBoard = (props) => {
                         return <div>
                           <Button
                             variant={'contained'}
+                            disabled={props.readOnly}
                             size="large"
                             style={{width: '100%'}}
                             key={index}
@@ -297,7 +316,8 @@ const WhiteBoard = (props) => {
                     borderRadius: "4px",
                     marginLeft: "8px",
                     height: "79%",
-                    width: "calc(100% - 288px)"
+                    width: "calc(100% - 288px)",
+                    backgroundColor: '#FFFFFF'
                   }} className={'col-*-* dropTarget'}
                        onClick={(e) => mouseClickHandler(e)}>
                     <canvas style={{height: "100%", width: '100%', overflow: "auto"}}
