@@ -70,15 +70,25 @@ const WebLinkLanding = (props) => {
         console.log('_______ RES: ', response);
 
         if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
-          let _user = response.meetingAttendee.external ? response.meetingAttendee.emailAddress : response.userId;
-          navigate('/guest', {
-            state: {
-              meetingId: meetingId,
-              tokenUserId: _user,
-              token: urlToken,
-              meetingExternal: response.meetingAttendee.external
-            }
-          });
+          if (response.meetingAttendee.external) {
+            let _user = response.meetingAttendee.external ? response.meetingAttendee.emailAddress : response.userId;
+            navigate('/guest', {
+              state: {
+                meetingId: meetingId,
+                tokenUserId: _user,
+                token: urlToken,
+                meetingExternal: response.meetingAttendee.external
+              }
+            });
+          } else {
+            navigate('/login', {
+              state: {
+                meetingId: meetingId,
+                tokenUserId: response.userId,
+                token: urlToken
+              }
+            });
+          }
         } else {
           let userDetails = appManager.getUserDetails();
           if (response.userId === userDetails.userId) {

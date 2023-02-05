@@ -75,8 +75,6 @@ const Guest = (props) => {
       (response) => {
         setIsLoading(false);
 
-        console.log('____ RES: ', response);
-
         let lastLogin = new Date().getTime();
         appManager.add("accessToken", response.access_token);
         appManager.add("refreshToken", response.refresh_token);

@@ -604,7 +604,11 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     setIsHost(props.isHost);
     fetchChats();
-    persistMeetingSettings();
+
+    if (!isDirectCall) {
+      persistMeetingSettings();
+    }
+
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     setupStream();
     appManager.add('CURRENT_MEETING', selectedMeeting);
