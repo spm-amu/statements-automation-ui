@@ -771,6 +771,23 @@ const MeetingRoom = (props) => {
     }
   }, [audioMuted]);
 
+
+  useEffect(() => {
+    socketManager.userPeerMap.forEach((peerObj) => {
+      if(currentUserStream.getVideoTracks().length > 0) {
+        peerObj.peer.replaceTrack(
+          currentUserStream.getVideoTracks()[0],
+          currentUserStream.videoTrack,
+          currentUserStream.obj
+        );
+      }
+    });
+
+    if(userVideo.current) {
+      userVideo.current.srcObject = currentUserStream.obj;
+    }
+  }, [currentUserStream.videoTrack]);
+
   useEffect(() => {
     if (videoMuted !== null) {
       toggleVideo();
@@ -787,6 +804,7 @@ const MeetingRoom = (props) => {
       }
     }
   }
+
 
   return (
     <Fragment>

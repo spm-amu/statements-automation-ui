@@ -4,23 +4,20 @@ export class Stream {
 
   init = (video = true, audio = true, successHandler, errorhandler) => {
     let userMedia = navigator.mediaDevices
-      .getUserMedia({
+      .getUserMedia(video ? {
         audio: audio,
         video: {
           width: 240,
           height: 240,
         }
+      } : {
+        audio: audio,
+        video: false
       });
 
     userMedia
       .then((stream) => {
         this.obj = stream;
-
-        if(!video) {
-          // If we stop the track here it never comes back on. TODO: fix this issue so that the light is not on by default
-          //stream.getVideoTracks()[0].enabled = false;
-        }
-
         if (successHandler) {
           successHandler(this.obj);
         }
@@ -54,6 +51,10 @@ export class Stream {
   };
 
   getVideoTracks = () => {
+    if(!this.obj) {
+      return [];
+    }
+
     return this.obj.getVideoTracks();
   };
 
@@ -66,15 +67,6 @@ export class Stream {
   };
 
   enableVideo = (enabled) => {
-
-    this.obj
-      .getVideoTracks()
-      .forEach((track) => {
-        track.enabled = false;
-        track.stop();
-        this.obj.removeTrack(track);
-      });
-
     if (enabled) {
       let userMedia = navigator.mediaDevices
         .getUserMedia(
@@ -88,7 +80,6 @@ export class Stream {
       userMedia
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
-          this.obj.addTrack(this.videoTrack);
         });
     }
   }
