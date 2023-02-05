@@ -4,19 +4,23 @@ export class Stream {
 
   init = (video = true, audio = true, successHandler, errorhandler) => {
     let userMedia = navigator.mediaDevices
-      .getUserMedia(video ? {
+      .getUserMedia({
         audio: audio,
         video: {
           width: 240,
           height: 240,
         }
-      } : {
-        audio: audio,
-        video: false
       });
 
     userMedia
       .then((stream) => {
+
+        if(!video) {
+          // If we stop the track here it never comes back on. TODO: fix this issue so that the light is not on by default
+          stream.getVideoTracks()[0].enabled = false;
+          stream.getVideoTracks()[0].stop();
+        }
+
         this.obj = stream;
         if (successHandler) {
           successHandler(this.obj);
@@ -35,7 +39,6 @@ export class Stream {
       this.obj
         .getTracks()
         .forEach((track) => {
-          track.enabled = false;
           track.stop();
           this.removeTrack(track);
         });
@@ -80,17 +83,20 @@ export class Stream {
       userMedia
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
-          if(socketManager) {
-            socketManager.userPeerMap.forEach((peerObj) => {
-              peerObj.peer.replaceTrack(
-                this.getVideoTracks()[0],
-                this.videoTrack,
-                this.obj
-              );
-            });
+          if(this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
+            if (socketManager) {
+              socketManager.userPeerMap.forEach((peerObj) => {
+                peerObj.peer.replaceTrack(
+                  this.getVideoTracks()[0],
+                  this.videoTrack,
+                  this.obj
+                );
+              });
+            }
+
+            this.obj.removeTrack(this.getVideoTracks()[0]);
           }
 
-          this.obj.removeTrack(this.getVideoTracks()[0]);
           this.obj.addTrack(this.videoTrack);
         })
     } else {
