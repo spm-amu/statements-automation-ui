@@ -66,14 +66,15 @@ export class Stream {
   };
 
   enableVideo = (enabled) => {
-
-    this.obj
-      .getVideoTracks()
-      .forEach((track) => {
-        track.enabled = false;
-        track.stop();
-        this.obj.removeTrack(track);
-      });
+    if (!enabled) {
+      this.obj
+        .getVideoTracks()
+        .forEach((track) => {
+          track.enabled = false;
+          track.stop();
+          this.obj.removeTrack(track);
+        });
+    }
 
     if (enabled) {
       let userMedia = navigator.mediaDevices
