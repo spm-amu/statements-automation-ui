@@ -386,7 +386,6 @@ ipcMain.on("readTokens", async (_event, args) => {
   tokens.accessToken = store.get('accessToken');
   tokens.refreshToken = store.get('refreshToken');
 
-  tokens.appPath = app.getAppPath();
   tokens.pathResolve = path.resolve(__dirname, '../renderer/', 'index.html#/dialingPreview');
 
   let lastLogin = store.get('lastLogin') as string;
