@@ -13,6 +13,7 @@ import Window from "../Window";
 import appManager from "../../../common/service/AppManager";
 import "./ViewContainer.css"
 import Activity from "../view/Activity";
+import WhiteboardView from "../view/WhiteboardView";
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -102,6 +103,9 @@ const ViewContainer = (props) => {
           break;
         case 'joinMeetingSettings':
           element = <JoinMeetingSettings selectedMeeting={location.state}/>;
+          break;
+        case 'whiteboard':
+          element = <WhiteboardView id={location.state}/>;
           break;
         case 'people':
           element = <People dialEnabled={true} chatEnabled={false}/>;

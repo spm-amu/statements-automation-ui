@@ -591,7 +591,7 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
                     rowCount={totalNumberOfRows}
                   />
                   <Tbody className={classes.tableBody}
-                         style={{maxHeight: Utils.isNull(props.bodyMaxHeight) ? props.bodyMaxHeight : "42vh"}}
+                         style={{maxHeight: !Utils.isNull(props.bodyMaxHeight) ? props.bodyMaxHeight : "42vh"}}
                          id="mainTableBody">
                   {stableSort(rows, getSorting(order, orderBy)).map((row, index) => {
                     const isItemSelected = isSelected(row.id);

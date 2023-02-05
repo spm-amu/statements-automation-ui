@@ -54,7 +54,7 @@ const grid = {
       "id": "downloadActions",
       "attributes": {
         "filterable": false,
-        "width": "20.0%",
+        "width": "10.0%",
         "label": "Recording",
         "toolbar": {
           "items": [
@@ -62,6 +62,25 @@ const grid = {
               "id": "downloadRecording",
               "type": "iconButton",
               "icon": "DOWNLOAD"
+            }
+          ]
+        },
+        "sortable": false
+      }
+    },
+    {
+      "type": "gridColumn",
+      "id": "whiteboardActions",
+      "attributes": {
+        "filterable": false,
+        "width": "10.0%",
+        "label": "Whiteboard",
+        "toolbar": {
+          "items": [
+            {
+              "id": "viewWhiteboard",
+              "type": "iconButton",
+              "icon": "NOTE"
             }
           ]
         },
@@ -85,8 +104,7 @@ const MeetingHistory = (props) => {
     }, (e) => {
     }, '', false);
 
-  }
-
+  };
 
   const viewMeeting = (selectedMeeting) => {
     getSelectedMeetingEvent(selectedMeeting);
@@ -115,6 +133,7 @@ const MeetingHistory = (props) => {
             }}/>
           </div>
           <DataGrid config={grid}
+                    bodyMaxHeight={"65vh"}
                     criteriaParams={criteriaParams}
                     dataUrl={`${host}/api/v1/meeting/fetchMeetingHistory`}
                     actionHandler={(e) => {
@@ -127,6 +146,9 @@ const MeetingHistory = (props) => {
                         viewMeeting(e.data);
                       }
 
+                      if(e.id === 'viewWhiteboard') {
+                        navigate("/view/whiteboard", {state: e.data.id})
+                      }
                     }}
           />
         </ul>

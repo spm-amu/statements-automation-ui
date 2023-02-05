@@ -76,7 +76,8 @@ const MeetingRoom = (props) => {
   const [participantsRaisedHands, setParticipantsRaisedHands] = useState([]);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
-  const [currentUserStream, setCurrentUserStream] = useState(null);
+  const [currentUserStream] = useState(new Stream());
+  const [streamsInitiated, setStreamsInitiated] = useState(false);
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
@@ -91,7 +92,7 @@ const MeetingRoom = (props) => {
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('AUTO_ADJUST');
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
-  const [whiteboardItems] = useState([]);
+  const [whiteboardItems, setWhiteboardItems] = useState([]);
   const [eventHandler] = useState({});
 
   const recordedChunks = [];
@@ -143,7 +144,13 @@ const MeetingRoom = (props) => {
             onCallEnded();
             break;
           case MessageType.WHITEBOARD_EVENT:
+            updateWhiteboardEvents(be.payload);
             appManager.fireEvent(SystemEventType.WHITEBOARD_EVENT_ARRIVED, be.payload);
+            break;
+          case MessageType.WHITEBOARD:
+            if(be.payload) {
+              setWhiteboardItems(be.payload.items);
+            }
             break;
         }
       }
@@ -161,6 +168,18 @@ const MeetingRoom = (props) => {
     if (mediaRecorder != null) {
       mediaRecorder.start();
       setIsRecording(true);
+    }
+  };
+
+  const updateWhiteboardEvents = (e) => {
+    let find = whiteboardItems.find((i) => i.id === e.metadata.id);
+    if(find) {
+      const properties = Object.getOwnPropertyNames(e.metadata);
+      for (const property of properties) {
+        find[property] = e.metadata[property];
+      }
+    } else {
+      whiteboardItems.push(e.metadata);
     }
   };
 
@@ -218,7 +237,7 @@ const MeetingRoom = (props) => {
       peerObj.peer.replaceTrack(
         currentUserStream.getVideoTracks()[0], // prev video track - webcam
         stream.getVideoTracks()[0], // current video track - screen track
-        currentUserStream
+        currentUserStream.obj
       );
     });
 
@@ -293,7 +312,7 @@ const MeetingRoom = (props) => {
       peerObj.peer.replaceTrack(
         currentUserStream.getVideoTracks()[0], // prev video track - webcam
         tmpVideoTrack.current, // current video track - screen track
-        currentUserStream
+        currentUserStream.obj
       );
     });
 
@@ -412,7 +431,6 @@ const MeetingRoom = (props) => {
     } else {
       let userPeerMap = [];
       users.forEach((user) => {
-        console.log("\n\n\nADDING PART : ", user);
         userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream.obj, MessageType.ALL_USERS, audioMuted, videoMuted))
       });
 
@@ -514,10 +532,10 @@ const MeetingRoom = (props) => {
   }, []);
 
   useEffect(() => {
-    if (currentUserStream) {
+    if (currentUserStream.obj) {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
-        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT);
+        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD);
 
       if (isHost || isDirectCall) {
         join();
@@ -527,7 +545,7 @@ const MeetingRoom = (props) => {
     } else {
       socketManager.removeSubscriptions(eventHandler);
     }
-  }, [currentUserStream]);
+  }, [streamsInitiated]);
 
   const {settings} = props;
 
@@ -573,12 +591,10 @@ const MeetingRoom = (props) => {
   };
 
   const setupStream = () => {
-    let currentStream = new Stream();
-    setCurrentUserStream(currentStream);
     console.log("INITIALIZING STREAMS...");
-    currentStream.init(!videoMuted, true, (stream) => {
+    currentUserStream.init(!videoMuted, true, (stream) => {
       console.log("STREAM CREATED");
-      console.log(stream);
+      setStreamsInitiated(true);
     }, (e) => {
       console.log("STREAM ERROR");
       console.log(e);
@@ -604,7 +620,7 @@ const MeetingRoom = (props) => {
     if (userVideo.current && !userVideo.current.srcObject) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
-  }, [userVideo.current, currentUserStream]);
+  }, [userVideo.current, streamsInitiated]);
 
   const persistMeetingSettings = () => {
     post(
@@ -657,7 +673,7 @@ const MeetingRoom = (props) => {
   };
 
   const endCall = () => {
-    if (currentUserStream) {
+    if (currentUserStream.obj) {
       socketManager.endCall(isDirectCall, callerUser);
     }
 
@@ -666,11 +682,8 @@ const MeetingRoom = (props) => {
   };
 
   const closeStreams = () => {
-    if (currentUserStream) {
-      hangUpAudio.play();
-      currentUserStream.close();
-    }
-
+    hangUpAudio.play();
+    currentUserStream.close();
   };
 
   const onCallEnded = () => {
@@ -738,7 +751,7 @@ const MeetingRoom = (props) => {
   }
 
   function toggleVideo() {
-    if (currentUserStream) {
+    if (currentUserStream.obj) {
       if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         if (!screenShared) {
           currentUserStream.enableVideo(!videoMuted);
@@ -757,7 +770,7 @@ const MeetingRoom = (props) => {
   }, [audioMuted, videoMuted]);
 
   function toggleAudio() {
-    if (currentUserStream && currentUserStream.getAudioTracks() && currentUserStream.getAudioTracks().length > 0) {
+    if (currentUserStream.obj && currentUserStream.getAudioTracks() && currentUserStream.getAudioTracks().length > 0) {
       let audioTrack = currentUserStream.getAudioTracks()[0];
       if (audioTrack && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         audioTrack.enabled = !audioMuted;
@@ -810,7 +823,7 @@ const MeetingRoom = (props) => {
         maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
         overflow: displayState === 'MAXIMIZED' ? null : 'hidden',
       }}>
-        <div className={'col'} style={{paddingLeft: '0', paddingRight: '0'}}>
+        <div className={'col'} style={{paddingLeft: '0', paddingRight: '0', maxHeight: '100%'}}>
           <div style={{height: '100%'}}>
             <div style={{
               height: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null,
@@ -837,7 +850,7 @@ const MeetingRoom = (props) => {
                       {
                         showWhiteBoard && meetingParticipantGridMode === 'SIDE_ONLY' &&
                         <div className={'col'}>
-                          <WhiteBoard  items={whiteboardItems} eventHandler={
+                          <WhiteBoard isHost={isHost} id={selectedMeeting.id} items={whiteboardItems} eventHandler={
                             {
                               onAddItem: (item) => {
                                 whiteboardItems.push(item);
@@ -925,7 +938,7 @@ const MeetingRoom = (props) => {
                             }
                           },
                           shareScreen: () => {
-                            if (currentUserStream) {
+                            if (currentUserStream.obj) {
                               if (screenShared) {
                                 stopShareScreen();
                               } else {

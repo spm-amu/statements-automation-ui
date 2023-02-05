@@ -80,7 +80,7 @@ const MeetingParticipantGrid = (props) => {
 
   return (
     grid !== null ?
-      <div className={'row grid'} style={{height: 'calc(100% - 16px)', width: mode === 'AUTO_ADJUST' ? '100%' : '320px'}}>
+      <div className={'row grid'} style={{height: 'calc(100% - 16px)', width: mode === 'AUTO_ADJUST' ? '100%' : '256px'}}>
         {grid && grid.length > 0 &&
           <div className={'col h-100'}>
             <div className={'row h-100'}>
@@ -110,7 +110,7 @@ const MeetingParticipantGrid = (props) => {
                   sideGrid.map((participant, index) => {
                     return <div key={index} className={'side-grid-item'}>
                       <MeetingParticipant data={participant} videoMuted={participant.videoMuted}
-                                          audioMuted={participant.audioMuted} showName={true} padding={'0'} height={'320px'} />
+                                          audioMuted={participant.audioMuted} showName={true} padding={'0'} height={'256px'} />
                     </div>
                   })
                 }
