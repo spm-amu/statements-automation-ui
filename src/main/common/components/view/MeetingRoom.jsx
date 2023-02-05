@@ -798,7 +798,7 @@ const MeetingRoom = (props) => {
   return (
     <Fragment>
       {
-        !started && step === 'SESSION' && isHost &&
+        !started && step === 'SESSION' && isHost && !isDirectCall &&
         <div className={'row'} style={{margin: '0 0 16px 16px'}}>
           <Button
             variant={'contained'}
@@ -811,7 +811,7 @@ const MeetingRoom = (props) => {
         </div>
       }
       {
-        started && step === 'SESSION' && isHost &&
+        started && step === 'SESSION' && isHost && !isDirectCall &&
         <div className={'row'} style={{margin: '0 0 0 16px'}}>
           <div className={'col no-margin no-padding'}>
             <Button
