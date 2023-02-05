@@ -51,7 +51,7 @@ export class Stream {
   };
 
   getVideoTracks = () => {
-    if(!this.obj) {
+    if (!this.obj) {
       return [];
     }
 
@@ -66,7 +66,7 @@ export class Stream {
     return this.obj.getTracks();
   };
 
-  enableVideo = (enabled) => {
+  enableVideo = (enabled, socketManager) => {
     if (enabled) {
       let userMedia = navigator.mediaDevices
         .getUserMedia(
@@ -80,7 +80,24 @@ export class Stream {
       userMedia
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
-        });
+          if(socketManager) {
+            socketManager.userPeerMap.forEach((peerObj) => {
+              peerObj.peer.replaceTrack(
+                this.getVideoTracks()[0],
+                this.videoTrack,
+                this.obj
+              );
+            });
+          }
+
+          this.obj.removeTrack(this.getVideoTracks()[0]);
+          this.obj.addTrack(this.videoTrack);
+        })
+    } else {
+      let videoTrack = this.getVideoTracks()[0];
+      if(videoTrack) {
+        videoTrack.stop();
+      }
     }
   }
 }

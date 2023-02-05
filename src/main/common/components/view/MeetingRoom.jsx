@@ -758,7 +758,7 @@ const MeetingRoom = (props) => {
     if (currentUserStream.obj) {
       if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         if (!screenShared) {
-          currentUserStream.enableVideo(!videoMuted);
+          currentUserStream.enableVideo(!videoMuted, socketManager);
         }
       }
     }
@@ -771,18 +771,7 @@ const MeetingRoom = (props) => {
     }
   }, [audioMuted]);
 
-
   useEffect(() => {
-    socketManager.userPeerMap.forEach((peerObj) => {
-      if(currentUserStream.getVideoTracks().length > 0) {
-        peerObj.peer.replaceTrack(
-          currentUserStream.getVideoTracks()[0],
-          currentUserStream.videoTrack,
-          currentUserStream.obj
-        );
-      }
-    });
-
     if(userVideo.current) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
