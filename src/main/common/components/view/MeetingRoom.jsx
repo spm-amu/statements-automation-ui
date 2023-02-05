@@ -765,13 +765,18 @@ const MeetingRoom = (props) => {
   }
 
   useEffect(() => {
-    if (audioMuted !== null && videoMuted !== null) {
-      toggleVideo();
+    if (audioMuted !== null) {
       toggleAudio();
-
       emitAVSettingsChange();
     }
-  }, [audioMuted, videoMuted]);
+  }, [audioMuted]);
+
+  useEffect(() => {
+    if (videoMuted !== null) {
+      toggleVideo();
+      emitAVSettingsChange();
+    }
+  }, [videoMuted]);
 
   function toggleAudio() {
     if (currentUserStream.obj && currentUserStream.getAudioTracks() && currentUserStream.getAudioTracks().length > 0) {
