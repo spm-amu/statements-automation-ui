@@ -1,7 +1,6 @@
 /* eslint import/prefer-default-export: off, import/no-mutable-exports: off */
 import { URL } from 'url';
 import path from 'path';
-import slash from 'slash';
 
 export let resolveHtmlPath: (htmlFileName: string) => string;
 
@@ -17,6 +16,16 @@ if (process.env.NODE_ENV === 'development') {
   resolveHtmlPath = (htmlFileName: string) => {
     return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
   };
+}
+
+function slash(path: string) {
+  const isExtendedLengthPath = /^\\\\\?\\/.test(path);
+
+  if (isExtendedLengthPath) {
+    return path;
+  }
+
+  return path.replace(/\\/g, '/');
 }
 
 export let resolveWindowHtmlPath: (htmlFileName: string) => string;
