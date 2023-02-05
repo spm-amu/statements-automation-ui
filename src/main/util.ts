@@ -1,6 +1,7 @@
 /* eslint import/prefer-default-export: off, import/no-mutable-exports: off */
 import { URL } from 'url';
 import path from 'path';
+import slash from 'slash';
 
 export let resolveHtmlPath: (htmlFileName: string) => string;
 
@@ -28,6 +29,11 @@ if (process.env.NODE_ENV === 'development') {
   };
 } else {
   resolveWindowHtmlPath = (htmlFileName: string) => {
-    return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
+    let htmlFilePath = path.resolve(__dirname, '../renderer/', htmlFileName);
+    if(!htmlFilePath.startsWith('/')) {
+      htmlFilePath = '/' + htmlFilePath;
+    }
+
+    return `file://${slash(htmlFilePath)}`;
   };
 }

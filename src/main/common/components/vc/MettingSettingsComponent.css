@@ -21,12 +21,12 @@
 }
 
 .lobby-settings {
-  width: 700px;
-  height: 700px;
-  background-color: rgb(40, 40, 43);
+  width: 40vh; /*NB: vh was used intentionally*/
+  height: 44vh;
+  background-color: transparent;
   border-radius: 4px;
 }
-
+C:\Users\Mokgadim1\IdeaProjects\armscor-connect-ui\src\main\common\components\vc\MettingSettingsComponent.css
 .meeting-settings-container .title {
   font-size: 28px;
 }
