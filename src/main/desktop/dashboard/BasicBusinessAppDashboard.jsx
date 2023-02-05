@@ -368,6 +368,9 @@ const BasicBusinessAppDashboard = (props) => {
 
     if (!isSafari && !isChrome && !isIE && !isEdge) {
       electron.ipcRenderer.on('tokensRead', args => {
+
+        console.log('______ PATHS: ', args);
+
         if(args.accessToken && args.refreshToken) {
           appManager.add(ACCESS_TOKEN_PROPERTY, args.accessToken);
           appManager.add(REFRESH_TOKEN_PROPERTY, args.refreshToken);
