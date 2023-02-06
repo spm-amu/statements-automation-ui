@@ -21,7 +21,7 @@ const MeetingParticipant = forwardRef((props, ref) => {
           showVideo ?
             <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
               {
-                props.videoMuted &&
+                props.videoMuted && !props.screenShared &&
                 <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
                   <div className={'avatar'} data-label={Utils.getInitials(props.data.name)} />
                 </div>
@@ -29,13 +29,13 @@ const MeetingParticipant = forwardRef((props, ref) => {
               {
                 props.audioMuted || props.data.peer === null ?
                   <video
-                    hidden={props.videoMuted}
+                    hidden={props.videoMuted && !props.screenShared}
                     muted playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
                   />
                   :
                   <video
-                    hidden={props.videoMuted}
+                    hidden={props.videoMuted && !props.screenShared}
                     playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
                   />

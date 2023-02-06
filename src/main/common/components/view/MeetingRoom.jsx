@@ -97,6 +97,7 @@ const MeetingRoom = (props) => {
 
   const recordedChunks = [];
 
+  const shareScreenSource = useRef();
   const userVideo = useRef();
   const tmpVideoTrack = useRef();
 
@@ -231,7 +232,6 @@ const MeetingRoom = (props) => {
 
   const handleScreenShareStream = (stream) => {
     tmpVideoTrack.current = currentUserStream.getVideoTracks()[0];
-    currentUserStream.addTrack(stream.getVideoTracks()[0]);
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
@@ -242,6 +242,7 @@ const MeetingRoom = (props) => {
     });
 
     currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
+    currentUserStream.addTrack(stream.getVideoTracks()[0]);
     userVideo.current.srcObject = currentUserStream.obj;
 
     const options = {mimeType: "video/webm; codecs=vp9"};
@@ -250,6 +251,7 @@ const MeetingRoom = (props) => {
     recorder.onstop = handleStop;
 
     setMediaRecorder(recorder);
+    emitAVSettingsChange();
   };
 
   const handleDataAvailable = (e) => {
@@ -304,9 +306,8 @@ const MeetingRoom = (props) => {
   };
 
   const stopShareScreen = () => {
+    shareScreenSource.current = null;
     setScreenShared(false);
-
-    currentUserStream.addTrack(tmpVideoTrack.current);
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
@@ -317,14 +318,39 @@ const MeetingRoom = (props) => {
     });
 
     currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
+    currentUserStream.addTrack(tmpVideoTrack.current);
+
     userVideo.current.srcObject = currentUserStream.obj;
+    emitAVSettingsChange();
   };
 
   const selectSourceHandler = (selectedSource) => {
     setScreenSharePopupVisible(false);
+    shareScreenSource.current = selectedSource;
 
     if (screenSources && selectedSource) {
       setScreenShared(true);
+    }
+  };
+
+  const shareScreen = () => {
+    electron.ipcRenderer.getSources()
+      .then(sources => {
+        if (sources && sources.length > 0) {
+          setScreenSources(sources);
+          setScreenSharePopupVisible(true);
+        }
+      });
+  };
+
+  useEffect(() => {
+    if (displayState) {
+      setDisplayState(props.displayState);
+    }
+  }, [props.displayState]);
+
+  useEffect(() => {
+    if (screenShared) {
 
       const videoConstraints = {
         cursor: true,
@@ -336,7 +362,7 @@ const MeetingRoom = (props) => {
         video: {
           mandatory: {
             chromeMediaSource: 'desktop',
-            chromeMediaSourceId: selectedSource.id,
+            chromeMediaSourceId: shareScreenSource.current.id,
             minWidth: 1280,
             maxWidth: 1280,
             minHeight: 720,
@@ -358,25 +384,7 @@ const MeetingRoom = (props) => {
           console.log(e)
         });
     }
-  };
-
-  const shareScreen = () => {
-    electron.ipcRenderer.getSources()
-      .then(sources => {
-        console.log('\n\n\n sources: ', sources);
-
-        if (sources && sources.length > 0) {
-          setScreenSources(sources);
-          setScreenSharePopupVisible(true);
-        }
-      });
-  };
-
-  useEffect(() => {
-    if (displayState) {
-      setDisplayState(props.displayState);
-    }
-  }, [props.displayState]);
+  }, [screenShared]);
 
   useEffect(() => {
     setAutoPermit(props.autoPermit);
@@ -750,7 +758,7 @@ const MeetingRoom = (props) => {
       meetingId: selectedMeeting.id,
       userId: userDetails.userId,
       audioMuted: audioMuted,
-      videoMuted: videoMuted
+      videoMuted: videoMuted || !screenShared
     });
   }
 
@@ -793,7 +801,6 @@ const MeetingRoom = (props) => {
       }
     }
   }
-
 
   return (
     <Fragment>
@@ -920,6 +927,7 @@ const MeetingRoom = (props) => {
                       handRaised={handRaised}
                       isRecording={isRecording}
                       displayState={displayState}
+                      screenShared={screenShared}
                       isHost={isHost}
                       step={step}
                       autoPermit={autoPermit}
@@ -955,14 +963,13 @@ const MeetingRoom = (props) => {
                           },
                           shareScreen: () => {
                             if (currentUserStream.obj) {
-                              if (screenShared) {
-                                stopShareScreen();
-                              } else {
-                                shareScreen();
-                              }
+                              shareScreen();
                             }
                           },
                           stopShareScreen: () => {
+                            if (currentUserStream.obj) {
+                              stopShareScreen();
+                            }
                           },
                           showPeople: () => {
                             setSideBarTab('People');

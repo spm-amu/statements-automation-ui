@@ -67,6 +67,7 @@ const Footer = (props) => {
                   }}
                   videoMuted={videoMuted}
                   audioMuted={audioMuted}
+                  screenShared={screenShared}
                   displayName={false}
                   ref={userVideo}
                   padding={'0'}

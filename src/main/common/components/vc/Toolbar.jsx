@@ -15,7 +15,7 @@ const Toolbar = (props) => {
   const [autoPermit, setAutoPermit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const openMoreActions = Boolean(anchorEl);
-  const [screenShared] = useState(false);
+  const [screenShared, setScreenShared] = useState(false);
 
   const {
     displayState,
@@ -74,10 +74,12 @@ const Toolbar = (props) => {
 
   const shareScreen = () => {
     eventHandler.shareScreen();
+    setScreenShared(true);
   };
 
   const stopShareScreen = () => {
     eventHandler.stopShareScreen();
+    setScreenShared(false);
   };
 
   const endCall = () => {

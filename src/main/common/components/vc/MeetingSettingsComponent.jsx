@@ -33,7 +33,7 @@ const MeetingSettingsComponent = (props) => {
 
   useEffect(() => {
     if (stream) {
-      stream.enableVideo(!videoMuted);
+      stream.enableVideo(!videoMuted, null, null);
     }
   }, [videoMuted]);
 
