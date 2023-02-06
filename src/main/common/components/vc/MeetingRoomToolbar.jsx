@@ -64,8 +64,8 @@ const MeetingRoomToolbar = (props) => {
         }
         {
           started && isHost && !isDirectCall &&
-          <div className={'row'} style={{margin: '0 0 0 0'}}>
-            <div className={'col no-margin no-padding'}>
+          <div className={'row'} style={{margin: '0 0 0 0', display: 'flex', alignItems: 'center'}}>
+            <div className={'no-padding'} style={{maxHeight: '48px', marginLeft: '0', marginRight: '16px'}}>
               <Button
                 variant={'contained'}
                 size="large"

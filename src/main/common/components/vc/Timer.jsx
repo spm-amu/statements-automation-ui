@@ -6,7 +6,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
-const MINUTE = 1000;
+const MINUTE = 60000;
 const Timer = (props) => {
 
   const {
@@ -79,7 +79,10 @@ const Timer = (props) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'rgb(235, 63, 33)'
+              color: 'rgb(235, 63, 33)',
+              marginLeft: '32px',
+              marginRight: '32px',
+              fontSize: '12px'
             }} className={'row'}>
               <div className={'row'}>
                 There {minutes === 1 ? <>is</> : <>are</>} {minutes} minute{minutes !== 1 && <>s</>} remaining. Do you want to automatically extend the meeting?
