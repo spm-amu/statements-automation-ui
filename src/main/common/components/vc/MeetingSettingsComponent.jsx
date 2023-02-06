@@ -118,22 +118,25 @@ const MeetingSettingsComponent = (props) => {
           <tr>
             <td className={'lobby-settings'} colSpan={4}>
               <div
+                className={'centered-flex-box'}
                 style={{
                   width: '100%',
-                  height: '100%',
+                  height: '100%'
                 }}
               >
                 {
                   videoMuted &&
-                  <div className={'centered-flex-box'} style={{width: '100%', height: '100%', backgroundColor: '#000000', borderRadius: '4px'}}>
+                  <div className={'centered-flex-box'} style={{width: '70%', height: '280px', backgroundColor: '#000000', borderRadius: '4px'}}>
                     <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)}/>
                   </div>
                 }
-                <video
-                  hidden={videoMuted}
-                  muted playsInline autoPlay ref={userVideo}
-                  style={{width: '100%', height: '100%', backgroundColor: '#000000', borderRadius: '4px'}}
-                />
+                <div>
+                  <video
+                    hidden={videoMuted}
+                    muted playsInline autoPlay ref={userVideo}
+                    style={{maxHeight: '280px', height: '280px', width: 'unset', backgroundColor: '#000000', borderRadius: '4px'}}
+                  />
+                </div>
               </div>
             </td>
           </tr>
