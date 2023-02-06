@@ -130,7 +130,7 @@ const MeetingSettingsComponent = (props) => {
                     <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)}/>
                   </div>
                 }
-                <div>
+                <div style={{ maxWidth: '70%' }}>
                   <video
                     hidden={videoMuted}
                     muted playsInline autoPlay ref={userVideo}
