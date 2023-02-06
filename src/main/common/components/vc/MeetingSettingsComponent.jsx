@@ -134,7 +134,7 @@ const MeetingSettingsComponent = (props) => {
                   <video
                     hidden={videoMuted}
                     muted playsInline autoPlay ref={userVideo}
-                    style={{maxHeight: '280px', height: '284px', width: 'unset', maxWidth: '280px', backgroundColor: '#000000', borderRadius: '4px'}}
+                    style={{maxHeight: '280px', height: '280px', width: 'unset', maxWidth: '280px', backgroundColor: '#000000', borderRadius: '4px'}}
                   />
                 </div>
               </div>
