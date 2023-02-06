@@ -14,8 +14,8 @@ const StyledDialog = withStyles({
     width: '100%',
     height: '100%',
     maxWidth: 'calc(100% - 144px)',
-    maxHeight: 'calc(100% - 136px)',
-    margin: '136px 0 0 144px',
+    maxHeight: 'calc(100% - 48px)',
+    margin: '48px 0 0 144px',
     padding: '0',
     overflow: 'hidden',
     boxShadow: 'none !important',
@@ -125,36 +125,48 @@ const Window = (props) => {
         PaperComponent={PaperComponent}
         PaperProps={{id: 'meetingDialogPaper', disabled: displayState === 'MAXIMIZED'}}
       >
-        <div id="meeting-window-title">
-          {
-            minimizable &&
-            <div className={'dialogHeader'}>
-              {
-                displayState === 'MAXIMIZED' ?
-                  <IconButton
-                    onClick={(e) => {
-                      minimizeView(e)
-                    }}
-                    style={{
-                      marginRight: '4px'
-                    }}
-                  >
-                    <Icon id={'MINIMIZE'}/>
-                  </IconButton>
-                  :
-                  <IconButton
-                    onClick={(e) => {
-                      maximizeView(e)
-                    }}
-                    style={{
-                      marginRight: '4px'
-                    }}
-                  >
-                    <Icon id={'MAXIMIZE'}/>
-                  </IconButton>
-              }
-            </div>
-          }
+        <div className={"meeting-window-header"}>
+          <div id="meeting-window-title">
+            {
+              minimizable &&
+              <div>
+                <div className={'dialogHeader row'}>
+                  <div className={'meeting-title col'}>
+                    {
+                      props.toolbarDisplayState === 'VISIBLE' &&
+                      props.toolbar
+                    }
+                  </div>
+                  <div>
+                    {
+                      displayState === 'MAXIMIZED' ?
+                        <IconButton
+                          onClick={(e) => {
+                            minimizeView(e)
+                          }}
+                          style={{
+                            marginRight: '4px'
+                          }}
+                        >
+                          <Icon id={'MINIMIZE'}/>
+                        </IconButton>
+                        :
+                        <IconButton
+                          onClick={(e) => {
+                            maximizeView(e)
+                          }}
+                          style={{
+                            marginRight: '4px'
+                          }}
+                        >
+                          <Icon id={'MAXIMIZE'}/>
+                        </IconButton>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
         </div>
         {
           children

@@ -33,7 +33,7 @@ const StyledDialog = withStyles({
     width: '100%',
     height: '100%',
     maxWidth: 'calc(100% - 144px)',
-    maxHeight: 'calc(100% - 136px)',
+    maxHeight: 'calc(100% - 48px)',
     margin: '136px 0 0 144px',
     padding: '0',
     overflow: 'hidden',
@@ -87,8 +87,6 @@ const MeetingRoom = (props) => {
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [screenSources, setScreenSources] = useState();
-  const [started, setStarted] = useState(false);
-  const [remainingTime, setRemainingTime] = useState();
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('AUTO_ADJUST');
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
@@ -394,6 +392,7 @@ const MeetingRoom = (props) => {
       if (!isDirectCall) {
         // TODO : Introduce a new step for this
         setStep("LOBBY");
+        props.windowHandler.hide();
       } else {
         endCall();
         onCallEnded();
@@ -423,6 +422,7 @@ const MeetingRoom = (props) => {
       setAllUserParticipantsLeft(false);
       if (step === Steps.LOBBY) {
         setStep(Steps.SESSION);
+        props.windowHandler.show();
       }
     });
 
@@ -464,6 +464,7 @@ const MeetingRoom = (props) => {
               if (userPeerMap.length > 0) {
                 if (step === Steps.LOBBY) {
                   setStep(Steps.SESSION);
+                  props.windowHandler.show();
                 }
               }
             } else {
@@ -622,12 +623,6 @@ const MeetingRoom = (props) => {
   }, []);
 
   useEffect(() => {
-    if (remainingTime) {
-      setStarted(true);
-    }
-  }, [remainingTime]);
-
-  useEffect(() => {
     if (userVideo.current && !userVideo.current.srcObject) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
@@ -642,7 +637,7 @@ const MeetingRoom = (props) => {
       {
         meetingId: selectedMeeting.id,
         askToJoin: autoPermit
-      }
+      }, null, false
     );
   };
 
@@ -672,15 +667,6 @@ const MeetingRoom = (props) => {
 
   const onLowerHand = (payload) => {
     setParticipantsRaisedHands(participantsRaisedHands.filter((p) => p.userId !== payload.userId));
-  };
-
-  const endMeeting = () => {
-    if(isHost) {
-      socketManager.emitEvent(MessageType.END_MEETING, {
-        meetingId: selectedMeeting.id,
-        userId: appManager.getUserDetails().userId
-      })
-    }
   };
 
   const endCall = () => {
@@ -719,26 +705,6 @@ const MeetingRoom = (props) => {
     });
 
     removeFromLobbyWaiting(item);
-  };
-
-  const startMeeting = (e) => {
-
-    const data = {
-      meetingId: selectedMeeting.id,
-      end: selectedMeeting.endDate
-    };
-
-    post(
-      `${host}/api/v1/meeting/start`,
-      (response) => {
-        setRemainingTime(response.remainingTime);
-      },
-      (e) => {
-      },
-      data,
-      '',
-      true
-    );
   };
 
   const rejectUser = (item) => {
@@ -803,43 +769,6 @@ const MeetingRoom = (props) => {
 
   return (
     <Fragment>
-      {
-        !started && step === 'SESSION' && isHost && !isDirectCall &&
-        <div className={'row'} style={{margin: '0 0 16px 16px'}}>
-          <Button
-            variant={'contained'}
-            size="large"
-            color={'primary'}
-            onClick={(e) => startMeeting(e)}
-          >
-            START MEETING
-          </Button>
-        </div>
-      }
-      {
-        started && step === 'SESSION' && isHost && !isDirectCall &&
-        <div className={'row'} style={{margin: '0 0 0 16px'}}>
-          <div className={'col no-margin no-padding'}>
-            <Button
-              variant={'contained'}
-              size="large"
-              color={'primary'}
-              onClick={(e) => endMeeting()}
-            >
-              END MEETING
-            </Button>
-          </div>
-          <div className={'col no-margin'}>
-            <Timer onTimeLapse={
-              (extend) => {
-                if (!extend) {
-                  endMeeting();
-                }
-              }
-            } time={remainingTime}/>
-          </div>
-        </div>
-      }
       <div className={'row meeting-container'} style={{
         height: displayState === 'MAXIMIZED' ? '100%' : '90%',
         maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',

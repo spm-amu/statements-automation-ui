@@ -34,7 +34,7 @@ class HomeNavbar extends React.Component {
   styles = {
     header: {
       backgroundColor: this.props.color,
-      height: '136px'
+      height: '54px'
     }
   };
 
@@ -110,9 +110,9 @@ class HomeNavbar extends React.Component {
 
   getTodayDate = () => {
     let today = new Date();
-    return `${today.toLocaleDateString('en-us', {weekday: 'short'})}, 
-            ${this.formatDateNumber(today.toLocaleDateString('en-us', {day: 'numeric'}))} 
-            ${this.formatDateNumber(today.toLocaleDateString('en-us', {month: 'long'}))} 
+    return `${today.toLocaleDateString('en-us', {weekday: 'short'})},
+            ${this.formatDateNumber(today.toLocaleDateString('en-us', {day: 'numeric'}))}
+            ${this.formatDateNumber(today.toLocaleDateString('en-us', {month: 'long'}))}
             ${this.formatDateNumber(today.toLocaleDateString('en-us', {year: 'numeric'}))}`;
   };
 
@@ -150,7 +150,7 @@ class HomeNavbar extends React.Component {
                   </div>
 
                 </div>
-                <div className={'col no-margin .no-padding'}
+                <div className={'col no-margin no-padding'}
                      style={{float: 'left'}}>
                   <div className={'user-label'}>Welcome, {this.props.userDetails.name}</div>
                   <div className={'date-label'}>{this.getTodayDate()}</div>
@@ -191,13 +191,13 @@ class HomeNavbar extends React.Component {
                           aria-controls="menu-list-grow"
                           style={{
                             borderColor: grey800,
-                            width: '64px',
-                            height: '64px',
+                            width: '32px',
+                            height: '32px',
                             padding: '0'
                           }}
                           aria-haspopup="true"
                         >
-                          <img alt="..." src={require('../../../../../assets/icons/noimage-person.png')} width={'64px'} height={'64px'}
+                          <img alt="..." src={require('../../../../../assets/icons/noimage-person.png')} width={'32px'} height={'32px'}
                                style={{borderRadius: '50%'}}/>
                         </IconButton>
                         {" "}

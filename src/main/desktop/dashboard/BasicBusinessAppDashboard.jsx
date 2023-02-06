@@ -666,7 +666,7 @@ const BasicBusinessAppDashboard = (props) => {
           />{" "}
           <div className="main-panel" data={activeColor}>
             <div className="content">
-              <div style={{height: '136px'}}>
+              <div style={{height: '48px'}}>
                 <HomeNavbar
                   {...props}
                   color={"#FFFFFF"}

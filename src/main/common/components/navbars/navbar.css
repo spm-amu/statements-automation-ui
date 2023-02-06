@@ -54,9 +54,8 @@
 .user-label {
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   font-style: normal;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 36px;
+  font-weight: 400;
+  font-size: 16px;
   color: #3E435D;
 }
 
@@ -64,8 +63,7 @@
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   font-style: normal;
   font-weight: 300;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 12px;
   color: #ADA7A7;
 }
 

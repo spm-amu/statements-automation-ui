@@ -14,6 +14,7 @@ import appManager from "../../../common/service/AppManager";
 import "./ViewContainer.css"
 import Activity from "../view/Activity";
 import WhiteboardView from "../view/WhiteboardView";
+import MeetingRoomToolbar from "../vc/MeetingRoomToolbar";
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -25,6 +26,7 @@ const ViewContainer = (props) => {
     currentDisplayMode: 'inline',
     windowClosing: false,
     windowDisplayState: 'MAXIMIZED',
+    windowToolbarDisplayState: 'HIDDEN',
   });
 
   const [windowOpen, setWindowOpen] = useState(null);
@@ -43,6 +45,7 @@ const ViewContainer = (props) => {
     if (windowOpen !== null && windowOpen === false) {
       attributes.currentDisplayMode = 'inline';
       attributes.windowClosing = true;
+      attributes.windowToolbarDisplayState = 'HIDDEN';
     }
   }, [windowOpen]);
 
@@ -124,8 +127,16 @@ const ViewContainer = (props) => {
       }
       {
         attributes.currentWindow === 'meetingRoom' && attributes.data && windowOpen &&
-        <Window minimizable={true} open={windowOpen}
+        <Window minimizable={true} open={windowOpen} toolbar={
+          <MeetingRoomToolbar
+            isHost={attributes.data.isHost}
+            isDirectCall={attributes.data.isDirectCall}
+            selectedMeeting={attributes.data.selectedMeeting}
+          />
+        }
+                title={attributes.data.selectedMeeting.title}
                 containerClassName={'meeting-window-container'}
+                toolbarDisplayState={attributes.windowToolbarDisplayState}
                 displayState={attributes.windowDisplayState} onDisplayModeChange={
           (mode) => {
             attributes.windowDisplayState = mode;
@@ -139,6 +150,18 @@ const ViewContainer = (props) => {
           }
         }>
           <MeetingRoom
+            windowHandler={
+              {
+                show: () => {
+                  attributes.windowToolbarDisplayState = 'VISIBLE';
+                  setRefresher(!refresher);
+                },
+                hide: () => {
+                  attributes.windowToolbarDisplayState = 'HIDDEN';
+                  setRefresher(!refresher);
+                }
+              }
+            }
             closeHandler={() => {
               if (attributes.currentView === 'joinMeetingSettings') {
                 navigate('/view/calendar');

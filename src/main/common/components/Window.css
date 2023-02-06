@@ -1,3 +1,17 @@
+.meeting-window-header {
+  width: 100%;
+  border-bottom: 1px solid #e1e1e1;
+  padding-bottom: 8px;
+}
+
 #meeting-window-title {
-  margin: 8px 32px;
+  margin: 0 32px;
+}
+
+.meeting-title {
+  margin: 8px 0 0 0;
+  font-size: 24px;
+  font-weight: 400;
+  text-align: left;
+  padding-left: 0 !important;
 }
