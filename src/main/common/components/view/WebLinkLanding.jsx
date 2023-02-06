@@ -32,7 +32,7 @@ const WebLinkLanding = (props) => {
   }, []);
 
   const openApp = () => {
-    window.location.replace(`armscor-connect://meetingId=${meetingId}&accessToken=${accessToken}`);
+    window.location.href = `armscor-connect://meetingId=${meetingId}&accessToken=${urlToken}`;
   }
 
   const redirectToMeeting = (params) => {
