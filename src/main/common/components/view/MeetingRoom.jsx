@@ -251,7 +251,6 @@ const MeetingRoom = (props) => {
     recorder.onstop = handleStop;
 
     setMediaRecorder(recorder);
-    emitAVSettingsChange();
   };
 
   const handleDataAvailable = (e) => {
@@ -321,7 +320,6 @@ const MeetingRoom = (props) => {
     currentUserStream.addTrack(tmpVideoTrack.current);
 
     userVideo.current.srcObject = currentUserStream.obj;
-    emitAVSettingsChange();
   };
 
   const selectSourceHandler = (selectedSource) => {
@@ -351,7 +349,6 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (screenShared) {
-
       const videoConstraints = {
         cursor: true,
         audio: {
@@ -384,6 +381,8 @@ const MeetingRoom = (props) => {
           console.log(e)
         });
     }
+
+    emitAVSettingsChange();
   }, [screenShared]);
 
   useEffect(() => {
@@ -758,7 +757,7 @@ const MeetingRoom = (props) => {
       meetingId: selectedMeeting.id,
       userId: userDetails.userId,
       audioMuted: audioMuted,
-      videoMuted: videoMuted || !screenShared
+      videoMuted: screenShared ? false : videoMuted
     });
   }
 
