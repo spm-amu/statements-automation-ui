@@ -126,15 +126,15 @@ const MeetingSettingsComponent = (props) => {
               >
                 {
                   videoMuted &&
-                  <div className={'centered-flex-box'} style={{width: '70%', height: '280px', backgroundColor: '#000000', borderRadius: '4px'}}>
+                  <div className={'centered-flex-box'} style={{width: '280px', maxWidth: '280px', height: '280px', backgroundColor: '#000000', borderRadius: '4px'}}>
                     <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)}/>
                   </div>
                 }
-                <div style={{ maxWidth: '70%' }}>
+                <div style={{ maxWidth: '280px' }}>
                   <video
                     hidden={videoMuted}
                     muted playsInline autoPlay ref={userVideo}
-                    style={{maxHeight: '280px', height: '280px', width: 'unset', backgroundColor: '#000000', borderRadius: '4px'}}
+                    style={{maxHeight: '280px', height: '284px', width: 'unset', maxWidth: '280px', backgroundColor: '#000000', borderRadius: '4px'}}
                   />
                 </div>
               </div>
