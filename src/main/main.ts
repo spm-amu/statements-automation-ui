@@ -474,9 +474,6 @@ app.on('open-url', function (event, url) {
     const params = new URLSearchParams(query);
     meetingId = params.get('meetingId');
     accessToken = params.get('accessToken');
-
-    log.info('.... meetingId: ', meetingId);
-    log.info('.... accessToken: ', accessToken);
   }
 
   if (mainWindow) {

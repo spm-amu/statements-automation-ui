@@ -4,9 +4,11 @@ import ChatRoom from '../chat/ChatRoom';
 import './Chat.scss';
 import ChatForm from "../chat/ChatForm";
 import socketManager from '../../service/SocketManager';
-import {get, host} from '../../service/RestService';
+import { get, host, post } from '../../service/RestService';
 import moment from 'moment';
 import {MessageType} from '../../types';
+import { useLocation } from 'react-router-dom';
+import appManager from '../../service/AppManager';
 
 const Chats = (props) => {
   const [selectedChat, setSelectedChat] = useState(null);
@@ -15,6 +17,8 @@ const Chats = (props) => {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState('LIST');
   const [socketEventHandler] = useState({});
+
+  const location = useLocation();
 
   const socketEventHandlerApi = () => {
     return {
@@ -45,6 +49,66 @@ const Chats = (props) => {
     }
   };
 
+  const createChatHandler = (chatParticipants) => {
+    if (chatParticipants.length > 0) {
+      let newChat = {
+        participants: chatParticipants,
+        type: 'DIRECT',
+        messages: []
+      };
+
+      let userDetails = appManager.getUserDetails();
+
+      newChat.participants.push({
+        emailAddress: userDetails.emailAddress,
+        name: userDetails.name,
+        phoneNumber: userDetails.phoneNumber,
+        userId: userDetails.userId
+      });
+
+      post(
+        `${host}/api/v1/chat/create`,
+        (response) => {
+          setSelectedChat(newChat);
+          setMode('LIST');
+          loadChats();
+        },
+        (e) => {},
+        newChat,
+        null
+      );
+    }
+  }
+
+  const privateRoomChat = (filteredChatEvents, meetingRoomNav) => {
+    let userDetails = appManager.getUserDetails();
+    let existingChat = filteredChatEvents
+      .find(chat => {
+        if (chat.participants.length === 2) {
+          let userParticipants = chat.participants.find(p => p.userId === userDetails.userId);
+          let privateChatParticipants = chat.participants
+            .find(p => p.userId === meetingRoomNav.privateChatUserId);
+
+          if (userParticipants && privateChatParticipants) {
+            return chat;
+          }
+        }
+
+        return null;
+      });
+
+    if (existingChat) {
+      setSelectedChat(existingChat);
+    } else {
+      get(`${host}/api/v1/auth/userInfo/${meetingRoomNav.privateChatUserId}`, (response) => {
+        const addParticipants = [];
+        addParticipants.push(response);
+        createChatHandler(addParticipants);
+      }, (e) => {
+      })
+    }
+  }
+
   const loadChats = () => {
     get(`${host}/api/v1/chat/fetchChats`, (response) => {
       const filteredChatEvents = response.filter(chat => {
@@ -59,11 +123,13 @@ const Chats = (props) => {
 
       filteredChatEvents.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-      console.log('CHATS: ', filteredChatEvents);
-
       setChatEvents([].concat(filteredChatEvents));
 
-      if (props.selected && props.selected.chatId) {
+      console.log('______ CHAT STATE: ', location.state);
+
+      if (location.state && location.state.meetingRoom) {
+        privateRoomChat(filteredChatEvents, location.state.meetingRoom);
+      } else if (props.selected && props.selected.chatId) {
         const eventSelected = response.find(chat => chat.id === props.selected.chatId);
         setSelectedChat(eventSelected);
       } else if (filteredChatEvents && filteredChatEvents.length > 0) {
@@ -123,14 +189,10 @@ const Chats = (props) => {
           </div>
           :
           <div className={'w-100 h-100'}>
-            <ChatForm addHandler={(chat) => {
-              setSelectedChat(chat);
-              setMode('LIST');
-              // setNewChat(chat);
-              loadChats();
-            }
-            }>
-            </ChatForm>
+            <ChatForm addHandler={(newParticipants) => {
+                createChatHandler(newParticipants);
+              }
+            } />
           </div>
       }
     </div>

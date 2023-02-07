@@ -6,19 +6,33 @@ import Button from '@material-ui/core/Button';
 import SendIcon from '@material-ui/icons/Send';
 import { Autorenew, Note, PersonAdd, Settings } from '@material-ui/icons';
 import Tooltip from '@material-ui/core/Tooltip';
+import { useNavigate } from 'react-router-dom';
 
 const InCall = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMoreActions = Boolean(anchorEl);
   const {participant, raisedHands} = props;
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     console.log('IN CALL CARD participant: ', participant);
   }, []);
 
+  const privateChatHandler = () => {
+    navigate("/view/chats", {
+      state: {
+        meetingRoom: {
+          privateChatUserId: participant.userId
+        }
+      }
+    });
+  };
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -53,19 +67,11 @@ const InCall = (props) => {
           }}>
             <div>
               <IconButton
-                onClick={handleClick}
+                onClick={privateChatHandler}
                 size="small"
                 sx={{ml: 2}}
               >
                 <Icon id={'CHAT_BUBBLE'} fontSize={'small'}/>
-              </IconButton>
-              <IconButton
-                onClick={() => {
-                }}
-                size="small"
-                sx={{ml: 2}}
-              >
-                <Icon id={'MIC'} fontSize={'small'}/>
               </IconButton>
               {
                 raisedHands &&

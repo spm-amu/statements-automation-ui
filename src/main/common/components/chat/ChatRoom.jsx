@@ -471,8 +471,6 @@ const ChatRoom = (props) => {
     } else {
       const poll = message.poll;
 
-      console.log('_______ P: ', poll);
-
       if (!currentVote && poll.selectedOption) {
         setCurrentVote(poll.selectedOption);
       }
