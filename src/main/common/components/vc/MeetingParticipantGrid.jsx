@@ -39,11 +39,7 @@ const MeetingParticipantGrid = (props) => {
       sideGrid: []
     };
 
-    let pos = 0;
-
-    let maxGridSize = MAX_COLS * MAX_ROWS;
     let numCols = participants.length < MAX_COLS ? participants.length : MAX_COLS;
-
     if(mode === 'AUTO_ADJUST') {
       for (let i = 0; i < numCols; i++) {
         itemGrid.mainGrid.push([]);

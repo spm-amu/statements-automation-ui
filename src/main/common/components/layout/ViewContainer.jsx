@@ -4,6 +4,7 @@ import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import Calendar from '../view/Calendar';
 import Chats from '../view/Chats';
 import Files from '../view/Files';
+import TestView from '../view/TestView';
 import MeetingHistory from '../view/MeetingHistory';
 import Meeting from '../view/Meeting';
 import JoinMeetingSettings from '../view/JoinMeetingSettings';
@@ -99,7 +100,7 @@ const ViewContainer = (props) => {
           element = <MeetingHistory/>;
           break;
         case 'files':
-          element = <Files/>;
+          element = <TestView />;
           break;
         case 'meeting':
           element = <Meeting selectedEvent={location.state}/>;

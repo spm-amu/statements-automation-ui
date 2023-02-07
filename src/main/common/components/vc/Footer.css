@@ -1,36 +1,25 @@
 .vc-footer {
   display: grid;
   grid-template-rows: auto auto;
-  gap: 20px;
-  padding: 16px 0;
-  max-height: 180px;
+  height: 72px;
 }
 
 .vc-footer .toolbar-container {
-
+  margin-top: 8px;
 }
 
-.vc-footer .video {
-  justify-content: flex-end;
+.vc-footer .time {
+  margin-top: 16px;
+  margin-left: 16px;
 }
 
-.vc-footer .video,
 .vc-footer .time {
   display: flex;
-  max-width: 280px;
+  min-width: 128px;
 }
 
-
 @media screen and (max-width:800px) {
-  .vc-footer .video,
   .vc-footer .time {
-    max-width: 100%;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .vc-footer .toolbar-container {
-    margin: 16px 0;
-    align-items: center;
+    display: none;
   }
 }

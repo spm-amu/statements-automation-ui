@@ -24,7 +24,7 @@ const Footer = (props) => {
       <div className={'row'}>
         {
           displayState === 'MAXIMIZED' &&
-          <div  className={'col time'}>
+          <div  className={'time'}>
             <h3
               style={{
                 position: 'absolute',
@@ -53,8 +53,10 @@ const Footer = (props) => {
                    autoPermit={autoPermit}
           />
         </div>
+        <div  className={'time'}>
+        </div>
         {
-          <div className={'col video'} style={displayState === 'MAXIMIZED' ? null : {display: 'none'}}>
+          /*<div className={'col video'} style={displayState === 'MAXIMIZED' ? null : {display: 'none'}}>
             <div
               style={{display: 'flex', justifyContent: 'flex-end'}}
             >
@@ -74,7 +76,7 @@ const Footer = (props) => {
                 />
               </section>
             </div>
-          </div>
+          </div>*/
         }
       </div>
     </div>

@@ -15,7 +15,7 @@ const MeetingParticipant = forwardRef((props, ref) => {
 
   return (
     <div className={'col-*-* meeting-participant-container'}
-         style={{padding: props.padding ? props.padding : '4px 4px 12px 12px', height: props.height ? props.height : null}}>
+         style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null}}>
       <div style={{width: '100%', height: '100%'}}>
         {
           showVideo ?
@@ -23,7 +23,14 @@ const MeetingParticipant = forwardRef((props, ref) => {
               {
                 props.videoMuted && !props.screenShared &&
                 <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
-                  <div className={'avatar'} data-label={Utils.getInitials(props.data.name)} />
+                  <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
+                       style={
+                         {
+                           width: props.sizing === 'sm' ? '64px' : null,
+                           height: props.sizing === 'sm' ? '64px' : null,
+                           fontSize: props.sizing === 'sm' ? '14px' : null
+                         }
+                       }/>
                 </div>
               }
               {
@@ -40,7 +47,7 @@ const MeetingParticipant = forwardRef((props, ref) => {
                     style={{width: '100%', height: '100%'}}
                   />
               }
-              <div className={'name-label'}> {props.showName ? props.data.name : 'You'}</div>
+              <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}> {props.showName ? props.data.name : 'You'}</div>
             </div>
             :
             <div className={'h-100'} style={{backgroundColor: 'rgb(40, 40, 43)'}}>
@@ -54,7 +61,7 @@ const MeetingParticipant = forwardRef((props, ref) => {
                     justifyContent: 'center'
                   }}>
                   <img src={props.data.avatar}
-                       style={{width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#FFFFFF'}}/>
+                       style={{width: props.sizing === 'sm' ? '40px' : '80px', height: props.sizing === 'sm' ? '40px' : '80px', borderRadius: '50%', backgroundColor: '#FFFFFF'}}/>
                 </div>
               </div>
               <div className={'name-label'}>

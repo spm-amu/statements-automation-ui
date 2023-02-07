@@ -6,12 +6,20 @@
   max-height: 100%;
 }
 
+.name-label-sm,
 .name-label {
   color: #ffffff;
   font-size: 16px;
-  margin-top: -48px;
-  padding-left: 16px;
+  margin-top: -32px;
+  padding-left: 12px;
   text-align: left;
+}
+
+.name-label-sm {
+  font-size: 10px;
+  margin-top: -16px;
+  text-align: center;
+  padding-left: 0;
 }
 
 video {

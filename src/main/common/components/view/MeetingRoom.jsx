@@ -776,10 +776,7 @@ const MeetingRoom = (props) => {
       }}>
         <div className={'col'} style={{paddingLeft: '0', paddingRight: '0', maxHeight: '100%'}}>
           <div style={{height: '100%'}}>
-            <div style={{
-              height: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null,
-              maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 200px)' : null, overflow: 'hidden'
-            }}>
+            <div className={displayState === 'MAXIMIZED' ? 'workspace-max' : 'workspace-min'}>
               {
                 step === Steps.LOBBY ?
                   <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
