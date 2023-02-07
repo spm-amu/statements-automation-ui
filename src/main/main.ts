@@ -252,6 +252,7 @@ const createWindow = async () => {
     },
   });
 
+  mainWindow.setMenuBarVisibility(false);
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
@@ -474,9 +475,6 @@ app.on('open-url', function (event, url) {
     const params = new URLSearchParams(query);
     meetingId = params.get('meetingId');
     accessToken = params.get('accessToken');
-
-    log.info('.... meetingId: ', meetingId);
-    log.info('.... accessToken: ', accessToken);
   }
 
   if (mainWindow) {

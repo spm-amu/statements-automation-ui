@@ -10,32 +10,7 @@ const ChatForm = (props) => {
   const [participants, setParticipants] = useState([]);
 
   const handleAdd = () => {
-    if (participants.length > 0) {
-      let chat = {
-        participants: participants,
-        type: 'DIRECT',
-        messages: []
-      };
-
-      let userDetails = appManager.getUserDetails();
-
-      chat.participants.push({
-        emailAddress: userDetails.emailAddress,
-        name: userDetails.name,
-        phoneNumber: userDetails.phoneNumber,
-        userId: userDetails.userId
-      });
-
-      post(
-        `${host}/api/v1/chat/create`,
-        (response) => {
-          props.addHandler(chat);
-        },
-        (e) => {},
-        chat,
-        "The chat details have been saved successfully"
-      );
-    }
+    props.addHandler(participants);
   };
 
   return (

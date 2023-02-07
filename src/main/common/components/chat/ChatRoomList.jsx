@@ -53,8 +53,6 @@ const ChatRoomList = (props) => {
 
             let newArr = [...event.messages];
 
-            console.log('new msges: ', newArr);
-
             event.messages = newArr
               .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
 

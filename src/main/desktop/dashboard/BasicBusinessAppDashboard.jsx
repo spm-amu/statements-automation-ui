@@ -339,26 +339,37 @@ const BasicBusinessAppDashboard = (props) => {
   }
 
   const redirectToMeeting = (params) => {
-    get(`${host}/api/v1/meeting/fetch/${params.meetingId}`, (response) => {
-      let userDetails = appManager.getUserDetails();
-      let isHost = false;
-      response.extendedProps.attendees.forEach(att => {
-        if (att.userId === userDetails.userId) {
-          isHost = att.type === 'HOST';
-        }
-      });
+    console.log('____PARAMS: ', params);
 
-      navigate("/view/meetingRoom", {
-        state: {
-          displayMode: 'window',
-          selectedMeeting: {
-            id: response.id
-          },
-          videoMuted: true,
-          audioMuted: true,
-          isHost
-        }
-      })
+    let meetingRedirectId =
+      params.selectedMeeting && params.selectedMeeting.id ? params.selectedMeeting.id : params.meetingId;
+
+    get(`${host}/api/v1/meeting/fetch/${meetingRedirectId}`, (response) => {
+      if (response.extendedProps.status === 'CANCELLED') {
+        appManager.fireEvent(SystemEventType.API_ERROR, {
+          message: 'The meeting has been cancelled.'
+        });
+      } else {
+        let userDetails = appManager.getUserDetails();
+        let isHost = false;
+        response.extendedProps.attendees.forEach(att => {
+          if (att.userId === userDetails.userId) {
+            isHost = att.type === 'HOST';
+          }
+        });
+
+        navigate("/view/meetingRoom", {
+          state: {
+            displayMode: 'window',
+            selectedMeeting: {
+              id: response.id
+            },
+            videoMuted: true,
+            audioMuted: true,
+            isHost
+          }
+        })
+      }
     }, (e) => {
     }, '', false);
   };
