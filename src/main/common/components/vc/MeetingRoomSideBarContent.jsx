@@ -14,14 +14,14 @@ import People from "../view/People";
 import "./MeetingRoomSideBarContent.css"
 import InCall from '../view/InCall';
 import ChatRoom from '../chat/ChatRoom';
-import appManager from "../../../common/service/AppManager";
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
   paper: {
     pointerEvents: 'auto',
-    width: '40%',
-    height: '40%',
+    width: '50%',
+    height: '50%',
+    minWidth: '400px',
     padding: '0',
     overflow: 'hidden'
   }
@@ -85,7 +85,8 @@ const MeetingRoomSideBarContent = (props) => {
         </DialogTitle>
         <DialogContent>
           <div style={{height: '100%'}} className={'request-to-join-dialog-content'}>
-            <People meetingId={meetingId} dialEnabled={true} chatEnabled={false} onAudioCallHandler={(e) => props.onAudioCallHandler(e)}/>
+            <People meetingId={meetingId} dialEnabled={true} chatEnabled={false}
+                    onAudioCallHandler={(e) => props.onAudioCallHandler(e)}/>
           </div>
         </DialogContent>
         <DialogActions>
@@ -94,9 +95,9 @@ const MeetingRoomSideBarContent = (props) => {
       <div className={'raised-hands'}>
 
       </div>
-      <div className={'toolbar'}>
-        {
-          tab === 'People' &&
+      {
+        tab === 'People' &&
+        <div className={'toolbar'}>
           <Button
             onClick={(e) => {
               setPeopleDialogOpen(true)
@@ -108,8 +109,8 @@ const MeetingRoomSideBarContent = (props) => {
           >
             Request to join
           </Button>
-        }
-      </div>
+        </div>
+      }
       <div className={'list'}>
         {
           tab === 'People' ?

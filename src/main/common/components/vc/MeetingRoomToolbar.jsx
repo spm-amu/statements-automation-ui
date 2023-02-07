@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {Fragment, useEffect, useState} from "react";
-import Button from "@material-ui/core/Button";
+import React, {useEffect, useState} from "react";
 import Timer from "./Timer";
 import {host, post} from "../../service/RestService";
 import socketManager from "../../service/SocketManager";
 import {MessageType} from "../../types";
 import appManager from "../../service/AppManager";
+import Icon from "../Icon";
+import {IconButton} from "@material-ui/core";
 
 const MeetingRoomToolbar = (props) => {
 
@@ -14,7 +15,7 @@ const MeetingRoomToolbar = (props) => {
   const [remainingTime, setRemainingTime] = useState();
 
   const endMeeting = () => {
-    if(isHost) {
+    if (isHost) {
       socketManager.emitEvent(MessageType.END_MEETING, {
         meetingId: selectedMeeting.id,
         userId: appManager.getUserDetails().userId
@@ -48,34 +49,33 @@ const MeetingRoomToolbar = (props) => {
   };
 
   return (
-      <div>
-        {
-          !started && isHost && !isDirectCall &&
-          <div className={'row'} style={{margin: '0 0 0 0'}}>
-            <Button
+    <div>
+      {
+        isHost && !isDirectCall &&
+        <div className={'row'} style={{margin: '0 0 0 0', display: 'flex', alignItems: 'center'}}>
+          <div style={{margin: '0 8px 0 0'}}>
+            <IconButton
               variant={'contained'}
+              disabled={started}
               size="large"
               color={'primary'}
               onClick={(e) => startMeeting(e)}
             >
-              START MEETING
-            </Button>
+              <Icon id={'PLAY'}/>
+            </IconButton>
+            <IconButton
+              variant={'contained'}
+              disabled={!started}
+              size="large"
+              color={'primary'}
+              onClick={(e) => endMeeting()}
+            >
+              <Icon id={'STOP'}/>
+            </IconButton>
           </div>
-        }
-        {
-          started && isHost && !isDirectCall &&
-          <div className={'row'} style={{margin: '0 0 0 0', display: 'flex', alignItems: 'center'}}>
-            <div className={'no-padding'} style={{maxHeight: '48px', marginLeft: '0', marginRight: '16px'}}>
-              <Button
-                variant={'contained'}
-                size="large"
-                color={'primary'}
-                onClick={(e) => endMeeting()}
-              >
-                END MEETING
-              </Button>
-            </div>
-            <div className={'col no-margin'}>
+          <div className={'col no-margin'}>
+            {
+              started &&
               <Timer onTimeLapse={
                 (extend) => {
                   if (!extend) {
@@ -83,10 +83,11 @@ const MeetingRoomToolbar = (props) => {
                   }
                 }
               } time={remainingTime}/>
-            </div>
+            }
           </div>
-        }
-      </div>
+        </div>
+      }
+    </div>
   );
 };
 

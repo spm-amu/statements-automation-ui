@@ -34,12 +34,12 @@ const StyledDialog = withStyles({
     height: '100%',
     maxWidth: 'calc(100% - 144px)',
     maxHeight: 'calc(100% - 48px)',
-    margin: '136px 0 0 144px',
+    margin: '54px 0 0 144px',
     padding: '0',
     overflow: 'hidden',
     boxShadow: 'none !important',
     ['@media (max-width:800px)']: {
-      margin: '136px 0 0 0',
+      margin: '54px 0 0 0',
       maxWidth: '100%'
     }
   }
@@ -644,9 +644,9 @@ const MeetingRoom = (props) => {
   const handleSidebarToggle = (e) => {
     let paper = document.getElementById('meetingDialogPaper');
     if (e.detail.open) {
-      paper.style.margin = '136px 0 0 144px';
+      paper.style.margin = '54px 0 0 144px';
     } else {
-      paper.style.margin = '136px 0 0 0';
+      paper.style.margin = '54px 0 0 0';
     }
   };
 
@@ -932,14 +932,8 @@ const MeetingRoom = (props) => {
           </div>
         </div>
         {
-          sideBarOpen && sideBarTab &&
-          <div style={displayState === 'MAXIMIZED' ? {
-            width: '320px',
-            margin: '0 8px'
-          } : {
-            width: '100%',
-            height: '100%'
-          }}>
+          sideBarOpen && sideBarTab && displayState === 'MAXIMIZED' &&
+            <div className={'closable-panel-container'}>
             <ClosablePanel
               closeHandler={(e) => setSideBarOpen(false)}
               title={sideBarTab}

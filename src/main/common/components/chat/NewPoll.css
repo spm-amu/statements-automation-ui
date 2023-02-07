@@ -1,3 +1,31 @@
+.chat-container {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 8px;
+  background-color: #FFFFFF;
+  margin-top: 2px;
+}
+
+.poll-input {
+  width: 100%;
+}
+
+.full-poll-input {
+  width: 60%;
+}
+
+.optional-poll-input {
+  width: calc(100% - 58px);
+}
+.full-poll-input div,
+.optional-poll-input div,
+.poll-input div {
+  width: 100%;
+}
+
 .new-poll-container {
     max-width: 520px;
     margin: 0 auto;
@@ -48,4 +76,7 @@
 
 .poll-form-row input, .poll-form-row textarea {
     margin-bottom: 4px;
+}
+
+@media screen and (max-width: 991px) {
 }

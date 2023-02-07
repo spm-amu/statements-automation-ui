@@ -20,7 +20,7 @@ const StyledDialog = withStyles({
     overflow: 'hidden',
     boxShadow: 'none !important',
     ['@media (max-width:800px)']: {
-      margin: '136px 0 0 0',
+      margin: '54px 0 0 0',
       maxWidth: '100%'
     }
   }
@@ -100,7 +100,7 @@ const Window = (props) => {
       paper.style.backgroundColor = '#FFFFFF';
       paper.style.width = '100%';
       paper.style.height = '100%';
-      paper.style.margin = isSidebarHidden ? '136px 0 0 0' : '136px 0 0 144px';
+      paper.style.margin = isSidebarHidden ? '54px 0 0 0' : '54px 0 0 144px';
 
       let header = document.getElementsByClassName('dialogHeader')[0];
       header.getElementsByTagName('button')[0].style.color = 'rgba(0, 0, 0, 0.54)';
@@ -156,7 +156,8 @@ const Window = (props) => {
                             maximizeView(e)
                           }}
                           style={{
-                            marginRight: '4px'
+                            marginRight: '4px',
+                            color: 'white'
                           }}
                         >
                           <Icon id={'MAXIMIZE'}/>

@@ -76,7 +76,7 @@ const ChatRoom = (props) => {
         currentOption.voteCount > prevOption.voteCount ? currentOption : prevOption,
       {voteCount: -Infinity}
     );
-  }
+  };
 
   const pollRemainingTime = (expirationDateTime) => {
     const expirationTime = new Date(expirationDateTime).getTime();
@@ -116,14 +116,14 @@ const ChatRoom = (props) => {
         id: pollId
       }
     );
-  }
+  };
 
   const submitPollVote = (poll, chatParticipant) => {
     const date = {
       pollId: poll.id,
       optionId: currentVote,
       chatParticipant: chatParticipant
-    }
+    };
 
     post(
       `${host}/api/v1/poll/vote`,
@@ -133,7 +133,7 @@ const ChatRoom = (props) => {
       (e) => {},
       date
     );
-  }
+  };
 
   // const onChatMessage = () => {
   //   if (be.payload.message.participant.userId !== currentUser.userId) {
@@ -322,16 +322,16 @@ const ChatRoom = (props) => {
         }
       );
     }
-  }
+  };
 
   const handleClose = (e) => {
     setNewParticipants([]);
     setOpenAddPeople(false)
-  }
+  };
 
   const openAddPeopleDialog = (e) => {
     setOpenAddPeople(true)
-  }
+  };
 
   const renderFileThumbnail = (message) => {
     const {document} = message;
@@ -640,39 +640,44 @@ const ChatRoom = (props) => {
 
         <div className="chatroom__header">
           <div className="chatroom__headerleft">
-            <Avatar>
-              {selectedChat.type === 'CALENDAR_MEETING' || selectedChat.participants.length > 2 ? (
-                <Calendar/>
-              ) : (
-                Utils.getInitials(selectedChat.participants.find(p => p.userId !== currentUser.userId).name)
-              )}
-            </Avatar>
-
+            <div className={'chat-avatar'}>
+              <Avatar>
+                {selectedChat.type === 'CALENDAR_MEETING' || selectedChat.participants.length > 2 ? (
+                  <Calendar/>
+                ) : (
+                  Utils.getInitials(selectedChat.participants.find(p => p.userId !== currentUser.userId).name)
+                )}
+              </Avatar>
+            </div>
             <h5>
               {selectedChat.type === 'CALENDAR_MEETING' ? selectedChat.title : Utils.getChatMeetingTitle(selectedChat.participants, currentUser.userId, 58)}
             </h5>
           </div>
           <div className="chatroom__headerright">
-            <Tooltip title="Call">
-              <IconButton
-                onClick={(e) => {
-                  callNow(e);
-                }}
-              >
-                <CallIcon/>
-              </IconButton>
-            </Tooltip>
+            {
+              !props.chatTab &&
+                <>
+                  <Tooltip title="Call">
+                    <IconButton
+                      onClick={(e) => {
+                        callNow(e);
+                      }}
+                    >
+                      <CallIcon/>
+                    </IconButton>
+                  </Tooltip>
 
-            <Tooltip title="Add People">
-              <IconButton
-                onClick={(e) => {
-                  openAddPeopleDialog(e);
-                }}
-              >
-                <GroupAdd/>
-              </IconButton>
-            </Tooltip>
-
+                  <Tooltip title="Add People">
+                    <IconButton
+                      onClick={(e) => {
+                        openAddPeopleDialog(e);
+                      }}
+                    >
+                      <GroupAdd/>
+                    </IconButton>
+                  </Tooltip>
+                </>
+            }
             <Tooltip title="Poll">
               <IconButton
                 onClick={(e) => {
@@ -688,6 +693,7 @@ const ChatRoom = (props) => {
         {
           mode === 'POLL' ?
             <ChatPoll
+              chatTab={props.chatTab}
               participants={selectedChat.participants}
               createPollHandler={(pollData) => {
                 sendMessage(null, null, pollData);
@@ -723,6 +729,7 @@ const ChatRoom = (props) => {
                   }}
                 />
               </div>
+              <div className={'chat-input'}>
               <CustomInput
                 labelText="Type a new message"
                 id="message"
@@ -748,6 +755,7 @@ const ChatRoom = (props) => {
                   },
                 }}
               />
+              </div>
             </form>
           </div>
         }

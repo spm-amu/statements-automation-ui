@@ -49,6 +49,8 @@ import {
   VideocamOff,
   Warning,
   TextFields,
+  PlayArrow,
+  Stop,
   Note, MoreHoriz, PersonAdd
 } from '@material-ui/icons';
 import SendIcon from "./chat/ChatRoom";
@@ -172,6 +174,10 @@ class Icon extends Component {
       return <MoreHoriz />
     } else if (this.props.id === 'NOTE') {
       return <Note/>
+    } else if (this.props.id === 'PLAY') {
+      return <PlayArrow/>
+    } else if (this.props.id === 'STOP') {
+      return <Stop/>
     } else if (this.props.id === 'TEXT_FIELDS') {
       return <TextFields/>
     } else if (this.props.id === 'PERSON_ADD') {

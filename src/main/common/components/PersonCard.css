@@ -45,3 +45,11 @@
 .avatar-small {
   width: 32px;
 }
+
+@media screen and (max-width: 991px) {
+  .person-card {
+    padding: 0;
+    justify-content: center;
+  }
+}
+

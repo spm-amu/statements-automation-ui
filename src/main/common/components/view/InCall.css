@@ -10,7 +10,7 @@
 .people-content {
   border-top: 1px solid #e1e1e1;
   width: 100%;
-  padding: 16px 0;
+  padding: 0 !important;
 }
 
 .participant-card {
@@ -62,11 +62,12 @@
 
 .header-panel {
   margin-bottom: 0.25rem;
-  margin-top: 0.75rem;
+  margin-top: 8px;
   letter-spacing: .01785714em;
   font-family: "Google Sans",Roboto,Arial,sans-serif;
   font-size: 16px;
   font-weight: 500;
   line-height: 1.25rem;
   color: #a1a1a1 !important;
+  padding: 0 8px;
 }

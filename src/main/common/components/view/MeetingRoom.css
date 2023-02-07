@@ -4,6 +4,12 @@
   padding: 16px;
 }
 
+.closable-panel-container {
+  width: 25%;
+  height: 98%;
+  margin: 0 8px;
+}
+
 .call {
   height: 100%;
   position: relative;

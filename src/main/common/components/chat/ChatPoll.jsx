@@ -156,20 +156,11 @@ const ChatPoll = (props) => {
         data
       );
     }
-  }
+  };
 
   return (
     <div
-      style={{
-        width: '100%',
-        height: '100%',
-        maxHeight: '100%',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        padding: '32px',
-        backgroundColor: '#FFFFFF',
-        marginTop: '2px',
-      }}
+      className={'chat-container'}
     >
       <h5 style={{ fontSize: '24px', marginBottom: '8px' }}>
         Create Poll
@@ -179,7 +170,7 @@ const ChatPoll = (props) => {
 
       <div style={{width: '100%'}}>
         <Form>
-          <div>
+          <div className={props.chatTab ? "poll-input" : 'full-poll-input'}>
             <TextField
               className={'question-txt'}
               label="Question"
@@ -199,17 +190,19 @@ const ChatPoll = (props) => {
               return (
                 <div key={index} className={'row no-margin'}>
                   <Fragment>
-                    <TextField
-                      className={ options[index].id === 'option-1' || options[index].id === 'option-2' ? 'question-txt' : 'optional-choice' }
-                      label={option.label}
-                      id={option.id}
-                      value={option.value}
-                      valueChangeHandler={(e) => handleFormChange(index, e)}
-                    />
+                    <div className={props.chatTab ? options[index].id === 'option-1' || options[index].id === 'option-2' ? "poll-input" : "optional-poll-input" : 'full-poll-input'}>
+                      <TextField
+                        className={ options[index].id === 'option-1' || options[index].id === 'option-2' ? 'question-txt' : 'optional-choice' }
+                        label={option.label}
+                        id={option.id}
+                        value={option.value}
+                        valueChangeHandler={(e) => handleFormChange(index, e)}
+                      />
+                    </div>
                     {
                       options[index].id === 'option-1' || options[index].id === 'option-2' ?
                         null :
-                        <div className={'dynamic-delete-button'} style={{paddingLeft: '8px'}}>
+                        <div className={props.chatTab ? 'dynamic-delete-button' : null} style={{paddingLeft: '8px', width: '32px'}}>
                           <IconButton
                             onClick={() => removeOption(index)}
                           >
@@ -267,11 +260,6 @@ const ChatPoll = (props) => {
 
           <div
             className="d-flex mb-1"
-            style={{
-              position: 'absolute',
-              bottom: '20px',
-              right: '8px'
-            }}
           >
             <div
               style={{

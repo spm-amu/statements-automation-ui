@@ -1,7 +1,6 @@
 .meeting-window-header {
   width: 100%;
-  border-bottom: 1px solid #e1e1e1;
-  padding-bottom: 8px;
+  padding: 8px 0;
 }
 
 #meeting-window-title {

@@ -103,7 +103,7 @@ const People = (props) => {
         <SearchBar valueChangeHandler={onValueChangedHandler} onSearch={(searchValue) => {
         }}/>
       </div>
-      <div className={'people-content row'}>
+      <div className={'people-content row'} style={{maxHeight: props.meetingId ? '50%' : '77vh'}}>
         {searchResult.records.map((user, index) => {
           return <div key={index} className={'col person-card-wrapper'}
                       style={{marginLeft: '0', paddingLeft: '0', minWidth: '320px', maxWidth: '320px', marginBottom: '8px'}}>
