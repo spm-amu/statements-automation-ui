@@ -73,14 +73,6 @@ const InCall = (props) => {
               >
                 <Icon id={'CHAT_BUBBLE'} fontSize={'small'}/>
               </IconButton>
-              <IconButton
-                onClick={() => {
-                }}
-                size="small"
-                sx={{ml: 2}}
-              >
-                <Icon id={'MIC'} fontSize={'small'}/>
-              </IconButton>
               {
                 raisedHands &&
                 <IconButton
