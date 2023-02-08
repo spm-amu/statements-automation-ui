@@ -2,6 +2,7 @@
 import React, { } from "react";
 import Lottie from 'react-lottie';
 import waitingData from '../assets/lotties/waiting';
+import recordingData from '../assets/lotties/recording';
 import loadingData from '../assets/lotties/loading';
 import callingData from '../assets/lotties/calling2';
 import chatData from '../assets/lotties/msg2';
@@ -97,6 +98,25 @@ const LottieIcon = (props) => {
           }}
           height={300}
           width={300}
+        />
+      </div>
+    );
+  }
+
+  if (props.id === 'recording') {
+    return (
+      <div>
+        <Lottie
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: recordingData,
+            rendererSettings: {
+              preserveAspectRatio: "xMidYMid slice"
+            }
+          }}
+          height={35}
+          width={35}
         />
       </div>
     );

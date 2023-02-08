@@ -7,6 +7,7 @@ import Utils from "../../Utils";
 import Tooltip from '@material-ui/core/Tooltip';
 import { ListItemIcon, Menu, MenuItem } from '@material-ui/core';
 import { Note, PersonAdd, Settings } from '@material-ui/icons';
+import LottieIcon from '../LottieIcon';
 
 const Toolbar = (props) => {
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
@@ -120,12 +121,14 @@ const Toolbar = (props) => {
             toggleRecorder();
           }}
           style={{
-            backgroundColor: isRecording ? '#eb3f21' : '#404239',
+            backgroundColor: isRecording ? 'white' : '#404239',
             color: 'white',
             marginRight: '4px'
           }}
         >
-          <Icon id={'RECORD'}/>
+          {
+            isRecording ? <LottieIcon id={'recording'}/> : <Icon id={'RECORD'}/>
+          }
         </IconButton>
 
         {!screenShared && (

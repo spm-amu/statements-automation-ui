@@ -156,7 +156,6 @@ class SocketManager {
     });
 
     peer.on('close', () => {
-      alert("PEER CLOSED");
     });
 
     return peer;

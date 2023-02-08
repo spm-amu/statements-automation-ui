@@ -241,12 +241,7 @@ const MeetingRoom = (props) => {
     currentUserStream.addTrack(stream.getVideoTracks()[0]);
     userVideo.current.srcObject = currentUserStream.obj;
 
-    const options = {mimeType: "video/webm; codecs=vp9"};
-    const recorder = new MediaRecorder(stream, options);
-    recorder.ondataavailable = handleDataAvailable;
-    recorder.onstop = handleStop;
-
-    setMediaRecorder(recorder);
+    createMediaRecorder(stream);
   };
 
   const handleDataAvailable = (e) => {
@@ -597,15 +592,23 @@ const MeetingRoom = (props) => {
   };
 
   const setupStream = () => {
-    console.log("INITIALIZING STREAMS...");
     currentUserStream.init(!videoMuted, true, (stream) => {
-      console.log("STREAM CREATED");
       setStreamsInitiated(true);
+
+      createMediaRecorder(stream);
     }, (e) => {
-      console.log("STREAM ERROR");
       console.log(e);
     });
   };
+
+  const createMediaRecorder = (stream) => {
+    const options = {mimeType: "video/webm; codecs=vp9"};
+    const recorder = new MediaRecorder(stream, options);
+    recorder.ondataavailable = handleDataAvailable;
+    recorder.onstop = handleStop;
+
+    setMediaRecorder(recorder);
+  }
 
   useEffect(() => {
     setIsHost(props.isHost);

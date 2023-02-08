@@ -12,7 +12,6 @@ const MenuItem = React.forwardRef((props, ref) => {
         });
 
     const handleClick = (e) => {
-      alert("Click fireee");
     };
 
     return (
