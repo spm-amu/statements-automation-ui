@@ -136,20 +136,16 @@ const ChatRoom = (props) => {
     );
   };
 
-  // const onChatMessage = () => {
-  //   if (be.payload.message.participant.userId !== currentUser.userId) {
-  //     setMessages(oldMsgs => [...oldMsgs, be.payload.message]);
-  //   }
-  // };
-
   const onMessage = (payload) => {
     console.log('____ ON MESSAGE: ', payload);
     if (selectedChat && selectedChat.id === payload.roomId) {
       if (props.onMessage) {
-        console.log('if');
         props.onMessage(payload.chatMessage, selectedChat);
+
+        if (payload.chatMessage.type === 'EVENT') {
+          props.addedPeopleHandler()
+        }
       } else {
-        console.log('Else');
         selectedChat.messages.push(payload.chatMessage);
       }
 
@@ -250,6 +246,8 @@ const ChatRoom = (props) => {
       msg.participant.active = true;
 
       const participantsToSignalIds = participantsUserIds();
+
+      console.log('___ MSG: ', msg);
 
       socketManager.emitEvent(MessageType.CHAT_MESSAGE, {
         roomId: selectedChat.id,
