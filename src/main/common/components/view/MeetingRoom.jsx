@@ -809,8 +809,8 @@ const MeetingRoom = (props) => {
                     <div className={'row'} style={{width: '100%', height: '100%'}}>
                       {
                         showWhiteBoard && meetingParticipantGridMode === 'STRIP' &&
-                        <div className={'row'} style={{width: '100%', height: '70%'}}>
-                          <div className={'col'} style={{width: '100%'}}>
+                        <div className={'row no-margin no-padding'} style={{width: '100%', height: '72%'}}>
+                          <div className={'col no-margin no-padding'} style={{width: '100%'}}>
                             <WhiteBoard isHost={isHost} id={selectedMeeting.id} items={whiteboardItems} eventHandler={
                               {
                                 onAddItem: (item) => {
@@ -838,8 +838,10 @@ const MeetingRoom = (props) => {
                           </div>
                         </div>
                       }
-                      <div className={'row no-margin no-padding'} style={{width: '100%', height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : null, margin: '0 0 0 `16px'}}>
-                        <div className={'col'} style={{width: '100%'}}>
+                      <div className={'row'} style={{width: '100%',
+                        height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : null,
+                        margin: '32px 0 0 `16px'}}>
+                        <div className={'col'} style={{width: '100%', marginLeft: '16px', marginRight: '-16px'}}>
                           {
                             currentUserStream && currentUserStream.obj &&
                             <MeetingParticipantGrid participants={participants}

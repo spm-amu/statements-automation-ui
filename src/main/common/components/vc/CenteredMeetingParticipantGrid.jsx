@@ -119,7 +119,7 @@ const MeetingParticipantGrid = (props) => {
           overflowX: 'auto',
           maxWidth: '100%',
           width: '100%',
-          height: '96%',
+          height: !props.screenShared ? '96%' : null,
           borderRadius: '4px',
           overflowY: 'hidden',
           margin: props.screenShared || mode === 'STRIP' ? "0" : "12px 8px",
