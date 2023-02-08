@@ -123,12 +123,14 @@ const MeetingParticipantGrid = (props) => {
           borderRadius: '4px',
           overflowY: 'hidden',
           margin: props.screenShared || mode === 'STRIP' ? "0" : "12px 8px",
-          backgroundColor: 'rgb(40, 40, 43)'
+          backgroundColor: 'rgb(40, 40, 43)',
+          display: 'flex',
+          alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
         {overflowGrid.map((participant, index) => {
           return <div className={'col-*-*'} key={index}
-                      style={{borderRadius: '4px', minWidth: "180px", width: "180px", height: "180px", marginRight: '8px'}}>
+                      style={{borderRadius: '4px', minWidth: "100px", width: "100px", height: "100px", marginRight: '8px'}}>
             <MeetingParticipant data={participant}
                                 ref={participant.isCurrentUser ? userVideo : null}
                                 showName={!participant.isCurrentUser}
