@@ -839,8 +839,7 @@ const MeetingRoom = (props) => {
                         </div>
                       }
                       <div className={'row'} style={{width: '100%',
-                        height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : null,
-                        margin: '32px 0 0 `16px'}}>
+                        height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : null}}>
                         <div className={'col'} style={{width: '100%', marginLeft: '16px', marginRight: '-16px'}}>
                           {
                             currentUserStream && currentUserStream.obj &&
