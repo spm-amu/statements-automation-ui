@@ -11,6 +11,9 @@ const MeetingParticipant = forwardRef((props, ref) => {
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
     }
+
+    console.log("\n\n\n\nRENDERING PARTICIPANT : ", props.data);
+    console.log(ref);
   }, []);
 
   return (

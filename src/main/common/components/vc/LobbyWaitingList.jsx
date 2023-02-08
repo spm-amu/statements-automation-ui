@@ -15,7 +15,7 @@ const Lobby = (props) => {
     <>
       {
         waitingList && waitingList.length > 0 &&
-        <div style={{width: '320px', height: '100%', border: '1px solid #e1e1e1', borderRadius: '4px', color: '#1d253b', backgroundColor: '#ffffff', overflow: 'hidden'}}>
+        <div style={{width: '320px', height: props.autoHeight ? null : '100%', border: '1px solid #e1e1e1', borderRadius: '4px', color: '#1d253b', backgroundColor: '#ffffff', overflow: 'hidden'}}>
           <div style={{fontSize: '20px', margin: '16px', borderBottom: '1px solid #e1e1e1'}}>
             Users requesting to join the call...
           </div>

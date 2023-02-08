@@ -256,34 +256,36 @@ const WhiteBoard = (props) => {
   };
 
   return (
-    <div>
+    <div style={{width: '100%', height: '100%'}}>
       {
-        <div>
+        <div style={{width: '100%', height: '100%'}}>
           {
             designData ?
               <>
-                <IconButton component="span"
-                            disabled={selectedItem === null || props.readOnly}
-                            variant={'contained'}
-                            size="large"
-                            onClick={handleDelete}
-                >
-                  <Icon id={'DELETE'}/>
-                </IconButton>
-                {
-                  props.isHost && !props.readOnly &&
+                <div style={{height: '64px'}}>
                   <IconButton component="span"
-                              disabled={props.items.length === 0}
+                              disabled={selectedItem === null || props.readOnly}
                               variant={'contained'}
                               size="large"
-                              onClick={handleSave}
+                              onClick={handleDelete}
                   >
-                    <Icon id={'SAVE'}/>
+                    <Icon id={'DELETE'}/>
                   </IconButton>
-                }
+                  {
+                    props.isHost && !props.readOnly &&
+                    <IconButton component="span"
+                                disabled={props.items.length === 0}
+                                variant={'contained'}
+                                size="large"
+                                onClick={handleSave}
+                    >
+                      <Icon id={'SAVE'}/>
+                    </IconButton>
+                  }
+                </div>
                 <div className={"row"} style={{
                   width: '100%',
-                  height: '72vh',
+                  height: 'calc(100% - 64px)',
                   marginTop: '8px',
                   marginLeft: '0'
                 }}>
@@ -315,7 +317,7 @@ const WhiteBoard = (props) => {
                     border: "1px solid #e1e1e1",
                     borderRadius: "4px",
                     marginLeft: "8px",
-                    height: "79%",
+                    height: "100%",
                     width: "calc(100% - 288px)",
                     backgroundColor: '#FFFFFF'
                   }} className={'col-*-* dropTarget'}

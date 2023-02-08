@@ -11,7 +11,7 @@ import Footer from "../vc/Footer";
 import socketManager from "../../service/SocketManager";
 import {MessageType, SystemEventType} from "../../types";
 import Utils from "../../Utils";
-import MeetingParticipantGrid from '../vc/MeetingParticipantGrid';
+import MeetingParticipantGrid from '../vc/CenteredMeetingParticipantGrid';
 import ClosablePanel from "../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
 import appManager from "../../../common/service/AppManager";
@@ -20,8 +20,6 @@ import {get, host, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
 import {osName} from "react-device-detect";
 import {Stream} from "../../service/Stream";
-import Button from '@material-ui/core/Button';
-import Timer from "../vc/Timer";
 import WhiteBoard from "../whiteboard/WhiteBoard";
 
 const {electron} = window;
@@ -87,7 +85,7 @@ const MeetingRoom = (props) => {
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [screenSources, setScreenSources] = useState();
-  const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('AUTO_ADJUST');
+  const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [whiteboardItems, setWhiteboardItems] = useState([]);
@@ -147,7 +145,7 @@ const MeetingRoom = (props) => {
             appManager.fireEvent(SystemEventType.WHITEBOARD_EVENT_ARRIVED, be.payload);
             break;
           case MessageType.WHITEBOARD:
-            if(be.payload) {
+            if (be.payload) {
               setWhiteboardItems(be.payload.items);
             }
             break;
@@ -172,7 +170,7 @@ const MeetingRoom = (props) => {
 
   const updateWhiteboardEvents = (e) => {
     let find = whiteboardItems.find((i) => i.id === e.metadata.id);
-    if(find) {
+    if (find) {
       const properties = Object.getOwnPropertyNames(e.metadata);
       for (const property of properties) {
         find[property] = e.metadata[property];
@@ -633,7 +631,8 @@ const MeetingRoom = (props) => {
       `${host}/api/v1/meeting/settings`,
       (response) => {
       },
-      (e) => {},
+      (e) => {
+      },
       {
         meetingId: selectedMeeting.id,
         askToJoin: autoPermit
@@ -649,6 +648,7 @@ const MeetingRoom = (props) => {
       paper.style.margin = '54px 0 0 0';
     }
   };
+
 
   const onRaiseHand = (payload) => {
     const raisedHandParticipant = participants.find(p => p.userId === payload.userId);
@@ -735,6 +735,12 @@ const MeetingRoom = (props) => {
         }
       }
     }
+
+    onAVSettingsChange({
+      userId: appManager.getUserDetails().userId,
+      videoMuted,
+      audioMuted
+    });
   }
 
   useEffect(() => {
@@ -745,7 +751,7 @@ const MeetingRoom = (props) => {
   }, [audioMuted]);
 
   useEffect(() => {
-    if(userVideo.current) {
+    if (userVideo.current) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
   }, [currentUserStream.videoTrack]);
@@ -765,6 +771,12 @@ const MeetingRoom = (props) => {
         emitAVSettingsChange();
       }
     }
+
+    onAVSettingsChange({
+      userId: appManager.getUserDetails().userId,
+      videoMuted,
+      audioMuted
+    });
   }
 
   return (
@@ -794,49 +806,60 @@ const MeetingRoom = (props) => {
                   />
                   :
                   displayState === 'MAXIMIZED' ?
-                    <div className={'row'} style={{height: '100%'}}>
+                    <div className={'row'} style={{width: '100%', height: '100%'}}>
                       {
-                        showWhiteBoard && meetingParticipantGridMode === 'SIDE_ONLY' &&
-                        <div className={'col'}>
-                          <WhiteBoard isHost={isHost} id={selectedMeeting.id} items={whiteboardItems} eventHandler={
-                            {
-                              onAddItem: (item) => {
-                                whiteboardItems.push(item);
-                              },
-                              onDeleteItem: (item) => {
-                                let filtered = whiteboardItems.filter((i) => i.id !== item.id);
-                                whiteboardItems.splice(0, whiteboardItems.length);
+                        showWhiteBoard && meetingParticipantGridMode === 'STRIP' &&
+                        <div className={'row'} style={{width: '100%', height: '70%'}}>
+                          <div className={'col'} style={{width: '100%'}}>
+                            <WhiteBoard isHost={isHost} id={selectedMeeting.id} items={whiteboardItems} eventHandler={
+                              {
+                                onAddItem: (item) => {
+                                  whiteboardItems.push(item);
+                                },
+                                onDeleteItem: (item) => {
+                                  let filtered = whiteboardItems.filter((i) => i.id !== item.id);
+                                  whiteboardItems.splice(0, whiteboardItems.length);
 
-                                for (const filteredElement of filtered) {
-                                  whiteboardItems.push(filteredElement);
-                                }
-                              },
-                              onUpdateItem: (item) => {
-                                let filtered = whiteboardItems.filter((i) => i.id === item.id);
-                                if(filtered.length > 0) {
-                                  const properties = Object.getOwnPropertyNames(item);
-                                  for (const property of properties) {
-                                    filtered[0][property] = item[property];
+                                  for (const filteredElement of filtered) {
+                                    whiteboardItems.push(filteredElement);
+                                  }
+                                },
+                                onUpdateItem: (item) => {
+                                  let filtered = whiteboardItems.filter((i) => i.id === item.id);
+                                  if (filtered.length > 0) {
+                                    const properties = Object.getOwnPropertyNames(item);
+                                    for (const property of properties) {
+                                      filtered[0][property] = item[property];
+                                    }
                                   }
                                 }
                               }
-                            }
-                          }/>
+                            }/>
+                          </div>
                         </div>
                       }
-                      <div className={meetingParticipantGridMode === 'AUTO_ADJUST' ? 'col' : null}>
-                        <MeetingParticipantGrid participants={participants}
-                                                waitingList={lobbyWaitingList}
-                                                mode={meetingParticipantGridMode}
-                                                acceptUserHandler={
-                                                  (item) => {
-                                                    acceptUser(item);
-                                                  }}
-                                                rejectUserHandler={
-                                                  (item) => {
-                                                    rejectUser(item);
-                                                  }}
-                        />
+                      <div className={'row no-margin no-padding'} style={{width: '100%', height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : null, margin: '0 0 0 `16px'}}>
+                        <div className={'col'} style={{width: '100%'}}>
+                          {
+                            currentUserStream && currentUserStream.obj &&
+                            <MeetingParticipantGrid participants={participants}
+                                                    waitingList={lobbyWaitingList}
+                                                    mode={meetingParticipantGridMode}
+                                                    screenShared={screenShared}
+                                                    userVideo={userVideo}
+                                                    audioMuted={audioMuted}
+                                                    videoMuted={videoMuted}
+                                                    acceptUserHandler={
+                                                      (item) => {
+                                                        acceptUser(item);
+                                                      }}
+                                                    rejectUserHandler={
+                                                      (item) => {
+                                                        rejectUser(item);
+                                                      }}
+                            />
+                          }
+                        </div>
                       </div>
                     </div>
                     :
@@ -845,10 +868,9 @@ const MeetingRoom = (props) => {
             </div>
             {
               currentUserStream &&
-              <Footer userVideo={userVideo}
-                      userStream={currentUserStream.obj}
-                      audioMuted={audioMuted}
+              <Footer audioMuted={audioMuted}
                       videoMuted={videoMuted}
+                      userStream={currentUserStream.obj}
                       handRaised={handRaised}
                       isRecording={isRecording}
                       displayState={displayState}
@@ -901,11 +923,11 @@ const MeetingRoom = (props) => {
                             setSideBarOpen(true);
                           },
                           showWhiteboard: () => {
-                            if (meetingParticipantGridMode === 'AUTO_ADJUST') {
-                              setMeetingParticipantGridMode('SIDE_ONLY');
+                            if (meetingParticipantGridMode === 'DEFAULT') {
+                              setMeetingParticipantGridMode('STRIP');
                               setShowWhiteBoard(true);
                             } else {
-                              setMeetingParticipantGridMode('AUTO_ADJUST');
+                              setMeetingParticipantGridMode('DEFAULT');
                               setShowWhiteBoard(false);
                             }
                           },
@@ -930,7 +952,7 @@ const MeetingRoom = (props) => {
         </div>
         {
           sideBarOpen && sideBarTab && displayState === 'MAXIMIZED' &&
-            <div className={'closable-panel-container'}>
+          <div className={'closable-panel-container'}>
             <ClosablePanel
               closeHandler={(e) => setSideBarOpen(false)}
               title={sideBarTab}

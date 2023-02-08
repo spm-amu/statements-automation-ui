@@ -1,30 +1,51 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {Fragment, useEffect, useRef} from 'react';
+import React, {Fragment, useEffect} from 'react';
 import './CenteredMeetingParticipantGrid.css';
 import MeetingParticipant from "./MeetingParticipant";
 import LobbyWaitingList from "./LobbyWaitingList";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
+import appManager from "../../../common/service/AppManager";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
 const MAX_TILES = 6;
 
 const MeetingParticipantGrid = (props) => {
-  const videoRef = useRef();
   const {participants} = props;
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
   const {
     waitingList,
-    mode
+    mode,
+    userVideo,
+    videoMuted,
+    audioMuted
   } = props;
 
   useEffect(() => {
+    if(participants) {
+      let currentUserParticipant = participants.find((p) => p.isCurrentUser);
+      if(!currentUserParticipant) {
+        currentUserParticipant = {
+          isCurrentUser: true,
+          userId: appManager.getUserDetails().userId,
+          peer: null,
+          name: appManager.getUserDetails().name,
+          avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+          videoMuted,
+          audioMuted
+        };
+
+        participants.splice(0, 0, currentUserParticipant);
+      }
+    }
+
+    console.log("\n\n\nPARTS : ", participants);
     let gridData = createGrid();
     setGrid(gridData.mainGrid);
     setOverflowGrid(gridData.overflowGrid);
-  }, [participants, mode]);
+  }, [participants, props.mode, props.screenShared]);
 
   const createGrid = () => {
     let itemGrid = {
@@ -34,11 +55,11 @@ const MeetingParticipantGrid = (props) => {
 
     let numRows = participants.length < MAX_ROWS ? participants.length : MAX_ROWS;
 
-    if(props.screenShared) {
+    if (props.screenShared) {
       numRows = 1;
     }
 
-    if (mode === 'AUTO_ADJUST') {
+    if (mode === 'DEFAULT') {
       for (let i = 0; i < numRows; i++) {
         itemGrid.mainGrid.push([]);
       }
@@ -47,7 +68,7 @@ const MeetingParticipantGrid = (props) => {
     let currentRowIndex = 0;
     let maxTiles = props.screenShared ? 1 : MAX_TILES;
     for (let i = 0; i < participants.length; i++) {
-      if (i < maxTiles && mode === 'AUTO_ADJUST') {
+      if (i < maxTiles && mode === 'DEFAULT') {
         itemGrid.mainGrid[currentRowIndex].push(participants[i]);
         if (currentRowIndex++ === MAX_ROWS - 1 || participants.length === 2) {
           currentRowIndex = 0;
@@ -63,6 +84,7 @@ const MeetingParticipantGrid = (props) => {
   const renderRow = (row, index) => {
     return (
       <Grid
+        style={{height: props.screenShared ? "100%" : null,}}
         direction="row"
         justifyContent="center"
         alignItems="center" container item spacing={2}>
@@ -79,7 +101,9 @@ const MeetingParticipantGrid = (props) => {
               }
             }
             >
-              <MeetingParticipant data={participant} showName={true} videoMuted={participant.videoMuted}
+              <MeetingParticipant data={participant}
+                                  ref={participant.isCurrentUser ? userVideo : null}
+                                  showName={!participant.isCurrentUser} videoMuted={participant.videoMuted}
                                   audioMuted={participant.audioMuted}/>
             </Grid>
           })}
@@ -88,10 +112,37 @@ const MeetingParticipantGrid = (props) => {
     )
   };
 
+  function renderOverflowGrid() {
+    return overflowGrid && overflowGrid.length > 0 &&
+      <div
+        style={{
+          overflowX: 'auto',
+          maxWidth: '100%',
+          width: '100%',
+          height: '96%',
+          borderRadius: '4px',
+          overflowY: 'hidden',
+          margin: props.screenShared || mode === 'STRIP' ? "0" : "12px 8px",
+          backgroundColor: 'rgb(40, 40, 43)'
+        }}
+        className="row flex-row flex-nowrap">
+        {overflowGrid.map((participant, index) => {
+          return <div className={'col-*-*'} key={index}
+                      style={{borderRadius: '4px', minWidth: "180px", width: "180px", height: "180px", marginRight: '8px'}}>
+            <MeetingParticipant data={participant}
+                                ref={participant.isCurrentUser ? userVideo : null}
+                                showName={!participant.isCurrentUser}
+                                videoMuted={participant.videoMuted}
+                                audioMuted={participant.audioMuted} sizing={'sm'}/>
+          </div>
+        })}
+      </div>;
+  }
+
   return (
     grid !== null ?
       <div className={'row grid'}
-           style={{height: '100%', width: mode === 'AUTO_ADJUST' ? '100%' : '256px'}}>
+           style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
         {grid && grid.length > 0 &&
         <Box sx={{
           flexGrow: 1,
@@ -100,45 +151,55 @@ const MeetingParticipantGrid = (props) => {
           justifyContent: 'center',
           alignItems: 'center',
           display: 'flex',
-          padding: '0px 32px'
+          padding: '32px'
         }}>
           <Grid container spacing={2} style={{width: '100%', height: props.screenShared ? "100%" : null}}>
             {grid.map((row, index) => {
-              return <div key={index} style={{width: '100%', height: props.screenShared ? "80%" : null, border: '4px solid red'}}>
+              return <>
                 {
-                  renderRow(row, index)
+                  props.screenShared ?
+                    <div key={index} style={{width: '100%', height: props.screenShared ? "calc(75% + 40px)" : null}}>
+                      {
+                        renderRow(row, index)
+                      }
+                    </div>
+                    :
+                    <Fragment key={index}>
+                      {
+                        renderRow(row, index)
+                      }
+                    </Fragment>
                 }
-              </div>
+              </>
             })}
             {
-              overflowGrid && overflowGrid.length > 0 &&
-              <div
-                style={{
-                  overflowX: 'auto',
-                  maxWidth: '100%',
-                  borderRadius: '4px',
-                  margin: "12px 8px",
-                  backgroundColor: 'rgb(40, 40, 43)'
-                }}
-                className="row flex-row flex-nowrap">
-                {overflowGrid.map((participant, index) => {
-                  return <div className={'col'} key={index}
-                              style={{borderRadius: '4px', minWidth: "16vh", height: "16vh", marginRight: '8px'}}>
-                    <MeetingParticipant data={participant} showName={true} videoMuted={participant.videoMuted}
-                                        audioMuted={participant.audioMuted} sizing={'sm'}/>
-                  </div>
-                })}
-              </div>
+              renderOverflowGrid()
             }
           </Grid>
         </Box>
         }
         {
+          mode === 'STRIP' &&
+            <div style={{width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
+              {
+                renderOverflowGrid()
+              }
+            </div>
+        }
+        {
           ((waitingList && waitingList.length > 0)) &&
-          <div className={'no-side-margin no-side-padding grid-side-bar'} style={{backgroundColor: 'transparent'}}>
+          <div className={'no-side-margin no-side-padding grid-side-bar'} style={
+            {
+              backgroundColor: 'transparent',
+              position: 'absolute',
+              top: '112px',
+              right: '48px'
+            }
+          }>
             {
               waitingList && waitingList.length > 0 &&
               <LobbyWaitingList waitingList={waitingList}
+                                autoHeight={true}
                                 rejectUserHandler={props.rejectUserHandler}
                                 acceptUserHandler={props.acceptUserHandler}/>
             }

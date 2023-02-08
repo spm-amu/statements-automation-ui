@@ -4,12 +4,12 @@ import MeetingParticipantGrid from "../vc/CenteredMeetingParticipantGrid";
 const TestView = (props) => {
 
   const [participants, setParticipants] = useState([]);
-  const [lobbyWaitingList] = useState(null);
-  const [meetingParticipantGridMode] = useState('AUTO_ADJUST');
+  const [lobbyWaitingList] = useState([]);
+  const [meetingParticipantGridMode] = useState('STRIP');
 
   useEffect(() => {
     let users = [];
-    for (let i=0;i<30;i++) {
+    for (let i=0;i<1;i++) {
       let user = {
         userId: 'test-' + i,
         peer: null,
@@ -23,6 +23,7 @@ const TestView = (props) => {
     }
 
     setParticipants(users);
+    //lobbyWaitingList.push({});
   }, []);
 
   return (
@@ -33,6 +34,8 @@ const TestView = (props) => {
                                 waitingList={lobbyWaitingList}
                                 mode={meetingParticipantGridMode}
                                 screenShared={true}
+                                videoMuted={true}
+                                audioMuted={true}
                                 acceptUserHandler={
                                   (item) => {
                                     acceptUser(item);
