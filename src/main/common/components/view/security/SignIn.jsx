@@ -237,6 +237,12 @@ const SignIn = (props) => {
                       formControlProps={{ fullWidth: true }}
                       success={usernameState === 'success'}
                       error={usernameState === 'error'}
+                      onKeyUp={(e) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          fireLogin();
+                        }
+                      }}
                       inputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -258,6 +264,12 @@ const SignIn = (props) => {
                   type={showPassword ? 'text' : 'password'}
                   success={passwordState === 'success'}
                   error={passwordState === 'error'}
+                  onKeyUp={(e) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      fireLogin();
+                    }
+                  }}
                   formControlProps={{ fullWidth: true }}
                   inputProps={{
                     endAdornment: (

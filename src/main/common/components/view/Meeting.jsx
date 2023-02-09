@@ -508,6 +508,39 @@ const Meeting = (props) => {
     return meetingStartDateTime !== null && meetingEndDateTime !== null && meetingStartDateTime.isBefore(meetingEndDateTime);
   };
 
+  const JoinAction = () => {
+    if (
+      !Utils.isNull(props.selectedEvent) &&
+      !Utils.isNull(props.selectedEvent.id) &&
+      !Utils.isStringEmpty(props.selectedEvent.id)
+    ) {
+      return (
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'right',
+            margin: '16px 0',
+          }}
+        >
+          <div style={{marginRight: '4px'}}>
+            {
+              !appManager.get('CURRENT_MEETING') && !lapsed && !edited &&
+              <Button
+                variant={'contained'}
+                size="large"
+                color={'primary'}
+                onClick={(e) => handleJoin(e)}
+              >
+                JOIN
+              </Button>
+            }
+          </div>
+        </div>
+      );
+    }
+  };
+
   // ** Event Action buttons
   const EventActions = () => {
     if (
@@ -560,17 +593,6 @@ const Meeting = (props) => {
             RESPOND
           </Button>*/}
         </div>
-        {
-          !appManager.get('CURRENT_MEETING') && !lapsed &&
-          <Button
-            variant={'contained'}
-            size="large"
-            color={'primary'}
-            onClick={(e) => handleJoin(e)}
-          >
-            JOIN
-          </Button>
-        }
         <Button variant={'text'} size="large" onClick={(e) => handleClose(e)}>
           CLOSE
         </Button>
@@ -584,19 +606,6 @@ const Meeting = (props) => {
           margin: '16px 0',
         }}
       >
-        <div style={{marginRight: '4px'}}>
-          {
-            !appManager.get('CURRENT_MEETING') && !lapsed && !edited &&
-            <Button
-              variant={'contained'}
-              size="large"
-              color={'primary'}
-              onClick={(e) => handleJoin(e)}
-            >
-              JOIN
-            </Button>
-          }
-        </div>
         {
           edited ? (
             <div style={{marginRight: '4px'}}>
@@ -690,6 +699,9 @@ const Meeting = (props) => {
         </h5>
         <div style={{width: '80%'}}>
           <Form>
+            <div className="d-flex mb-1">
+              <JoinAction/>
+            </div>
             {readOnly && !Utils.isNull(hostAttendee) ? (
               <div>From {hostAttendee.name}</div>
             ) : null}

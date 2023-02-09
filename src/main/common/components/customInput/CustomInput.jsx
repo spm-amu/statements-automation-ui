@@ -81,6 +81,7 @@ export default function CustomInput(props) {
           disabled: classes.disabled,
           underline: underlineClasses,
         }}
+        onKeyUp={props.onKeyUp}
         id={id}
         {...inputProps}
         inputProps={newInputProps}
