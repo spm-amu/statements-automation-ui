@@ -811,10 +811,10 @@ const MeetingRoom = (props) => {
                   />
                   :
                   displayState === 'MAXIMIZED' ?
-                    <div className={'row'} style={{width: '100%', height: '100%'}}>
+                    <div className={'row no-margin no-padding'} style={{width: '100%', height: '100%'}}>
                       {
                         showWhiteBoard && meetingParticipantGridMode === 'STRIP' &&
-                        <div className={'row no-margin no-padding'} style={{width: '100%', height: '72%'}}>
+                        <div className={'row no-margin no-padding'} style={{width: '100%', height: 'calc(100% - 200px)', margin: '16px 0'}}>
                           <div className={'col no-margin no-padding'} style={{width: '100%'}}>
                             <WhiteBoard isHost={isHost} id={selectedMeeting.id} items={whiteboardItems} eventHandler={
                               {
@@ -844,8 +844,8 @@ const MeetingRoom = (props) => {
                         </div>
                       }
                       <div className={'row'} style={{width: '100%',
-                        height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : null}}>
-                        <div className={'col'} style={{width: '100%', marginLeft: '16px', marginRight: '-16px'}}>
+                        height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : "160px", marginLeft: '0', marginRight: '0'}}>
+                        <div className={'col'} style={{width: '100%', paddingLeft: '0', paddingRight: '0'}}>
                           {
                             currentUserStream.obj &&
                             <MeetingParticipantGrid participants={participants}

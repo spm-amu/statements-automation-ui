@@ -129,6 +129,7 @@ const MeetingParticipantGrid = (props) => {
           margin: props.screenShared || mode === 'STRIP' ? "0" : "12px 8px",
           backgroundColor: 'rgb(40, 40, 43)',
           display: 'flex',
+          padding: props.screenShared ? '0 16px' : null,
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
@@ -136,9 +137,9 @@ const MeetingParticipantGrid = (props) => {
           return <div className={'col-*-*'} key={index}
                       style={{
                         borderRadius: '4px',
-                        minWidth: "100px",
-                        width: "100px",
-                        height: "100px",
+                        height: "120px",
+                        maxHeight: "120px",
+                        minWidth: "200px",
                         marginRight: '8px'
                       }}>
             <MeetingParticipant data={participant}
