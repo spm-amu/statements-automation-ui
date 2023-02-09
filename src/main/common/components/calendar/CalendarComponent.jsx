@@ -134,9 +134,9 @@ const CalendarComponent = (props) => {
     stickyHeaderDates: true,
 
     eventTimeFormat: { // like '14:30:00'
-      hour: '2-digit',
-      minute: '2-digit',
-      meridiem: false
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
     },
 
     /*

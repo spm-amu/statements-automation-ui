@@ -125,8 +125,6 @@ const Chats = (props) => {
 
       setChatEvents([].concat(filteredChatEvents));
 
-      console.log('______ CHAT STATE: ', location.state);
-
       if (location.state && location.state.meetingRoom) {
         privateRoomChat(filteredChatEvents, location.state.meetingRoom);
       } else if (props.selected && props.selected.chatId) {
@@ -177,7 +175,8 @@ const Chats = (props) => {
             <div style={{width: "30%", borderRight: '1px solid #e1e1e1'}} className="h-100">
               <ChatRoomList chatEvents={chatEvents} addedChat={newChat} selectionHandler={(selected) => {
                 setSelectedChat(selected);
-              }} addHandler={() => setMode('FORM')}/>
+              }} addHandler={() => setMode('FORM')}
+              />
             </div>
             <div style={{width: "70%", height: '100%'}}>
               {

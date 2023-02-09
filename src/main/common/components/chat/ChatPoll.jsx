@@ -128,7 +128,8 @@ const ChatPoll = (props) => {
 
   const sendPoll = () => {
     let errorState = {
-      pollQuestion: Utils.isNull(pollQuestion),
+      pollQuestion: pollQuestion.length === 0,
+      pollOptions: options[0].value.length === 0 || options[1].value.length === 0
     };
 
     setErrors(errorState);
@@ -140,7 +141,9 @@ const ChatPoll = (props) => {
           days: pollLengthDays,
           hours: pollLengthHours
         },
-        options: options.map(option => {
+        options: options
+          .filter(option => option.value.length > 0)
+          .map(option => {
           return {
             text: option.value
           }
@@ -197,6 +200,10 @@ const ChatPoll = (props) => {
                         id={option.id}
                         value={option.value}
                         valueChangeHandler={(e) => handleFormChange(index, e)}
+                        hasError={errors.pollOptions}
+                        errorMessage={
+                          'At least two options required.'
+                        }
                       />
                     </div>
                     {

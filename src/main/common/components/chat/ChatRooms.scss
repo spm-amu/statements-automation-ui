@@ -227,6 +227,14 @@
     border-radius: 15px;
   }
 
+  .peerchat > .peer-event {
+    margin-left: 10px;
+    background-color: red;
+    padding: 0.1px 10px;
+    margin-top: 5px;
+    border-radius: 15px;
+  }
+
   .peerchat > div > span {
     font-size: 10px !important;
     font-weight: 500;
@@ -342,7 +350,7 @@
   font-weight: 500;
   font-size: 21px;
   color: rgba(0, 0, 0, 0.85);
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 @media (max-width: 768px) {
@@ -450,6 +458,10 @@
 
 .cv-choice-percent-chart.winner {
   background-color: #eadfd5;
+}
+
+.cv-choice-percent-chart.event {
+  background-color: #d2d7d8;
 }
 
 .poll-creator-info {
