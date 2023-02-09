@@ -140,6 +140,7 @@ const ChatRoom = (props) => {
     console.log('____ ON MESSAGE: ', payload);
     if (selectedChat && selectedChat.id === payload.roomId) {
       if (props.onMessage) {
+        console.log('____ onMessage: ');
         props.onMessage(payload.chatMessage, selectedChat);
 
         if (payload.chatMessage.type === 'EVENT') {
@@ -147,6 +148,7 @@ const ChatRoom = (props) => {
         }
       } else {
         selectedChat.messages.push(payload.chatMessage);
+        console.log('_____ MSGES else: ', selectedChat.messages);
       }
 
       loadMessages();
@@ -155,6 +157,8 @@ const ChatRoom = (props) => {
 
   const loadMessages = () => {
     scrollToBottom();
+
+    console.log('_____ MSGES: ', messages);
 
     if (selectedChat) {
       const newMessages = [].concat(selectedChat.messages);
@@ -257,6 +261,7 @@ const ChatRoom = (props) => {
       });
 
       setMessages(oldMsgs => [...oldMsgs, msg]);
+      selectedChat.messages.push(msg);
 
       if (props.onMessage) {
         props.onMessage(msg, selectedChat);
@@ -272,8 +277,6 @@ const ChatRoom = (props) => {
   const callNow = (e) => {
     e.preventDefault();
     sendMessage(e, `${currentUser.name} has started a call.`);
-
-    console.log('selectedChat: ', selectedChat);
 
     const directCallRoom = {
       id: uuid()
