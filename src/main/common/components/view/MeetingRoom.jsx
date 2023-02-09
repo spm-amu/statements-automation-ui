@@ -149,6 +149,9 @@ const MeetingRoom = (props) => {
               setWhiteboardItems(be.payload.items);
             }
             break;
+          case MessageType.CHANGE_HOST:
+            onChangeHost(be);
+            break;
         }
       }
     }
@@ -161,9 +164,13 @@ const MeetingRoom = (props) => {
     callerUser
   } = props;
 
+  const onChangeHost = (args) => {
+    let userDetails = appManager.getUserDetails();
+    setIsHost(userDetails.userId === args.payload.host);
+  };
+
   const recordMeeting = () => {
     if (mediaRecorder != null) {
-      console.log('____ STARTED');
       mediaRecorder.start();
       setIsRecording(true);
     }
@@ -183,7 +190,6 @@ const MeetingRoom = (props) => {
 
   const stopRecordingMeeting = () => {
     if (mediaRecorder != null) {
-      console.log('______ mediaRecorder: ', mediaRecorder);
       mediaRecorder.stop();
       setIsRecording(false);
     }
@@ -284,6 +290,11 @@ const MeetingRoom = (props) => {
     post(
       `${host}/api/v1/meeting/changeHost`,
       (response) => {
+        socketManager.emitEvent(MessageType.CHANGE_HOST, {
+          roomID: selectedMeeting.id,
+          host: participant.userId
+        });
+
         setIsHost(!isHost);
       },
       (e) => {
@@ -538,7 +549,7 @@ const MeetingRoom = (props) => {
     if (currentUserStream.obj) {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
-        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD);
+        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD, MessageType.CHANGE_HOST);
 
       if (isHost || isDirectCall) {
         join();

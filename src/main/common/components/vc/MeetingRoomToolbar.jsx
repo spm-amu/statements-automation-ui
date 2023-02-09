@@ -10,12 +10,53 @@ import {IconButton} from "@material-ui/core";
 
 const MeetingRoomToolbar = (props) => {
 
-  const {isHost, isDirectCall, selectedMeeting} = props;
+  const { isDirectCall, selectedMeeting } = props;
+
   const [started, setStarted] = useState(false);
+  const [isHost, setIsHost] = useState(false);
   const [remainingTime, setRemainingTime] = useState();
+
+  const socketEventHandler = useState({});
+
+  const handler = () => {
+    return {
+      get id() {
+        return 'meeting-room-toolbar-' + selectedMeeting.id;
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case MessageType.CHANGE_HOST:
+            updateHost(be);
+            break;
+        }
+      }
+    }
+  };
+
+  const updateHost = (args) => {
+    let userDetails = appManager.getUserDetails();
+    setIsHost(userDetails.userId === args.payload.host);
+  }
+
+  useEffect(() => {
+    socketEventHandler.api = handler();
+  });
+
+  useEffect(() => {
+    socketManager.addSubscriptions(socketEventHandler, MessageType.CHANGE_HOST);
+    setIsHost(props.isHost);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      socketManager.removeSubscriptions(socketEventHandler);
+    };
+  }, []);
 
   const endMeeting = () => {
     if (isHost) {
+      console.log('______#######: ', isHost);
+
       socketManager.emitEvent(MessageType.END_MEETING, {
         meetingId: selectedMeeting.id,
         userId: appManager.getUserDetails().userId
