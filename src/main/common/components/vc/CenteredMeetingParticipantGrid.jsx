@@ -24,9 +24,9 @@ const MeetingParticipantGrid = (props) => {
   } = props;
 
   useEffect(() => {
-    if(participants) {
+    if (participants) {
       let currentUserParticipant = participants.find((p) => p.isCurrentUser);
-      if(!currentUserParticipant) {
+      if (!currentUserParticipant) {
         currentUserParticipant = {
           isCurrentUser: true,
           userId: appManager.getUserDetails().userId,
@@ -102,7 +102,11 @@ const MeetingParticipantGrid = (props) => {
             }
             >
               <MeetingParticipant data={participant}
-                                  ref={participant.isCurrentUser ? userVideo : null}
+                                  refChangeHandler={
+                                    participant.isCurrentUser ? (ref) => {
+                                      props.userVideoChangeHandler(ref);
+                                    } : null
+                                  }
                                   showName={!participant.isCurrentUser} videoMuted={participant.videoMuted}
                                   audioMuted={participant.audioMuted}/>
             </Grid>
@@ -130,9 +134,19 @@ const MeetingParticipantGrid = (props) => {
         className="row flex-row flex-nowrap">
         {overflowGrid.map((participant, index) => {
           return <div className={'col-*-*'} key={index}
-                      style={{borderRadius: '4px', minWidth: "100px", width: "100px", height: "100px", marginRight: '8px'}}>
+                      style={{
+                        borderRadius: '4px',
+                        minWidth: "100px",
+                        width: "100px",
+                        height: "100px",
+                        marginRight: '8px'
+                      }}>
             <MeetingParticipant data={participant}
-                                ref={participant.isCurrentUser ? userVideo : null}
+                                refChangeHandler={
+                                  participant.isCurrentUser ? (ref) => {
+                                    props.userVideoChangeHandler(ref);
+                                  } : null
+                                }
                                 showName={!participant.isCurrentUser}
                                 videoMuted={participant.videoMuted}
                                 audioMuted={participant.audioMuted} sizing={'sm'}/>
@@ -182,11 +196,11 @@ const MeetingParticipantGrid = (props) => {
         }
         {
           mode === 'STRIP' &&
-            <div style={{width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
-              {
-                renderOverflowGrid()
-              }
-            </div>
+          <div style={{width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
+            {
+              renderOverflowGrid()
+            }
+          </div>
         }
         {
           ((waitingList && waitingList.length > 0)) &&

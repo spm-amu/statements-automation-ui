@@ -90,11 +90,11 @@ const MeetingRoom = (props) => {
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [whiteboardItems, setWhiteboardItems] = useState([]);
   const [eventHandler] = useState({});
+  const [userVideo, setUserVideo] = useState(null);
 
   const recordedChunks = [];
 
   const shareScreenSource = useRef();
-  const userVideo = useRef();
   const tmpVideoTrack = useRef();
 
   const handler = () => {
@@ -623,11 +623,12 @@ const MeetingRoom = (props) => {
     appManager.add('CURRENT_MEETING', selectedMeeting);
   }, []);
 
+
   useEffect(() => {
-    if (userVideo.current && !userVideo.current.srcObject) {
+    if (userVideo && userVideo.current && !userVideo.current.srcObject) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
-  }, [userVideo.current, streamsInitiated]);
+  }, [userVideo, streamsInitiated]);
 
   const persistMeetingSettings = () => {
     post(
@@ -732,7 +733,7 @@ const MeetingRoom = (props) => {
 
   function toggleVideo() {
     if (currentUserStream.obj) {
-      if (!Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
+      if (userVideo && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         if (!screenShared) {
           currentUserStream.enableVideo(!videoMuted, socketManager);
         }
@@ -754,7 +755,7 @@ const MeetingRoom = (props) => {
   }, [audioMuted]);
 
   useEffect(() => {
-    if (userVideo.current) {
+    if (userVideo && userVideo.current) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
   }, [currentUserStream.videoTrack]);
@@ -845,14 +846,14 @@ const MeetingRoom = (props) => {
                         height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : null}}>
                         <div className={'col'} style={{width: '100%', marginLeft: '16px', marginRight: '-16px'}}>
                           {
-                            currentUserStream && currentUserStream.obj &&
+                            currentUserStream.obj &&
                             <MeetingParticipantGrid participants={participants}
                                                     waitingList={lobbyWaitingList}
                                                     mode={meetingParticipantGridMode}
                                                     screenShared={screenShared}
-                                                    userVideo={userVideo}
                                                     audioMuted={audioMuted}
                                                     videoMuted={videoMuted}
+                                                    userVideoChangeHandler={(ref) => setUserVideo(ref)}
                                                     acceptUserHandler={
                                                       (item) => {
                                                         acceptUser(item);

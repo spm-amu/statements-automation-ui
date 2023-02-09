@@ -38,16 +38,16 @@ const Toolbar = (props) => {
   };
 
   const toggleRecorder = () => {
-    setIsRecording((prevStatus) => !prevStatus);
-  };
+    let newRecordingState = !recording;
 
-  useEffect(() => {
-    if (!isRecording) {
-      eventHandler.stopRecording(isRecording);
+    if (newRecordingState) {
+      eventHandler.stopRecording();
     } else {
-      eventHandler.recordMeeting(isRecording)
+      eventHandler.recordMeeting()
     }
-  }, [isRecording]);
+
+    setIsRecording(newRecordingState);
+  };
 
   useEffect(() => {
     setAutoPermit(props.autoPermit);
