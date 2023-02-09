@@ -5,12 +5,14 @@ import {host, post} from "../../service/RestService";
 import AutoComplete from "../customInput/AutoComplete";
 import Button from "@material-ui/core/Button";
 import appManager from "../../service/AppManager";
+import TextField from '../customInput/TextField';
 
 const ChatForm = (props) => {
   const [participants, setParticipants] = useState([]);
+  const [title, setTitle] = useState('');
 
   const handleAdd = () => {
-    props.addHandler(participants);
+    props.addHandler(title, participants);
   };
 
   return (
@@ -32,6 +34,14 @@ const ChatForm = (props) => {
       </h5>
       <Form>
         <div>
+          <div style={{ marginTop: '8px' }}>
+            <TextField
+              label="Title"
+              id="title"
+              value={title}
+              valueChangeHandler={(e) => setTitle(e.target.value)}
+            />
+          </div>
           <div style={{ marginTop: '8px' }}>
             <AutoComplete
               id="participants"

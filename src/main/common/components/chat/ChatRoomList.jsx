@@ -17,7 +17,6 @@ const ChatRoomList = (props) => {
   };
 
   useEffect(() => {
-    console.log('##### ROOM LIST EVENTS UPDATED')
     setChats([].concat(props.chatEvents));
   }, [props.chatEvents]);
 

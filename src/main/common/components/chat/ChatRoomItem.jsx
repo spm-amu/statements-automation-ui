@@ -44,7 +44,7 @@ const ChatRoomItem = (props) => {
       <div className="chatroom__info">
         <div className="chatRoom__title">
           <p style={{ fontSize: '16px' }}>
-            {event.type === 'CALENDAR_MEETING'
+            {event.type === 'CALENDAR_MEETING' || event.title
               ? event.title
               : Utils.getChatMeetingTitle(event.participants, currentUser.userId, 22)
             }
