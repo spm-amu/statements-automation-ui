@@ -247,8 +247,6 @@ const ChatRoom = (props) => {
 
       const participantsToSignalIds = participantsUserIds();
 
-      console.log('___ MSG: ', msg);
-
       socketManager.emitEvent(MessageType.CHAT_MESSAGE, {
         roomId: selectedChat.id,
         chatMessage: msg,
