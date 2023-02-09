@@ -285,10 +285,6 @@ const BasicBusinessAppDashboard = (props) => {
   });
 
   useEffect(() => {
-    if(screen.availHeight <= 680) {
-      document.getElementsByTagName("body")[0].style.zoom = .7;
-    }
-
     return () => {
       socketManager.removeSubscriptions(socketEventHandler);
       appManager.removeSubscriptions(systemEventHandler);
@@ -306,7 +302,6 @@ const BasicBusinessAppDashboard = (props) => {
       tokenManager.startTokenRefreshMonitor(`${host}/api/v1/auth/refresh`, response.username);
       setTokenRefreshMonitorStarted(true);
     }
-
 
     if (location.state) {
       window.history.replaceState({}, document.title); // clear location.state

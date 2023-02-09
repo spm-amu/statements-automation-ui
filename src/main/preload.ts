@@ -1,6 +1,10 @@
-import { contextBridge, ipcRenderer, IpcRendererEvent, desktopCapturer } from 'electron';
+import { webFrame, contextBridge, ipcRenderer, IpcRendererEvent, desktopCapturer } from 'electron';
 
 export type Channels = 'ipc-armscor';
+
+if(screen.availHeight <= 680) {
+  webFrame.setZoomFactor(.7);
+}
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
