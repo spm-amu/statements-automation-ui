@@ -49,10 +49,11 @@ const Chats = (props) => {
     }
   };
 
-  const createChatHandler = (chatParticipants) => {
+  const createChatHandler = (title, chatParticipants) => {
     if (chatParticipants.length > 0) {
       let newChat = {
         participants: chatParticipants,
+        title: title,
         type: 'DIRECT',
         messages: []
       };
@@ -188,8 +189,8 @@ const Chats = (props) => {
           </div>
           :
           <div className={'w-100 h-100'}>
-            <ChatForm addHandler={(newParticipants) => {
-                createChatHandler(newParticipants);
+            <ChatForm addHandler={(title, newParticipants) => {
+                createChatHandler(title, newParticipants);
               }
             } />
           </div>

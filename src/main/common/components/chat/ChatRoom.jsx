@@ -174,6 +174,14 @@ const ChatRoom = (props) => {
     setLoading(false);
   };
 
+  const getChatRoomTitle = () => {
+    if (selectedChat.type === 'CALENDAR_MEETING' || selectedChat.title) {
+      return selectedChat.title;
+    }
+
+    return Utils.getChatMeetingTitle(selectedChat.participants, currentUser.userId, 58);
+  }
+
   useEffect(() => {
     setSelectedChat(props.selectedChat)
   }, [props.selectedChat]);
@@ -704,7 +712,7 @@ const ChatRoom = (props) => {
               </Avatar>
             </div>
             <h5>
-              {selectedChat.type === 'CALENDAR_MEETING' ? selectedChat.title : Utils.getChatMeetingTitle(selectedChat.participants, currentUser.userId, 58)}
+              { getChatRoomTitle() }
             </h5>
           </div>
           <div className="chatroom__headerright">
