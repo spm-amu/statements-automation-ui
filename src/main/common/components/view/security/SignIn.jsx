@@ -51,10 +51,6 @@ const SignIn = (props) => {
   };
 
   useEffect(() => {
-    if(screen.availHeight <= 680) {
-      document.getElementsByTagName("body")[0].style.zoom = .7;
-    }
-
     clearErrorStates();
 
     if (!isSafari && !isChrome && !isIE && !isEdge) {
