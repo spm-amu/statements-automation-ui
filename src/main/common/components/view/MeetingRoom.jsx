@@ -770,10 +770,9 @@ const MeetingRoom = (props) => {
   function toggleAudio() {
     if (currentUserStream.obj && currentUserStream.getAudioTracks() && currentUserStream.getAudioTracks().length > 0) {
       let audioTrack = currentUserStream.getAudioTracks()[0];
-      if (audioTrack && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
+      if (audioTrack && userVideo && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         audioTrack.enabled = !audioMuted;
-        emitAVSettingsChange();
-      }
+        emitAVSettingsChange();      }
     }
 
     onAVSettingsChange({
