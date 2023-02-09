@@ -285,6 +285,10 @@ const BasicBusinessAppDashboard = (props) => {
   });
 
   useEffect(() => {
+    if(screen.availHeight <= 680) {
+      document.getElementById("body").style.zoom = .7;
+    }
+
     return () => {
       socketManager.removeSubscriptions(socketEventHandler);
       appManager.removeSubscriptions(systemEventHandler);
