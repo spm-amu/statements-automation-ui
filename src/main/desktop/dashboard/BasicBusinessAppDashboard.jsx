@@ -286,7 +286,7 @@ const BasicBusinessAppDashboard = (props) => {
 
   useEffect(() => {
     if(screen.availHeight <= 680) {
-      document.getElementById("body").style.zoom = .7;
+      document.getElementsByTagName("body")[0].style.zoom = .7;
     }
 
     return () => {
