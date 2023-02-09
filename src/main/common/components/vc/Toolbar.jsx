@@ -29,6 +29,7 @@ const Toolbar = (props) => {
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -38,15 +39,13 @@ const Toolbar = (props) => {
   };
 
   const toggleRecorder = () => {
-    let newRecordingState = !recording;
-
-    if (newRecordingState) {
+    if (isRecording) {
       eventHandler.stopRecording();
     } else {
       eventHandler.recordMeeting()
     }
 
-    setIsRecording(newRecordingState);
+    setIsRecording(!isRecording);
   };
 
   useEffect(() => {
@@ -116,20 +115,23 @@ const Toolbar = (props) => {
     <div className={'footer-toolbar'}>
       <div className={'row centered-flex-box'}>
 
-        <IconButton
-          onClick={() => {
-            toggleRecorder();
-          }}
-          style={{
-            backgroundColor: isRecording ? 'white' : '#404239',
-            color: 'white',
-            marginRight: '4px'
-          }}
-        >
-          {
-            isRecording ? <LottieIcon id={'recording'}/> : <Icon id={'RECORD'}/>
-          }
-        </IconButton>
+        {
+          isHost &&
+          <IconButton
+            onClick={() => {
+              toggleRecorder();
+            }}
+            style={{
+              backgroundColor: isRecording ? 'white' : '#404239',
+              color: 'white',
+              marginRight: '4px'
+            }}
+          >
+            {
+              isRecording ? <LottieIcon id={'recording'}/> : <Icon id={'RECORD'}/>
+            }
+          </IconButton>
+        }
 
         {!screenShared && (
           <IconButton

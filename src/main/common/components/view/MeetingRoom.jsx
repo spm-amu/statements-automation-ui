@@ -163,6 +163,7 @@ const MeetingRoom = (props) => {
 
   const recordMeeting = () => {
     if (mediaRecorder != null) {
+      console.log('____ STARTED');
       mediaRecorder.start();
       setIsRecording(true);
     }
@@ -182,6 +183,7 @@ const MeetingRoom = (props) => {
 
   const stopRecordingMeeting = () => {
     if (mediaRecorder != null) {
+      console.log('______ mediaRecorder: ', mediaRecorder);
       mediaRecorder.stop();
       setIsRecording(false);
     }
