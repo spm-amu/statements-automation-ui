@@ -1,17 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from "react";
 import Timer from "./Timer";
-import {host, post} from "../../service/RestService";
+import {get, host, post} from "../../service/RestService";
 import socketManager from "../../service/SocketManager";
 import {MessageType} from "../../types";
 import appManager from "../../service/AppManager";
 import Icon from "../Icon";
 import {IconButton} from "@material-ui/core";
+import AlertDialog from "../AlertDialog";
 
 const MeetingRoomToolbar = (props) => {
 
   const { isDirectCall, selectedMeeting } = props;
-
+  const [endMeetingPromiseContext, setEndMeetingPromiseContext] = useState(null);
   const [started, setStarted] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [remainingTime, setRemainingTime] = useState();
@@ -36,7 +37,7 @@ const MeetingRoomToolbar = (props) => {
   const updateHost = (args) => {
     let userDetails = appManager.getUserDetails();
     setIsHost(userDetails.userId === args.payload.host);
-  }
+  };
 
   useEffect(() => {
     socketEventHandler.api = handler();
@@ -53,10 +54,24 @@ const MeetingRoomToolbar = (props) => {
     };
   }, []);
 
+  const handleEndMeetingButton = (e) => {
+    confirmEndMeeting().then((data) => {
+      endMeeting();
+    }, () => {
+    });
+  };
+
+  const confirmEndMeeting = () => {
+    return new Promise((resolve, reject) => {
+      setEndMeetingPromiseContext({
+        reject,
+        resolve
+      });
+    });
+  };
+
   const endMeeting = () => {
     if (isHost) {
-      console.log('______#######: ', isHost);
-
       socketManager.emitEvent(MessageType.END_MEETING, {
         meetingId: selectedMeeting.id,
         userId: appManager.getUserDetails().userId
@@ -92,6 +107,24 @@ const MeetingRoomToolbar = (props) => {
   return (
     <div>
       {
+        endMeetingPromiseContext &&
+        <AlertDialog title={'Warning'}
+                     message={'Are you sure you want to end the meeting?'}
+                     onLeft={() => {
+                       endMeetingPromiseContext.reject();
+                       setEndMeetingPromiseContext(null);
+                     }}
+                     onRight={() => {
+                       endMeetingPromiseContext.resolve(endMeetingPromiseContext.data);
+                       setEndMeetingPromiseContext(null);
+                     }}
+                     showLeft={true}
+                     showRight={true}
+                     btnTextLeft={'NO'}
+                     btnTextRight={'YES'}
+        />
+      }
+      {
         isHost && !isDirectCall &&
         <div className={'row'} style={{margin: '0 0 0 0', display: 'flex', alignItems: 'center'}}>
           <div style={{margin: '0 8px 0 0'}}>
@@ -109,7 +142,7 @@ const MeetingRoomToolbar = (props) => {
               disabled={!started}
               size="large"
               color={'primary'}
-              onClick={(e) => endMeeting()}
+              onClick={(e) => handleEndMeetingButton()}
             >
               <Icon id={'STOP'}/>
             </IconButton>

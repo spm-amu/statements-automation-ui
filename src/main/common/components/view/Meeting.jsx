@@ -671,8 +671,8 @@ const Meeting = (props) => {
                          setCancelPromiseContext(null);
                        }}
                        onRight={() => {
+                         cancelPromiseContext.resolve(cancelPromiseContext.data);
                          setCancelPromiseContext(null);
-                         cancelPromiseContext.resolve(cancelPromiseContext.data)
                        }}
                        showLeft={true}
                        showRight={true}
