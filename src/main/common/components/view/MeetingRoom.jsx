@@ -811,19 +811,22 @@ const MeetingRoom = (props) => {
         }}>
           <div style={{height: '100%'}}>
             <div className={displayState === 'MAXIMIZED' ? 'workspace-max' : 'workspace-min'}>
-              <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
-                     meetingTitle={selectedMeeting.title}
-                     acceptUserHandler={
-                       (item) => {
-                         acceptUser(item);
-                       }}
-                     rejectUserHandler={
-                       (item) => {
-                         rejectUser(item);
-                       }}
-                     displayState={displayState}
-                     allUserParticipantsLeft={allUserParticipantsLeft}
-              />
+              {
+                userToCall &&
+                <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
+                       meetingTitle={selectedMeeting.title}
+                       acceptUserHandler={
+                         (item) => {
+                           acceptUser(item);
+                         }}
+                       rejectUserHandler={
+                         (item) => {
+                           rejectUser(item);
+                         }}
+                       displayState={displayState}
+                       allUserParticipantsLeft={allUserParticipantsLeft}
+                />
+              }
               {
                 displayState === 'MAXIMIZED' ?
                   <div className={'row no-margin no-padding'} style={{width: '100%', height: '100%'}}>
@@ -874,6 +877,8 @@ const MeetingRoom = (props) => {
                                                   screenShared={screenShared}
                                                   audioMuted={audioMuted}
                                                   videoMuted={videoMuted}
+                                                  meetingTitle={selectedMeeting.title}
+                                                  step={step}
                                                   userVideoChangeHandler={(ref) => setUserVideo(ref)}
                                                   acceptUserHandler={
                                                     (item) => {

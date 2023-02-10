@@ -6,10 +6,14 @@ import LobbyWaitingList from "./LobbyWaitingList";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
+import LottieIcon from "../LottieIcon";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
 const MAX_TILES = 6;
+
+const WAITING_FOR_OTHERS_TO_JOIN_MESSAGE = 'Waiting for others to join';
+const ATTENDEE_WAITING_FOR_PERMISION_MESSAGE = 'Waiting for the meeting host to let you in';
 
 const MeetingParticipantGrid = (props) => {
   const {participants} = props;
@@ -18,9 +22,10 @@ const MeetingParticipantGrid = (props) => {
   const {
     waitingList,
     mode,
-    userVideo,
+    step,
     videoMuted,
-    audioMuted
+    audioMuted,
+    meetingTitle
   } = props;
 
   useEffect(() => {
@@ -160,40 +165,71 @@ const MeetingParticipantGrid = (props) => {
     grid !== null ?
       <div className={'row grid'}
            style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
-        {grid && grid.length > 0 &&
-        <Box sx={{
-          flexGrow: 1,
-          height: '100%',
-          width: '100%',
-          justifyContent: 'center',
-          alignItems: 'center',
-          display: 'flex',
-          padding: '32px'
-        }}>
-          <Grid container spacing={2} style={{width: '100%', height: props.screenShared ? "100%" : null}}>
-            {grid.map((row, index) => {
-              return <>
-                {
-                  props.screenShared ?
-                    <div key={index} style={{width: '100%', height: props.screenShared ? "calc(75% + 40px)" : null}}>
-                      {
-                        renderRow(row, index)
-                      }
-                    </div>
-                    :
-                    <Fragment key={index}>
-                      {
-                        renderRow(row, index)
-                      }
-                    </Fragment>
-                }
-              </>
-            })}
-            {
-              renderOverflowGrid()
-            }
-          </Grid>
-        </Box>
+        {
+          step === "LOBBY" &&
+          <div
+            style={{
+              display: 'inline-block',
+              textAlign: 'center',
+              margin: 'auto',
+              overflow: 'hidden',
+              fontSize: '20px',
+              color: '#F1F1F1',
+              width: '100%'
+            }}
+            className={'row no-padding no-margin centered-flex-box'}
+          >
+            <div style={props.displayState === 'MINIMIZED' ? {margin: '0 8px', fontSize: '20px'} : null}>
+              {meetingTitle}
+            </div>
+            <div className={'centered-flex-box'}>
+              <LottieIcon id={props.displayState === 'MINIMIZED' ? 'waiting-sm' : 'waiting'}/>
+            </div>
+            <div style={props.displayState === 'MINIMIZED' ? {margin: '0 8px', fontSize: '20px'} : null}>
+              {
+                props.isHost || props.allUserParticipantsLeft ?
+                  WAITING_FOR_OTHERS_TO_JOIN_MESSAGE
+                  :
+                  ATTENDEE_WAITING_FOR_PERMISION_MESSAGE
+              }
+            </div>
+          </div>
+        }
+        {
+          grid && grid.length > 0 &&
+          <Box sx={{
+            flexGrow: 1,
+            height: step === "LOBBY" ? null : '100%',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            display: 'flex',
+            padding: '32px'
+          }}>
+            <Grid container spacing={2} style={{width: '100%', height: props.screenShared ? "100%" : null}}>
+              {grid.map((row, index) => {
+                return <>
+                  {
+                    props.screenShared ?
+                      <div key={index} style={{width: '100%', height: props.screenShared ? "calc(75% + 40px)" : null}}>
+                        {
+                          renderRow(row, index)
+                        }
+                      </div>
+                      :
+                      <Fragment key={index}>
+                        {
+                          renderRow(row, index)
+                        }
+                      </Fragment>
+                  }
+                </>
+              })}
+              {
+                renderOverflowGrid()
+              }
+            </Grid>
+          </Box>
         }
         {
           mode === 'STRIP' &&
