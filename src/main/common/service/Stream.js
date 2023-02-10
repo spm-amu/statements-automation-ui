@@ -4,22 +4,19 @@ export class Stream {
 
   init = (video = true, audio = true, successHandler, errorhandler) => {
     let userMedia = navigator.mediaDevices
-      .getUserMedia(video ? {
+      .getUserMedia({
         audio: audio,
         video: {
           width: 240,
           height: 240,
         }
-      } : {
-        audio: audio,
-        video: false
       });
 
     userMedia
       .then((stream) => {
 
         if(!video) {
-          //stream.getVideoTracks()[0].enabled = false;
+          stream.getVideoTracks()[0].enabled = false;
           //stream.getVideoTracks()[0].stop();
         }
 
