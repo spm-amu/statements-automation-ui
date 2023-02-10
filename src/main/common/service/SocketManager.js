@@ -136,10 +136,7 @@ class SocketManager {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream,
-      config: {
-        iceServers: []
-      }
+      stream
     });
 
     peer.on('signal', (signal) => {

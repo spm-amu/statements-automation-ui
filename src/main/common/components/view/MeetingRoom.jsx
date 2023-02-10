@@ -785,7 +785,8 @@ const MeetingRoom = (props) => {
       let audioTrack = currentUserStream.getAudioTracks()[0];
       if (audioTrack && userVideo && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
         audioTrack.enabled = !audioMuted;
-        emitAVSettingsChange();      }
+        emitAVSettingsChange();
+      }
     }
 
     onAVSettingsChange({
