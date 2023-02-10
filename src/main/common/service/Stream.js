@@ -15,11 +15,11 @@ export class Stream {
     userMedia
       .then((stream) => {
 
-        console.log("\n\n\n\n\n\nSTREAM STARTED");
+        console.log("STREAM STARTED");
 
         if(!video) {
-          //stream.getVideoTracks()[0].enabled = false;
-          //stream.getVideoTracks()[0].stop();
+          stream.getVideoTracks()[0].enabled = false;
+          stream.getVideoTracks()[0].stop();
         }
 
         this.obj = stream;
@@ -27,7 +27,7 @@ export class Stream {
           successHandler(this.obj);
         }
       }).catch((e) => {
-      console.log("\n\n\n\n\n\nSSTREAM FAILED");
+      console.log("STREAM FAILED");
       console.log(e);
       if (errorhandler) {
         errorhandler(e);
