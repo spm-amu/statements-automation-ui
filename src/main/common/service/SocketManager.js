@@ -17,20 +17,20 @@ class SocketManager {
   }
 
   emitEvent = (eventType, data) => {
-    if(this.socket) {
+    if (this.socket) {
       this.socket.emit(eventType, data);
     }
   };
 
   disconnectSocket = () => {
-    if(this.socket) {
+    if (this.socket) {
       this.socket.disconnect();
     }
   };
 
   isUserOnline = (user) => {
     for (const usersOnlineElement of this.usersOnline) {
-      if(usersOnlineElement.userId === user.userId) {
+      if (usersOnlineElement.userId === user.userId) {
         return true;
       }
     }
@@ -77,7 +77,7 @@ class SocketManager {
     socket.on(MessageType.USER_OFFLINE, (payload) => {
       for (let i = 0; i < this.usersOnline.length; i++) {
         console.log(this.usersOnline[i].userId + " === " + payload.userId);
-        if(this.usersOnline[i].userId === payload.userId) {
+        if (this.usersOnline[i].userId === payload.userId) {
           this.usersOnline.splice(i, 1);
         }
       }
@@ -136,7 +136,16 @@ class SocketManager {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream
+      stream,
+      config: {
+        iceServers: [
+          {urls: 'stun:stun.l.google.com:19302'},
+          {urls: 'stun:stun1.l.google.com:19302'},
+          {urls: 'stun:stun2.l.google.com:19302'},
+          {urls: 'stun:stun3.l.google.com:19302'},
+          {urls: 'stun:stun4.l.google.com:19302'}
+        ]
+      }
     });
 
     peer.on('signal', (signal) => {
@@ -166,7 +175,13 @@ class SocketManager {
       trickle: false,
       stream,
       config: {
-        iceServers: []
+        iceServers: [
+          {urls: 'stun:stun.l.google.com:19302'},
+          {urls: 'stun:stun1.l.google.com:19302'},
+          {urls: 'stun:stun2.l.google.com:19302'},
+          {urls: 'stun:stun3.l.google.com:19302'},
+          {urls: 'stun:stun4.l.google.com:19302'}
+        ]
       }
     });
 
@@ -181,7 +196,7 @@ class SocketManager {
       });
     });
 
-    return  peer;
+    return peer;
   };
 
   addPeer(callerId, stream, audioMuted, videoMuted) {
@@ -259,8 +274,11 @@ class SocketManager {
   };
 
   endCall = (isDirect = false, caller = null) => {
-    if(this.socket) {
-      this.emitEvent(MessageType.END_CALL, {callerID: isDirect && caller ? caller.socketId : this.socket.id, direct: isDirect});
+    if (this.socket) {
+      this.emitEvent(MessageType.END_CALL, {
+        callerID: isDirect && caller ? caller.socketId : this.socket.id,
+        direct: isDirect
+      });
     }
   };
 

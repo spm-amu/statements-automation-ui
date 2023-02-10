@@ -15,6 +15,8 @@ export class Stream {
     userMedia
       .then((stream) => {
 
+        console.log("\n\n\n\n\n\nSTREAM STARTED");
+
         if(!video) {
           stream.getVideoTracks()[0].enabled = false;
           //stream.getVideoTracks()[0].stop();
@@ -25,7 +27,7 @@ export class Stream {
           successHandler(this.obj);
         }
       }).catch((e) => {
-      console.log("STREAM FAILED");
+      console.log("\n\n\n\n\n\nSSTREAM FAILED");
       console.log(e);
       if (errorhandler) {
         errorhandler(e);
