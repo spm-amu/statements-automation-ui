@@ -5,6 +5,7 @@ import Icon from "./Icon";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "./customInput/TextField";
 import appManager from "../service/AppManager";
+import CustomInput from "./customInput/CustomInput";
 
 const SearchBarComponent = React.memo(React.forwardRef((props, ref) => {
   const [searchValue, setSearchValue] = React.useState();
@@ -20,6 +21,12 @@ const SearchBarComponent = React.memo(React.forwardRef((props, ref) => {
           value={searchValue}
           label={'Search'}
           id="title"
+          keyHandler={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              props.onSearch(searchValue);
+            }
+          }}
           valueChangeHandler={(e) => {
             setSearchValue(e.target.value);
             if (props.valueChangeHandler) {

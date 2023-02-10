@@ -238,8 +238,8 @@ const SignIn = (props) => {
                       success={usernameState === 'success'}
                       error={usernameState === 'error'}
                       onKeyUp={(e) => {
-                        if (event.key === "Enter") {
-                          event.preventDefault();
+                        if (e.key === "Enter") {
+                          e.preventDefault();
                           fireLogin();
                         }
                       }}
@@ -265,8 +265,8 @@ const SignIn = (props) => {
                   success={passwordState === 'success'}
                   error={passwordState === 'error'}
                   onKeyUp={(e) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
+                    if (e.key === "Enter") {
+                      e.preventDefault();
                       fireLogin();
                     }
                   }}

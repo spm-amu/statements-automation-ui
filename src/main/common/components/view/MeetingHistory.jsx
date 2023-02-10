@@ -137,7 +137,6 @@ const MeetingHistory = (props) => {
                     criteriaParams={criteriaParams}
                     dataUrl={`${host}/api/v1/meeting/fetchMeetingHistory`}
                     actionHandler={(e) => {
-
                       if(e.id === 'downloadRecording') {
                         onDownload(e.data.id);
                       }
