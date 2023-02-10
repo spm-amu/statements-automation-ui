@@ -136,16 +136,7 @@ class SocketManager {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream,
-      config: {
-        iceServers: [
-          {urls: 'stun:stun.l.google.com:19302'},
-          {urls: 'stun:stun1.l.google.com:19302'},
-          {urls: 'stun:stun2.l.google.com:19302'},
-          {urls: 'stun:stun3.l.google.com:19302'},
-          {urls: 'stun:stun4.l.google.com:19302'}
-        ]
-      }
+      stream
     });
 
     peer.on('signal', (signal) => {
@@ -173,16 +164,7 @@ class SocketManager {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream,
-      config: {
-        iceServers: [
-          {urls: 'stun:stun.l.google.com:19302'},
-          {urls: 'stun:stun1.l.google.com:19302'},
-          {urls: 'stun:stun2.l.google.com:19302'},
-          {urls: 'stun:stun3.l.google.com:19302'},
-          {urls: 'stun:stun4.l.google.com:19302'}
-        ]
-      }
+      stream
     });
 
     peer.on("signal", (signal) => {
@@ -205,7 +187,12 @@ class SocketManager {
       trickle: false,
       stream,
       config: {
-        iceServers: []
+        iceServers: [
+          {urls: 'stun:stun.l.google.com:19302'},
+          {urls: 'stun:stun1.l.google.com:19302'},
+          {urls: 'stun:stun2.l.google.com:19302'},
+          {urls: 'stun:stun3.l.google.com:19302'},
+          {urls: 'stun:stun4.l.google.com:19302'}]
       }
     });
 

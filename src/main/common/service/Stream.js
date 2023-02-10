@@ -18,7 +18,7 @@ export class Stream {
         console.log("\n\n\n\n\n\nSTREAM STARTED");
 
         if(!video) {
-          stream.getVideoTracks()[0].enabled = false;
+          //stream.getVideoTracks()[0].enabled = false;
           //stream.getVideoTracks()[0].stop();
         }
 
