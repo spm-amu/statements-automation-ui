@@ -24,7 +24,7 @@ const Footer = (props) => {
       <div className={'row'}>
         {
           displayState === 'MAXIMIZED' &&
-          <div  className={'time'}>
+          <div  className={'col time'}>
             <h3
               style={{
                 position: 'absolute',
@@ -54,12 +54,7 @@ const Footer = (props) => {
           />
         </div>
         {
-          displayState === 'MAXIMIZED' &&
-          <div className={'time'}>
-          </div>
-        }
-        {
-          /*<div className={'col video'} style={displayState === 'MAXIMIZED' ? null : {display: 'none'}}>
+          <div className={'col video'} style={displayState === 'MAXIMIZED' ? null : {display: 'none'}}>
             <div
               style={{display: 'flex', justifyContent: 'flex-end'}}
             >
@@ -79,7 +74,7 @@ const Footer = (props) => {
                 />
               </section>
             </div>
-          </div>*/
+          </div>
         }
       </div>
     </div>
