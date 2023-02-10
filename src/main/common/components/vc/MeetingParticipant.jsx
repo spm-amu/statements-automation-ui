@@ -4,17 +4,20 @@ import './MeetingParticipant.css'
 import Utils from '../../Utils';
 
 const MeetingParticipant = forwardRef((props, ref) => {
-  const videoRef = ref ? ref : useRef();
+  const videoRef = useRef();
   const showVideo = true;
 
   useEffect(() => {
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
     }
-
-    console.log("\n\n\n\nRENDERING PARTICIPANT : ", props.data);
-    console.log(ref);
   }, []);
+
+  useEffect(() => {
+    if (props.refChangeHandler) {
+      props.refChangeHandler(videoRef);
+    }
+  }, [videoRef.current]);
 
   return (
     <div className={'col-*-* meeting-participant-container'}
