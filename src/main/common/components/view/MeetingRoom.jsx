@@ -438,47 +438,37 @@ const MeetingRoom = (props) => {
   const createParticipants = (users, socket) => {
     socketManager.clearUserToPeerMap();
 
-    if (isHost && users.length > 0) {
-      // If this condition is true, then the host is re-joining the session
-      // TODO : Implement host re-join
-    } else {
-      let userPeerMap = [];
-      users.forEach((user) => {
-        userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream.obj, MessageType.ALL_USERS, audioMuted, videoMuted))
-      });
+    let userPeerMap = [];
+    users.forEach((user) => {
+      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream.obj, MessageType.ALL_USERS, audioMuted, videoMuted))
+    });
 
-      let participants = [];
-      for (const mapItem of userPeerMap) {
-        let user = {
-          userId: mapItem.user.userAlias,
-          peer: mapItem.peer,
-          name: mapItem.user.name,
-          avatar: mapItem.user.avatar,
-          audioMuted: mapItem.user.audioMuted,
-          videoMuted: mapItem.user.videoMuted
-        };
+    let participants = [];
+    for (const mapItem of userPeerMap) {
+      let user = {
+        userId: mapItem.user.userAlias,
+        peer: mapItem.peer,
+        name: mapItem.user.name,
+        avatar: mapItem.user.avatar,
+        audioMuted: mapItem.user.audioMuted,
+        videoMuted: mapItem.user.videoMuted
+      };
 
-        mapItem.peer.on('stream', (stream) => {
-          user.stream = stream;
-          participants.push(user);
+      mapItem.peer.on('stream', (stream) => {
+        user.stream = stream;
+        participants.push(user);
 
-          if (participants.length === userPeerMap.length) {
-            if (!isHost) {
-              setParticipants(participants);
-              setAllUserParticipantsLeft(false);
-
-              if (userPeerMap.length > 0) {
-                if (step === Steps.LOBBY) {
-                  setStep(Steps.SESSION);
-                  props.windowHandler.show();
-                }
-              }
-            } else {
-              setLobbyWaitingList(participants);
+        if (participants.length === userPeerMap.length) {
+          setParticipants(participants);
+          setAllUserParticipantsLeft(false);
+          if (userPeerMap.length > 0) {
+            if (step === Steps.LOBBY) {
+              setStep(Steps.SESSION);
+              props.windowHandler.show();
             }
           }
-        });
-      }
+        }
+      });
     }
   };
 
