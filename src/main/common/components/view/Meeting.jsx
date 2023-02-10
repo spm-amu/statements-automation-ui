@@ -557,6 +557,9 @@ const Meeting = (props) => {
             margin: '16px 0',
           }}
         >
+          <Button variant={'text'} size="large" onClick={(e) => handleClose(e)}>
+            CLOSE
+          </Button>
           <div style={{marginRight: '4px'}}>
             <Button
               onClick={(e) => handleAdd()}
@@ -567,9 +570,6 @@ const Meeting = (props) => {
               SEND
             </Button>
           </div>
-          <Button variant={'text'} size="large" onClick={(e) => handleClose(e)}>
-            CLOSE
-          </Button>
         </div>
       );
     }
@@ -607,20 +607,6 @@ const Meeting = (props) => {
         }}
       >
         {
-          edited ? (
-            <div style={{marginRight: '4px'}}>
-              <Button
-                variant={'contained'}
-                size="large"
-                color={'primary'}
-                onClick={(e) => handleUpdate(e)}
-              >
-                SEND UPDATE
-              </Button>
-            </div>
-          ) : null
-        }
-        {
           !lapsed &&
           <div style={{marginRight: '4px'}}>
             <Button
@@ -635,6 +621,20 @@ const Meeting = (props) => {
         <Button variant={'text'} size="large" onClick={(e) => handleClose(e)}>
           CLOSE
         </Button>
+        {
+          edited ? (
+            <div style={{marginRight: '4px'}}>
+              <Button
+                variant={'contained'}
+                size="large"
+                color={'primary'}
+                onClick={(e) => handleUpdate(e)}
+              >
+                SEND UPDATE
+              </Button>
+            </div>
+          ) : null
+        }
       </div>
     );
   };
