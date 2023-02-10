@@ -14,7 +14,7 @@ const MeetingRoomSummary = (props) => {
 
   return (
     participants && participantsRaisedHands &&
-    <div style={{height: '160px', maxHeight: '160px', width: '100%', overflow: 'auto'}}>
+    <div style={{height: '100%', maxHeight: '100%', width: '100%', overflow: 'auto'}}>
       <div>
         {participants.map((participant, index) => {
           return <InCallCard key={index} participant={participant} maxWidth={'700px'} borderBottom={'none'}

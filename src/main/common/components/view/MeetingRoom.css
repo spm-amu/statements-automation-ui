@@ -17,6 +17,7 @@
 
 .workspace-min {
   overflow: hidden;
+  height: calc(100% - 72px);
 }
 
 .call {

@@ -802,7 +802,7 @@ const MeetingRoom = (props) => {
         maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
         overflow: displayState === 'MAXIMIZED' ? null : 'hidden',
       }}>
-        <div className={'col'} style={{paddingLeft: '0', paddingRight: '0', maxHeight: '100%'}}>
+        <div className={'col'} style={{paddingLeft: '0', paddingRight: '0', maxHeight: '100%', height: displayState === 'MAXIMIZED' ? null : '100%'}}>
           <div style={{height: '100%'}}>
             <div className={displayState === 'MAXIMIZED' ? 'workspace-max' : 'workspace-min'}>
               {

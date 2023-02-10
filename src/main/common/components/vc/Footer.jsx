@@ -53,8 +53,11 @@ const Footer = (props) => {
                    autoPermit={autoPermit}
           />
         </div>
-        <div  className={'time'}>
-        </div>
+        {
+          displayState === 'MAXIMIZED' &&
+          <div className={'time'}>
+          </div>
+        }
         {
           /*<div className={'col video'} style={displayState === 'MAXIMIZED' ? null : {display: 'none'}}>
             <div
