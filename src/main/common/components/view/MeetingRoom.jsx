@@ -183,6 +183,17 @@ const MeetingRoom = (props) => {
   };
 
   const updateWhiteboardEvents = (e) => {
+    if (whiteboardItems.length === 0) {
+      let userId = atob(e.metadata.id.split("-")[0]);
+      let participant = participants.find((p) => p.userId === userId);
+
+      if(participant) {
+       handleMessageArrived({
+         message: participant.name + " has started a whiteboard"
+       });
+      }
+    }
+
     let find = whiteboardItems.find((i) => i.id === e.metadata.id);
     if (find) {
       const properties = Object.getOwnPropertyNames(e.metadata);
@@ -439,6 +450,9 @@ const MeetingRoom = (props) => {
     });
 
     userToPeerItem.peer.signal(payload.signal);
+    handleMessageArrived({
+      message: userToPeerItem.user.name + " has joined"
+    })
   };
 
   const createParticipants = (users, socket) => {
@@ -618,7 +632,7 @@ const MeetingRoom = (props) => {
     recorder.onstop = handleStop;
 
     setMediaRecorder(recorder);
-  }
+  };
 
   useEffect(() => {
     setIsHost(props.isHost);
@@ -780,11 +794,11 @@ const MeetingRoom = (props) => {
 
   const handleMessageArrived = (event) => {
     if (event.message && event.message.length > 0) {
-      setSuccessMessage(event.message);
+      setActivityMessage(event.message);
       const messageTimeout = setTimeout(() => {
         setActivityMessage(null);
         clearTimeout(messageTimeout);
-      }, 2000)
+      }, 4000)
     }
   };
 
