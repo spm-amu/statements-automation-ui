@@ -21,6 +21,8 @@ import SelectScreenShareDialog from '../SelectScreenShareDialog';
 import {osName} from "react-device-detect";
 import {Stream} from "../../service/Stream";
 import WhiteBoard from "../whiteboard/WhiteBoard";
+import Alert from "react-bootstrap/Alert";
+import Icon from "../Icon";
 
 const {electron} = window;
 
@@ -91,9 +93,10 @@ const MeetingRoom = (props) => {
   const [whiteboardItems, setWhiteboardItems] = useState([]);
   const [eventHandler] = useState({});
   const [userVideo, setUserVideo] = useState(null);
-
+  const [activityMessage, setActivityMessage] = useState(null);
+  const [chatMessage, setChatMessage] = useState(null);
+  const [chatSender, setChatSender] = useState(null);
   const recordedChunks = [];
-
   const shareScreenSource = useRef();
   const tmpVideoTrack = useRef();
 
@@ -151,6 +154,9 @@ const MeetingRoom = (props) => {
             break;
           case MessageType.CHANGE_HOST:
             onChangeHost(be);
+            break;
+          case MessageType.CHAT_MESSAGE:
+            handleChatMessage(be.payload);
             break;
         }
       }
@@ -539,7 +545,8 @@ const MeetingRoom = (props) => {
     if (currentUserStream.obj) {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
-        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD, MessageType.CHANGE_HOST);
+        MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD,
+        MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE);
 
       if (isHost || isDirectCall) {
         join();
@@ -730,7 +737,8 @@ const MeetingRoom = (props) => {
       meetingId: selectedMeeting.id,
       userId: userDetails.userId,
       audioMuted: audioMuted,
-      videoMuted: screenShared ? false : videoMuted
+      videoMuted: screenShared ? false : videoMuted,
+      screenShared: screenShared
     });
   }
 
@@ -770,6 +778,29 @@ const MeetingRoom = (props) => {
     }
   }, [videoMuted]);
 
+  const handleMessageArrived = (event) => {
+    if (event.message && event.message.length > 0) {
+      setSuccessMessage(event.message);
+      const messageTimeout = setTimeout(() => {
+        setActivityMessage(null);
+        clearTimeout(messageTimeout);
+      }, 2000)
+    }
+  };
+
+  const handleChatMessage = (payload) => {
+    setChatSender(payload.chatMessage.participant.label);
+    setChatMessage(payload.chatMessage.content);
+
+    if (payload.meetingId === selectedMeeting.id) {
+      const messageTimeout = setTimeout(() => {
+        setChatMessage(null);
+        setChatSender(null);
+        clearTimeout(messageTimeout);
+      }, 4000);
+    }
+  };
+
   function toggleAudio() {
     if (currentUserStream.obj && currentUserStream.getAudioTracks() && currentUserStream.getAudioTracks().length > 0) {
       let audioTrack = currentUserStream.getAudioTracks()[0];
@@ -784,7 +815,7 @@ const MeetingRoom = (props) => {
       videoMuted,
       audioMuted
     });
-  }
+  };
 
   return (
     <Fragment>
@@ -1004,6 +1035,44 @@ const MeetingRoom = (props) => {
             selectSourceHandler={(selectedSource) => selectSourceHandler(selectedSource)}
           />
         }
+      </div>
+      <div style={{
+        padding: '0 32px 0 32px',
+        maxHeight: '64px',
+        bottom: '72px',
+        right: '16px',
+        minWidth: '320px',
+        zIndex: '1200',
+        position: 'absolute'
+      }}>
+        <Alert
+          variant={'info'}
+          show={activityMessage !== null}
+          fade={true}
+        >
+          <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{activityMessage}</p>
+        </Alert>
+        <Alert
+          variant={'info'}
+          show={chatMessage !== null}
+          fade={true}
+        >
+          <div className={'row'} style={{borderBottom: '1px solid white', paddingBottom: '8px'}}>
+            <div className={'col'}>
+              <div className={'row'}>
+                <div>
+                  <Icon id={'CHAT_BUBBLE'}/>
+                </div>
+                <div className={'col'}>
+                  <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{chatSender}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={'row'} style={{marginTop: '8px'}}>
+            <div className={'col'}><p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{chatMessage}</p></div>
+          </div>
+        </Alert>
       </div>
     </Fragment>
   );
