@@ -112,6 +112,7 @@ const MeetingParticipantGrid = (props) => {
                                       props.userVideoChangeHandler(ref);
                                     } : null
                                   }
+                                  screenShared={props.screenShared}
                                   showName={!participant.isCurrentUser} videoMuted={participant.videoMuted}
                                   audioMuted={participant.audioMuted}/>
             </Grid>
