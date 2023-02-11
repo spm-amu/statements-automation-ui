@@ -7,6 +7,7 @@ import SendIcon from '@material-ui/icons/Send';
 import { Autorenew, Note, PersonAdd, Settings } from '@material-ui/icons';
 import Tooltip from '@material-ui/core/Tooltip';
 import { useNavigate } from 'react-router-dom';
+import appManager from "../../service/AppManager";
 
 const InCall = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -66,15 +67,18 @@ const InCall = (props) => {
             textAlign: 'right'
           }}>
             <div>
-              <IconButton
-                onClick={privateChatHandler}
-                size="small"
-                sx={{ml: 2}}
-              >
-                <Icon id={'CHAT_BUBBLE'} fontSize={'small'}/>
-              </IconButton>
               {
-                raisedHands &&
+                appManager.getUserDetails().userId !== participant.userId &&
+                <IconButton
+                  onClick={privateChatHandler}
+                  size="small"
+                  sx={{ml: 2}}
+                >
+                  <Icon id={'CHAT_BUBBLE'} fontSize={'small'}/>
+                </IconButton>
+              }
+              {
+                appManager.getUserDetails().userId !== participant.userId && raisedHands &&
                 <IconButton
                   onClick={() => {
                   }}
@@ -87,7 +91,7 @@ const InCall = (props) => {
               }
 
               {
-                props.isHost &&
+                props.isHost && appManager.getUserDetails().userId !== participant.userId &&
                 <Tooltip title="More Actions">
                   <IconButton
                     onClick={handleClick}

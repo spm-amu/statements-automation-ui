@@ -4,7 +4,6 @@ import Icon from "./Icon";
 import IconButton from "@material-ui/core/IconButton";
 import socketManager from "../../common/service/SocketManager";
 import {MessageType} from "../types";
-import {useNavigate} from 'react-router-dom';
 import appManager from "../service/AppManager";
 
 const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
