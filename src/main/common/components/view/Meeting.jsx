@@ -141,7 +141,7 @@ const Meeting = (props) => {
       }
 
       setValue(getInitialValue(props.selectedEvent));
-      setLapsed(props.selectedEvent.endDate < new Date());
+      setLapsed(props.selectedEvent.endDate < new Date() && props.selectedEvent.status !== 'SESSION_IN_PROGRESS');
     } else {
       setValue({
         startDate:

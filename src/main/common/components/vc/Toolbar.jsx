@@ -21,6 +21,7 @@ const Toolbar = (props) => {
     participants,
     hasUnreadChats,
     hasUnseenWhiteboardEvent,
+    whiteBoardShown,
     displayState,
     eventHandler,
     handRaised,
@@ -172,7 +173,7 @@ const Toolbar = (props) => {
         </IconButton>
         {" "}
         {
-          step === 'SESSION' && displayState === 'MAXIMIZED' &&
+          step === 'SESSION' && displayState === 'MAXIMIZED' && !whiteBoardShown &&
           <IconButton
             onClick={() => {
               if (screenShared) {
@@ -329,14 +330,17 @@ const Toolbar = (props) => {
             autoPermit ? 'Do not auto permit' : 'Auto permit'
           }
         </MenuItem>
-        <MenuItem
-          onClick={showWhiteboard}
-        >
-          <ListItemIcon>
-            <Note fontSize="small"/>
-          </ListItemIcon>
-          Whiteboard
-        </MenuItem>
+        {
+          !screenShared &&
+          <MenuItem
+            onClick={showWhiteboard}
+          >
+            <ListItemIcon>
+              <Note fontSize="small"/>
+            </ListItemIcon>
+            Whiteboard
+          </MenuItem>
+        }
       </Menu>
     </div>
   );

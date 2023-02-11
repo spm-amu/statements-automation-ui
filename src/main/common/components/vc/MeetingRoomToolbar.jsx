@@ -75,7 +75,17 @@ const MeetingRoomToolbar = (props) => {
       socketManager.emitEvent(MessageType.END_MEETING, {
         meetingId: selectedMeeting.id,
         userId: appManager.getUserDetails().userId
-      })
+      });
+
+      get(
+        `${host}/api/v1/meeting/end/${selectedMeeting.id}`,
+        (response) => {
+        },
+        (e) => {
+        },
+        '',
+        true
+      );
     }
   };
 

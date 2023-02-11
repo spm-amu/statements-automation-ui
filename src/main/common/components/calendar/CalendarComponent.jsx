@@ -180,6 +180,7 @@ const CalendarComponent = (props) => {
         title: clickedEvent.title,
         locations: clickedEvent.extendedProps.locations,
         description: clickedEvent.extendedProps.description,
+        status: clickedEvent.extendedProps.status,
         attendees: clickedEvent.extendedProps.attendees,
         privacyType: clickedEvent.extendedProps.privacyType,
         documents: clickedEvent.extendedProps.documents,

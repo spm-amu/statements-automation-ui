@@ -46,11 +46,12 @@ const Activity = (props) => {
   }, []);
 
   return (
-    <div className="activity row" style={{marginLeft: '0px', marginRight: '0px'}}>
+    <div className="activity row" style={{marginLeft: '0px', marginRight: '0px', height: '100%'}}>
       <div className={'col'} style={{
         borderRight: "1px solid #e1e1e1",
         paddingRight: '8px',
-        paddingLeft: '8px'
+        paddingLeft: '8px',
+        height: '100%'
       }}>
         <ActivityList selectionHandler={(selected) => {
           setSelectedChat(null);

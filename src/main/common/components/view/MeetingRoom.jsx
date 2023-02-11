@@ -253,6 +253,16 @@ const MeetingRoom = (props) => {
         //onCallEnded();
         //props.closeHandler();
         setAllUserParticipantsLeft(true);
+
+        get(
+          `${host}/api/v1/meeting/end/${selectedMeeting.id}`,
+          (response) => {
+          },
+          (e) => {
+          },
+          '',
+          true
+        );
       }
     }
   };
@@ -954,6 +964,7 @@ const MeetingRoom = (props) => {
                       isRecording={isRecording}
                       displayState={displayState}
                       screenShared={screenShared}
+                      whiteBoardShown={showWhiteBoard}
                       isHost={isHost}
                       step={step}
                       autoPermit={autoPermit}

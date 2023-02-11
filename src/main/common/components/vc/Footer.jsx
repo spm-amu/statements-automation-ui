@@ -15,6 +15,7 @@ const Footer = (props) => {
     userStream,
     userVideo,
     handRaised,
+    whiteBoardShown,
     step,
     isHost,
     autoPermit
@@ -48,6 +49,7 @@ const Footer = (props) => {
                    hasUnseenWhiteboardEvent={hasUnseenWhiteboardEvent}
                    participants={participants}
                    handRaised={handRaised}
+                   whiteBoardShown={whiteBoardShown}
                    userVideo={userVideo}
                    userStream={userStream}
                    videoMuted={videoMuted}

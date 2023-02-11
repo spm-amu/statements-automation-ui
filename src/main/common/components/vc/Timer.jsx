@@ -6,7 +6,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
-const MINUTE = 60000;
+const MINUTE = 1000;
 const Timer = (props) => {
 
   const {

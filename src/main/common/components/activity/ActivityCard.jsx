@@ -74,7 +74,6 @@ const ActivityCardComponent = React.memo(React.forwardRef((props, ref) => {
           <div className={'time'} style={{fontSize: '16px'}}>
             <div
               style={{
-                position: 'absolute',
                 fontSize: 'auto',
                 marginBottom: '0'
               }}
