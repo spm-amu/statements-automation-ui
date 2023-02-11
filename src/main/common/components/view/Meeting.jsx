@@ -141,7 +141,7 @@ const Meeting = (props) => {
       }
 
       setValue(getInitialValue(props.selectedEvent));
-      setLapsed(props.selectedEvent.startDate < new Date());
+      setLapsed(props.selectedEvent.endDate < new Date());
     } else {
       setValue({
         startDate:
