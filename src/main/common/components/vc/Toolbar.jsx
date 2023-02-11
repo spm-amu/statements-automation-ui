@@ -3,10 +3,9 @@ import React, {useEffect, useState} from "react";
 import './Toolbar.css';
 import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
-import Utils from "../../Utils";
 import Tooltip from '@material-ui/core/Tooltip';
-import { ListItemIcon, Menu, MenuItem } from '@material-ui/core';
-import { Note, PersonAdd, Settings } from '@material-ui/icons';
+import {ListItemIcon, Menu, MenuItem} from '@material-ui/core';
+import {Note, PersonAdd} from '@material-ui/icons';
 import LottieIcon from '../LottieIcon';
 
 const Toolbar = (props) => {
@@ -19,6 +18,9 @@ const Toolbar = (props) => {
   const [screenShared, setScreenShared] = useState(false);
 
   const {
+    participants,
+    hasUnreadChats,
+    hasUnseenWhiteboardEvent,
     displayState,
     eventHandler,
     handRaised,
@@ -111,7 +113,7 @@ const Toolbar = (props) => {
     eventHandler.toggleAutoPermit()
   };
 
-	return (
+  return (
     <div className={'footer-toolbar'}>
       <div className={'row centered-flex-box'}>
 
@@ -136,7 +138,7 @@ const Toolbar = (props) => {
         {!screenShared && (
           <IconButton
             onClick={() => {
-                muteVideo();
+              muteVideo();
             }}
             style={{
               backgroundColor: videoMuted ? "#eb3f21" : "#404239",
@@ -154,7 +156,7 @@ const Toolbar = (props) => {
 
         <IconButton
           onClick={() => {
-              muteAudio();
+            muteAudio();
           }}
           style={{
             backgroundColor: audioMuted ? "#eb3f21" : "#404239",
@@ -194,17 +196,22 @@ const Toolbar = (props) => {
         }
         {
           step === 'SESSION' && displayState === 'MAXIMIZED' &&
-          <IconButton
-            style={{
-              backgroundColor: '#404239',
-              color: 'white',
-              marginRight: '4px'
-            }}
-            onClick={(e) => showChat()}
-          >
-            <Icon id={'CHAT_BUBBLE'}/>
-          </IconButton>
-
+          <div>
+            {
+              hasUnreadChats &&
+              <div className={'unread-dot'}/>
+            }
+            <IconButton
+              style={{
+                backgroundColor: '#404239',
+                color: 'white',
+                marginRight: '4px'
+              }}
+              onClick={(e) => showChat()}
+            >
+              <Icon id={'CHAT_BUBBLE'}/>
+            </IconButton>
+          </div>
         }
         <IconButton
           onClick={endCall}
@@ -218,21 +225,27 @@ const Toolbar = (props) => {
         </IconButton>
         {
           step === 'SESSION' && displayState === 'MAXIMIZED' &&
-          <IconButton
-            onClick={(e) => showPeople()}
-            style={{
-              backgroundColor: '#404239',
-              color: 'white',
-              marginRight: '4px'
-            }}
-          >
-            <Icon id={'PEOPLE'}/>
-          </IconButton>
+          <div>
+            {
+              participants.length > 1 &&
+              <div className={'people-count-bubble'}>{participants.length}</div>
+            }
+            <IconButton
+              onClick={(e) => showPeople()}
+              style={{
+                backgroundColor: '#404239',
+                color: 'white',
+                marginRight: '4px'
+              }}
+            >
+              <Icon id={'PEOPLE'}/>
+            </IconButton>
+          </div>
         }
 
         <IconButton
           onClick={(e) => {
-            if(handRaised) {
+            if (handRaised) {
               lowerHand();
             } else {
               raiseHand();
@@ -246,22 +259,28 @@ const Toolbar = (props) => {
         >
           <Icon id={'PAN_TOOL'}/>
         </IconButton>
-        <Tooltip title="More Actions">
-          <IconButton
-            onClick={handleClick}
-            sx={{ ml: 2 }}
-            aria-controls={openMoreActions ? 'account-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={openMoreActions ? 'true' : undefined}
-            style={{
-              backgroundColor: '#404239',
-              color: 'white',
-              marginRight: '4px'
-            }}
-          >
-            <Icon id={'MORE'}/>
-          </IconButton>
-        </Tooltip>
+        <div>
+          {
+            hasUnseenWhiteboardEvent &&
+            <div className={'unread-dot'}/>
+          }
+          <Tooltip title="More Actions">
+            <IconButton
+              onClick={handleClick}
+              sx={{ml: 2}}
+              aria-controls={openMoreActions ? 'account-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={openMoreActions ? 'true' : undefined}
+              style={{
+                backgroundColor: '#404239',
+                color: 'white',
+                marginRight: '4px'
+              }}
+            >
+              <Icon id={'MORE'}/>
+            </IconButton>
+          </Tooltip>
+        </div>
       </div>
 
       <Menu
@@ -299,12 +318,12 @@ const Toolbar = (props) => {
             },
           },
         }}
-        transformOrigin={{ horizontal: 20, vertical: 136 }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+        transformOrigin={{horizontal: 20, vertical: 136}}
+        anchorOrigin={{horizontal: 'right', vertical: 'top'}}
       >
         <MenuItem disabled={!isHost} onClick={toggleAutoPermit}>
           <ListItemIcon>
-            <PersonAdd fontSize="small" />
+            <PersonAdd fontSize="small"/>
           </ListItemIcon>
           {
             autoPermit ? 'Do not auto permit' : 'Auto permit'
@@ -314,7 +333,7 @@ const Toolbar = (props) => {
           onClick={showWhiteboard}
         >
           <ListItemIcon>
-            <Note fontSize="small" />
+            <Note fontSize="small"/>
           </ListItemIcon>
           Whiteboard
         </MenuItem>

@@ -96,6 +96,8 @@ const MeetingRoom = (props) => {
   const [activityMessage, setActivityMessage] = useState(null);
   const [chatMessage, setChatMessage] = useState(null);
   const [chatSender, setChatSender] = useState(null);
+  const [hasUnreadChats, setHasUnreadChats] = useState(null);
+  const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
   const recordedChunks = [];
   const shareScreenSource = useRef();
   const tmpVideoTrack = useRef();
@@ -187,10 +189,10 @@ const MeetingRoom = (props) => {
       let userId = atob(e.metadata.id.split("-")[0]);
       let participant = participants.find((p) => p.userId === userId);
 
-      if(participant) {
-       handleMessageArrived({
-         message: participant.name + " has started a whiteboard"
-       });
+      if (participant) {
+        handleMessageArrived({
+          message: participant.name + " has started a whiteboard"
+        });
       }
     }
 
@@ -202,6 +204,10 @@ const MeetingRoom = (props) => {
       }
     } else {
       whiteboardItems.push(e.metadata);
+    }
+
+    if (!showWhiteBoard) {
+      setHasUnseenWhiteboardEvent(true);
     }
   };
 
@@ -803,15 +809,19 @@ const MeetingRoom = (props) => {
   };
 
   const handleChatMessage = (payload) => {
-    setChatSender(payload.chatMessage.participant.label);
-    setChatMessage(payload.chatMessage.content);
+    if (!sideBarOpen && sideBarTab !== 'Chat') {
+      setChatSender(payload.chatMessage.participant.label);
+      setChatMessage(payload.chatMessage.content);
 
-    if (payload.meetingId === selectedMeeting.id) {
-      const messageTimeout = setTimeout(() => {
-        setChatMessage(null);
-        setChatSender(null);
-        clearTimeout(messageTimeout);
-      }, 4000);
+      if (payload.meetingId === selectedMeeting.id) {
+        const messageTimeout = setTimeout(() => {
+          setChatMessage(null);
+          setChatSender(null);
+          clearTimeout(messageTimeout);
+        }, 4000);
+      }
+
+      setHasUnreadChats(true);
     }
   };
 
@@ -935,6 +945,9 @@ const MeetingRoom = (props) => {
             {
               currentUserStream &&
               <Footer audioMuted={audioMuted}
+                      hasUnreadChats={hasUnreadChats}
+                      hasUnseenWhiteboardEvent={hasUnseenWhiteboardEvent}
+                      participants={participants}
                       videoMuted={videoMuted}
                       userStream={currentUserStream.obj}
                       handRaised={handRaised}
@@ -996,10 +1009,13 @@ const MeetingRoom = (props) => {
                               setMeetingParticipantGridMode('DEFAULT');
                               setShowWhiteBoard(false);
                             }
+
+                            setHasUnseenWhiteboardEvent(false);
                           },
                           showChat: () => {
                             setSideBarTab('Chat');
                             setSideBarOpen(true);
+                            setHasUnreadChats(false);
                           },
                           raiseHand: () => {
                             raiseHand();
@@ -1020,7 +1036,10 @@ const MeetingRoom = (props) => {
           sideBarOpen && sideBarTab && displayState === 'MAXIMIZED' &&
           <div className={'closable-panel-container'}>
             <ClosablePanel
-              closeHandler={(e) => setSideBarOpen(false)}
+              closeHandler={(e) => {
+                setSideBarOpen(false);
+                setSideBarTab(null);
+              }}
               title={sideBarTab}
             >
               <MeetingRoomSideBarContent

@@ -6,10 +6,12 @@ import appManager from "../../../common/service/AppManager";
 
 const Footer = (props) => {
   const {
+    participants,
+    hasUnreadChats,
+    hasUnseenWhiteboardEvent,
     displayState,
     videoMuted,
     audioMuted,
-    screenShared,
     userStream,
     userVideo,
     handRaised,
@@ -42,6 +44,9 @@ const Footer = (props) => {
         }
         <div className={'col toolbar-container'}>
           <Toolbar eventHandler={props.toolbarEventHandler}
+                   hasUnreadChats={hasUnreadChats}
+                   hasUnseenWhiteboardEvent={hasUnseenWhiteboardEvent}
+                   participants={participants}
                    handRaised={handRaised}
                    userVideo={userVideo}
                    userStream={userStream}
