@@ -652,7 +652,6 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     setIsHost(props.isHost);
-    fetchChats();
 
     if (!isDirectCall) {
       persistMeetingSettings();
@@ -1024,6 +1023,7 @@ const MeetingRoom = (props) => {
                             setHasUnseenWhiteboardEvent(false);
                           },
                           showChat: () => {
+                            fetchChats();
                             setSideBarTab('Chat');
                             setSideBarOpen(true);
                             setHasUnreadChats(false);

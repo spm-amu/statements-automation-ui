@@ -14,7 +14,7 @@ const NotificationListener = (props) => {
       on: (eventType, be) => {
         switch (eventType) {
           case MessageType.SYSTEM_ACTIVITY:
-            setCount(count++);
+            setCount(count + 1);
             break;
         }
       }

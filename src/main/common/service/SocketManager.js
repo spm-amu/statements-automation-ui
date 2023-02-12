@@ -39,9 +39,9 @@ class SocketManager {
   };
 
   init = () => {
-    //let socket = io.connect('https://svn.agilemotion.co.za');
+    let socket = io.connect('https://svn.agilemotion.co.za');
     // let socket = io.connect('http://DEVHOVC03:8000');
-    let socket = io.connect('http://localhost:8000');
+    // let socket = io.connect('http://localhost:8000');
     // let socket = io.connect('http://100.72.124.104:8000');
     let userDetails = appManager.getUserDetails();
 

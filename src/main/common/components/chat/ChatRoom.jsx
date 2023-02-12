@@ -137,10 +137,8 @@ const ChatRoom = (props) => {
   };
 
   const onMessage = (payload) => {
-    console.log('____ ON MESSAGE: ', payload);
     if (selectedChat && selectedChat.id === payload.roomId) {
       if (props.onMessage) {
-        console.log('____ onMessage: ');
         props.onMessage(payload.chatMessage, selectedChat);
 
         if (payload.chatMessage.type === 'EVENT') {
@@ -148,7 +146,6 @@ const ChatRoom = (props) => {
         }
       } else {
         selectedChat.messages.push(payload.chatMessage);
-        console.log('_____ MSGES else: ', selectedChat.messages);
       }
 
       loadMessages();
