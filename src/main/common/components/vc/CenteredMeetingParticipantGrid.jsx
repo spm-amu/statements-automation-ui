@@ -25,7 +25,8 @@ const MeetingParticipantGrid = (props) => {
     step,
     videoMuted,
     audioMuted,
-    meetingTitle
+    meetingTitle,
+    userVideoRef
   } = props;
 
   useEffect(() => {
@@ -107,11 +108,7 @@ const MeetingParticipantGrid = (props) => {
             }
             >
               <MeetingParticipant data={participant}
-                                  refChangeHandler={
-                                    participant.isCurrentUser ? (ref) => {
-                                      props.userVideoChangeHandler(ref);
-                                    } : null
-                                  }
+                                  ref={participant.isCurrentUser ? userVideoRef : null}
                                   screenShared={props.screenShared}
                                   showName={!participant.isCurrentUser} videoMuted={participant.videoMuted}
                                   audioMuted={participant.audioMuted}/>
@@ -149,11 +146,7 @@ const MeetingParticipantGrid = (props) => {
                         marginRight: '8px'
                       }}>
             <MeetingParticipant data={participant}
-                                refChangeHandler={
-                                  participant.isCurrentUser ? (ref) => {
-                                    props.userVideoChangeHandler(ref);
-                                  } : null
-                                }
+                                ref={participant.isCurrentUser ? userVideoRef : null}
                                 showName={!participant.isCurrentUser}
                                 videoMuted={participant.videoMuted}
                                 audioMuted={participant.audioMuted} sizing={'sm'}/>
