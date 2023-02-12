@@ -24,6 +24,7 @@ export default function CustomInput(props) {
     inputRootCustomClasses,
     success,
     helperText,
+    disabled
   } = props;
 
   const labelClasses = classNames({
@@ -85,6 +86,7 @@ export default function CustomInput(props) {
         id={id}
         {...inputProps}
         inputProps={newInputProps}
+        disabled={disabled}
       />
       {helperText !== undefined ? (
         <FormHelperText id={`${id}-text`} className={helpTextClasses}>

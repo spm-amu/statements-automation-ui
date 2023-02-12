@@ -3,7 +3,7 @@ import {Avatar, IconButton} from '@material-ui/core';
 import SendIcon from '@material-ui/icons/Send';
 import CallIcon from '@material-ui/icons/Call';
 import Tooltip from '@material-ui/core/Tooltip';
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import './ChatRooms.scss';
 import moment from 'moment';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -16,12 +16,10 @@ import socketManager from '../../service/SocketManager';
 import {MessageType} from '../../types';
 import uuid from 'react-uuid';
 import appManager from "../../../common/service/AppManager";
-import Files from '../customInput/Files';
-import { CheckCircle, GroupAdd, Info, Poll } from '@material-ui/icons';
-import ChatForm from './ChatForm';
+import {GroupAdd, Info, Poll} from '@material-ui/icons';
 import AutoComplete from '../customInput/AutoComplete';
-import { host, post } from '../../service/RestService';
-import { Form } from 'reactstrap';
+import {host, post} from '../../service/RestService';
+import {Form} from 'reactstrap';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
@@ -31,6 +29,7 @@ import Radio from '@material-ui/core/Radio';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import PollResult from './PollResult';
+import Files from "../customInput/Files";
 
 const ChatRoom = (props) => {
   const navigate = useNavigate();
@@ -83,20 +82,20 @@ const ChatRoom = (props) => {
     const currentTime = new Date().getTime();
 
     const difference_ms = expirationTime - currentTime;
-    const seconds = Math.floor( (difference_ms/1000) % 60 );
-    const minutes = Math.floor( (difference_ms/1000/60) % 60 );
-    const hours = Math.floor( (difference_ms/(1000*60*60)) % 24 );
-    const days = Math.floor( difference_ms/(1000*60*60*24) );
+    const seconds = Math.floor((difference_ms / 1000) % 60);
+    const minutes = Math.floor((difference_ms / 1000 / 60) % 60);
+    const hours = Math.floor((difference_ms / (1000 * 60 * 60)) % 24);
+    const days = Math.floor(difference_ms / (1000 * 60 * 60 * 24));
 
     let timeRemaining;
 
-    if(days > 0) {
+    if (days > 0) {
       timeRemaining = days + " days left";
     } else if (hours > 0) {
       timeRemaining = hours + " hours left";
     } else if (minutes > 0) {
       timeRemaining = minutes + " minutes left";
-    } else if(seconds > 0) {
+    } else if (seconds > 0) {
       timeRemaining = seconds + " seconds left";
     } else {
       timeRemaining = "less than a second left";
@@ -112,7 +111,8 @@ const ChatRoom = (props) => {
         sendMessage(e, `Poll ${poll.question} has been closed.`);
         props.addedPeopleHandler();
       },
-      (e) => {},
+      (e) => {
+      },
       {
         id: poll.id
       }
@@ -131,7 +131,8 @@ const ChatRoom = (props) => {
       (response) => {
         props.addedPeopleHandler();
       },
-      (e) => {},
+      (e) => {
+      },
       date
     );
   };
@@ -323,7 +324,8 @@ const ChatRoom = (props) => {
           setOpenAddPeople(false);
           props.addedPeopleHandler();
         },
-        (e) => {},
+        (e) => {
+        },
         {
           chatId: selectedChat.id,
           participants: newParticipants
@@ -486,10 +488,10 @@ const ChatRoom = (props) => {
               />
           </span>
           <span className="cv-choice-text">
-              { message.content }
+              {message.content}
           </span>
           </span>
-          <span className={'cv-choice-percent-chart event'} style={{width: '100%' }}>
+          <span className={'cv-choice-percent-chart event'} style={{width: '100%'}}>
           </span>
         </div>
       );
@@ -509,7 +511,7 @@ const ChatRoom = (props) => {
               key={option.id}
               option={option}
               isWinner={winningOpt && option.id === winningOpt.id}
-              isSelected={ poll.selectedOption === option.id }
+              isSelected={poll.selectedOption === option.id}
               percentVote={calculatePercentage(poll, option)}
             />
           );
@@ -522,7 +524,7 @@ const ChatRoom = (props) => {
               className="poll-choice-radio"
               value={option.id}
               control={
-                <Radio />
+                <Radio/>
               }
               label={option.text}
             />
@@ -537,11 +539,11 @@ const ChatRoom = (props) => {
               <div>
                 <Avatar
                   className="poll-creator-avatar"
-                  style={{ backgroundColor: Utils.getAvatarColor(message.participant.name)}} >
-                  { message.participant.name.toUpperCase() }
+                  style={{backgroundColor: Utils.getAvatarColor(message.participant.name)}}>
+                  {message.participant.name.toUpperCase()}
                 </Avatar>
                 <span className="poll-creator-name">
-                    { message.participant.name }
+                    {message.participant.name}
                 </span>
                 <span className="poll-creation-date">
                     {Utils.formatDateTime(message.createdDate)}
@@ -549,14 +551,14 @@ const ChatRoom = (props) => {
               </div>
             </div>
             <div className="poll-question">
-              { poll.question }
+              {poll.question}
             </div>
             <div className="poll-creation-date">
               Results are visible after the poll has closed / expired.
             </div>
           </div>
           <div className="poll-choices">
-            <FormControl style={{ width: '100%' }}>
+            <FormControl style={{width: '100%'}}>
               <RadioGroup
                 className="poll-choice-radio-group"
                 value={currentVote.find(c => c.id === poll.id) ? currentVote.find(c => c.id === poll.id).value : poll.selectedOption}
@@ -566,7 +568,7 @@ const ChatRoom = (props) => {
                       id: poll.id,
                       value: e.target.value
                     };
-                    setCurrentVote(oldArray => [...oldArray,newValue] );
+                    setCurrentVote(oldArray => [...oldArray, newValue]);
                   } else {
                     const newArray = currentVote.map(it => {
                       if (it.id === poll.id) {
@@ -583,64 +585,65 @@ const ChatRoom = (props) => {
                   }
                 }}
               >
-                { pollOptions }
+                {pollOptions}
               </RadioGroup>
             </FormControl>
           </div>
 
           {
             !pollClosed ?
-            <div className="poll-footer">
-              <Button
-                className="vote-button"
-                variant={'outlined'}
-                onClick={() => {
-                  let currentParticipant = selectedChat.participants.find(p => p.userId === currentUser.userId);
-                  let selectedVote = currentVote.find(it => it.id === poll.id);
-                  poll.selectedOption = selectedVote ? selectedVote.value : null;
-                  console.log('poll: ', poll);
-                  submitPollVote(poll, currentParticipant);
-                }}
-              >
-                Submit Vote
-              </Button>
-
-              {
-                currentUser.userId === message.participant.userId &&
+              <div className="poll-footer">
                 <Button
                   className="vote-button"
                   variant={'outlined'}
-                  onClick={(e) => {
-                    closePoll(e, poll);
+                  onClick={() => {
+                    let currentParticipant = selectedChat.participants.find(p => p.userId === currentUser.userId);
+                    let selectedVote = currentVote.find(it => it.id === poll.id);
+                    poll.selectedOption = selectedVote ? selectedVote.value : null;
+                    console.log('poll: ', poll);
+                    submitPollVote(poll, currentParticipant);
                   }}
-                  style={{ marginLeft: '8px' }}
                 >
-                  Close Poll
+                  Submit Vote
                 </Button>
-              }
 
-              <span style={{ marginLeft: '8px' }} className="time-left">
-                { poll.totalVotes ? `${poll.totalVotes} out of ${selectedChat.participants.length}` : `0 out of ${selectedChat.participants.length}`} votes
+                {
+                  currentUser.userId === message.participant.userId &&
+                  <Button
+                    className="vote-button"
+                    variant={'outlined'}
+                    onClick={(e) => {
+                      closePoll(e, poll);
+                    }}
+                    style={{marginLeft: '8px'}}
+                  >
+                    Close Poll
+                  </Button>
+                }
+
+                <span style={{marginLeft: '8px'}} className="time-left">
+                {poll.totalVotes ? `${poll.totalVotes} out of ${selectedChat.participants.length}` : `0 out of ${selectedChat.participants.length}`} votes
               </span>
-              <span className="separator">•</span>
-              <span className="time-left" style={{ marginLeft: '4px' }}>
+                <span className="separator">•</span>
+                <span className="time-left" style={{marginLeft: '4px'}}>
                 {
                   pollRemainingTime(poll.expirationDateTime)
                 }
               </span>
 
-              {
-                poll.selectedOption &&
-                <div className="poll-creation-date">
-                  <span style={{ color: '#945c33' }}>You have Voted</span>
-                </div>
-              }
-            </div> :
-            <div className="poll-footer">
-              <span style={{ marginLeft: '4px' }} className="time-left">{ `${poll.totalVotes} voted out of ${selectedChat.participants.length}`}</span>
-              <span className="separator">•</span>
-              <span className="time-left" style={{ marginLeft: '4px' }}>Closed / Expired</span>
-            </div>
+                {
+                  poll.selectedOption &&
+                  <div className="poll-creation-date">
+                    <span style={{color: '#945c33'}}>You have Voted</span>
+                  </div>
+                }
+              </div> :
+              <div className="poll-footer">
+                <span style={{marginLeft: '4px'}}
+                      className="time-left">{`${poll.totalVotes} voted out of ${selectedChat.participants.length}`}</span>
+                <span className="separator">•</span>
+                <span className="time-left" style={{marginLeft: '4px'}}>Closed / Expired</span>
+              </div>
           }
         </div>
       )
@@ -661,10 +664,10 @@ const ChatRoom = (props) => {
             backgroundColor: '#FFFFFF',
             marginTop: '2px',
           }}>
-            <h5 style={{ fontSize: '24px' }}>Add People</h5>
+            <h5 style={{fontSize: '24px'}}>Add People</h5>
             <Form>
               <div>
-                <div style={{ marginTop: '8px' }}>
+                <div style={{marginTop: '8px'}}>
                   <AutoComplete
                     id="participants"
                     label={'Participants'}
@@ -709,33 +712,33 @@ const ChatRoom = (props) => {
               </Avatar>
             </div>
             <h5>
-              { getChatRoomTitle() }
+              {getChatRoomTitle()}
             </h5>
           </div>
           <div className="chatroom__headerright">
             {
               !props.chatTab &&
-                <>
-                  <Tooltip title="Call">
-                    <IconButton
-                      onClick={(e) => {
-                        callNow(e);
-                      }}
-                    >
-                      <CallIcon/>
-                    </IconButton>
-                  </Tooltip>
+              <>
+                <Tooltip title="Call">
+                  <IconButton
+                    onClick={(e) => {
+                      callNow(e);
+                    }}
+                  >
+                    <CallIcon/>
+                  </IconButton>
+                </Tooltip>
 
-                  <Tooltip title="Add People">
-                    <IconButton
-                      onClick={(e) => {
-                        openAddPeopleDialog(e);
-                      }}
-                    >
-                      <GroupAdd/>
-                    </IconButton>
-                  </Tooltip>
-                </>
+                <Tooltip title="Add People">
+                  <IconButton
+                    onClick={(e) => {
+                      openAddPeopleDialog(e);
+                    }}
+                  >
+                    <GroupAdd/>
+                  </IconButton>
+                </Tooltip>
+              </>
             }
             <Tooltip title="Poll">
               <IconButton
@@ -776,44 +779,46 @@ const ChatRoom = (props) => {
           <div>
             <form className="chatroom__sendMessage">
               <div
-                className="message__imageSelector" style={{width: '48px'}}
-              >
-                <Files
-                  enableFile={true}
-                  id={'documents'}
-                  value={document}
-                  valueChangeHandler={(value, id) => {
-                    setDocument(value);
-                    setImgUploadConfirm('File is selected and will be displayed after sending the message!');
+                className="message__imageSelector" style={{width: '72px'}}
+              />
+              <div className={'chat-input'}>
+                <div className={"file-upload"}>
+                  <Files
+                    enableFile={true}
+                    id={'documents'}
+                    value={document}
+                    valueChangeHandler={(value, id) => {
+                      setDocument(value);
+                      setImgUploadConfirm('File is selected and will be displayed after sending the message!');
+                    }}
+                  />
+                </div>
+                <CustomInput
+                  labelText={document ? "" : "Type a new message"}
+                  disabled={!Utils.isNull(document)}
+                  id="message"
+                  formControlProps={{fullWidth: true}}
+                  autoFocus
+                  inputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          style={styles.inputAdornmentIcon}
+                          type="submit"
+                          onClick={(e) => {
+                            sendMessage(e);
+                          }}
+                        >
+                          <SendIcon style={{fontSize: '24px'}}/>
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                    value: message,
+                    onChange: (e) => {
+                      handleChange(e);
+                    },
                   }}
                 />
-              </div>
-              <div className={'chat-input'}>
-              <CustomInput
-                labelText="Type a new message"
-                id="message"
-                formControlProps={{fullWidth: true}}
-                autoFocus
-                inputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        style={styles.inputAdornmentIcon}
-                        type="submit"
-                        onClick={(e) => {
-                          sendMessage(e);
-                        }}
-                      >
-                        <SendIcon style={{fontSize: '24px'}}/>
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                  value: message,
-                  onChange: (e) => {
-                    handleChange(e);
-                  },
-                }}
-              />
               </div>
             </form>
           </div>

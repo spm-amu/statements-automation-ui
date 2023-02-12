@@ -468,7 +468,7 @@ const MeetingRoom = (props) => {
     userToPeerItem.peer.signal(payload.signal);
     handleMessageArrived({
       message: userToPeerItem.user.name + " has joined"
-    })
+    });
   };
 
   const createParticipants = (users, socket) => {
@@ -634,15 +634,7 @@ const MeetingRoom = (props) => {
   const setupStream = () => {
     currentUserStream.init(!videoMuted, true, (stream) => {
       setStreamsInitiated(true);
-
       createMediaRecorder(stream);
-
-      // When the video is muted, the audio switches off. We put this code to force the audio track back on
-      if(videoMuted) {
-        setTimeout(function () {
-          currentUserStream.getVideoTracks()[0].stop();
-        }, 2000);
-      }
     }, (e) => {
       console.log(e);
     });
@@ -698,7 +690,6 @@ const MeetingRoom = (props) => {
       paper.style.margin = '54px 0 0 0';
     }
   };
-
 
   const onRaiseHand = (payload) => {
     const raisedHandParticipant = participants.find(p => p.userId === payload.userId);
