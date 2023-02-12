@@ -639,9 +639,8 @@ const MeetingRoom = (props) => {
 
       // When the video is muted, the audio switches off. We put this code to force the audio track back on
       if(videoMuted) {
-        setVideoMuted(false);
         setTimeout(function () {
-          setVideoMuted(true);
+          currentUserStream.getVideoTracks()[0].stop();
         }, 2000);
       }
     }, (e) => {

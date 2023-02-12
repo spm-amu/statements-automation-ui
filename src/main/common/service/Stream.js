@@ -19,7 +19,7 @@ export class Stream {
 
         if(!video) {
           stream.getVideoTracks()[0].enabled = false;
-          stream.getVideoTracks()[0].stop();
+          //stream.getVideoTracks()[0].stop();
         }
 
         this.obj = stream;
