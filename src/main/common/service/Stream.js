@@ -71,8 +71,7 @@ export class Stream {
   };
 
   enableVideo = (enabled, socketManager) => {
-    this.getVideoTracks()[0].enabled = enabled;
-    /*if (enabled) {
+    if (enabled) {
       let userMedia = navigator.mediaDevices
         .getUserMedia(
           {
@@ -91,10 +90,9 @@ export class Stream {
                 peerObj.peer.replaceTrack(
                   this.getVideoTracks()[0],
                   this.videoTrack,
-                  this.obj
+                  peerObj.peer.stream
                 );
-              });
-            }
+              });            }
 
             this.obj.removeTrack(this.getVideoTracks()[0]);
           }
@@ -106,6 +104,6 @@ export class Stream {
       if (videoTrack) {
         videoTrack.stop();
       }
-    }*/
+    }
   }
 }

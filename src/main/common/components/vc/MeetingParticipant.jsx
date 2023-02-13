@@ -4,7 +4,7 @@ import './MeetingParticipant.css'
 import Utils from '../../Utils';
 
 const MeetingParticipant = forwardRef((props, ref) => {
-  const videoRef = ref ? ref : useRef();
+  const videoRef = useRef();
   const showVideo = true;
 
   useEffect(() => {

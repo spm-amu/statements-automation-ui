@@ -92,7 +92,7 @@ const MeetingRoom = (props) => {
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [whiteboardItems, setWhiteboardItems] = useState([]);
   const [eventHandler] = useState({});
-  const userVideo = useRef();
+  const [userVideo, setUserVideo] = useState(null);
   const [activityMessage, setActivityMessage] = useState(null);
   const [chatMessage, setChatMessage] = useState(null);
   const [chatSender, setChatSender] = useState(null);
@@ -101,7 +101,6 @@ const MeetingRoom = (props) => {
   const recordedChunks = [];
   const shareScreenSource = useRef();
   const tmpVideoTrack = useRef();
-
 
   const handler = () => {
     return {
@@ -667,7 +666,7 @@ const MeetingRoom = (props) => {
     if (userVideo && userVideo.current && !userVideo.current.srcObject) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
-  }, [userVideo.current, streamsInitiated]);
+  }, [userVideo, streamsInitiated]);
 
   const persistMeetingSettings = () => {
     post(
@@ -932,7 +931,6 @@ const MeetingRoom = (props) => {
                                                   videoMuted={videoMuted}
                                                   meetingTitle={selectedMeeting.title}
                                                   step={step}
-                                                  userVideoRef={userVideo}
                                                   userVideoChangeHandler={(ref) => setUserVideo(ref)}
                                                   acceptUserHandler={
                                                     (item) => {
