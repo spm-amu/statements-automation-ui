@@ -592,39 +592,53 @@ const MeetingRoom = (props) => {
 
   const fetchChats = () => {
     console.log('fetchMeetingChat selectedMeeting: ', selectedMeeting);
+    console.log('fetchMeetingChat selectedMeeting: ', participants);
 
     get(`${host}/api/v1/chat/fetchMeetingChat/${selectedMeeting.id}`, (response) => {
       if (response && response.id) {
         setMeetingChat(response);
       } else {
-        // TODO : Nsovo to check this if block. It causes an error if there are no attendees on a direct call
-        if (selectedMeeting.attendees) {
-          let chatParticipants = JSON.parse(JSON.stringify(selectedMeeting.attendees));
+        let chatParticipants;
 
+        if (isDirectCall) {
+          let userDetails = appManager.getUserDetails();
+          chatParticipants = [];
+          chatParticipants.push(userDetails);
+
+          participants.forEach(p => {
+            if (p.userId !== userDetails.userId) {
+              get(`${host}/api/v1/auth/userInfo/${p.userId}`, (response) => {
+                chatParticipants.push(response);
+              }, (e) => {
+              })
+            }
+          })
+        } else {
+          chatParticipants = JSON.parse(JSON.stringify(selectedMeeting.attendees));
           chatParticipants.forEach(chatParticipant => {
             delete chatParticipant.id
           });
-
-          let chat = {
-            meetingId: selectedMeeting.id,
-            title: selectedMeeting.title,
-            participants: chatParticipants,
-            type: 'CALENDAR_MEETING',
-            messages: []
-          };
-
-          post(
-            `${host}/api/v1/chat/create`,
-            (chat) => {
-              setMeetingChat(chat);
-            },
-            (e) => {
-            },
-            chat,
-            '',
-            false
-          );
         }
+
+        let chat = {
+          meetingId: isDirectCall ? null : selectedMeeting.id,
+          title: selectedMeeting.title,
+          participants: chatParticipants,
+          type: isDirectCall ? 'DIRECT' : 'CALENDAR_MEETING',
+          messages: []
+        };
+
+        post(
+          `${host}/api/v1/chat/create`,
+          (chat) => {
+            setMeetingChat(chat);
+          },
+          (e) => {
+          },
+          chat,
+          '',
+          false
+        );
       }
     }, (e) => {
 

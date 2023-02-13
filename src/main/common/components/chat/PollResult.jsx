@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './ChatRooms.scss';
 import { CheckCircle } from '@material-ui/icons';
 
-const ChatForm = (props) => {
+const PollResult = (props) => {
   return (
     <div className="cv-poll-choice">
       <span className="cv-poll-choice-details">
@@ -28,4 +28,4 @@ const ChatForm = (props) => {
 };
 
 
-export default ChatForm;
+export default PollResult;

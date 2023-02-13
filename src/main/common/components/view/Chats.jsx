@@ -174,9 +174,14 @@ const Chats = (props) => {
         mode === 'LIST' ?
           <div className="chat__rooms w-100 h-100">
             <div style={{width: "30%", borderRight: '1px solid #e1e1e1'}} className="h-100">
-              <ChatRoomList chatEvents={chatEvents} addedChat={newChat} selectionHandler={(selected) => {
-                setSelectedChat(selected);
-              }} addHandler={() => setMode('FORM')}
+              <ChatRoomList
+                selectedChat={selectedChat}
+                chatEvents={chatEvents}
+                addedChat={newChat}
+                selectionHandler={(selected) => {
+                  setSelectedChat(selected);
+                }}
+                addHandler={() => setMode('FORM')}
               />
             </div>
             <div style={{width: "70%", height: '100%'}}>

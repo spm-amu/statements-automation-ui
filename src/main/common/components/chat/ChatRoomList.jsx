@@ -55,7 +55,7 @@ const ChatRoomList = (props) => {
             event.messages = newArr
               .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
 
-            return <ChatRoomItem key={index} event={event} selectionHandler={props.selectionHandler}/>;
+            return <ChatRoomItem selectedChat={props.selectedChat} key={index} event={event} selectionHandler={props.selectionHandler}/>;
           })}
       </div>
     </div>

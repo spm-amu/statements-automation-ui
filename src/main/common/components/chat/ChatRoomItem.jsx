@@ -8,7 +8,7 @@ import Utils from '../../Utils';
 import appManager from "../../../common/service/AppManager";
 
 const ChatRoomItem = (props) => {
-  const { event } = props;
+  const { event, selectedChat } = props;
   const [currentUser, setCurrentUser] = useState(
     appManager.getUserDetails()
   );
@@ -18,18 +18,12 @@ const ChatRoomItem = (props) => {
   }, []);
 
   const goToRoom = (id) => {
-    /*navigate("/view/chats", {
-      state: {
-        id: id,
-      }
-    })*/
-
     props.selectionHandler(event);
   };
 
   return (
     <div
-      className="chatroom__item"
+      className={`chatroom__item ${event.id === selectedChat.id ? 'active-tab' : ''}`}
       onClick={() => {
         goToRoom(event.id);
       }}
