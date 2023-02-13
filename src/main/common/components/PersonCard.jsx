@@ -76,7 +76,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
           }
         </div>
         {
-          !appManager.get('CURRENT_MEETING') && props.dialEnabled &&
+          (!appManager.get('CURRENT_MEETING') || props.inCall) && props.dialEnabled &&
           <div style={{marginRight: '4px'}} className={'buttons'}>
             <IconButton
               onClick={(e) => {
@@ -88,22 +88,6 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
               }}
             >
               <Icon id={'CALL_END'}/>
-            </IconButton>
-          </div>
-        }
-        {
-          !appManager.get('CURRENT_MEETING') && props.dialEnabled &&
-          <div className={'col-*-*'}>
-            <IconButton
-              onClick={(e) => {
-
-              }}
-              disabled={online}
-              style={{
-                marginRight: '4px'
-              }}
-            >
-              <Icon id={'CAMERA'}/>
             </IconButton>
           </div>
         }

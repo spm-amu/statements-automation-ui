@@ -14,6 +14,7 @@ import People from "../view/People";
 import "./MeetingRoomSideBarContent.css"
 import InCall from '../view/InCall';
 import ChatRoom from '../chat/ChatRoom';
+import InCallCard from "./InCallCard";
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -39,6 +40,7 @@ const PaperComponent = (props) => (
 
 const MeetingRoomSideBarContent = (props) => {
   const [peopleDialogOpen, setPeopleDialogOpen] = useState(false);
+  const [peopleExclusions] = useState([]);
   const {
     tab,
     isHost,
@@ -49,7 +51,14 @@ const MeetingRoomSideBarContent = (props) => {
   } = props;
 
   React.useEffect(() => {
+    for (const participant of participants) {
+      peopleExclusions.push(participant.userId);
+    }
   }, []);
+
+  React.useEffect(() => {
+
+  }, [meetingChat]);
 
   return (
     <div className={'meeting-room-sb-container'}
@@ -86,6 +95,7 @@ const MeetingRoomSideBarContent = (props) => {
         <DialogContent>
           <div style={{height: '100%'}} className={'request-to-join-dialog-content'}>
             <People meetingId={meetingId} dialEnabled={true} chatEnabled={false}
+                    inCall={true} exclusions={peopleExclusions}
                     onAudioCallHandler={(e) => props.onAudioCallHandler(e)}/>
           </div>
         </DialogContent>
@@ -93,7 +103,6 @@ const MeetingRoomSideBarContent = (props) => {
         </DialogActions>
       </StyledDialog>
       <div className={'raised-hands'}>
-
       </div>
       {
         tab === 'People' &&

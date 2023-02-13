@@ -111,6 +111,7 @@ const People = (props) => {
                         data={user}
                         avatarSize={!Utils.isNull(props.avatarSize) ? props.avatarSize : true}
                         showOnlineIndicator={!Utils.isNull(props.showOnlineIndicator) ? props.showOnlineIndicator : true}
+                        inCall={!Utils.isNull(props.inCall) ? props.inCall : false}
                         chatEnabled={!Utils.isNull(props.chatEnabled) ? props.chatEnabled : true}
                         dialEnabled={!Utils.isNull(props.dialEnabled) ? props.dialEnabled : true}
             />

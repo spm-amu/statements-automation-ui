@@ -631,6 +631,7 @@ const MeetingRoom = (props) => {
     }, '', false)
   };
 
+
   const setupStream = () => {
     currentUserStream.init(!videoMuted, true, (stream) => {
       setStreamsInitiated(true);
