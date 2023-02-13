@@ -25,7 +25,8 @@ const MeetingParticipantGrid = (props) => {
     step,
     videoMuted,
     audioMuted,
-    meetingTitle
+    meetingTitle,
+    sharingUser
   } = props;
 
   useEffect(() => {

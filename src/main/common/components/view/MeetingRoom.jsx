@@ -927,6 +927,7 @@ const MeetingRoom = (props) => {
                                                   waitingList={lobbyWaitingList}
                                                   mode={meetingParticipantGridMode}
                                                   screenShared={screenShared}
+                                                  sharingUser={"nsovo"}
                                                   audioMuted={audioMuted}
                                                   videoMuted={videoMuted}
                                                   meetingTitle={selectedMeeting.title}
