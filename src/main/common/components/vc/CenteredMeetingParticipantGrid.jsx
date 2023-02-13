@@ -16,9 +16,9 @@ const WAITING_FOR_OTHERS_TO_JOIN_MESSAGE = 'Waiting for others to join';
 const ATTENDEE_WAITING_FOR_PERMISION_MESSAGE = 'Waiting for the meeting host to let you in';
 
 const MeetingParticipantGrid = (props) => {
-  const {participants} = props;
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
+  const [participants, setParticipants] = React.useState(null);
   const {
     waitingList,
     mode,
@@ -29,8 +29,9 @@ const MeetingParticipantGrid = (props) => {
   } = props;
 
   useEffect(() => {
-    if (participants) {
-      let currentUserParticipant = participants.find((p) => p.isCurrentUser);
+    let newParticipants = [];
+    if (props.participants) {
+      let currentUserParticipant = props.participants.find((p) => p.isCurrentUser);
       if (!currentUserParticipant) {
         currentUserParticipant = {
           isCurrentUser: true,
@@ -42,23 +43,31 @@ const MeetingParticipantGrid = (props) => {
           audioMuted
         };
 
-        participants.splice(0, 0, currentUserParticipant);
+        //participants.splice(0, 0, currentUserParticipant);
+        newParticipants.push(currentUserParticipant);
+      }
+
+      for (const participant of props.participants) {
+        newParticipants.push(participant);
       }
     }
 
-    console.log("\n\n\nPARTS : ", participants);
-    let gridData = createGrid();
+    console.log("\n\n\nPARTS : ", newParticipants);
+    let gridData = createGrid(newParticipants);
+    console.log(gridData);
     setGrid(gridData.mainGrid);
     setOverflowGrid(gridData.overflowGrid);
-  }, [participants, props.mode, props.screenShared]);
 
-  const createGrid = () => {
+    setParticipants(newParticipants);
+  }, [props.participants, props.mode, props.screenShared]);
+
+  const createGrid = (newParticipants) => {
     let itemGrid = {
       mainGrid: [],
       overflowGrid: []
     };
 
-    let numRows = participants.length < MAX_ROWS ? participants.length : MAX_ROWS;
+    let numRows = newParticipants.length < MAX_ROWS ? newParticipants.length : MAX_ROWS;
 
     if (props.screenShared) {
       numRows = 1;
@@ -72,21 +81,22 @@ const MeetingParticipantGrid = (props) => {
 
     let currentRowIndex = 0;
     let maxTiles = props.screenShared ? 1 : MAX_TILES;
-    for (let i = 0; i < participants.length; i++) {
+    for (let i = 0; i < newParticipants.length; i++) {
       if (i < maxTiles && mode === 'DEFAULT') {
-        itemGrid.mainGrid[currentRowIndex].push(participants[i]);
-        if (currentRowIndex++ === MAX_ROWS - 1 || participants.length === 2) {
+        itemGrid.mainGrid[currentRowIndex].push(newParticipants[i]);
+        if (currentRowIndex++ === MAX_ROWS - 1 || newParticipants.length === 2) {
           currentRowIndex = 0;
         }
       } else {
-        itemGrid.overflowGrid.push(participants[i]);
+        itemGrid.overflowGrid.push(newParticipants[i]);
       }
     }
 
     return itemGrid;
   };
 
-  const renderRow = (row, index) => {
+  const renderRow = (row) => {
+    console.log("\n\n\n\n\nRENDERING ROW : ", row);
     return (
       <Grid
         style={{height: props.screenShared ? "100%" : null,}}
@@ -106,7 +116,12 @@ const MeetingParticipantGrid = (props) => {
               }
             }
             >
-              <MeetingParticipant data={participant}
+              <div style={{color: 'white'}}>
+                {
+                  participant.name
+                }
+              </div>
+              <MeetingParticipant data={participant} key={index}
                                   refChangeHandler={
                                     participant.isCurrentUser ? (ref) => {
                                       props.userVideoChangeHandler(ref);
@@ -163,7 +178,7 @@ const MeetingParticipantGrid = (props) => {
   }
 
   return (
-    grid !== null ?
+    participants && grid !== null ?
       <div className={'row grid'}
            style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
         {

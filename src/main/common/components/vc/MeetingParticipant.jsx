@@ -8,10 +8,13 @@ const MeetingParticipant = forwardRef((props, ref) => {
   const showVideo = true;
 
   useEffect(() => {
+    console.log("\n\n\n\n\n\n\n\nMP: " + props.data.name);
     if (props.data.peer) {
+      console.log(props.data.stream);
+      console.log(props.data.peer);
       videoRef.current.srcObject = props.data.stream;
     }
-  }, []);
+  });
 
   useEffect(() => {
     if (props.refChangeHandler) {
