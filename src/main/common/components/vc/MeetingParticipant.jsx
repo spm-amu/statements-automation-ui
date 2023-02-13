@@ -3,18 +3,15 @@ import {forwardRef, useEffect, useRef} from "react";
 import './MeetingParticipant.css'
 import Utils from '../../Utils';
 
-const MeetingParticipant = forwardRef((props, ref) => {
+const MeetingParticipant = (props) => {
   const videoRef = useRef();
   const showVideo = true;
 
   useEffect(() => {
-    console.log("\n\n\n\n\n\n\n\nMP: " + props.data.name);
     if (props.data.peer) {
-      console.log(props.data.stream);
-      console.log(props.data.peer);
       videoRef.current.srcObject = props.data.stream;
     }
-  });
+  }, [props.data]);
 
   useEffect(() => {
     if (props.refChangeHandler) {
@@ -93,6 +90,6 @@ const MeetingParticipant = forwardRef((props, ref) => {
     </div>
   )
 
-});
+};
 
 export default MeetingParticipant;
