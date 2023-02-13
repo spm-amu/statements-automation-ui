@@ -92,7 +92,8 @@ export class Stream {
                   this.videoTrack,
                   peerObj.peer.stream
                 );
-              });            }
+              });
+            }
 
             this.obj.removeTrack(this.getVideoTracks()[0]);
           }
