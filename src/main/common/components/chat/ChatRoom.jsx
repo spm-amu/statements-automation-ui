@@ -185,6 +185,7 @@ const ChatRoom = (props) => {
   }, [props.selectedChat]);
 
   useEffect(() => {
+    console.log('_______ Chat Updated!!!!');
     setMessage('');
     setDocument(null);
     loadMessages();
