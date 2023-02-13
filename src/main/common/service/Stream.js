@@ -90,7 +90,7 @@ export class Stream {
                 peerObj.peer.replaceTrack(
                   this.getVideoTracks()[0],
                   this.videoTrack,
-                  peerObj.peer.stream
+                  this.obj
                 );
               });
             }
