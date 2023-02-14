@@ -19,15 +19,19 @@ const MeetingParticipantGrid = (props) => {
   const {participants} = props;
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
+  const [screenShared, setScreenShared] = React.useState(false);
   const {
     waitingList,
     mode,
     step,
     videoMuted,
     audioMuted,
-    meetingTitle,
-    sharingUser
+    meetingTitle
   } = props;
+
+  useEffect(() => {
+    setScreenShared(props.screenShared);
+  }, [props.screenShared]);
 
   useEffect(() => {
     if (participants) {
@@ -45,13 +49,24 @@ const MeetingParticipantGrid = (props) => {
 
         participants.splice(0, 0, currentUserParticipant);
       }
+
+      if(!screenShared) {
+        let sharingParticipant = participants.find((p) => p.screenShared);
+        if (sharingParticipant) {
+          let sharingParticipantIndex = participants.findIndex((p) => p.screenShared);
+          setScreenShared(true);
+          participants.unshift(participants.splice(sharingParticipantIndex, 1)[0]);
+        } else {
+          setScreenShared(false);
+        }
+      }
     }
 
     console.log("\n\n\nPARTS : ", participants);
     let gridData = createGrid();
     setGrid(gridData.mainGrid);
     setOverflowGrid(gridData.overflowGrid);
-  }, [participants, props.mode, props.screenShared]);
+  }, [participants, props.mode, screenShared]);
 
   const createGrid = () => {
     let itemGrid = {
@@ -61,7 +76,7 @@ const MeetingParticipantGrid = (props) => {
 
     let numRows = participants.length < MAX_ROWS ? participants.length : MAX_ROWS;
 
-    if (props.screenShared) {
+    if (screenShared) {
       numRows = 1;
     }
 
@@ -72,7 +87,7 @@ const MeetingParticipantGrid = (props) => {
     }
 
     let currentRowIndex = 0;
-    let maxTiles = props.screenShared ? 1 : MAX_TILES;
+    let maxTiles = screenShared ? 1 : MAX_TILES;
     for (let i = 0; i < participants.length; i++) {
       if (i < maxTiles && mode === 'DEFAULT') {
         itemGrid.mainGrid[currentRowIndex].push(participants[i]);
@@ -90,7 +105,7 @@ const MeetingParticipantGrid = (props) => {
   const renderRow = (row, index) => {
     return (
       <Grid
-        style={{height: props.screenShared ? "100%" : null,}}
+        style={{height: screenShared ? "100%" : null,}}
         direction="row"
         justifyContent="center"
         alignItems="center" container item spacing={2}>
@@ -99,11 +114,11 @@ const MeetingParticipantGrid = (props) => {
             return <Grid item xs={4} key={index} style={
               {
                 borderRadius: '4px',
-                width: props.screenShared ? "100%" : "33vh",
-                height: props.screenShared ? "100%" : "33vh",
-                maxHeight: props.screenShared ? "100%" : "33vh",
-                flexBasis: props.screenShared ? "100%" : null,
-                maxWidth: props.screenShared ? "100%" : null
+                width: screenShared ? "100%" : "33vh",
+                height: screenShared ? "100%" : "33vh",
+                maxHeight: screenShared ? "100%" : "33vh",
+                flexBasis: screenShared ? "100%" : null,
+                maxWidth: screenShared ? "100%" : null
               }
             }
             >
@@ -113,7 +128,7 @@ const MeetingParticipantGrid = (props) => {
                                       props.userVideoChangeHandler(ref);
                                     } : null
                                   }
-                                  screenShared={props.screenShared}
+                                  screenShared={screenShared}
                                   showName={!participant.isCurrentUser} videoMuted={participant.videoMuted}
                                   audioMuted={participant.audioMuted}/>
             </Grid>
@@ -130,13 +145,13 @@ const MeetingParticipantGrid = (props) => {
           overflowX: 'auto',
           maxWidth: '100%',
           width: '100%',
-          height: !props.screenShared ? '96%' : null,
+          height: !screenShared ? '96%' : null,
           borderRadius: '4px',
           overflowY: 'hidden',
-          margin: props.screenShared || mode === 'STRIP' ? "0" : "12px 8px",
+          margin: screenShared || mode === 'STRIP' ? "0" : "12px 8px",
           backgroundColor: 'rgb(40, 40, 43)',
           display: 'flex',
-          padding: props.screenShared ? '0 16px' : null,
+          padding: screenShared ? '0 16px' : null,
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
@@ -208,12 +223,12 @@ const MeetingParticipantGrid = (props) => {
             display: 'flex',
             padding: '32px'
           }}>
-            <Grid container spacing={2} style={{width: '100%', height: props.screenShared ? "100%" : null}}>
+            <Grid container spacing={2} style={{width: '100%', height: screenShared ? "100%" : null}}>
               {grid.map((row, index) => {
                 return <>
                   {
-                    props.screenShared ?
-                      <div key={index} style={{width: '100%', height: props.screenShared ? "calc(75% + 40px)" : null}}>
+                    screenShared ?
+                      <div key={index} style={{width: '100%', height: screenShared ? "calc(75% + 40px)" : null}}>
                         {
                           renderRow(row, index)
                         }

@@ -714,8 +714,13 @@ const MeetingRoom = (props) => {
   const onAVSettingsChange = (payload) => {
     let participant = participants.find((p) => p.userId === payload.userId);
     if (participant) {
+      participant.screenShared = payload.screenShared;
       participant.audioMuted = payload.audioMuted;
       participant.videoMuted = payload.videoMuted;
+
+      handleMessageArrived({
+        message: participant.name + " started sharing"
+      })
     }
 
     setParticipants([].concat(participants));
@@ -942,7 +947,6 @@ const MeetingRoom = (props) => {
                                                   waitingList={lobbyWaitingList}
                                                   mode={meetingParticipantGridMode}
                                                   screenShared={screenShared}
-                                                  sharingUser={"nsovo"}
                                                   audioMuted={audioMuted}
                                                   videoMuted={videoMuted}
                                                   meetingTitle={selectedMeeting.title}
