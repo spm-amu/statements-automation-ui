@@ -87,6 +87,7 @@ const CalendarComponent = (props) => {
      //  };
      //
      //  setEvents(myEvent.events);
+      //console.log("\n\n\n\n\n\nEVENTS : ", response);
       setEvents(response);
     }, (e) => {
 

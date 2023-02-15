@@ -248,21 +248,26 @@ const MeetingRoom = (props) => {
       const peerObj = participants.find((p) => p.peerID === user.id);
       const newParticipants = participants.filter((p) => p.userId !== userId);
 
-      setParticipants(newParticipants);
-      if (newParticipants.length === 0) {
-        //onCallEnded();
-        //props.closeHandler();
-        setAllUserParticipantsLeft(true);
+      if (newParticipants.length === 1 && isDirectCall) {
+        onCallEnded();
+        props.closeHandler();
+      } else {
+        setParticipants(newParticipants);
+        if (newParticipants.length === 0) {
+          //onCallEnded();
+          //props.closeHandler();
+          setAllUserParticipantsLeft(true);
 
-        get(
-          `${host}/api/v1/meeting/end/${selectedMeeting.id}`,
-          (response) => {
-          },
-          (e) => {
-          },
-          '',
-          true
-        );
+          get(
+            `${host}/api/v1/meeting/end/${selectedMeeting.id}`,
+            (response) => {
+            },
+            (e) => {
+            },
+            '',
+            true
+          );
+        }
       }
     }
   };
@@ -640,6 +645,10 @@ const MeetingRoom = (props) => {
           false
         );
       }
+
+      setSideBarTab('Chat');
+      setSideBarOpen(true);
+      setHasUnreadChats(false);
     }, (e) => {
 
     }, '', false)
@@ -884,7 +893,7 @@ const MeetingRoom = (props) => {
           <div style={{height: '100%'}}>
             <div className={displayState === 'MAXIMIZED' ? 'workspace-max' : 'workspace-min'}>
               {
-                userToCall &&
+                userToCall && step === Steps.LOBBY ?
                 <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
                        meetingTitle={selectedMeeting.title}
                        acceptUserHandler={
@@ -898,8 +907,7 @@ const MeetingRoom = (props) => {
                        displayState={displayState}
                        allUserParticipantsLeft={allUserParticipantsLeft}
                 />
-              }
-              {
+                :
                 displayState === 'MAXIMIZED' ?
                   <div className={'row no-margin no-padding'} style={{width: '100%', height: '100%'}}>
                     {
@@ -1042,9 +1050,6 @@ const MeetingRoom = (props) => {
                           },
                           showChat: () => {
                             fetchChats();
-                            setSideBarTab('Chat');
-                            setSideBarOpen(true);
-                            setHasUnreadChats(false);
                           },
                           raiseHand: () => {
                             raiseHand();
