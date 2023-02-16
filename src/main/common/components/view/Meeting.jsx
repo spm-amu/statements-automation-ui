@@ -191,6 +191,7 @@ const Meeting = (props) => {
     if (props.selectedEvent.startDate < moment(new Date()).startOf('day')) {
       setReadOnly(true);
     }
+
   }, []);
 
   // ** Custom select components
