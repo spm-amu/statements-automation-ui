@@ -75,11 +75,10 @@ const CalendarComponent = (props) => {
      //        title: 'my recurring event',
      //       // rrule: 'DTSTART:20221113T103000Z\nRRULE:FREQ=MONTHLY;BYSETPOS=-1;BYDAY=WE;INTERVAL=1'
      //        rrule: {
-     //          freq: 'MONTHLY',
-     //          dtstart: '2022-11-13',
-     //          bysetpos: -1,
-     //          byweekday: 'WE',
-     //          // bymonthday: 21,
+     //          freq: 'DAILY',
+     //          dtstart: '2023-02-16T10:47:00',
+     //          until: '2023-02-20',
+     //          byweekday: [],
      //          interval: 1
      //        }
      //      }
@@ -87,7 +86,8 @@ const CalendarComponent = (props) => {
      //  };
      //
      //  setEvents(myEvent.events);
-      //console.log("\n\n\n\n\n\nEVENTS : ", response);
+
+      // console.log("\n\n\n\n\n\nEVENTS : ", response);
       setEvents(response);
     }, (e) => {
 

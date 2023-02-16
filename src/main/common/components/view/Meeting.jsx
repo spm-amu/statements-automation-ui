@@ -72,7 +72,7 @@ const Meeting = (props) => {
   const [byWeekDay, setByWeekDay] = React.useState('MO');
   const [refresher, setRefresher] = React.useState(false);
   const [recurrenceRepetition, setRecurrenceRepetition] = useState('NONE');
-  const [recurrence] = React.useState({
+  const [recurrence, setRecurrence] = React.useState({
     repeatingEvery: '',
     numberOfOccurences: 1,
     bysetpos: 1,
@@ -116,24 +116,28 @@ const Meeting = (props) => {
       !Utils.isStringEmpty(props.selectedEvent.id)
     ) {
       if (props.selectedEvent.recurringFreq !== null) {
-        recurrence.repeatingEvery = props.selectedEvent.recurringFreq;
-        recurrence.eventRecurrence = props.selectedEvent.recurringFreq;
-        recurrence.numberOfOccurences = props.selectedEvent.recurringInterval;
+        const rec = {};
+
+        rec.repeatingEvery = props.selectedEvent.recurringFreq;
+        rec.eventRecurrence = props.selectedEvent.recurringFreq;
+        rec.numberOfOccurences = props.selectedEvent.recurringInterval;
 
         if (props.selectedEvent.recurringFreq === 'MONTHLY') {
           if (props.selectedEvent.recurringBymonthday !== null) {
-            recurrence.monthlyDayType = "monthlyCalendarDay";
-            recurrence.byMonthDay = props.selectedEvent.recurringBymonthday;
+            rec.monthlyDayType = "monthlyCalendarDay";
+            rec.byMonthDay = props.selectedEvent.recurringBymonthday;
           } else {
-            recurrence.monthlyDayType = "monthlyWeekDay";
-            recurrence.bysetpos = props.selectedEvent.recurringBysetpos;
-            recurrence.byWeekDay = props.selectedEvent.recurringByweekday[0];
+            rec.monthlyDayType = "monthlyWeekDay";
+            rec.bysetpos = props.selectedEvent.recurringBysetpos;
+            rec.byWeekDay = props.selectedEvent.recurringByweekday[0];
             setBysetpos(props.selectedEvent.recurringBysetpos);
             setByWeekDay(props.selectedEvent.recurringByweekday[0]);
           }
         } else if (props.selectedEvent.recurringFreq === 'WEEKLY') {
-          recurrence.weekDays = props.selectedEvent.recurringByweekday;
+          rec.weekDays = props.selectedEvent.recurringByweekday;
         }
+
+        setRecurrence(rec);
       }
 
       if (props.selectedEvent.recurringFreq) {
@@ -248,13 +252,14 @@ const Meeting = (props) => {
 
     if (recurrenceRepetition !== 'NONE') {
       let recEndDate = new Date(Utils.getFormattedDate(value.recurringUntil));
+      // let untilDateMilli = recEndDate.setDate(recEndDate.getDate() + 1);
       //recEndDate.setDate(recEndDate.getDate() + 1);
 
       eventData.schedule.rrule = {
         freq: recurrenceRepetition,
         interval: recurrence.numberOfOccurences,
         dtstart: new Date(Utils.getFormattedDate(value.recurringDtstart)),
-        until: recEndDate
+        until: new Date(recEndDate)
       };
 
       if (recurrenceRepetition === 'WEEKLY') {
@@ -461,6 +466,8 @@ const Meeting = (props) => {
         recurrenceValue.byWeekDay = 'MO';
         recurrenceValue.monthlyDayType = 'monthlyWeekDay';
       }
+
+      setRecurrence(recurrenceValue);
     }
 
     validateRecurrence();
@@ -468,24 +475,37 @@ const Meeting = (props) => {
 
   const handleByWeekDay = (e) => {
     setByWeekDay(e.target.value);
-    recurrence.byWeekDay = e.target.value;
+    setRecurrence(existingValues => ({
+      ...existingValues,
+      byWeekDay: e.target.value
+    }));
+
     validateRecurrence();
   };
 
   const handleBysetpos = (e) => {
     setBysetpos(e.target.value);
-    recurrence.bysetpos = parseInt(e.target.value);
+    setRecurrence(existingValues => ({
+      ...existingValues,
+      bysetpos: parseInt(e.target.value)
+    }));
+
     validateRecurrence();
   };
 
   const handleWeekdayChange = (event) => {
     const index = recurrence.weekDays.indexOf(event.target.value);
+    let selectedWeekDays = [];
     if (index === -1) {
-      recurrence.weekDays = [...recurrence.weekDays, event.target.value];
+      selectedWeekDays = [...recurrence.weekDays, event.target.value];
     } else {
-      recurrence.weekDays = recurrence.weekDays.filter((weekDay) => weekDay !== event.target.value);
+      selectedWeekDays = recurrence.weekDays.filter((weekDay) => weekDay !== event.target.value);
     }
 
+    setRecurrence(existingValues => ({
+      ...existingValues,
+      weekDays: selectedWeekDays
+    }));
 
     setRefresher(!refresher);
     validateRecurrence();
@@ -820,7 +840,11 @@ const Meeting = (props) => {
                         valueChangeHandler={(e) => {
                           console.log(e.target.value);
                           // if(e.target.value > 0 && e.target.value < 100) {
-                          recurrence.numberOfOccurences = e.target.value;
+                          setRecurrence(existingValues => ({
+                            ...existingValues,
+                            numberOfOccurences: e.target.value
+                          }));
+
                           validateRecurrence();
                           // }
                         }}
@@ -911,7 +935,11 @@ const Meeting = (props) => {
                         value={recurrence.monthlyDayType}
                         name="radio-buttons-group"
                         onChange={(e, val) => {
-                          recurrence.monthlyDayType = val;
+                          setRecurrence(existingValues => ({
+                            ...existingValues,
+                            monthlyDayType: e.target.value
+                          }));
+
                           validateRecurrence();
                           setRefresher(!refresher);
                         }}
@@ -934,7 +962,11 @@ const Meeting = (props) => {
                               value={recurrence.byMonthDay}
                               required={true}
                               valueChangeHandler={(e) => {
-                                recurrence.byMonthDay = e.target.value;
+                                setRecurrence(existingValues => ({
+                                  ...existingValues,
+                                  byMonthDay: e.target.value
+                                }));
+
                                 validateRecurrence();
                               }}
                               errorMessage={'Please enter a number'}
