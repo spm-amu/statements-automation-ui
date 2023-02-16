@@ -59,12 +59,15 @@ const SignIn = (props) => {
           post(
             `${host}/api/v1/auth/validateMeetingToken`,
             (response) => {
-              setUsername(response.userId);
+              if (response.userId) {
+                setUsername(response.userId);
+                setIsMeetingRedirect(true);
+              }
+
               setRedirectData({
                 meetingId: response.meetingID,
                 tokenUserId: response.userId
               });
-              setIsMeetingRedirect(true);
             },
             (e) => {
               console.log('ERR: ', e);
@@ -80,6 +83,8 @@ const SignIn = (props) => {
       });
     }
 
+    console.log('@@@@@@@@', location);
+
     if (location.state) {
       setUsername(location.state.tokenUserId);
       setRedirectData(location.state);
@@ -90,11 +95,11 @@ const SignIn = (props) => {
   const fireLogin = () => {
     clearErrorStates();
 
-    if (username === '') {
+    if (!username) {
       setUsernameState('error');
     }
 
-    if (password === '') {
+    if (!password) {
       setPasswordState('error');
     }
 

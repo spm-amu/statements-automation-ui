@@ -73,7 +73,13 @@ const Guest = (props) => {
     post(
       `${host}/api/v1/auth/meetingLogin/${location.state.meetingId}`,
       (response) => {
+        console.log('______ VALIDATE: ', response);
         setIsLoading(false);
+
+        if(!response.access_token) {
+          setErrorMessage('Invalid or expired passcode');
+          return;
+        }
 
         let lastLogin = new Date().getTime();
         appManager.add("accessToken", response.access_token);

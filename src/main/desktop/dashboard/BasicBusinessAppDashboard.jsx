@@ -337,19 +337,38 @@ const BasicBusinessAppDashboard = (props) => {
     }
   }
 
-  const redirectToMeeting = (params) => {
-    console.log('____PARAMS: ', params);
+  const redirectToMeeting = (params, redirect = false) => {
+    let userDetails = appManager.getUserDetails();
 
     let meetingRedirectId =
       params.selectedMeeting && params.selectedMeeting.id ? params.selectedMeeting.id : params.meetingId;
 
     get(`${host}/api/v1/meeting/fetch/${meetingRedirectId}`, (response) => {
+      console.log('****************** : ', response);
+      console.log('#################', params);
+      console.log('#################', !params.tokenUserId);
+      console.log('#################', response.extendedProps.privacyType === "PRIVATE");
+      console.log('#################', params.tokenUserId !== userDetails.userId);
+
+      const externalUserNotAuth = redirect && response.extendedProps.privacyType === "PRIVATE"  && params.emailAddress !== userDetails.emailAddress;
+      const internalUserNotAuth = response.extendedProps.privacyType === "PRIVATE" && !params.tokenUserId &&  params.tokenUserId !== userDetails.userId;
+
+      console.log('externalUserNotAuth: ', externalUserNotAuth);
+      console.log('internalUserNotAuth: ', internalUserNotAuth);
+
+      if (externalUserNotAuth || internalUserNotAuth) {
+        appManager.fireEvent(SystemEventType.API_ERROR, {
+          message: `Please login in as ${params.emailAddress} to join this meeting. Please avoid sharing private meetings with uninvited guests!`
+        });
+
+        return;
+      }
+
       if (response.extendedProps.status === 'CANCELLED') {
         appManager.fireEvent(SystemEventType.API_ERROR, {
           message: 'The meeting has been cancelled.'
         });
       } else {
-        let userDetails = appManager.getUserDetails();
         let isHost = false;
         response.extendedProps.attendees.forEach(att => {
           if (att.userId === userDetails.userId) {
@@ -439,14 +458,9 @@ const BasicBusinessAppDashboard = (props) => {
                   }
                 });
               } else {
-                let userDetails = appManager.getUserDetails();
-                if (response.userId === userDetails.userId) {
-                  redirectToMeeting(args.payload.params);
-                } else {
-                  appManager.fireEvent(SystemEventType.API_ERROR, {
-                    message: `Please login in as ${response.userId} to join this meeting. Please avoid sharing private meetings with uninvited guests!`
-                  });
-                }
+                const data = args.payload.params;
+                data.emailAddress = response.attendeeName;
+                redirectToMeeting(data, true);
               }
             },
             (e) => {
