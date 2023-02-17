@@ -57,7 +57,7 @@ const Guest = (props) => {
       setEmail(location.state.tokenUserId);
       setPrivateExternal(true);
     }
-  }, [])
+  }, []);
 
   const fireJoinMeeting = () => {
     clearErrorStates();

@@ -573,6 +573,7 @@ const MeetingRoom = (props) => {
       endCall();
       socketManager.removeSubscriptions(eventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
+      appManager.remove('CURRENT_MEETING');
     };
   }, []);
 
@@ -655,11 +656,18 @@ const MeetingRoom = (props) => {
   };
 
 
+
+
+
+
   const setupStream = () => {
+    alert(1.2);
     currentUserStream.init(!videoMuted, true, (stream) => {
+      alert(1.3);
       setStreamsInitiated(true);
       createMediaRecorder(stream);
     }, (e) => {
+      alert(1.4);
       console.log(e);
     });
   };
@@ -681,7 +689,7 @@ const MeetingRoom = (props) => {
     }
 
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
-    setupStream();
+    //setupStream();
     appManager.add('CURRENT_MEETING', selectedMeeting);
   }, []);
 
@@ -689,8 +697,12 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     if (userVideo && userVideo.current && !userVideo.current.srcObject) {
       userVideo.current.srcObject = currentUserStream.obj;
+
+      if(!streamsInitiated) {
+        setupStream();
+      }
     }
-  }, [userVideo, streamsInitiated]);
+  }, [userVideo]);
 
   const persistMeetingSettings = () => {
     post(
@@ -727,9 +739,11 @@ const MeetingRoom = (props) => {
       participant.audioMuted = payload.audioMuted;
       participant.videoMuted = payload.videoMuted;
 
-      handleMessageArrived({
-        message: participant.name + " started sharing"
-      })
+      if(payload.screenShared) {
+        handleMessageArrived({
+          message: participant.name + " started sharing"
+        })
+      }
     }
 
     setParticipants([].concat(participants));
@@ -950,7 +964,6 @@ const MeetingRoom = (props) => {
                     }}>
                       <div className={'col'} style={{width: '100%', paddingLeft: '0', paddingRight: '0'}}>
                         {
-                          currentUserStream.obj &&
                           <MeetingParticipantGrid participants={participants}
                                                   waitingList={lobbyWaitingList}
                                                   mode={meetingParticipantGridMode}

@@ -291,7 +291,7 @@ const BasicBusinessAppDashboard = (props) => {
     };
   }, []);
 
-  function setup(response) {
+  function setup(response, isGuest = false) {
     appManager.setUserDetails(response);
     setUserDetails(response);
     init();
@@ -303,7 +303,7 @@ const BasicBusinessAppDashboard = (props) => {
       setTokenRefreshMonitorStarted(true);
     }
 
-    if (location.state) {
+    if (isGuest) {
       window.history.replaceState({}, document.title); // clear location.state
       redirectToMeeting(location.state);
     }
@@ -344,12 +344,7 @@ const BasicBusinessAppDashboard = (props) => {
       params.selectedMeeting && params.selectedMeeting.id ? params.selectedMeeting.id : params.meetingId;
 
     get(`${host}/api/v1/meeting/fetch/${meetingRedirectId}`, (response) => {
-      console.log('****************** : ', response);
-      console.log('#################', params);
-      console.log('#################', !params.tokenUserId);
-      console.log('#################', response.extendedProps.privacyType === "PRIVATE");
-      console.log('#################', params.tokenUserId !== userDetails.userId);
-
+      // TODO : Review this code and find alternative. These validations should be handled by the backend
       const externalUserNotAuth = redirect && response.extendedProps.privacyType === "PRIVATE"  && params.emailAddress !== userDetails.emailAddress;
       const internalUserNotAuth = response.extendedProps.privacyType === "PRIVATE" && !params.tokenUserId &&  params.tokenUserId !== userDetails.userId;
 
@@ -363,6 +358,7 @@ const BasicBusinessAppDashboard = (props) => {
 
         return;
       }
+      // ==== END TODO block
 
       if (response.extendedProps.status === 'CANCELLED') {
         appManager.fireEvent(SystemEventType.API_ERROR, {
@@ -380,10 +376,11 @@ const BasicBusinessAppDashboard = (props) => {
           state: {
             displayMode: 'window',
             selectedMeeting: {
-              id: response.id
+              id: response.id,
+              title: response.title
             },
-            videoMuted: true,
-            audioMuted: true,
+            videoMuted: false,
+            audioMuted: false,
             isHost
           }
         })
@@ -487,15 +484,15 @@ const BasicBusinessAppDashboard = (props) => {
 
       electron.ipcRenderer.sendMessage('readTokens', {});
     } else {
-      const loginTokens = location.state;
+      const guestNaviationData = location.state;
 
-      if (loginTokens && loginTokens.accessToken && loginTokens.refreshToken) {
-        appManager.add(ACCESS_TOKEN_PROPERTY, loginTokens.accessToken);
-        appManager.add(REFRESH_TOKEN_PROPERTY, loginTokens.refreshToken);
-        appManager.add(LAST_LOGIN, loginTokens.lastLogin);
+      if (guestNaviationData && guestNaviationData.accessToken && guestNaviationData.refreshToken) {
+        appManager.add(ACCESS_TOKEN_PROPERTY, guestNaviationData.accessToken);
+        appManager.add(REFRESH_TOKEN_PROPERTY, guestNaviationData.refreshToken);
+        appManager.add(LAST_LOGIN, guestNaviationData.lastLogin);
 
-        if (loginTokens.guest) {
-          setup(loginTokens.guest);
+        if (guestNaviationData.guest) {
+          setup(guestNaviationData.guest, true);
         } else {
           load();
         }
