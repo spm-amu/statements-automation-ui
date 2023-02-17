@@ -45,7 +45,11 @@ const Chats = (props) => {
         switch (eventType) {
           case SystemEventType.ACTIVE_CHAT_CHANGED:
             let chat = updateSelectedChat(be.payload);
-            onChatRoomMessage(be.payload.message, chat);
+            if(chat) {
+              onChatRoomMessage(be.payload.message, chat);
+            } else {
+              loadChats();
+            }
             break;
         }
       }

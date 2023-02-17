@@ -275,7 +275,7 @@ const ChatRoom = (props) => {
       setMessages(oldMsgs => [...oldMsgs, msg]);
       selectedChat.messages.push(msg);
 
-      if (props.onMessage) {
+      if (props.onMessage && selectedChat) {
         props.onMessage(msg, selectedChat);
       }
     }
