@@ -655,19 +655,11 @@ const MeetingRoom = (props) => {
     }, '', false)
   };
 
-
-
-
-
-
   const setupStream = () => {
-    alert(1.2);
     currentUserStream.init(!videoMuted, true, (stream) => {
-      alert(1.3);
       setStreamsInitiated(true);
       createMediaRecorder(stream);
     }, (e) => {
-      alert(1.4);
       console.log(e);
     });
   };
@@ -696,13 +688,17 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (userVideo && userVideo.current && !userVideo.current.srcObject) {
-      userVideo.current.srcObject = currentUserStream.obj;
-
       if(!streamsInitiated) {
         setupStream();
       }
     }
   }, [userVideo]);
+
+  useEffect(() => {
+    if (streamsInitiated) {
+      userVideo.current.srcObject = currentUserStream.obj;
+    }
+  }, [streamsInitiated]);
 
   const persistMeetingSettings = () => {
     post(

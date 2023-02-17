@@ -12,7 +12,6 @@ export class Stream {
         }
       });
 
-    alert("STARTING MEDIA STREAM");
     userMedia
       .then((stream) => {
 
