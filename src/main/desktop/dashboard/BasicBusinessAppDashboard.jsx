@@ -379,8 +379,8 @@ const BasicBusinessAppDashboard = (props) => {
               id: response.id,
               title: response.title
             },
-            videoMuted: false,
-            audioMuted: false,
+            videoMuted: true,
+            audioMuted: true,
             isHost
           }
         })
