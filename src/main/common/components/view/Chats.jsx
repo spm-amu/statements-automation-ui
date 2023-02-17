@@ -157,7 +157,7 @@ const Chats = (props) => {
 
   const onChatRoomMessage = (message, chat) => {
     chat.updatedAt = moment().format();
-    chat.messages.push(message);
+    //chat.messages.push(message);
 
     setSelectedChat(chat);
     const sorted = chatEvents

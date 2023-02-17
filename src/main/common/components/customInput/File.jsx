@@ -1,11 +1,10 @@
-﻿import React from 'react';
+﻿import React, {useEffect} from 'react';
 import "./Form.css";
-import AutoComplete from "./AutoComplete";
 import IconButton from '@material-ui/core/IconButton';
 import Icon from '../Icon'
 import {host} from "../../service/RestService";
-import Utils from "../../Utils";
-const { electron } = window;
+
+const {electron} = window;
 
 const Files = React.memo(React.forwardRef((props, ref) => {
 
@@ -32,13 +31,17 @@ const Files = React.memo(React.forwardRef((props, ref) => {
           let joined = files.concat(allFiles);
           setFiles(joined);
 
-          if(props.valueChangeHandler) {
+          if (props.valueChangeHandler) {
             props.valueChangeHandler(joined, props.id);
           }
         }
       };
     }
   };
+
+  useEffect(() => {
+    setFiles([]);
+  }, [props.clearUploadedFileSwitch]);
 
   const onDownload = (documentId) => {
 
@@ -50,8 +53,8 @@ const Files = React.memo(React.forwardRef((props, ref) => {
   };
 
   return <>
-    <div className={'row'}>
-      <div className={'col-*-*'} style={{marginLeft: '12px', width: '48px'}}>
+    <div className={'row'} style={{alignItems: 'center', margin: '0', width: '100%'}}>
+      <div className={'col-*-*'} style={{marginLeft: '0', width: '72px'}}>
         <input
           accept={props.style === 'IMAGE' ? "image/jpeg,image/gif,image/png,image/x-eps"
             : "image/*,application/*"}
@@ -73,23 +76,24 @@ const Files = React.memo(React.forwardRef((props, ref) => {
       </div>
       {
         files.length > 0 ?
-          <div className={'col-*-*'} style={{padding: '8px 0 0 8px', width: 'calc(100% - 88px)'}}>
-            <AutoComplete
-              id={props.id}
-              label={''}
-              disabled={props.disabled}
-              enableFile={props.enableFile}
-              invalidText={''}
-              value={files}
-              multiple={!Utils.isNull(props.multiple) ? props.multiple : true}
-              borderless={true}
-              className={'files'}
-              labelClickHandler={(option) => onDownload(option)}
-              valueChangeHandler={(value, id) => {
-                setFiles(value);
-                props.valueChangeHandler(value, id);
-              }}
-            />
+          <div className={'col-*-*'}
+               style={{padding: '8px 0 16px 8px', width: 'calc(100% - 88px)', marginLeft: '-24px'}}>
+            {
+              files && files.length > 0 &&
+              <div className={'row no-margin no-padding'}>
+                <div>
+                  <div className={'row no-margin file-label'}>
+                    <div>{files[0].name}</div>
+                    <div className={'close-button'} onClick={(e) => {
+                      setFiles([]);
+                      props.valueChangeHandler(null, props.id);
+                    }}>x
+                    </div>
+                  </div>
+                </div>
+                <div className={'col spacer'}>&nbsp;</div>
+              </div>
+            }
           </div>
           :
           null

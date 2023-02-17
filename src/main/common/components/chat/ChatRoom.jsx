@@ -29,7 +29,7 @@ import Radio from '@material-ui/core/Radio';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import PollResult from './PollResult';
-import Files from "../customInput/Files";
+import File from "../customInput/File";
 
 const ChatRoom = (props) => {
   const navigate = useNavigate();
@@ -45,6 +45,7 @@ const ChatRoom = (props) => {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState('CHAT');
   const [currentVote, setCurrentVote] = useState([]);
+  const [clearUploadedFileSwitch, setClearUploadedFileSwitch] = useState(false);
   const [openAddPeople, setOpenAddPeople] = useState(false);
   const [socketEventHandler] = useState({});
 
@@ -102,7 +103,7 @@ const ChatRoom = (props) => {
     }
 
     return timeRemaining;
-  }
+  };
 
   const closePoll = (e, poll) => {
     post(
@@ -145,10 +146,9 @@ const ChatRoom = (props) => {
         if (payload.chatMessage.type === 'EVENT') {
           props.addedPeopleHandler()
         }
-      } else {
-        selectedChat.messages.push(payload.chatMessage);
       }
 
+      selectedChat.messages.push(payload.chatMessage);
       loadMessages();
     }
   };
@@ -156,16 +156,16 @@ const ChatRoom = (props) => {
   const loadMessages = () => {
     scrollToBottom();
 
+    console.log('_____ SEL MSGES: ', selectedChat.messages);
     console.log('_____ MSGES: ', messages);
 
     if (selectedChat) {
       const newMessages = [].concat(selectedChat.messages);
-
       const dateAddedToChat = selectedChat.participants.find(p => p.userId === currentUser.userId).dateAddedToChat;
-
       const filteredMessages = newMessages
         .filter(txt => dateAddedToChat === null || new Date(dateAddedToChat) < new Date(txt.createdDate));
 
+      console.log('_____ NEW MSGES: ', filteredMessages);
       setMessages(filteredMessages);
     }
 
@@ -178,11 +178,15 @@ const ChatRoom = (props) => {
     }
 
     return Utils.getChatMeetingTitle(selectedChat.participants, currentUser.userId, 58);
-  }
+  };
 
   useEffect(() => {
     setSelectedChat(props.selectedChat)
   }, [props.selectedChat]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     console.log('_______ Chat Updated!!!!');
@@ -248,6 +252,7 @@ const ChatRoom = (props) => {
 
       if (document && document.length > 0) {
         msg.document = document[0];
+        setClearUploadedFileSwitch(!clearUploadedFileSwitch);
       }
 
       if (poll) {
@@ -273,8 +278,6 @@ const ChatRoom = (props) => {
       if (props.onMessage) {
         props.onMessage(msg, selectedChat);
       }
-
-      scrollToBottom();
     }
     setMessage('');
     setImgUploadConfirm('');
@@ -771,7 +774,7 @@ const ChatRoom = (props) => {
                 messages
                   .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate))?.map(renderMessages)
               }
-              <div ref={messagesEndRef}/>
+              <div ref={messagesEndRef}>&nbsp;</div>
             </div>
         }
 
@@ -783,18 +786,20 @@ const ChatRoom = (props) => {
                 className="message__imageSelector" style={{width: '72px'}}
               />
               <div className={'chat-input'}>
-                <div className={"file-upload"}>
-                  <Files
+                <div className={"file-upload chats-file-upload"} style={{zIndex: !Utils.isNull(document) ? 1 : 0}}>
+                  <File
                     enableFile={true}
+                    multiple={false}
                     id={'documents'}
                     value={document}
+                    clearUploadedFileSwitch={clearUploadedFileSwitch}
                     valueChangeHandler={(value, id) => {
                       setDocument(value);
-                      setImgUploadConfirm('File is selected and will be displayed after sending the message!');
                     }}
                   />
                 </div>
                 <CustomInput
+                  style={{zIndex: !Utils.isNull(document) ? 0 : 1}}
                   labelText={document ? "" : "Type a new message"}
                   disabled={!Utils.isNull(document)}
                   id="message"
