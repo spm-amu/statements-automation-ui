@@ -255,10 +255,16 @@ const BasicBusinessAppDashboard = (props) => {
         electron.ipcRenderer.sendMessage('receivingMessage', {
           payload: payload
         });
-      } else if(isChatScreenOpen || (currentchat && currentchat.id !== payload.roomId)){
-        appManager.fireEvent(SystemEventType.ACTIVE_CHAT_CHANGED, {
-          payload: payload
-        });
+      } else if(isChatScreenOpen || currentchat){
+        if(currentchat && currentchat.id !== payload.roomId) {
+          appManager.fireEvent(SystemEventType.ACTIVE_CHAT_CHANGED, {
+            payload: payload
+          });
+        } else if(!currentchat){
+          appManager.fireEvent(SystemEventType.FIRST_CHAT_ARRIVED, {
+            payload: payload
+          });
+        }
       }
     }
   };

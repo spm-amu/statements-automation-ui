@@ -51,6 +51,9 @@ const Chats = (props) => {
               loadChats();
             }
             break;
+          case SystemEventType.FIRST_CHAT_ARRIVED:
+            loadChats();
+            break;
         }
       }
     }
@@ -175,7 +178,7 @@ const Chats = (props) => {
   useEffect(() => {
     loadChats();
     socketManager.addSubscriptions(socketEventHandler, MessageType.CHAT_MESSAGE);
-    appManager.addSubscriptions(systemEventHandler, SystemEventType.ACTIVE_CHAT_CHANGED);
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.ACTIVE_CHAT_CHANGED, SystemEventType.FIRST_CHAT_ARRIVED);
   }, []);
 
   useEffect(() => {
