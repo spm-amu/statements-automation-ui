@@ -245,17 +245,22 @@ const BasicBusinessAppDashboard = (props) => {
 
   const onChatMessage = (payload) => {
     let loggedInUser = appManager.getUserDetails();
-
     if (payload.chatMessage.participant.userId !== loggedInUser.userId) {
       newMessageAudio.play();
 
-      if(!payload.skipAlert) {
+      let currentchat = appManager.get('CURRENT_CHAT');
+      if(!payload.skipAlert && !currentchat) {
         electron.ipcRenderer.sendMessage('receivingMessage', {
+          payload: payload
+        });
+      } else if(currentchat && currentchat.id !== payload.roomId){
+        appManager.fireEvent(SystemEventType.ACTIVE_CHAT_CHANGED, {
           payload: payload
         });
       }
     }
   };
+
 
   const cancelCall = (payload) => {
     electron.ipcRenderer.sendMessage('cancelCall', {});

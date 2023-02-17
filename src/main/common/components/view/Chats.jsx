@@ -6,7 +6,7 @@ import ChatForm from "../chat/ChatForm";
 import socketManager from '../../service/SocketManager';
 import { get, host, post } from '../../service/RestService';
 import moment from 'moment';
-import {MessageType} from '../../types';
+import {MessageType, SystemEventType} from '../../types';
 import { useLocation } from 'react-router-dom';
 import appManager from '../../service/AppManager';
 
@@ -17,6 +17,7 @@ const Chats = (props) => {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState('LIST');
   const [socketEventHandler] = useState({});
+  const [systemEventHandler] = useState({});
 
   const location = useLocation();
 
@@ -35,13 +36,35 @@ const Chats = (props) => {
     }
   };
 
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'chat-system-event-handler-api';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.ACTIVE_CHAT_CHANGED:
+            let chat = updateSelectedChat(be.payload);
+            onChatRoomMessage(be.payload.message, chat);
+            break;
+        }
+      }
+    }
+  };
+
+  function updateSelectedChat(payload) {
+    let chat = chatEvents.find((c) => c.id === payload.roomId);
+    if (chat) {
+      chat.messages.push(payload.chatMessage);
+      setSelectedChat(chat);
+    }
+
+    return chat;
+  }
+
   const onSocketMessage = (payload) => {
     if(!selectedChat) {
-      let chat = chatEvents.find((c) => c.id === payload.roomId);
-      if(chat) {
-        chat.messages.push(payload.chatMessage);
-        setSelectedChat(chat);
-      }
+      updateSelectedChat(payload);
     } else {
       if(selectedChat.id !== payload.id) {
         console.log('\n\n\nRECEIVED UNRELATED CHAT');
@@ -79,7 +102,7 @@ const Chats = (props) => {
         null
       );
     }
-  }
+  };
 
   const privateRoomChat = (filteredChatEvents, meetingRoomNav) => {
     let userDetails = appManager.getUserDetails();
@@ -108,7 +131,7 @@ const Chats = (props) => {
       }, (e) => {
       })
     }
-  }
+  };
 
   const loadChats = () => {
     get(`${host}/api/v1/chat/fetchChats`, (response) => {
@@ -120,7 +143,7 @@ const Chats = (props) => {
         }
 
         return false;
-      })
+      });
 
       filteredChatEvents.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
@@ -142,16 +165,24 @@ const Chats = (props) => {
 
   useEffect(() => {
     socketEventHandler.api = socketEventHandlerApi();
+    systemEventHandler.api = systemEventHandlerApi();
   });
 
   useEffect(() => {
     loadChats();
     socketManager.addSubscriptions(socketEventHandler, MessageType.CHAT_MESSAGE);
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.ACTIVE_CHAT_CHANGED);
   }, []);
+
+  useEffect(() => {
+    appManager.add('CURRENT_CHAT', selectedChat);
+  }, [selectedChat]);
 
   React.useEffect(() => {
     return () => {
       socketManager.removeSubscriptions(socketEventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
+      appManager.add('CURRENT_CHAT', null);
     };
   }, []);
 
