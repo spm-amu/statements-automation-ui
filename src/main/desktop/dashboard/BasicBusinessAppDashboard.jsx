@@ -249,11 +249,13 @@ const BasicBusinessAppDashboard = (props) => {
       newMessageAudio.play();
 
       let currentchat = appManager.get('CURRENT_CHAT');
-      if(!payload.skipAlert && !currentchat) {
+      let isChatScreenOpen = appManager.getCurrentView() === 'chats';
+
+      if(!payload.skipAlert && !currentchat && !isChatScreenOpen) {
         electron.ipcRenderer.sendMessage('receivingMessage', {
           payload: payload
         });
-      } else if(currentchat && currentchat.id !== payload.roomId){
+      } else if(isChatScreenOpen || (currentchat && currentchat.id !== payload.roomId)){
         appManager.fireEvent(SystemEventType.ACTIVE_CHAT_CHANGED, {
           payload: payload
         });
