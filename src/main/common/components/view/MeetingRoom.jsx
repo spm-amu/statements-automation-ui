@@ -6,7 +6,6 @@ import Dialog from "@material-ui/core/Dialog";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Paper from "@material-ui/core/Paper";
 import Draggable from "react-draggable";
-import Lobby from "../vc/Lobby";
 import Footer from "../vc/Footer";
 import socketManager from "../../service/SocketManager";
 import {MessageType, SystemEventType} from "../../types";
@@ -57,7 +56,8 @@ const PaperComponent = (props) => (
 
 const Steps = {
   LOBBY: 'LOBBY',
-  SESSION: 'SESSION'
+  SESSION: 'SESSION',
+  SESSION_ENDED: 'SESSION_ENDED'
 };
 
 const hangUpAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/hangupsound.mp3');
@@ -119,7 +119,7 @@ const MeetingRoom = (props) => {
             addUserToLobby(be.payload);
             break;
           case MessageType.ALL_USERS:
-            if(userToCall && isHost && isDirectCall) {
+            if (userToCall && isHost && isDirectCall) {
               socketManager.emitEvent(MessageType.CALL_USER, {
                 room: selectedMeeting.id,
                 userToCall: userToCall,
@@ -261,7 +261,7 @@ const MeetingRoom = (props) => {
 
       if (newParticipants.length === 1 && isDirectCall) {
         onCallEnded();
-        props.closeHandler();
+        //props.closeHandler();
       } else {
         setParticipants(newParticipants);
         if (newParticipants.length === 0) {
@@ -446,7 +446,7 @@ const MeetingRoom = (props) => {
     if (allUserParticipantsLeft) {
       if (!isDirectCall) {
         // TODO : Introduce a new step for this
-        setStep("LOBBY");
+        setStep(Steps.LOBBY);
         props.windowHandler.hide();
       } else {
         endCall();
@@ -699,7 +699,7 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (userVideo && userVideo.current && !userVideo.current.srcObject) {
-      if(!streamsInitiated) {
+      if (!streamsInitiated) {
         setupStream();
       }
     }
@@ -746,7 +746,7 @@ const MeetingRoom = (props) => {
       participant.audioMuted = payload.audioMuted;
       participant.videoMuted = payload.videoMuted;
 
-      if(payload.screenShared) {
+      if (payload.screenShared) {
         handleMessageArrived({
           message: participant.name + " started sharing"
         })
@@ -781,8 +781,10 @@ const MeetingRoom = (props) => {
     socketManager.clearUserToPeerMap();
     socketManager.disconnectSocket();
     socketManager.init();
-    props.onEndCall();
-    props.closeHandler();
+    //props.onEndCall();
+    //props.closeHandler();
+
+    setStep(Steps.SESSION_ENDED)
   };
 
   const removeFromLobbyWaiting = (item) => {
@@ -956,27 +958,32 @@ const MeetingRoom = (props) => {
                     }}>
                       <div className={'col'} style={{width: '100%', paddingLeft: '0', paddingRight: '0'}}>
                         {
-                          <MeetingParticipantGrid participants={participants}
-                                                  waitingList={lobbyWaitingList}
-                                                  mode={meetingParticipantGridMode}
-                                                  screenShared={screenShared}
-                                                  audioMuted={audioMuted}
-                                                  videoMuted={videoMuted}
-                                                  meetingTitle={selectedMeeting.title}
-                                                  userToCall={userToCall}
-                                                  step={step}
-                                                  isHost={isHost}
-                                                  allUserParticipantsLeft={allUserParticipantsLeft}
-                                                  userVideoChangeHandler={(ref) => setUserVideo(ref)}
-                                                  acceptUserHandler={
-                                                    (item) => {
-                                                      acceptUser(item);
-                                                    }}
-                                                  rejectUserHandler={
-                                                    (item) => {
-                                                      rejectUser(item);
-                                                    }}
-                          />
+                          step === Steps.SESSION_ENDED ?
+                            <div style={{backgroundColor: 'rgb(40, 40, 43)', color: 'white', fontSize: '24px', width: '100%', height: '100%'}} className={'centered-flex-box'}>
+                              {'The ' + (isDirectCall ? 'call' : 'meeting') + ' has been ended' + (isDirectCall ? '' : ' by the host')}
+                            </div>
+                            :
+                            <MeetingParticipantGrid participants={participants}
+                                                    waitingList={lobbyWaitingList}
+                                                    mode={meetingParticipantGridMode}
+                                                    screenShared={screenShared}
+                                                    audioMuted={audioMuted}
+                                                    videoMuted={videoMuted}
+                                                    meetingTitle={selectedMeeting.title}
+                                                    userToCall={userToCall}
+                                                    step={step}
+                                                    isHost={isHost}
+                                                    allUserParticipantsLeft={allUserParticipantsLeft}
+                                                    userVideoChangeHandler={(ref) => setUserVideo(ref)}
+                                                    acceptUserHandler={
+                                                      (item) => {
+                                                        acceptUser(item);
+                                                      }}
+                                                    rejectUserHandler={
+                                                      (item) => {
+                                                        rejectUser(item);
+                                                      }}
+                            />
                         }
                       </div>
                     </div>
@@ -1067,6 +1074,9 @@ const MeetingRoom = (props) => {
                           },
                           toggleAutoPermit: () => {
                             persistMeetingSettings()
+                          },
+                          closeWindow: () => {
+                            endCall();
                           },
                         }
                       }

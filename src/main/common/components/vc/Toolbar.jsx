@@ -16,6 +16,7 @@ const Toolbar = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMoreActions = Boolean(anchorEl);
   const [screenShared, setScreenShared] = useState(false);
+  const [step, setStep] = useState();
 
   const {
     participants,
@@ -25,7 +26,6 @@ const Toolbar = (props) => {
     displayState,
     eventHandler,
     handRaised,
-    step,
     isHost
   } = props;
 
@@ -50,6 +50,10 @@ const Toolbar = (props) => {
 
     setIsRecording(!isRecording);
   };
+
+  useEffect(() => {
+    setStep(props.step);
+  }, [props.step]);
 
   useEffect(() => {
     setAutoPermit(props.autoPermit);
@@ -109,6 +113,10 @@ const Toolbar = (props) => {
     eventHandler.lowerHand()
   };
 
+  const closeWindow = () => {
+    eventHandler.closeWindow()
+  };
+
   const toggleAutoPermit = () => {
     setAutoPermit(prevAutoPermit => !prevAutoPermit);
     eventHandler.toggleAutoPermit()
@@ -116,173 +124,189 @@ const Toolbar = (props) => {
 
   return (
     <div className={'footer-toolbar'}>
-      <div className={'row centered-flex-box'}>
-
-        {
-          isHost &&
-          <IconButton
-            onClick={() => {
-              toggleRecorder();
-            }}
-            style={{
-              backgroundColor: isRecording ? 'white' : '#404239',
-              color: 'white',
-              marginRight: '4px'
-            }}
-          >
+      {
+        step === 'SESSION_ENDED' ?
+          <div className={'row centered-flex-box'}>
+            <IconButton
+              onClick={() => {
+                closeWindow();
+              }}
+              style={{
+                backgroundColor: '#eb3f21',
+                color: 'white',
+                marginRight: '4px'
+              }}
+            >
+              <Icon id={'CLOSE'}/>
+            </IconButton>
+          </div>
+          :
+          <div className={'row centered-flex-box'}>
             {
-              isRecording ? <LottieIcon id={'recording'}/> : <Icon id={'RECORD'}/>
+              isHost &&
+              <IconButton
+                onClick={() => {
+                  toggleRecorder();
+                }}
+                style={{
+                  backgroundColor: isRecording ? 'white' : '#404239',
+                  color: 'white',
+                  marginRight: '4px'
+                }}
+              >
+                {
+                  isRecording ? <LottieIcon id={'recording'}/> : <Icon id={'RECORD'}/>
+                }
+              </IconButton>
             }
-          </IconButton>
-        }
-
-        {!screenShared && (
-          <IconButton
-            onClick={() => {
-              muteVideo();
-            }}
-            style={{
-              backgroundColor: videoMuted ? "#eb3f21" : "#404239",
-              color: 'white',
-              marginRight: '4px'
-            }}
-          >
-            {videoMuted ? (
-              <Icon id={'VIDEOCAM_OFF'}/>
-            ) : (
-              <Icon id={'VIDEOCAM'}/>
+            {!screenShared && (
+              <IconButton
+                onClick={() => {
+                  muteVideo();
+                }}
+                style={{
+                  backgroundColor: videoMuted ? "#eb3f21" : "#404239",
+                  color: 'white',
+                  marginRight: '4px'
+                }}
+              >
+                {videoMuted ? (
+                  <Icon id={'VIDEOCAM_OFF'}/>
+                ) : (
+                  <Icon id={'VIDEOCAM'}/>
+                )}
+              </IconButton>
             )}
-          </IconButton>
-        )}
 
-        <IconButton
-          onClick={() => {
-            muteAudio();
-          }}
-          style={{
-            backgroundColor: audioMuted ? "#eb3f21" : "#404239",
-            color: 'white',
-            marginRight: '4px'
-          }}
-        >
-          {audioMuted ? (
-            <Icon id={'MIC_OFF'}/>
-          ) : (
-            <Icon id={'MIC'}/>
-          )}
-        </IconButton>
-        {" "}
-        {
-          step === 'SESSION' && displayState === 'MAXIMIZED' && !whiteBoardShown &&
-          <IconButton
-            onClick={() => {
-              if (screenShared) {
-                stopShareScreen();
-              } else {
-                shareScreen();
+            <IconButton
+              onClick={() => {
+                muteAudio();
+              }}
+              style={{
+                backgroundColor: audioMuted ? "#eb3f21" : "#404239",
+                color: 'white',
+                marginRight: '4px'
+              }}
+            >
+              {audioMuted ? (
+                <Icon id={'MIC_OFF'}/>
+              ) : (
+                <Icon id={'MIC'}/>
+              )}
+            </IconButton>
+            {" "}
+            {
+              step === 'SESSION' && displayState === 'MAXIMIZED' && !whiteBoardShown &&
+              <IconButton
+                onClick={() => {
+                  if (screenShared) {
+                    stopShareScreen();
+                  } else {
+                    shareScreen();
+                  }
+                }}
+                style={{
+                  backgroundColor: screenShared ? '#8eb2f5' : '#404239',
+                  color: 'white',
+                  marginRight: '4px'
+                }}
+              >
+                {screenShared ? (
+                  <Icon id={'CANCEL_PRESENTATION'}/>
+                ) : (
+                  <Icon id={'PRESENT_TO_ALL'}/>
+                )}
+              </IconButton>
+            }
+            {
+              step === 'SESSION' && displayState === 'MAXIMIZED' &&
+              <div>
+                {
+                  hasUnreadChats &&
+                  <div className={'unread-dot'}/>
+                }
+                <IconButton
+                  style={{
+                    backgroundColor: '#404239',
+                    color: 'white',
+                    marginRight: '4px'
+                  }}
+                  onClick={(e) => showChat()}
+                >
+                  <Icon id={'CHAT_BUBBLE'}/>
+                </IconButton>
+              </div>
+            }
+            <IconButton
+              onClick={endCall}
+              style={{
+                backgroundColor: '#eb3f21',
+                color: 'white',
+                marginRight: '4px'
+              }}
+            >
+              <Icon id={'CALL_END'}/>
+            </IconButton>
+            {
+              step === 'SESSION' && displayState === 'MAXIMIZED' &&
+              <div>
+                {
+                  participants.length > 1 &&
+                  <div className={'people-count-bubble'}>{participants.length}</div>
+                }
+                <IconButton
+                  onClick={(e) => showPeople()}
+                  style={{
+                    backgroundColor: '#404239',
+                    color: 'white',
+                    marginRight: '4px'
+                  }}
+                >
+                  <Icon id={'PEOPLE'}/>
+                </IconButton>
+              </div>
+            }
+
+            <IconButton
+              onClick={(e) => {
+                if (handRaised) {
+                  lowerHand();
+                } else {
+                  raiseHand();
+                }
+              }}
+              style={{
+                backgroundColor: '#404239',
+                color: handRaised ? '#e2b030' : 'white',
+                marginRight: '4px'
+              }}
+            >
+              <Icon id={'PAN_TOOL'}/>
+            </IconButton>
+            <div>
+              {
+                hasUnseenWhiteboardEvent &&
+                <div className={'unread-dot'}/>
               }
-            }}
-            style={{
-              backgroundColor: screenShared ? '#8eb2f5' : '#404239',
-              color: 'white',
-              marginRight: '4px'
-            }}
-          >
-            {screenShared ? (
-              <Icon id={'CANCEL_PRESENTATION'}/>
-            ) : (
-              <Icon id={'PRESENT_TO_ALL'}/>
-            )}
-          </IconButton>
-        }
-        {
-          step === 'SESSION' && displayState === 'MAXIMIZED' &&
-          <div>
-            {
-              hasUnreadChats &&
-              <div className={'unread-dot'}/>
-            }
-            <IconButton
-              style={{
-                backgroundColor: '#404239',
-                color: 'white',
-                marginRight: '4px'
-              }}
-              onClick={(e) => showChat()}
-            >
-              <Icon id={'CHAT_BUBBLE'}/>
-            </IconButton>
+              <Tooltip title="More Actions">
+                <IconButton
+                  onClick={handleClick}
+                  sx={{ml: 2}}
+                  aria-controls={openMoreActions ? 'account-menu' : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={openMoreActions ? 'true' : undefined}
+                  style={{
+                    backgroundColor: '#404239',
+                    color: 'white',
+                    marginRight: '4px'
+                  }}
+                >
+                  <Icon id={'MORE'}/>
+                </IconButton>
+              </Tooltip>
+            </div>
           </div>
-        }
-        <IconButton
-          onClick={endCall}
-          style={{
-            backgroundColor: '#eb3f21',
-            color: 'white',
-            marginRight: '4px'
-          }}
-        >
-          <Icon id={'CALL_END'}/>
-        </IconButton>
-        {
-          step === 'SESSION' && displayState === 'MAXIMIZED' &&
-          <div>
-            {
-              participants.length > 1 &&
-              <div className={'people-count-bubble'}>{participants.length}</div>
-            }
-            <IconButton
-              onClick={(e) => showPeople()}
-              style={{
-                backgroundColor: '#404239',
-                color: 'white',
-                marginRight: '4px'
-              }}
-            >
-              <Icon id={'PEOPLE'}/>
-            </IconButton>
-          </div>
-        }
-
-        <IconButton
-          onClick={(e) => {
-            if (handRaised) {
-              lowerHand();
-            } else {
-              raiseHand();
-            }
-          }}
-          style={{
-            backgroundColor: '#404239',
-            color: handRaised ? '#e2b030' : 'white',
-            marginRight: '4px'
-          }}
-        >
-          <Icon id={'PAN_TOOL'}/>
-        </IconButton>
-        <div>
-          {
-            hasUnseenWhiteboardEvent &&
-            <div className={'unread-dot'}/>
-          }
-          <Tooltip title="More Actions">
-            <IconButton
-              onClick={handleClick}
-              sx={{ml: 2}}
-              aria-controls={openMoreActions ? 'account-menu' : undefined}
-              aria-haspopup="true"
-              aria-expanded={openMoreActions ? 'true' : undefined}
-              style={{
-                backgroundColor: '#404239',
-                color: 'white',
-                marginRight: '4px'
-              }}
-            >
-              <Icon id={'MORE'}/>
-            </IconButton>
-          </Tooltip>
-        </div>
-      </div>
+      }
 
       <Menu
         anchorEl={anchorEl}
