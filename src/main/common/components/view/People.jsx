@@ -2,13 +2,13 @@ import React, {useEffect, useState} from 'react';
 import SearchBar from "../SearchBar";
 import './People.css'
 import PersonCard from "../PersonCard";
-import {host, post} from '../../service/RestService';
+import {get, host, post} from '../../service/RestService';
 import socketManager from '../../service/SocketManager';
 import {MessageType} from '../../types';
-import uuid from 'react-uuid';
 import {useNavigate} from 'react-router-dom';
 import Utils from "../../Utils";
 import appManager from "../../../common/service/AppManager";
+import {uuid} from "uuidv4";
 
 const People = (props) => {
 
@@ -65,22 +65,30 @@ const People = (props) => {
     if (props.onAudioCallHandler) {
       props.onAudioCallHandler(userToCall);
     } else {
-      let userDetails = appManager.getUserDetails();
-      const directCallRoom = {
-        id: uuid()
-      };
+      get(
+        `${host}/api/v1/meeting/generateId`,
+        (response) => {
+          const directCallRoom = {
+            id: response
+          };
 
-      navigate("/view/meetingRoom", {
-        state: {
-          displayMode: 'window',
-          selectedMeeting: directCallRoom,
-          videoMuted: true,
-          audioMuted: false,
-          isDirectCall: true,
-          isHost: true,
-          userToCall
-        }
-      })
+          navigate("/view/meetingRoom", {
+            state: {
+              displayMode: 'window',
+              selectedMeeting: directCallRoom,
+              videoMuted: true,
+              audioMuted: false,
+              isDirectCall: true,
+              isHost: true,
+              userToCall
+            }
+          })
+        },
+        (e) => {
+        },
+        '',
+        true
+      );
     }
   };
 

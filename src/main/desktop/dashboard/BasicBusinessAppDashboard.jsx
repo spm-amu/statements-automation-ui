@@ -420,18 +420,29 @@ const BasicBusinessAppDashboard = (props) => {
 
       electron.ipcRenderer.on('answerCall', args => {
         console.log("\n\n\n\nANSWERING CALLL.....", args);
-        navigate("/view/meetingRoom", {
-          state: {
-            displayMode: 'window',
-            selectedMeeting: {
-              id: args.payload.roomId
-            },
-            videoMuted: true,
-            audioMuted: false,
-            isDirectCall: true,
-            callerUser: args.payload.callerUser
-          }
-        })
+        post(
+          `${host}/api/v1/meeting/answerCall`,
+          (response) => {
+            navigate("/view/meetingRoom", {
+              state: {
+                displayMode: 'window',
+                selectedMeeting: {
+                  id: args.payload.roomId
+                },
+                videoMuted: true,
+                audioMuted: false,
+                isDirectCall: true,
+                callerUser: args.payload.callerUser
+              }
+            })
+          },
+          (e) => {},
+          {
+            callId: args.payload.roomId,
+            caller: args.payload.callerUser
+          },
+          null
+        );
       });
 
       electron.ipcRenderer.on('joinMeetingEvent', args => {
