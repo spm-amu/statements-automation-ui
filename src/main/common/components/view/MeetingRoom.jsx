@@ -781,7 +781,7 @@ const MeetingRoom = (props) => {
     socketManager.clearUserToPeerMap();
     socketManager.disconnectSocket();
     socketManager.init();
-    if(isHost) {
+    if(isHost && !isDirectCall) {
       props.onEndCall();
       props.closeHandler();
     } else {
