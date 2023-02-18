@@ -781,10 +781,12 @@ const MeetingRoom = (props) => {
     socketManager.clearUserToPeerMap();
     socketManager.disconnectSocket();
     socketManager.init();
-    //props.onEndCall();
-    //props.closeHandler();
-
-    setStep(Steps.SESSION_ENDED)
+    if(isHost) {
+      props.onEndCall();
+      props.closeHandler();
+    } else {
+      setStep(Steps.SESSION_ENDED)
+    }
   };
 
   const removeFromLobbyWaiting = (item) => {
@@ -1077,6 +1079,7 @@ const MeetingRoom = (props) => {
                           },
                           closeWindow: () => {
                             endCall();
+                            props.closeHandler();
                           },
                         }
                       }
