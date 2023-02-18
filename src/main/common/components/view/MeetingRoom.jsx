@@ -604,6 +604,28 @@ const MeetingRoom = (props) => {
 
   const {settings} = props;
 
+  function createMeetingChat(chatParticipants) {
+    let chat = {
+      meetingId: isDirectCall ? null : selectedMeeting.id,
+      title: selectedMeeting.title,
+      participants: chatParticipants,
+      type: isDirectCall ? 'DIRECT' : 'CALENDAR_MEETING',
+      messages: []
+    };
+
+    post(
+      `${host}/api/v1/chat/create`,
+      (chat) => {
+        setMeetingChat(chat);
+      },
+      (e) => {
+      },
+      chat,
+      '',
+      false
+    );
+  }
+
   const fetchChats = () => {
     console.log('fetchMeetingChat selectedMeeting: ', selectedMeeting);
     console.log('fetchMeetingChat selectedMeeting: ', participants);
@@ -619,40 +641,33 @@ const MeetingRoom = (props) => {
           chatParticipants = [];
           chatParticipants.push(userDetails);
 
+          let users = [];
           participants.forEach(p => {
             if (p.userId !== userDetails.userId) {
-              get(`${host}/api/v1/auth/userInfo/${p.userId}`, (response) => {
-                chatParticipants.push(response);
-              }, (e) => {
-              })
+              users.push(p.userId);
             }
-          })
+          });
+
+          post(`${host}/api/v1/auth/userInfo/multiple`, (response) => {
+              for (const user of response.users) {
+                chatParticipants.push(user);
+              }
+
+              createMeetingChat(chatParticipants);
+            }, (e) => {
+            },
+            {
+              userIds: users
+            }
+          )
         } else {
           chatParticipants = JSON.parse(JSON.stringify(selectedMeeting.attendees));
           chatParticipants.forEach(chatParticipant => {
             delete chatParticipant.id
           });
+
+          createMeetingChat(chatParticipants);
         }
-
-        let chat = {
-          meetingId: isDirectCall ? null : selectedMeeting.id,
-          title: selectedMeeting.title,
-          participants: chatParticipants,
-          type: isDirectCall ? 'DIRECT' : 'CALENDAR_MEETING',
-          messages: []
-        };
-
-        post(
-          `${host}/api/v1/chat/create`,
-          (chat) => {
-            setMeetingChat(chat);
-          },
-          (e) => {
-          },
-          chat,
-          '',
-          false
-        );
       }
 
       setSideBarTab('Chat');
@@ -778,7 +793,7 @@ const MeetingRoom = (props) => {
     socketManager.clearUserToPeerMap();
     socketManager.disconnectSocket();
     socketManager.init();
-    if((isHost && !isDirectCall) || (step !== Steps.SESSION)) {
+    if ((isHost && !isDirectCall) || (step !== Steps.SESSION)) {
       props.onEndCall();
       props.closeHandler();
     } else {
@@ -959,7 +974,13 @@ const MeetingRoom = (props) => {
                       <div className={'col'} style={{width: '100%', paddingLeft: '0', paddingRight: '0'}}>
                         {
                           step === Steps.SESSION_ENDED ?
-                            <div style={{backgroundColor: 'rgb(40, 40, 43)', color: 'white', fontSize: '24px', width: '100%', height: '100%'}} className={'centered-flex-box'}>
+                            <div style={{
+                              backgroundColor: 'rgb(40, 40, 43)',
+                              color: 'white',
+                              fontSize: '24px',
+                              width: '100%',
+                              height: '100%'
+                            }} className={'centered-flex-box'}>
                               {'The ' + (isDirectCall ? 'call' : 'meeting') + ' has been ended' + (isDirectCall ? '' : ' by the host')}
                             </div>
                             :

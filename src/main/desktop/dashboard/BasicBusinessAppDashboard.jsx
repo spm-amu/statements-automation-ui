@@ -439,7 +439,7 @@ const BasicBusinessAppDashboard = (props) => {
           (e) => {},
           {
             callId: args.payload.roomId,
-            caller: args.payload.callerUser
+            caller: args.payload.callerUser.userId
           },
           null
         );
