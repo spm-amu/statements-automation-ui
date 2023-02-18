@@ -10,6 +10,7 @@ import {Stream} from "../../service/Stream";
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { get, host, post } from '../../service/RestService';
+import {Alert} from "@material-ui/lab";
 
 const MeetingSettingsComponent = (props) => {
   const userVideo = useRef();
@@ -116,6 +117,17 @@ const MeetingSettingsComponent = (props) => {
             </td>
           </tr>
           <tr>
+            <td colSpan={4}>
+            {
+            videoOptionDisabled &&
+              <Alert style={{marginBottom: '16px'}} severity="error">
+                We are trying to connect you. The system cannot initiate the media feed...
+              </Alert>
+
+            }
+            </td>
+          </tr>
+          <tr>
             <td className={'lobby-settings'} colSpan={4}>
               <div
                 className={'centered-flex-box'}
@@ -193,6 +205,7 @@ const MeetingSettingsComponent = (props) => {
             <td style={{paddingTop: '8px', textAlign: 'right'}}>
               <Button
                 variant={'contained'}
+                disabled={videoOptionDisabled}
                 size="large"
                 color={'primary'}
                 onClick={(e) => {
