@@ -119,7 +119,7 @@ const MeetingRoom = (props) => {
             addUserToLobby(be.payload);
             break;
           case MessageType.ALL_USERS:
-            if(userToCall) {
+            if(userToCall && isHost && isDirectCall) {
               socketManager.emitEvent(MessageType.CALL_USER, {
                 room: selectedMeeting.id,
                 userToCall: userToCall,
@@ -147,6 +147,9 @@ const MeetingRoom = (props) => {
             break;
           case MessageType.LOWER_HAND:
             onLowerHand(be.payload);
+            break;
+          case MessageType.CANCEL_CALL:
+            alert(12345);
             break;
           case MessageType.AUDIO_VISUAL_SETTINGS_CHANGED:
             onAVSettingsChange(be.payload);
@@ -1013,7 +1016,7 @@ const MeetingRoom = (props) => {
                             stopRecordingMeeting();
                           },
                           endCall: () => {
-                            if (userToCall && isDirectCall && participants.length === 0) {
+                            if (userToCall && isDirectCall && participants.length <= 1) {
                               console.log("USER TO CALL : ", userToCall);
                               socketManager.emitEvent(MessageType.CANCEL_CALL, {
                                 userId: userToCall.userId,

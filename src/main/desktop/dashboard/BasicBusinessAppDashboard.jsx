@@ -269,7 +269,6 @@ const BasicBusinessAppDashboard = (props) => {
     }
   };
 
-
   const cancelCall = (payload) => {
     electron.ipcRenderer.sendMessage('cancelCall', {});
   };
