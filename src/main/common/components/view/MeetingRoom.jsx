@@ -785,7 +785,9 @@ const MeetingRoom = (props) => {
       props.onEndCall();
       props.closeHandler();
     } else {
-      setStep(Steps.SESSION_ENDED)
+      if(step === Steps.SESSION) {
+        setStep(Steps.SESSION_ENDED)
+      }
     }
   };
 
