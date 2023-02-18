@@ -44,7 +44,7 @@ const Lobby = (props) => {
               className={'row no-padding no-margin centered-flex-box'}
             >
               <div style={props.displayState === 'MINIMIZED' ? {margin: '0 8px', fontSize: '20px'} : null}>
-                {meetingTitle}
+                {props.meetingTitle}
               </div>
               <div className={'centered-flex-box'}>
                 <LottieIcon id={props.displayState === 'MINIMIZED' ? 'waiting-sm' : 'waiting'}/>
