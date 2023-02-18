@@ -70,13 +70,6 @@ const People = (props) => {
         id: uuid()
       };
 
-      socketManager.emitEvent(MessageType.CALL_USER, {
-        room: directCallRoom.id,
-        userToCall: userToCall,
-        callerId: socketManager.socket.id,
-        name: userDetails.name,
-      });
-
       navigate("/view/meetingRoom", {
         state: {
           displayMode: 'window',

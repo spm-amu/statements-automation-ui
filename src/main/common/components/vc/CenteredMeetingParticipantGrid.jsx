@@ -7,6 +7,7 @@ import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
 import LottieIcon from "../LottieIcon";
+import Lobby from "./Lobby";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
@@ -184,33 +185,7 @@ const MeetingParticipantGrid = (props) => {
            style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
         {
           step === "LOBBY" &&
-          <div
-            style={{
-              display: 'inline-block',
-              textAlign: 'center',
-              margin: 'auto',
-              overflow: 'hidden',
-              fontSize: '20px',
-              color: '#F1F1F1',
-              width: '100%'
-            }}
-            className={'row no-padding no-margin centered-flex-box'}
-          >
-            <div style={props.displayState === 'MINIMIZED' ? {margin: '0 8px', fontSize: '20px'} : null}>
-              {meetingTitle}
-            </div>
-            <div className={'centered-flex-box'}>
-              <LottieIcon id={props.displayState === 'MINIMIZED' ? 'waiting-sm' : 'waiting'}/>
-            </div>
-            <div style={props.displayState === 'MINIMIZED' ? {margin: '0 8px', fontSize: '20px'} : null}>
-              {
-                props.isHost || props.allUserParticipantsLeft ?
-                  WAITING_FOR_OTHERS_TO_JOIN_MESSAGE
-                  :
-                  ATTENDEE_WAITING_FOR_PERMISION_MESSAGE
-              }
-            </div>
-          </div>
+          <Lobby userToCall={props.userToCall} displayState={props.displayState}/>
         }
         {
           grid && grid.length > 0 &&

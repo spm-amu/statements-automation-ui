@@ -119,6 +119,15 @@ const MeetingRoom = (props) => {
             addUserToLobby(be.payload);
             break;
           case MessageType.ALL_USERS:
+            if(isDirectCall) {
+              socketManager.emitEvent(MessageType.CALL_USER, {
+                room: selectedMeeting.id,
+                userToCall: userToCall,
+                callerId: socketManager.socket.id,
+                name: appManager.getUserDetails().name,
+              });
+            }
+
             createParticipants(be.payload);
             break;
           case MessageType.USER_JOINED:
@@ -245,7 +254,6 @@ const MeetingRoom = (props) => {
       socketManager.removeFromUserToPeerMap(user.id);
 
       const userId = user.alias;
-      const peerObj = participants.find((p) => p.peerID === user.id);
       const newParticipants = participants.filter((p) => p.userId !== userId);
 
       if (newParticipants.length === 1 && isDirectCall) {
@@ -903,21 +911,6 @@ const MeetingRoom = (props) => {
           <div style={{height: '100%'}}>
             <div className={displayState === 'MAXIMIZED' ? 'workspace-max' : 'workspace-min'}>
               {
-                userToCall && step === Steps.LOBBY ?
-                <Lobby userToCall={userToCall} isHost={isHost} waitingList={lobbyWaitingList}
-                       meetingTitle={selectedMeeting.title}
-                       acceptUserHandler={
-                         (item) => {
-                           acceptUser(item);
-                         }}
-                       rejectUserHandler={
-                         (item) => {
-                           rejectUser(item);
-                         }}
-                       displayState={displayState}
-                       allUserParticipantsLeft={allUserParticipantsLeft}
-                />
-                :
                 displayState === 'MAXIMIZED' ?
                   <div className={'row no-margin no-padding'} style={{width: '100%', height: '100%'}}>
                     {
@@ -967,7 +960,10 @@ const MeetingRoom = (props) => {
                                                   audioMuted={audioMuted}
                                                   videoMuted={videoMuted}
                                                   meetingTitle={selectedMeeting.title}
+                                                  userToCall={userToCall}
                                                   step={step}
+                                                  isHost={isHost}
+                                                  allUserParticipantsLeft={allUserParticipantsLeft}
                                                   userVideoChangeHandler={(ref) => setUserVideo(ref)}
                                                   acceptUserHandler={
                                                     (item) => {
