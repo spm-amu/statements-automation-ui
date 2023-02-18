@@ -119,7 +119,7 @@ const MeetingRoom = (props) => {
             addUserToLobby(be.payload);
             break;
           case MessageType.ALL_USERS:
-            if(isDirectCall) {
+            if(userToCall) {
               socketManager.emitEvent(MessageType.CALL_USER, {
                 room: selectedMeeting.id,
                 userToCall: userToCall,
