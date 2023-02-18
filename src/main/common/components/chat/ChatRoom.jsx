@@ -156,21 +156,17 @@ const ChatRoom = (props) => {
   const loadMessages = () => {
     scrollToBottom();
 
-    console.log('_____ SEL MSGES: ', selectedChat.messages);
-    console.log('_____ MSGES: ', messages);
-
     if (selectedChat) {
       const newMessages = [].concat(selectedChat.messages);
       const dateAddedToChat = selectedChat.participants.find(p => p.userId === currentUser.userId).dateAddedToChat;
       const filteredMessages = newMessages
         .filter(txt => dateAddedToChat === null || new Date(dateAddedToChat) < new Date(txt.createdDate));
-
-      console.log('_____ NEW MSGES: ', filteredMessages);
       setMessages(filteredMessages);
     }
 
     setLoading(false);
   };
+
 
   const getChatRoomTitle = () => {
     if (selectedChat.type === 'CALENDAR_MEETING' || selectedChat.title) {
@@ -785,7 +781,7 @@ const ChatRoom = (props) => {
               <div
                 className="message__imageSelector" style={{width: '72px'}}
               />
-              <div className={'chat-input'}>
+              <div className={'chat-input'} style={{position: 'relative'}}>
                 <div className={"file-upload chats-file-upload"} style={{zIndex: !Utils.isNull(document) ? 1 : 0}}>
                   <File
                     enableFile={true}

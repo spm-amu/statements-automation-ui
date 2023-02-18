@@ -148,9 +148,6 @@ const MeetingRoom = (props) => {
           case MessageType.LOWER_HAND:
             onLowerHand(be.payload);
             break;
-          case MessageType.CANCEL_CALL:
-            alert(12345);
-            break;
           case MessageType.AUDIO_VISUAL_SETTINGS_CHANGED:
             onAVSettingsChange(be.payload);
             break;
@@ -781,15 +778,14 @@ const MeetingRoom = (props) => {
     socketManager.clearUserToPeerMap();
     socketManager.disconnectSocket();
     socketManager.init();
-    if(isHost && !isDirectCall) {
+    if((isHost && !isDirectCall) || (step !== Steps.SESSION)) {
       props.onEndCall();
       props.closeHandler();
     } else {
-      if(step === Steps.SESSION) {
-        setStep(Steps.SESSION_ENDED)
-      }
+      setStep(Steps.SESSION_ENDED)
     }
   };
+
 
   const removeFromLobbyWaiting = (item) => {
     setLobbyWaitingList(lobbyWaitingList.filter((i) => i.user !== item.user));

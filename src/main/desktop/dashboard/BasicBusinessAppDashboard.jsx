@@ -356,22 +356,6 @@ const BasicBusinessAppDashboard = (props) => {
       params.selectedMeeting && params.selectedMeeting.id ? params.selectedMeeting.id : params.meetingId;
 
     get(`${host}/api/v1/meeting/fetch/${meetingRedirectId}`, (response) => {
-      // TODO : Review this code and find alternative. These validations should be handled by the backend
-      const externalUserNotAuth = redirect && response.extendedProps.privacyType === "PRIVATE"  && params.emailAddress !== userDetails.emailAddress;
-      const internalUserNotAuth = response.extendedProps.privacyType === "PRIVATE" && !params.tokenUserId &&  params.tokenUserId !== userDetails.userId;
-
-      console.log('externalUserNotAuth: ', externalUserNotAuth);
-      console.log('internalUserNotAuth: ', internalUserNotAuth);
-
-      if (externalUserNotAuth || internalUserNotAuth) {
-        appManager.fireEvent(SystemEventType.API_ERROR, {
-          message: `Please login in as ${params.emailAddress} to join this meeting. Please avoid sharing private meetings with uninvited guests!`
-        });
-
-        return;
-      }
-      // ==== END TODO block
-
       if (response.extendedProps.status === 'CANCELLED') {
         appManager.fireEvent(SystemEventType.API_ERROR, {
           message: 'The meeting has been cancelled.'
