@@ -13,9 +13,6 @@ const MAX_COLS = 3;
 const MAX_ROWS = 2;
 const MAX_TILES = 6;
 
-const WAITING_FOR_OTHERS_TO_JOIN_MESSAGE = 'Waiting for others to join';
-const ATTENDEE_WAITING_FOR_PERMISION_MESSAGE = 'Waiting for the meeting host to let you in';
-
 const MeetingParticipantGrid = (props) => {
   const {participants} = props;
   const [grid, setGrid] = React.useState(null);
@@ -185,7 +182,7 @@ const MeetingParticipantGrid = (props) => {
            style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
         {
           step === "LOBBY" &&
-          <Lobby userToCall={props.userToCall} displayState={props.displayState}/>
+          <Lobby userToCall={props.userToCall} displayState={props.displayState} meetingTitle={props.meetingTitle}/>
         }
         {
           grid && grid.length > 0 &&
