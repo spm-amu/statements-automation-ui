@@ -153,14 +153,14 @@ const Meeting = (props) => {
           !Utils.isNull(props.selectedEvent.startDate)
             ? props.selectedEvent.startDate
             : now,
-        recurringDtstart: now,
+        recurringDtstart: props.selectedEvent.startDate,
         startTime: now,
         endDate:
           !Utils.isNull(props.selectedEvent) &&
           !Utils.isNull(props.selectedEvent.endDate)
             ? props.selectedEvent.endDate
             : now,
-        recurringUntil: now,
+        recurringUntil: props.selectedEvent.endDate,
         endTime: now,
         attendees: [],
         locations: [],
@@ -259,12 +259,12 @@ const Meeting = (props) => {
       eventData.schedule.rrule = {
         freq: recurrenceRepetition,
         interval: recurrence.numberOfOccurences,
-        dtstart: new Date(Utils.getFormattedDate(value.recurringDtstart)),
+        dtstart: moment(Utils.getFormattedDate(value.recurringDtstart) + " " + value.startTime.toLocaleTimeString()),
         until: new Date(recEndDate)
       };
 
       if (recurrenceRepetition === 'WEEKLY') {
-        let occurs = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
+        let occurs = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 
         if (recurrence.weekDays && recurrence.weekDays.length > 0) {
           occurs = recurrence.weekDays;
@@ -323,7 +323,7 @@ const Meeting = (props) => {
         };
       }
 
-      saveMeetingObject(_hostAttendee, isUpdate).then((data) => {
+      getMeetingObject(_hostAttendee, isUpdate).then((data) => {
         post(
           `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
           (response) => {
@@ -340,7 +340,7 @@ const Meeting = (props) => {
     }
   };
 
-  const saveMeetingObject = (hostAttendee, isUpdate) => {
+  const getMeetingObject = (hostAttendee, isUpdate) => {
     return new Promise((resolve, reject) => {
 
       let data = createMeetingObject(hostAttendee);
@@ -466,6 +466,14 @@ const Meeting = (props) => {
         recurrenceValue.bysetpos = 1;
         recurrenceValue.byWeekDay = 'MO';
         recurrenceValue.monthlyDayType = 'monthlyWeekDay';
+      }
+
+      if(value.recurringDtstart) {
+        value.recurringDtstart = props.selectedEvent.startDate;
+      }
+
+      if(value.recurringUntil) {
+        value.recurringUntil = props.selectedEvent.endDate;
       }
 
       setRecurrence(recurrenceValue);
@@ -860,7 +868,7 @@ const Meeting = (props) => {
                         labelId="event-recurrence-label"
                         id="setEventRecurrenceSelect"
                         value={recurrenceRepetition}
-                        disabled={readOnly}
+                        disabled={true}
                         valueChangeHandler={handleEventRecurring}
                         options={recurrenceIntervalOptions}
                       />
@@ -868,6 +876,17 @@ const Meeting = (props) => {
                     {recurrenceRepetition === 'WEEKLY' ? (
                       <div className={'col-*-*'} style={{margin: '8px 0 0 8px'}}>
                         <FormGroup row>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={recurrence.weekDays.includes('SU')}
+                                onChange={handleWeekdayChange}
+                                value={'SU'}
+                              />
+                            }
+                            label="Sun"
+                          />
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -922,6 +941,17 @@ const Meeting = (props) => {
                               />
                             }
                             label="Fri"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={recurrence.weekDays.includes('SA')}
+                                onChange={handleWeekdayChange}
+                                value={'SA'}
+                              />
+                            }
+                            label="Sat"
                           />
                         </FormGroup>
                       </div>
@@ -1038,9 +1068,9 @@ const Meeting = (props) => {
                         valueChangeHandler={(date, id) =>
                           handleFormValueChange(date, id, true)
                         }
-                        errorMessage={
-                          'A recurring start time is required. Please select a value'
-                        }
+                        errorMessage={() => {
+                          return Utils.isNull(value.endTime) ? 'A recurring end time is required' : 'Recurring end should not be in the past'
+                        }}
                       />
                     </div>
                   </div>
