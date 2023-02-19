@@ -706,7 +706,6 @@ const ChatRoom = (props) => {
             </Button>
           </DialogActions>
         </Dialog>
-
         <div className="chatroom__header">
           <div className="chatroom__headerleft">
             <div className={'chat-avatar'}>

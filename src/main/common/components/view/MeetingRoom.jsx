@@ -602,17 +602,19 @@ const MeetingRoom = (props) => {
     }
   }, [streamsInitiated]);
 
-  const {settings} = props;
+  useEffect(() => {
+    if(meetingChat) {
+      setSideBarTab('Chat');
+      setSideBarOpen(true);
+      setHasUnreadChats(false);
+    }
+  }, [meetingChat]);
 
   const fetchChats = () => {
     get(`${host}/api/v1/chat/fetchMeetingChat/${selectedMeeting.id}`, (response) => {
       if (response && response.id) {
         setMeetingChat(response);
       }
-
-      setSideBarTab('Chat');
-      setSideBarOpen(true);
-      setHasUnreadChats(false);
     }, (e) => {
 
     }, '', false)
