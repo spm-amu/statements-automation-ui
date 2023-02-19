@@ -563,8 +563,6 @@ const MeetingRoom = (props) => {
 
   const requestUserToJoin = (requestedUser) => {
     let userDetails = appManager.getUserDetails();
-    alert(selectedMeeting.id);
-
     socketManager.emitEvent(MessageType.REQUEST_TO_JOIN, {
       roomId: selectedMeeting.id,
       callerName: userDetails.name,
