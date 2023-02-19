@@ -7,8 +7,6 @@ import socketManager from '../../service/SocketManager';
 import {MessageType} from '../../types';
 import {useNavigate} from 'react-router-dom';
 import Utils from "../../Utils";
-import appManager from "../../../common/service/AppManager";
-import {uuid} from "uuidv4";
 
 const People = (props) => {
 
