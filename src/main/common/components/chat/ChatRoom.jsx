@@ -18,7 +18,7 @@ import uuid from 'react-uuid';
 import appManager from "../../../common/service/AppManager";
 import {GroupAdd, Info, Poll} from '@material-ui/icons';
 import AutoComplete from '../customInput/AutoComplete';
-import {host, post} from '../../service/RestService';
+import {get, host, post} from '../../service/RestService';
 import {Form} from 'reactstrap';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -283,31 +283,39 @@ const ChatRoom = (props) => {
   const callNow = (e) => {
     e.preventDefault();
     sendMessage(e, `${currentUser.name} has started a call.`);
+    get(
+      `${host}/api/v1/meeting/generateId`,
+      (response) => {
+        alert(response);
+        const directCallRoom = {
+          id: response
+        };
 
-    const directCallRoom = {
-      id: uuid()
-    };
+        const participantsToSignalIds = participantsUserIds();
+        socketManager.emitEvent(MessageType.CALL_MULTIPLE_USER, {
+          room: directCallRoom.id,
+          usersToCall: participantsToSignalIds,
+          callerId: socketManager.socket.id,
+          name: currentUser.name,
+        });
 
-    const participantsToSignalIds = participantsUserIds();
-
-    socketManager.emitEvent(MessageType.CALL_MULTIPLE_USER, {
-      room: directCallRoom.id,
-      usersToCall: participantsToSignalIds,
-      callerId: socketManager.socket.id,
-      name: currentUser.name,
-    });
-
-    navigate("/view/meetingRoom", {
-      state: {
-        displayMode: 'window',
-        selectedMeeting: directCallRoom,
-        videoMuted: true,
-        audioMuted: false,
-        isDirectCall: true,
-        isHost: true,
-        usersToCall: participantsToSignalIds
-      }
-    })
+        navigate("/view/meetingRoom", {
+          state: {
+            displayMode: 'window',
+            selectedMeeting: directCallRoom,
+            videoMuted: true,
+            audioMuted: false,
+            isDirectCall: true,
+            isHost: true,
+            usersToCall: participantsToSignalIds
+          }
+        })
+      },
+      (e) => {
+      },
+      '',
+      true
+    );
   };
 
   const addPeople = (e) => {
