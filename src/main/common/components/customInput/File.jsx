@@ -83,12 +83,29 @@ const Files = React.memo(React.forwardRef((props, ref) => {
               <div className={'row no-margin no-padding'}>
                 <div>
                   <div className={'row no-margin file-label'}>
-                    <div>{files[0].name}</div>
-                    <div className={'close-button'} onClick={(e) => {
+                    <table>
+                      <tbody>
+                      <tr>
+                        <td>{files[0].name}</td>
+                        <td>
+                          <div style={{float: 'right'}} className={'close-button'} onClick={(e) => {
+                            setFiles([]);
+                            props.valueChangeHandler(null, props.id);
+                          }}>x
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+
+                    </table>
+                    {/*<div style={{float: 'left'}}>
+                      {files[0].name}
+                    </div>
+                    <div style={{float: 'right'}} className={'close-button'} onClick={(e) => {
                       setFiles([]);
                       props.valueChangeHandler(null, props.id);
                     }}>x
-                    </div>
+                    </div>*/}
                   </div>
                 </div>
                 <div className={'col spacer'}>&nbsp;</div>
