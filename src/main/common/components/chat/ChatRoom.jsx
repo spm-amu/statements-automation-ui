@@ -286,7 +286,6 @@ const ChatRoom = (props) => {
     get(
       `${host}/api/v1/meeting/generateId`,
       (response) => {
-        alert(response);
         const directCallRoom = {
           id: response
         };
@@ -727,7 +726,7 @@ const ChatRoom = (props) => {
             {
               !props.chatTab &&
               <>
-                <Tooltip title="Call">
+                {/*<Tooltip title="Call">
                   <IconButton
                     onClick={(e) => {
                       callNow(e);
@@ -735,7 +734,7 @@ const ChatRoom = (props) => {
                   >
                     <CallIcon/>
                   </IconButton>
-                </Tooltip>
+                </Tooltip>*/}
 
                 <Tooltip title="Add People">
                   <IconButton
