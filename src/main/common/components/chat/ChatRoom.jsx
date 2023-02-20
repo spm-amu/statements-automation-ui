@@ -142,10 +142,11 @@ const ChatRoom = (props) => {
   };
 
   const onSystemEvent = (be) => {
+    alert("POLL MSG RECEIVED");
     if(be.systemEventType === "NEW_POLL_VOTE") {
-      let find = messages.find((msg) => msg.id === be.data.messageId);
+      let find = messages.find((msg) => msg.poll && msg.poll.id === be.data.pollId);
       if(find) {
-        alert(find.data.poll.id);
+        alert(find.poll.id);
       }
     }
   };
@@ -627,11 +628,12 @@ const ChatRoom = (props) => {
                       participantIds.push(participant.userId);
                     }
 
+                    console.log("\n\n\n\n\nMSG : ", message);
                     socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
                       systemEventType: "NEW_POLL_VOTE",
                       recipients: participantIds,
                       data: {
-                        messageId: message.id
+                        pollId: poll.id
                       }
                     });
                   }}
