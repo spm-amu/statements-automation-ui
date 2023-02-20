@@ -630,6 +630,7 @@ const ChatRoom = (props) => {
                     socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
                       systemEventType: "NEW_POLL_VOTE",
                       data: {
+                        recipients: participantIds,
                         messageId: message.id
                       }
                     });
