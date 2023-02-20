@@ -60,7 +60,7 @@ const ChatRoom = (props) => {
             onMessage(be.payload);
             break;
           case MessageType.SYSTEM_EVENT:
-            onSystemEvent(be);
+            onSystemEvent(be.payload);
             break;
         }
       }
@@ -141,12 +141,12 @@ const ChatRoom = (props) => {
     );
   };
 
-  const onSystemEvent = (be) => {
-    alert("POLL MSG RECEIVED");
-    if(be.systemEventType === "NEW_POLL_VOTE") {
-      let find = messages.find((msg) => msg.poll && msg.poll.id === be.data.pollId);
+  const onSystemEvent = (payload) => {
+    console.log(messages);
+    if(payload.systemEventType === "NEW_POLL_VOTE") {
+      let find = messages.find((msg) => msg.poll && msg.poll.id === payload.data.pollId);
       if(find) {
-        alert(find.poll.id);
+        //find.totalVotes++;
       }
     }
   };
