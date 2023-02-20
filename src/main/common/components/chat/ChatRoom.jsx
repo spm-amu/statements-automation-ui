@@ -205,7 +205,7 @@ const ChatRoom = (props) => {
 
   useEffect(() => {
     setCurrentUser(appManager.getUserDetails());
-    socketManager.addSubscriptions(socketEventHandler, MessageType.CHAT_MESSAGE);
+    socketManager.addSubscriptions(socketEventHandler, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT);
   }, []);
 
   useEffect(() => {
