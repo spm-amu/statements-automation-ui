@@ -7,7 +7,7 @@ const PollResult = (props) => {
     <div className="cv-poll-choice">
       <span className="cv-poll-choice-details">
         <span className="cv-choice-percentage">
-            {Math.round(props.percentVote * 100) / 100}%
+            {!props.percentVote ? '0' : Math.round(props.percentVote * 100) / 100}%
         </span>
         <span className="cv-choice-text">
             { props.option.text }
@@ -21,7 +21,7 @@ const PollResult = (props) => {
         }
       </span>
       <span className={props.isWinner ? 'cv-choice-percent-chart winner': 'cv-choice-percent-chart'}
-        style={{width: props.percentVote + '%' }}>
+        style={{width: !props.percentVote ? '0%' : props.percentVote + '%' }}>
       </span>
     </div>
   )

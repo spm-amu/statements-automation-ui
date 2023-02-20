@@ -59,6 +59,9 @@ const ChatRoom = (props) => {
           case MessageType.CHAT_MESSAGE:
             onMessage(be.payload);
             break;
+          case MessageType.SYSTEM_EVENT:
+            onSystemEvent(be);
+            break;
         }
       }
     }
@@ -136,6 +139,15 @@ const ChatRoom = (props) => {
       },
       date
     );
+  };
+
+  const onSystemEvent = (be) => {
+    if(be.systemEventType === "NEW_POLL_VOTE") {
+      let find = messages.find((msg) => msg.id === be.data.messageId);
+      if(find) {
+        alert(find.data.poll.id);
+      }
+    }
   };
 
   const onMessage = (payload) => {
@@ -609,6 +621,18 @@ const ChatRoom = (props) => {
                     poll.selectedOption = selectedVote ? selectedVote.value : null;
                     console.log('poll: ', poll);
                     submitPollVote(poll, currentParticipant);
+
+                    let participantIds = [];
+                    for (const participant of selectedChat.participants) {
+                      participantIds.push(participant.userId);
+                    }
+
+                    socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
+                      systemEventType: "NEW_POLL_VOTE",
+                      data: {
+                        messageId: message.id
+                      }
+                    });
                   }}
                 >
                   Submit Vote
