@@ -84,6 +84,7 @@ const Meeting = (props) => {
 
   const [savePromiseContext, setSavePromiseContext] = useState(null);
   const [cancelPromiseContext, setCancelPromiseContext] = useState(null);
+  const [invalidAttendeesPromiseContext, setInvalidAttendeesPromiseContext] = useState(null);
   const navigate = useNavigate();
 
   const getInitialValue = (propsValue) => {
@@ -323,17 +324,19 @@ const Meeting = (props) => {
         };
       }
 
-      getMeetingObject(_hostAttendee, isUpdate).then((data) => {
-        post(
-          `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
-          (response) => {
-            handleClose();
-          },
-          (e) => {
-          },
-          data,
-          "The meeting details have been saved successfully"
-        );
+      getMeetingObject(_hostAttendee, isUpdate)
+        .then((data) => validateAttendees(data))
+        .then((data) => {
+          post(
+            `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
+            (response) => {
+              handleClose();
+            },
+            (e) => {
+            },
+            data,
+            "The meeting details have been saved successfully"
+          );
       }, () => {
       });
 
@@ -378,6 +381,33 @@ const Meeting = (props) => {
 
           return;
         }
+      }
+
+      resolve(data)
+    });
+  };
+
+  const validateAttendees = (data) => {
+    return new Promise((resolve, reject) => {
+      const attendeeElement = document.getElementById('attendees');
+
+      let invalidAttendeesSelectedWarning = attendeeElement.value && attendeeElement.value.length > 0;
+
+      for(let i = 0; i < data.attendees.length; i++) {
+        if(Utils.isNull(data.attendees[i].type)) {
+          invalidAttendeesSelectedWarning = true;
+          data.attendees.splice(i, 1);
+        }
+      }
+
+      if (invalidAttendeesSelectedWarning) {
+        setInvalidAttendeesPromiseContext({
+          reject,
+          resolve,
+          data
+        });
+
+        return;
       }
 
       resolve(data)
@@ -698,6 +728,25 @@ const Meeting = (props) => {
                        showRight={true}
                        btnTextLeft={'CANCEL'}
                        btnTextRight={'PROCEED'}
+          />
+        }
+        {
+          invalidAttendeesPromiseContext &&
+          <AlertDialog title={'Warning'}
+                       message={'You have selected attendees with invalid email addresses. They will be excluded from this email if you proceed. Would you like to proceed?'}
+                       onLeft={() => {
+                         invalidAttendeesPromiseContext.reject();
+                         setInvalidAttendeesPromiseContext(null);
+                       }}
+                       onRight={() => {
+                         setInvalidAttendeesPromiseContext(null);
+                         invalidAttendeesPromiseContext.resolve(invalidAttendeesPromiseContext.data)
+                       }}
+                       showLeft={true}
+                       showRight={true}
+                       btnTextLeft={'CANCEL'}
+                       btnTextRight={'PROCEED'}
+
           />
         }
         {
