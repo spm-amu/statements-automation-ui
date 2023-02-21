@@ -30,6 +30,8 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import PollResult from './PollResult';
 import File from "../customInput/File";
+import Icon from '../Icon';
+const { electron } = window;
 
 const ChatRoom = (props) => {
   const navigate = useNavigate();
@@ -164,6 +166,14 @@ const ChatRoom = (props) => {
       selectedChat.messages.push(payload.chatMessage);
       loadMessages();
     }
+  };
+
+  const onDownload = (documentId) => {
+    electron.ipcRenderer.sendMessage('downloadFile', {
+      payload: {
+        fileURL: `${host}/api/v1/document/download/${documentId}`,
+      },
+    });
   };
 
   const loadMessages = () => {
@@ -446,12 +456,18 @@ const ChatRoom = (props) => {
       if (message.participant.userId === currentUser.userId) {
         return (
           <div key={index} className="chatroom__message">
-            <div className="mychat">
+            <div className="mychat row">
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
               {
                 renderFileThumbnail(message)
               }
               <p key={index}>{message.content}</p>
+              <IconButton
+                component="span"
+                onClick={() => onDownload(message.document.id)}
+              >
+                <Icon id={'DOWNLOAD'}/>
+              </IconButton>
             </div>
           </div>
         );
@@ -465,10 +481,18 @@ const ChatRoom = (props) => {
             <div className="peer">
               <span>{message.participant.name}</span>
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
-              {
-                renderFileThumbnail(message)
-              }
+              <div>
+                {
+                  renderFileThumbnail(message)
+                }
+              </div>
               <p key={index}>{message.content}</p>
+              <IconButton
+                component="span"
+                onClick={() => onDownload(message.document.id)}
+              >
+                <Icon id={'DOWNLOAD'}/>
+              </IconButton>
             </div>
           </div>
         </div>
