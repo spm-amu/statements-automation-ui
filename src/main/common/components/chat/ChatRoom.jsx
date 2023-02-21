@@ -456,18 +456,23 @@ const ChatRoom = (props) => {
       if (message.participant.userId === currentUser.userId) {
         return (
           <div key={index} className="chatroom__message">
-            <div className="mychat row">
-              <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
+            <div className="mychat">
+              <div>{moment(message.createdDate).format('DD/MM, HH:mm')}</div>
               {
                 renderFileThumbnail(message)
               }
               <p key={index}>{message.content}</p>
-              <IconButton
-                component="span"
-                onClick={() => onDownload(message.document.id)}
-              >
-                <Icon id={'DOWNLOAD'}/>
-              </IconButton>
+              <div>
+                {
+                  message.document.id &&
+                  <IconButton
+                    component="span"
+                    onClick={() => onDownload(message.document.id)}
+                  >
+                    <Icon id={'DOWNLOAD'}/>
+                  </IconButton>
+                }
+              </div>
             </div>
           </div>
         );
