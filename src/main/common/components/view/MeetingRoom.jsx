@@ -285,6 +285,7 @@ const MeetingRoom = (props) => {
     tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
+      console.log("\n\n\n\n\nPEER : ", peerObj.peer);
       peerObj.peer.replaceTrack(
         currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
         stream.getVideoTracks()[0], // current video track - screen track

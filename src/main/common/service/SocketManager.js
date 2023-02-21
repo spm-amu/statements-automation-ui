@@ -136,8 +136,7 @@ class SocketManager {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream: stream.obj,
-      shareScreenStream: stream.shareScreenObj
+      streams: [stream.obj, stream.shareScreenObj]
     });
 
     peer.on('signal', (signal) => {
@@ -186,8 +185,7 @@ class SocketManager {
     const peer = new Peer({
       initiator: false,
       trickle: false,
-      stream: stream.obj,
-      shareScreenStream: stream.shareScreenObj,
+      streams: [stream.obj, stream.shareScreenObj],
       config: {
         iceServers: [
           {urls: 'stun:stun.l.google.com:19302'},
