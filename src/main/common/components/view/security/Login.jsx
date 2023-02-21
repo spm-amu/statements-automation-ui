@@ -7,11 +7,11 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import {withRouter} from 'react-router-dom';
 import Alert from "react-bootstrap/Alert";
 import styles from "./LoginStyle";
 import Utils from '../../../Utils';
-import {host, post} from "../../../service/RestService";
+import {post} from "../../../service/RestService";
+import appManager from '../../../service/AppManager'
 import { useNavigate } from 'react-router-dom';
 
 const Login = (props) => {
@@ -115,7 +115,7 @@ const Login = (props) => {
                   <Button
                     disabled={isLoading}
                     onClick={() => {
-                      post(`${host}/api/v1/auth/login`, (response) => {
+                      post(`${appManager.getAPIHost()}/api/v1/auth/login`, (response) => {
                         sessionStorage.setItem("accessToken", response.access_token);
                         sessionStorage.setItem("idToken", response.response_token);
                         sessionStorage.setItem("username", username);

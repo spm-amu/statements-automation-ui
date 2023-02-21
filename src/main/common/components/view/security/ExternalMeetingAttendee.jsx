@@ -4,18 +4,11 @@ import {CardText, CardTitle, Col, Row,} from 'reactstrap';
 import '../../../assets/scss/page-authentication.scss';
 import Button from '../../RegularButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import {host, get, post} from '../../../service/RestService';
 import styles from './LoginStyle';
 import CustomInput from '../../customInput/CustomInput';
 import {Face} from '@material-ui/icons';
 import {Alert} from '@material-ui/lab';
 import appManager from "../../../../common/service/AppManager";
-import {isSafari, isChrome, isEdge} from 'react-device-detect';
-import {ACCESS_TOKEN_PROPERTY, REFRESH_TOKEN_PROPERTY} from "../../../service/TokenManager";
-import Utils from "../../../Utils";
-import IconButton from "@material-ui/core/IconButton";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
 
 const {electron} = window;
 
@@ -65,7 +58,7 @@ const ExternalMeetingAttendee = (props) => {
       setIsLoading(true);
     }
 
-    // get(`${host}/api/v1/meeting/fetch/${meetingID}`, (response) => {
+    // get(`${appManager.getAPIHost()}/api/v1/meeting/fetch/${meetingID}`, (response) => {
     //   let userDetails = appManager.getUserDetails();
     //   let isHost = false;
     //   response.extendedProps.attendees.forEach(att => {

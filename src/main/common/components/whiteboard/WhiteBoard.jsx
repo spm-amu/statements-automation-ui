@@ -5,12 +5,12 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import EventHandler from "./EventHandler";
 import Utils from "../../Utils";
 import Button from '@material-ui/core/Button';
-import appManager from "../../../common/service/AppManager";
+import appManager from "../../service/AppManager";
 import {MessageType, SystemEventType} from "../../types";
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "../Icon";
 import socketManager from "../../service/SocketManager";
-import {host, post} from '../../service/RestService';
+import {post} from '../../service/RestService';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -208,7 +208,7 @@ const WhiteBoard = (props) => {
 
   const handleSave = () => {
     post(
-      `${host}/api/v1/meeting/whiteboard/save`,
+      `${appManager.getAPIHost()}/api/v1/meeting/whiteboard/save`,
       (response) => {
       },
       (e) => {

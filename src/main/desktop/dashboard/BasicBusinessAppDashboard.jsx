@@ -3,13 +3,13 @@ import {LARGE} from 'material-ui/utils/withWidth';
 import PropTypes from 'prop-types';
 import Utils from '../../common/Utils'
 import ViewPort from "../../common/components/layout/ViewPort";
-import { Route, useLocation, useNavigate } from 'react-router-dom';
+import {Route, useLocation, useNavigate} from 'react-router-dom';
 import PerfectScrollbar from "perfect-scrollbar";
 import Sidebar from './components/blackDashboard/sidebar/Sidebar';
 import HomeNavbar from "../../common/components/navbars/HomeNavbar";
 import "../../common/assets/scss/black-dashboard-react.scss";
 import "./BasicBusinessAppDashboard.css"
-import { get, host, post } from '../../common/service/RestService';
+import {get, post} from '../../common/service/RestService';
 import socketManager from "../../common/service/SocketManager";
 import appManager from "../../common/service/AppManager";
 import tokenManager, {
@@ -21,17 +21,19 @@ import {MessageType, SystemEventType} from '../../common/types';
 import LottieIcon from "../../common/components/LottieIcon";
 import LoadingIndicator from "../../common/components/LoadingIndicator";
 import Alert from "react-bootstrap/Alert";
-import { isChrome, isEdge, isIE, isSafari, osName } from 'react-device-detect';
+import {isChrome, isEdge, isIE, isSafari} from 'react-device-detect';
 
 const {electron} = window;
 
 let ps;
 
+const MODE = "PROD";
 const newMessageAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/message.mp3');
 
 const BasicBusinessAppDashboard = (props) => {
   const [navDrawerOpen, setNavDrawerOpen] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
+  const [networErrorMessage, setNetworErrorMessage] = React.useState(true);
   const [userDetails, setUserDetails] = React.useState(null);
   const [activeColor, setActiveColor] = React.useState("blue");
   const [secondaryThemeColor, setSecondaryThemeColor] = React.useState("");
@@ -81,7 +83,7 @@ const BasicBusinessAppDashboard = (props) => {
     }
   }, [props.width]);
 
-  const init = () => {
+  const initDashboardSettings = () => {
 
     document.body.classList.add("white-content");
 
@@ -166,7 +168,7 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute.isParent = true;
     utilsRoutes.push(newRoute);
 
-    if ((isSafari || isChrome || isIE || isEdge)  && location.state && location.state.guest) {
+    if ((isSafari || isChrome || isIE || isEdge) && location.state && location.state.guest) {
       setRoutes([]);
     } else {
       setRoutes(newRoutes);
@@ -210,7 +212,7 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   const handleApiSuccess = (event) => {
-    if(event.message && event.message.length > 0) {
+    if (event.message && event.message.length > 0) {
       setSuccessMessage(event.message);
       const messageTimeout = setTimeout(() => {
         setSuccessMessage(null);
@@ -251,16 +253,16 @@ const BasicBusinessAppDashboard = (props) => {
       let currentchat = appManager.get('CURRENT_CHAT');
       let isChatScreenOpen = appManager.getCurrentView() === 'chats';
 
-      if(!payload.skipAlert && !currentchat && !isChatScreenOpen) {
+      if (!payload.skipAlert && !currentchat && !isChatScreenOpen) {
         electron.ipcRenderer.sendMessage('receivingMessage', {
           payload: payload
         });
-      } else if(isChatScreenOpen || currentchat){
-        if(currentchat && currentchat.id !== payload.roomId) {
+      } else if (isChatScreenOpen || currentchat) {
+        if (currentchat && currentchat.id !== payload.roomId) {
           appManager.fireEvent(SystemEventType.ACTIVE_CHAT_CHANGED, {
             payload: payload
           });
-        } else if(!currentchat){
+        } else if (!currentchat) {
           appManager.fireEvent(SystemEventType.FIRST_CHAT_ARRIVED, {
             payload: payload
           });
@@ -278,7 +280,7 @@ const BasicBusinessAppDashboard = (props) => {
       payload: payload
     };
 
-    if(appManager.get('CURRENT_MEETING')) {
+    if (appManager.get('CURRENT_MEETING')) {
       args.currentMeetingId = appManager.get('CURRENT_MEETING').id;
     }
 
@@ -296,22 +298,15 @@ const BasicBusinessAppDashboard = (props) => {
     systemEventHandler.api = systemEventHandlerApi();
   });
 
-  useEffect(() => {
-    return () => {
-      socketManager.removeSubscriptions(socketEventHandler);
-      appManager.removeSubscriptions(systemEventHandler);
-    };
-  }, []);
-
   function setup(response, isGuest = false) {
     appManager.setUserDetails(response);
     setUserDetails(response);
-    init();
+    initDashboardSettings();
     socketManager.init();
     socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
 
     if (!tokenRefreshMonitorStarted) {
-      tokenManager.startTokenRefreshMonitor(`${host}/api/v1/auth/refresh`, response.username);
+      tokenManager.startTokenRefreshMonitor(`${appManager.getAPIHost()}/api/v1/auth/refresh`, response.username);
       setTokenRefreshMonitorStarted(true);
     }
 
@@ -328,13 +323,13 @@ const BasicBusinessAppDashboard = (props) => {
     if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
       navigate('/login');
     } else {
-      get(`${host}/api/v1/auth/userInfo`, (response) => {
+      get(`${appManager.getAPIHost()}/api/v1/auth/userInfo`, (response) => {
         setup(response);
       }, (e) => {
         if (e.status === 401) {
           console.log("DASHBOARD REFRESH");
-          if(refreshToken) {
-            get(`${host}/api/v1/auth/refresh?refreshToken=${refreshToken}`, (response) => {
+          if (refreshToken) {
+            get(`${appManager.getAPIHost()}/api/v1/auth/refresh?refreshToken=${refreshToken}`, (response) => {
               electron.ipcRenderer.sendMessage('saveTokens', {
                 accessToken: response.access_token,
                 refreshToken: response.refresh_token,
@@ -355,7 +350,7 @@ const BasicBusinessAppDashboard = (props) => {
     let meetingRedirectId =
       params.selectedMeeting && params.selectedMeeting.id ? params.selectedMeeting.id : params.meetingId;
 
-    get(`${host}/api/v1/meeting/fetch/${meetingRedirectId}`, (response) => {
+    get(`${appManager.getAPIHost()}/api/v1/meeting/fetch/${meetingRedirectId}`, (response) => {
       if (response.extendedProps.status === 'CANCELLED') {
         appManager.fireEvent(SystemEventType.API_ERROR, {
           message: 'The meeting has been cancelled.'
@@ -385,15 +380,14 @@ const BasicBusinessAppDashboard = (props) => {
     }, '', false);
   };
 
-  React.useEffect(() => {
+  function init() {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.UNAUTHORISED_API_CALL, SystemEventType.API_ERROR, SystemEventType.API_SUCCESS);
-
     if (!isSafari && !isChrome && !isIE && !isEdge) {
       electron.ipcRenderer.on('tokensRead', args => {
 
         console.log('______ PATHS: ', args);
 
-        if(args.accessToken && args.refreshToken) {
+        if (args.accessToken && args.refreshToken) {
           appManager.add(ACCESS_TOKEN_PROPERTY, args.accessToken);
           appManager.add(REFRESH_TOKEN_PROPERTY, args.refreshToken);
           appManager.add(LAST_LOGIN, args.lastLogin);
@@ -421,7 +415,7 @@ const BasicBusinessAppDashboard = (props) => {
       electron.ipcRenderer.on('answerCall', args => {
         console.log("\n\n\n\nANSWERING CALLL.....", args);
         post(
-          `${host}/api/v1/meeting/answerCall`,
+          `${appManager.getAPIHost()}/api/v1/meeting/answerCall`,
           (response) => {
             navigate("/view/meetingRoom", {
               state: {
@@ -436,7 +430,8 @@ const BasicBusinessAppDashboard = (props) => {
               }
             })
           },
-          (e) => {},
+          (e) => {
+          },
           {
             callId: args.payload.roomId,
             caller: args.payload.callerUser.userId
@@ -451,7 +446,7 @@ const BasicBusinessAppDashboard = (props) => {
 
         if (args.payload.params.redirect) {
           post(
-            `${host}/api/v1/auth/validateMeetingToken`,
+            `${appManager.getAPIHost()}/api/v1/auth/validateMeetingToken`,
             (response) => {
               if (Utils.isNull(accessToken) || Utils.isNull(refreshToken)) {
                 navigate('/login', {
@@ -507,10 +502,36 @@ const BasicBusinessAppDashboard = (props) => {
         navigate('/login');
       }
     }
+  }
+
+  function loadHost(apiHost, signalingServerHost) {
+    appManager.setAPIHost(apiHost);
+    appManager.setSignalingServerHost(apiHost, signalingServerHost);
+    setNetworErrorMessage(null);
+    init();
+  }
+
+  React.useEffect(() => {
+    if (MODE === 'PROD') {
+      get("http://DEVHOVC03/vc/api/v1/system/ping", (e) => {
+        loadHost("http://DEVHOVC03/vc", "http://DEVHOVC03:8000");
+      }, (e) => {
+        get("https://svn.agilemotion.co.za/vc/api/v1/system/ping", (e) => {
+          loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
+        }, (e) => {
+          setNetworErrorMessage("A network error has occurred while connecting to the server. Please contact your system administrator");
+        }, "", true, false);
+      }, "", true, false);
+    } else {
+      loadHost("http://localhost:8080/vc", "http://localhost:8000");
+    }
   }, []);
 
   React.useEffect(() => {
     return () => {
+      socketManager.removeSubscriptions(socketEventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
+
       appManager.clearAllEventListeners();
       socketManager.clearAllEventListeners();
       socketManager.disconnectSocket();
@@ -663,92 +684,106 @@ const BasicBusinessAppDashboard = (props) => {
     document.documentElement.classList.remove("nav-open");
   };
 
+
   return (
-    loading || !userDetails ?
-      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
-        <LottieIcon id={'waiting'}/>
+    networErrorMessage ?
+      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', color: 'red'}}>
+        {networErrorMessage}
       </div>
       :
-      <>
-        <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>
-          <LoadingIndicator color={"#945c33"}/>
-          <Sidebar
-            {...props}
-            routes={routes}
-            utilsRoutes={utilsRoutes}
-            activeColor={"agility"}
-            secondaryThemeColor={secondaryThemeColor}
-            activeRouteMenu={'calendar'}
-            className={"sidebar"}
-            viewLauncher={(path) => {
-              appManager.setCurrentView(path);
-              navigate('/view/' + path);
-            }}
-            appLogoPath={props.appLogoPath}
-            logo={{
-              outterLink: "",
-              text: "",
-              imgSrc: logo,
-            }}
-            closeSidebar={closeSidebar}
-          />{" "}
-          <div className="main-panel" data={activeColor}>
-            <div className="content">
-              <div style={{height: '48px'}}>
-                <HomeNavbar
-                  {...props}
-                  color={"#FFFFFF"}
-                  themeTextColor={"#ADA7A7"}
-                  brandText={getActiveRoute(routes)}
-                  sidebarOpened={sidebarOpened}
-                  userDetails={userDetails}
-                  avatar={props.avatar}
-                  settingsMenu={null}
-                  toggleSidebar={toggleSidebar}
-                  logoutCallBack={(e) => {
-                    appManager.remove("accessToken");
-                    appManager.remove("refreshToken");
-                    appManager.remove("lastLogin");
-
-                    tokenManager.stopTokenRefreshMonitor();
-
-                    if (!isSafari && !isChrome && !isIE && !isEdge) {
-                      electron.ipcRenderer.sendMessage('removeTokens', {});
-                    }
-
-                    navigate("/login");
-                  }}
-                />{" "}
-              </div>
-              <div>
-                <div style={{padding: '0 32px 0 32px', maxHeight: '64px', width: '90%', zIndex: '1200', position: 'absolute'}}>
-                  <Alert
-                    variant={'danger'}
-                    show={errorMessage !== null}
-                    fade={true}
-                    onClose={() => {setErrorMessage(null)}}
-                    dismissible
-                  >
-                    <Alert.Heading>Error</Alert.Heading>
-                    <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{errorMessage}</p>
-                  </Alert>
-                  <Alert
-                    variant={'success'}
-                    show={successMessage !== null}
-                    fade={true}
-                  >
-                    <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
-                  </Alert>
-                </div>
-                <ViewPort />
-              </div>
-            </div>
-
-            {/*<HomeFooter fluid /> {" "}*/}
-          </div>
-          {" "}
+      loading || !userDetails ?
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
+          <LottieIcon id={'waiting'}/>
         </div>
-      </>
+        :
+        <>
+          <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>
+            <LoadingIndicator color={"#945c33"}/>
+            <Sidebar
+              {...props}
+              routes={routes}
+              utilsRoutes={utilsRoutes}
+              activeColor={"agility"}
+              secondaryThemeColor={secondaryThemeColor}
+              activeRouteMenu={'calendar'}
+              className={"sidebar"}
+              viewLauncher={(path) => {
+                appManager.setCurrentView(path);
+                navigate('/view/' + path);
+              }}
+              appLogoPath={props.appLogoPath}
+              logo={{
+                outterLink: "",
+                text: "",
+                imgSrc: logo,
+              }}
+              closeSidebar={closeSidebar}
+            />{" "}
+            <div className="main-panel" data={activeColor}>
+              <div className="content">
+                <div style={{height: '48px'}}>
+                  <HomeNavbar
+                    {...props}
+                    color={"#FFFFFF"}
+                    themeTextColor={"#ADA7A7"}
+                    brandText={getActiveRoute(routes)}
+                    sidebarOpened={sidebarOpened}
+                    userDetails={userDetails}
+                    avatar={props.avatar}
+                    settingsMenu={null}
+                    toggleSidebar={toggleSidebar}
+                    logoutCallBack={(e) => {
+                      appManager.remove("accessToken");
+                      appManager.remove("refreshToken");
+                      appManager.remove("lastLogin");
+
+                      tokenManager.stopTokenRefreshMonitor();
+
+                      if (!isSafari && !isChrome && !isIE && !isEdge) {
+                        electron.ipcRenderer.sendMessage('removeTokens', {});
+                      }
+
+                      navigate("/login");
+                    }}
+                  />{" "}
+                </div>
+                <div>
+                  <div style={{
+                    padding: '0 32px 0 32px',
+                    maxHeight: '64px',
+                    width: '90%',
+                    zIndex: '1200',
+                    position: 'absolute'
+                  }}>
+                    <Alert
+                      variant={'danger'}
+                      show={errorMessage !== null}
+                      fade={true}
+                      onClose={() => {
+                        setErrorMessage(null)
+                      }}
+                      dismissible
+                    >
+                      <Alert.Heading>Error</Alert.Heading>
+                      <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{errorMessage}</p>
+                    </Alert>
+                    <Alert
+                      variant={'success'}
+                      show={successMessage !== null}
+                      fade={true}
+                    >
+                      <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
+                    </Alert>
+                  </div>
+                  <ViewPort/>
+                </div>
+              </div>
+
+              {/*<HomeFooter fluid /> {" "}*/}
+            </div>
+            {" "}
+          </div>
+        </>
 
   );
 };

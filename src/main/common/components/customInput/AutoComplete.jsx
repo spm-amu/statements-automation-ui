@@ -2,7 +2,7 @@
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Box from '@material-ui/core/Box';
-import {host, post} from "../../service/RestService";
+import {post} from "../../service/RestService";
 import "./Form.css";
 import Utils from "../../Utils";
 import appManager from "../../../common/service/AppManager";
@@ -39,8 +39,8 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
           <img
             style={{marginRight: '4px'}}
             width="20"
-            src={`${host}/${option.imagePath}`}
-            srcSet={`${host}/${option.imagePath} 2x`}
+            src={`${appManager.getAPIHost()}/${option.imagePath}`}
+            srcSet={`${appManager.getAPIHost()}/${option.imagePath} 2x`}
             alt=""
           />
           {option.label}

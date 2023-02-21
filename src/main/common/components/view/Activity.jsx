@@ -2,10 +2,11 @@ import React, {useEffect, useState} from 'react';
 import './Activity.css';
 import './Chat.scss';
 import socketManager from '../../service/SocketManager';
+import appManager from '../../service/AppManager'
 import {MessageType} from '../../types';
 import ActivityList from "../activity/ActivityList";
 import ChatRoom from '../chat/ChatRoom';
-import {get, host} from "../../service/RestService";
+import {get} from "../../service/RestService";
 
 const Activity = (props) => {
   const [socketEventHandler] = useState({});
@@ -56,7 +57,7 @@ const Activity = (props) => {
         <ActivityList selectionHandler={(selected) => {
           setSelectedChat(null);
           if (selected.data && selected.data.chatId) {
-            get(`${host}/api/v1/chat/fetch/${selected.data.chatId}`, (response) => {
+            get(`${appManager.getAPIHost()}/api/v1/chat/fetch/${selected.data.chatId}`, (response) => {
               setSelectedChat(response);
               setSelected(selected);
             }, (e) => {

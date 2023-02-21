@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import './ChartForm.css';
 import {Form} from "reactstrap";
-import {host, post} from "../../service/RestService";
 import AutoComplete from "../customInput/AutoComplete";
 import Button from "@material-ui/core/Button";
 import appManager from "../../service/AppManager";
@@ -55,7 +54,7 @@ const ChatForm = (props) => {
               valueChangeHandler={(value, id) => {
                 setParticipants(value);
               }}
-              optionsUrl={`${host}/api/v1/auth/search`}
+              optionsUrl={`${appManager.getAPIHost()}/api/v1/auth/search`}
             />
           </div>
         </div>

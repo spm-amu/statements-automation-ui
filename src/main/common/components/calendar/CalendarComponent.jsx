@@ -13,10 +13,11 @@ import '../../assets/scss/app-calendar.scss';
 import "./CalenderComponent.css";
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
-import {get, host} from "../../service/RestService";
+import {get} from "../../service/RestService";
 import Utils from '../../Utils';
 import {useNavigate} from 'react-router-dom';
 import moment from "moment";
+import appManager from '../../service/AppManager'
 
 const eventTemplate = {
   id: '',
@@ -67,7 +68,7 @@ const CalendarComponent = (props) => {
   }, []);
 
   const loadEvents = () => {
-    get(`${host}/api/v1/meeting/fetchMeetings`, (response) => {
+    get(`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetings`, (response) => {
       // FREQ=MONTHLY;BYSETPOS=3;BYDAY=WE;INTERVAL=1
      // let myEvent = {
      //    events: [

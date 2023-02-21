@@ -3,7 +3,7 @@ import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {CardBody, CardText, CardTitle, Col, Row} from 'reactstrap';
 import Button from '@material-ui/core/Button';
 import './WebLinkLanding.css'
-import {get, host, post} from '../../service/RestService';
+import {get, post} from '../../service/RestService';
 import Utils from '../../Utils';
 import appManager from '../../service/AppManager';
 import {SystemEventType} from '../../types';
@@ -38,7 +38,7 @@ const WebLinkLanding = (props) => {
   }
 
   const redirectToMeeting = (params) => {
-    get(`${host}/api/v1/meeting/fetch/${params.meetingId}`, (response) => {
+    get(`${appManager.getAPIHost()}/api/v1/meeting/fetch/${params.meetingId}`, (response) => {
       let userDetails = appManager.getUserDetails();
       let isHost = false;
       response.extendedProps.attendees.forEach(att => {
@@ -67,7 +67,7 @@ const WebLinkLanding = (props) => {
     let refreshToken = appManager.get(REFRESH_TOKEN_PROPERTY);
 
     post(
-      `${host}/api/v1/auth/validateMeetingToken`,
+      `${appManager.getAPIHost()}/api/v1/auth/validateMeetingToken`,
       (response) => {
         console.log('_______ RES: ', response);
 

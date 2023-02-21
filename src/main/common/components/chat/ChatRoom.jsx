@@ -14,11 +14,10 @@ import {Calendar} from 'react-feather';
 import Utils from '../../Utils';
 import socketManager from '../../service/SocketManager';
 import {MessageType} from '../../types';
-import uuid from 'react-uuid';
 import appManager from "../../../common/service/AppManager";
 import {GroupAdd, Info, Poll} from '@material-ui/icons';
 import AutoComplete from '../customInput/AutoComplete';
-import {get, host, post} from '../../service/RestService';
+import {get, post} from '../../service/RestService';
 import {Form} from 'reactstrap';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -112,7 +111,7 @@ const ChatRoom = (props) => {
 
   const closePoll = (e, poll) => {
     post(
-      `${host}/api/v1/poll/close`,
+      `${appManager.getAPIHost()}/api/v1/poll/close`,
       (response) => {
         sendMessage(e, `Poll ${poll.question} has been closed.`);
         props.addedPeopleHandler();
@@ -133,7 +132,7 @@ const ChatRoom = (props) => {
     };
 
     post(
-      `${host}/api/v1/poll/vote`,
+      `${appManager.getAPIHost()}/api/v1/poll/vote`,
       (response) => {
         props.addedPeopleHandler();
       },
@@ -307,7 +306,7 @@ const ChatRoom = (props) => {
     e.preventDefault();
     sendMessage(e, `${currentUser.name} has started a call.`);
     get(
-      `${host}/api/v1/meeting/generateId`,
+      `${appManager.getAPIHost()}/api/v1/meeting/generateId`,
       (response) => {
         const directCallRoom = {
           id: response
@@ -347,7 +346,7 @@ const ChatRoom = (props) => {
       });
 
       post(
-        `${host}/api/v1/chat/addParticipants`,
+        `${appManager.getAPIHost()}/api/v1/chat/addParticipants`,
         (response) => {
           sendMessage(e, newParticipants[0].name + ' has join the conversation.');
           setNewParticipants([]);
@@ -684,9 +683,9 @@ const ChatRoom = (props) => {
                   </Button>
                 }
 
-                <span style={{marginLeft: '8px'}} className="time-left">
+               {/* <span style={{marginLeft: '8px'}} className="time-left">
                 {poll.totalVotes ? `${poll.totalVotes} out of ${selectedChat.participants.length}` : `0 out of ${selectedChat.participants.length}`} votes
-              </span>
+              </span>*/}
                 <span className="separator">•</span>
                 <span className="time-left" style={{marginLeft: '4px'}}>
                 {
@@ -743,7 +742,7 @@ const ChatRoom = (props) => {
                     valueChangeHandler={(value, id) => {
                       setNewParticipants(value);
                     }}
-                    optionsUrl={`${host}/api/v1/auth/search`}
+                    optionsUrl={`${appManager.getAPIHost()}/api/v1/auth/search`}
                     fullWidth
                   />
                 </div>

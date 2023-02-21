@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import WhiteBoard from "../whiteboard/WhiteBoard";
-import {get, host} from "../../service/RestService";
+import {get} from "../../service/RestService";
+import appManager from '../../service/AppManager'
 import Button from "@material-ui/core/Button";
 import {useNavigate} from 'react-router-dom';
 
@@ -16,7 +17,7 @@ const WhiteboardView = (props) => {
   };
 
   useEffect(() => {
-    get(`${host}/api/v1/meeting/whiteboard/get/${props.id}`, (response) => {
+    get(`${appManager.getAPIHost()}/api/v1/meeting/whiteboard/get/${props.id}`, (response) => {
       if (response) {
         setWhiteboardItems(response.items);
       }

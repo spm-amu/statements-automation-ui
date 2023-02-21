@@ -4,7 +4,7 @@ import ChatRoom from '../chat/ChatRoom';
 import './Chat.scss';
 import ChatForm from "../chat/ChatForm";
 import socketManager from '../../service/SocketManager';
-import { get, host, post } from '../../service/RestService';
+import { get, post } from '../../service/RestService';
 import moment from 'moment';
 import {MessageType, SystemEventType} from '../../types';
 import { useLocation } from 'react-router-dom';
@@ -98,7 +98,7 @@ const Chats = (props) => {
       });
 
       post(
-        `${host}/api/v1/chat/create`,
+        `${appManager.getAPIHost()}/api/v1/chat/create`,
         (response) => {
           setSelectedChat(newChat);
           setMode('LIST');
@@ -131,7 +131,7 @@ const Chats = (props) => {
     if (existingChat) {
       setSelectedChat(existingChat);
     } else {
-      get(`${host}/api/v1/auth/userInfo/${meetingRoomNav.privateChatUserId}`, (response) => {
+      get(`${appManager.getAPIHost()}/api/v1/auth/userInfo/${meetingRoomNav.privateChatUserId}`, (response) => {
         const addParticipants = [];
         addParticipants.push(response);
         createChatHandler(addParticipants);
@@ -141,7 +141,7 @@ const Chats = (props) => {
   };
 
   const loadChats = () => {
-    get(`${host}/api/v1/chat/fetchChats`, (response) => {
+    get(`${appManager.getAPIHost()}/api/v1/chat/fetchChats`, (response) => {
       const filteredChatEvents = response.filter(chat => {
         if (chat.type === 'DIRECT') {
           return true;

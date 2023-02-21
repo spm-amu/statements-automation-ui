@@ -9,7 +9,7 @@ import AutoComplete from '../customInput/AutoComplete';
 import Files from '../customInput/Files';
 import Utils from '../../Utils';
 import Avatar from '../avatar';
-import {get, host, post} from '../../service/RestService';
+import {get, post} from '../../service/RestService';
 
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
@@ -328,7 +328,7 @@ const Meeting = (props) => {
         .then((data) => validateAttendees(data))
         .then((data) => {
           post(
-            `${host}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
+            `${appManager.getAPIHost()}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
             (response) => {
               handleClose();
             },
@@ -425,7 +425,7 @@ const Meeting = (props) => {
   const handleDelete = (e) => {
     cancelMeeting().then((data) => {
       get(
-        `${host}/api/v1/meeting/cancel/${value.id}`,
+        `${appManager.getAPIHost()}/api/v1/meeting/cancel/${value.id}`,
         (response) => {
           handleClose();
         },
@@ -1241,7 +1241,7 @@ const Meeting = (props) => {
                   setAttendees(value);
                   handleFormValueChange(value, id, false);
                 }}
-                optionsUrl={`${host}/api/v1/auth/search`}
+                optionsUrl={`${appManager.getAPIHost()}/api/v1/auth/search`}
               />
             </div>
 
@@ -1278,7 +1278,7 @@ const Meeting = (props) => {
                 valueChangeHandler={(value, id) =>
                   handleFormValueChange(value, id, false)
                 }
-                optionsUrl={`${host}/api/v1/location/search`}
+                optionsUrl={`${appManager.getAPIHost()}/api/v1/location/search`}
               />
             </div>
             <div>

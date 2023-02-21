@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import './ActivityList.css';
-import {get, host, post} from "../../service/RestService";
+import {get, post} from "../../service/RestService";
 import ActivityCard from "./ActivityCard";
+import appManager from '../../service/AppManager'
 
 const ActivityList = (props) => {
 
@@ -13,7 +14,7 @@ const ActivityList = (props) => {
   } = props;
 
   const loadActivities = () => {
-    post(`${host}/api/v1/activity/fetch`, (response) => {
+    post(`${appManager.getAPIHost()}/api/v1/activity/fetch`, (response) => {
         setLoading(false);
         setActivities(response.records);
       }, (e) => {
@@ -32,7 +33,7 @@ const ActivityList = (props) => {
 
   const handleSelection = (selected) => {
     if (!selected.read) {
-      get(`${host}/api/v1/activity/read/${selected.id}`, () => {
+      get(`${appManager.getAPIHost()}/api/v1/activity/read/${selected.id}`, () => {
         selected.read = true;
         setSelected(selected);
 

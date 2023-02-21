@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {host} from '../../service/RestService';
+import appManager from '../../service/AppManager'
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
 import {DataGrid} from "../DataGrid";
@@ -73,7 +73,7 @@ const Files = (props) => {
 
     electron.ipcRenderer.sendMessage('downloadFile', {
       payload: {
-        fileURL: `${host}/api/v1/document/download/${documentId}`,
+        fileURL: `${appManager.getAPIHost()}/api/v1/document/download/${documentId}`,
       },
     });
   };
@@ -94,7 +94,7 @@ const Files = (props) => {
           </div>
           <DataGrid config={grid}
                     criteriaParams={criteriaParams}
-                    dataUrl={`${host}/api/v1/document/fetchUserDocuments`}
+                    dataUrl={`${appManager.getAPIHost()}/api/v1/document/fetchUserDocuments`}
                     actionHandler={(e) => {
                          onDownload(e.data.documentId);
                     }}

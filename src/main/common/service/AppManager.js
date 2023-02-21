@@ -9,6 +9,22 @@ class AppManager {
     return AppManager.instance;
   }
 
+  setAPIHost = (apiHost) => {
+    this.store.apiHost = apiHost;
+  };
+
+  getAPIHost = () => {
+    return this.store.apiHost;
+  };
+
+  setSignalingServerHost = (signalingServerHost) => {
+    this.store.signalingServerHost = signalingServerHost;
+  };
+
+  getSignalingServerHost = () => {
+    return this.store.signalingServerHost;
+  };
+
   setUserDetails = (userDetails) => {
     this.store.userDetails = userDetails;
   };

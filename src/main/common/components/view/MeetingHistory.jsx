@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {get, host} from "../../service/RestService";
+import {get} from "../../service/RestService";
 import SearchBar from "../SearchBar";
 import {DataGrid} from "../DataGrid";
 import {useNavigate} from "react-router-dom";
@@ -99,7 +99,7 @@ const MeetingHistory = (props) => {
   const navigate = useNavigate();
 
   const getSelectedMeetingEvent = (selectedMeeting) => {
-    get(`${host}/api/v1/meeting/fetchMeetingEvent/${selectedMeeting.id}`, (response) => {
+    get(`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetingEvent/${selectedMeeting.id}`, (response) => {
       navigate("/view/meeting", {state: response})
     }, (e) => {
     }, '', false);
@@ -113,7 +113,7 @@ const MeetingHistory = (props) => {
   const onDownload = (documentId) => {
     electron.ipcRenderer.sendMessage('downloadFile', {
       payload: {
-        fileURL: `${host}/api/v1/document/download/${documentId}`,
+        fileURL: `${appManager.getAPIHost()}/api/v1/document/download/${documentId}`,
       },
     });
   };
@@ -135,7 +135,7 @@ const MeetingHistory = (props) => {
           <DataGrid config={grid}
                     bodyMaxHeight={"65vh"}
                     criteriaParams={criteriaParams}
-                    dataUrl={`${host}/api/v1/meeting/fetchMeetingHistory`}
+                    dataUrl={`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetingHistory`}
                     actionHandler={(e) => {
                       if(e.id === 'downloadRecording') {
                         onDownload(e.data.id);

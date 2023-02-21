@@ -15,7 +15,7 @@ import ClosablePanel from "../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
 import appManager from "../../../common/service/AppManager";
 import MeetingRoomSummary from "../vc/MeetingRoomSummary";
-import {get, host, post} from '../../service/RestService';
+import {get, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
 import {osName} from "react-device-detect";
 import {Stream} from "../../service/Stream";
@@ -267,7 +267,7 @@ const MeetingRoom = (props) => {
           setAllUserParticipantsLeft(true);
 
           get(
-            `${host}/api/v1/meeting/end/${selectedMeeting.id}`,
+            `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,
             (response) => {
             },
             (e) => {
@@ -320,7 +320,7 @@ const MeetingRoom = (props) => {
       };
 
       post(
-        `${host}/api/v1/document/saveToFile`,
+        `${appManager.getAPIHost()}/api/v1/document/saveToFile`,
         (response) => {
         },
         (e) => {
@@ -334,7 +334,7 @@ const MeetingRoom = (props) => {
 
   const changeHost = (participant) => {
     post(
-      `${host}/api/v1/meeting/changeHost`,
+      `${appManager.getAPIHost()}/api/v1/meeting/changeHost`,
       (response) => {
         socketManager.emitEvent(MessageType.CHANGE_HOST, {
           roomID: selectedMeeting.id,
@@ -613,7 +613,7 @@ const MeetingRoom = (props) => {
   }, [meetingChat]);
 
   const fetchChats = () => {
-    get(`${host}/api/v1/chat/fetchMeetingChat/${selectedMeeting.id}`, (response) => {
+    get(`${appManager.getAPIHost()}/api/v1/chat/fetchMeetingChat/${selectedMeeting.id}`, (response) => {
       if (response && response.id) {
         setMeetingChat(response);
       }
@@ -669,7 +669,7 @@ const MeetingRoom = (props) => {
 
   const persistMeetingSettings = () => {
     post(
-      `${host}/api/v1/meeting/settings`,
+      `${appManager.getAPIHost()}/api/v1/meeting/settings`,
       (response) => {
       },
       (e) => {

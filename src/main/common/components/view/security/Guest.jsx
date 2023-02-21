@@ -7,16 +7,12 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import { get, host, post } from '../../../service/RestService';
+import { post } from '../../../service/RestService';
 import styles from './LoginStyle';
 import CustomInput from '../../customInput/CustomInput';
 import { Email, Face } from '@material-ui/icons';
 import {Alert} from '@material-ui/lab';
 import appManager from "../../../../common/service/AppManager";
-import Utils from "../../../Utils";
-import {ACCESS_TOKEN_PROPERTY, REFRESH_TOKEN_PROPERTY} from "../../../service/TokenManager";
-import { SystemEventType } from '../../../types';
-import { isSafari, isChrome, isIE, isEdge } from 'react-device-detect';
 
 const {electron} = window;
 
@@ -71,7 +67,7 @@ const Guest = (props) => {
     }
 
     post(
-      `${host}/api/v1/auth/meetingLogin/${location.state.meetingId}`,
+      `${appManager.getAPIHost()}/api/v1/auth/meetingLogin/${location.state.meetingId}`,
       (response) => {
         console.log('______ VALIDATE: ', response);
         setIsLoading(false);

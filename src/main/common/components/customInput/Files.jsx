@@ -3,7 +3,7 @@ import "./Form.css";
 import AutoComplete from "./AutoComplete";
 import IconButton from '@material-ui/core/IconButton';
 import Icon from '../Icon'
-import {host} from "../../service/RestService";
+import appManager from '../../service/AppManager'
 import Utils from "../../Utils";
 const { electron } = window;
 
@@ -44,7 +44,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
 
     electron.ipcRenderer.sendMessage('downloadFile', {
       payload: {
-        fileURL: `${host}/api/v1/document/download/${documentId}`,
+        fileURL: `${appManager.getAPIHost()}/api/v1/document/download/${documentId}`,
       },
     });
   };

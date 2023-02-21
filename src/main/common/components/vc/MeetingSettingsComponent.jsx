@@ -9,7 +9,7 @@ import appManager from "../../../common/service/AppManager";
 import {Stream} from "../../service/Stream";
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import { get, host, post } from '../../service/RestService';
+import {get} from '../../service/RestService';
 import {Alert} from "@material-ui/lab";
 
 const MeetingSettingsComponent = (props) => {
@@ -57,11 +57,11 @@ const MeetingSettingsComponent = (props) => {
     let userDetails = appManager.getUserDetails();
     setLoggedInUser(userDetails.name);
 
-    get(`${host}/api/v1/meeting/settings/${selectedMeeting.id}`,
+    get(`${appManager.getAPIHost()}/api/v1/meeting/settings/${selectedMeeting.id}`,
       (response) => {
         setAutoPermit(response.askToJoin);
-    }, (e) => {
-    });
+      }, (e) => {
+      });
 
     selectedMeeting.attendees.forEach(att => {
       if (att.userId === userDetails.userId) {
@@ -118,13 +118,13 @@ const MeetingSettingsComponent = (props) => {
           </tr>
           <tr>
             <td colSpan={4}>
-            {
-            videoOptionDisabled &&
-              <Alert style={{marginBottom: '16px'}} severity="error">
-                We are trying to connect you. The system cannot initiate the media feed...
-              </Alert>
+              {
+                videoOptionDisabled &&
+                <span>
+                  Intiating connection...
+                </span>
 
-            }
+              }
             </td>
           </tr>
           <tr>
@@ -138,15 +138,28 @@ const MeetingSettingsComponent = (props) => {
               >
                 {
                   videoMuted &&
-                  <div className={'centered-flex-box'} style={{width: '280px', maxWidth: '280px', height: '280px', backgroundColor: '#000000', borderRadius: '4px'}}>
+                  <div className={'centered-flex-box'} style={{
+                    width: '280px',
+                    maxWidth: '280px',
+                    height: '280px',
+                    backgroundColor: '#000000',
+                    borderRadius: '4px'
+                  }}>
                     <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)}/>
                   </div>
                 }
-                <div style={{ maxWidth: '280px' }}>
+                <div style={{maxWidth: '280px'}}>
                   <video
                     hidden={videoMuted}
                     muted playsInline autoPlay ref={userVideo}
-                    style={{maxHeight: '280px', height: '280px', width: 'unset', maxWidth: '280px', backgroundColor: '#000000', borderRadius: '4px'}}
+                    style={{
+                      maxHeight: '280px',
+                      height: '280px',
+                      width: 'unset',
+                      maxWidth: '280px',
+                      backgroundColor: '#000000',
+                      borderRadius: '4px'
+                    }}
                   />
                 </div>
               </div>
@@ -197,7 +210,7 @@ const MeetingSettingsComponent = (props) => {
                         toggleAskToJoin();
                       }}
                     />
-                  } label="Auto permit" />
+                  } label="Auto permit"/>
                 </FormGroup>
               </td>
             }

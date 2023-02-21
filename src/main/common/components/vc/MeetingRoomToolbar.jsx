@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from "react";
 import Timer from "./Timer";
-import {get, host, post} from "../../service/RestService";
+import {get, post} from "../../service/RestService";
 import socketManager from "../../service/SocketManager";
 import {MessageType} from "../../types";
 import appManager from "../../service/AppManager";
@@ -78,7 +78,7 @@ const MeetingRoomToolbar = (props) => {
       });
 
       get(
-        `${host}/api/v1/meeting/end/${selectedMeeting.id}`,
+        `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,
         (response) => {
         },
         (e) => {
@@ -102,7 +102,7 @@ const MeetingRoomToolbar = (props) => {
     };
 
     post(
-      `${host}/api/v1/meeting/start`,
+      `${appManager.getAPIHost()}/api/v1/meeting/start`,
       (response) => {
         setRemainingTime(response.remainingTime);
       },

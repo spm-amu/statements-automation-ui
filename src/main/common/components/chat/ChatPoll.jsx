@@ -2,14 +2,14 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Form } from 'reactstrap';
 import TextField from '../customInput/TextField';
 import Utils from '../../Utils';
-import CallIcon from '@material-ui/icons/Call';
 import { IconButton } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Button from '@material-ui/core/Button';
 import './NewPoll.css'
 import { Add } from '@material-ui/icons';
 import SelectItem from '../customInput/SelectItem';
-import { host, post } from '../../service/RestService';
+import { post } from '../../service/RestService';
+import appManager from '../../service/AppManager'
 
 const pollLengthDaysOptions = [
   {id: 0, label: "0"},
@@ -151,7 +151,7 @@ const ChatPoll = (props) => {
       };
 
       post(
-        `${host}/api/v1/poll/create`,
+        `${appManager.getAPIHost()}/api/v1/poll/create`,
         (response) => {
           props.createPollHandler(response);
         },

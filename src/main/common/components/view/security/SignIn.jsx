@@ -7,23 +7,18 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import { get, host, post } from '../../../service/RestService';
+import { post } from '../../../service/RestService';
 import styles from './LoginStyle';
 import CustomInput from '../../customInput/CustomInput';
 import {Face} from '@material-ui/icons';
 import {Alert} from '@material-ui/lab';
-import appManager from "../../../../common/service/AppManager";
-import Utils from "../../../Utils";
-import {ACCESS_TOKEN_PROPERTY, REFRESH_TOKEN_PROPERTY} from "../../../service/TokenManager";
-import { SystemEventType } from '../../../types';
+import appManager from "../../../service/AppManager";
 import { isSafari, isChrome, isIE, isEdge } from 'react-device-detect';
 
 const {electron} = window;
 
 const SignIn = (props) => {
-  const [usernameError, setUsernameError] = useState(false);
   const [username, setUsername] = useState('');
-  const [passwordError, setPasswordError] = useState(false);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -57,7 +52,7 @@ const SignIn = (props) => {
       electron.ipcRenderer.on('joinMeetingEvent', args => {
         if (args.payload.params.redirect) {
           post(
-            `${host}/api/v1/auth/validateMeetingToken`,
+            `${appManager.getAPIHost()}/api/v1/auth/validateMeetingToken`,
             (response) => {
               if (response.userId) {
                 setUsername(response.userId);
@@ -109,7 +104,7 @@ const SignIn = (props) => {
       let loginUrl = location.state && location.state.meetingExternal ? `meetingLogin/${location.state.meetingId}` : 'login';
 
       post(
-        `${host}/api/v1/auth/${loginUrl}`,
+        `${appManager.getAPIHost()}/api/v1/auth/${loginUrl}`,
         (response) => {
           setIsLoading(false);
 

@@ -79,7 +79,7 @@ class RestService {
               }
             };
 
-            fetch(encodeURI(`${host}/api/v1/auth/refresh?refreshToken=${refreshToken}`), refreshFetchConfig)
+            fetch(encodeURI(`${appManager.getAPIHost()}/api/v1/auth/refresh?refreshToken=${refreshToken}`), refreshFetchConfig)
               .then(status)
               .then(json)
               .then((data) => {

@@ -2,8 +2,9 @@ import React, {useEffect, useState} from 'react';
 import SearchBar from "../SearchBar";
 import './People.css'
 import PersonCard from "../PersonCard";
-import {get, host, post} from '../../service/RestService';
+import {get, post} from '../../service/RestService';
 import socketManager from '../../service/SocketManager';
+import appManager from '../../service/AppManager'
 import {MessageType} from '../../types';
 import {useNavigate} from 'react-router-dom';
 import Utils from "../../Utils";
@@ -29,7 +30,7 @@ const People = (props) => {
     // NB : If a meeting id is passed, search for all meeting attendees and pass the search value as a filter ONLY within those attendees
     // @Nsovo - update the backend to take into account any meeting attendees
 
-    post(`${host}/api/v1/auth/search`, (response) => {
+    post(`${appManager.getAPIHost()}/api/v1/auth/search`, (response) => {
         console.log('RESPONSE: ', response);
         setSearchResult(response);
       }, (e) => {
@@ -64,7 +65,7 @@ const People = (props) => {
       props.onAudioCallHandler(userToCall);
     } else {
       get(
-        `${host}/api/v1/meeting/generateId`,
+        `${appManager.getAPIHost()}/api/v1/meeting/generateId`,
         (response) => {
           const directCallRoom = {
             id: response

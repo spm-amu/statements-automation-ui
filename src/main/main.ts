@@ -441,11 +441,9 @@ ipcMain.on("cancelCall", async (_event, args) => {
 });
 
 ipcMain.on("hideMessagePreview", async (_event, args) => {
-  if (!messageWindow) {
-    throw new Error('"messageWindow" is not defined');
+  if (messageWindow) {
+    messageWindow.hide();
   }
-
-  messageWindow.hide();
 });
 
 if (process.env.NODE_ENV === 'development' && process.platform === 'win32') {
