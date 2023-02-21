@@ -100,6 +100,7 @@ const MeetingRoom = (props) => {
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
   const recordedChunks = [];
   const shareScreenSource = useRef();
+  const shareScreenRef = useRef();
   const tmpVideoTrack = useRef();
 
   const handler = () => {
@@ -281,19 +282,19 @@ const MeetingRoom = (props) => {
   };
 
   const handleScreenShareStream = (stream) => {
-    tmpVideoTrack.current = currentUserStream.getVideoTracks()[0];
+    tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
-        currentUserStream.getVideoTracks()[0], // prev video track - webcam
+        currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
         stream.getVideoTracks()[0], // current video track - screen track
-        currentUserStream.obj
+        currentUserStream.shareScreenObj
       );
     });
 
-    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
-    currentUserStream.addTrack(stream.getVideoTracks()[0]);
-    userVideo.current.srcObject = currentUserStream.obj;
+    currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
+    currentUserStream.shareScreenObj.addTrack(stream.getVideoTracks()[0]);
+    shareScreenRef.current.srcObject = stream;
 
     createMediaRecorder(stream);
   };
@@ -360,16 +361,16 @@ const MeetingRoom = (props) => {
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
-        currentUserStream.getVideoTracks()[0], // prev video track - webcam
+        currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
         tmpVideoTrack.current, // current video track - screen track
-        currentUserStream.obj
+        currentUserStream.shareScreenObj.obj
       );
     });
 
-    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
-    currentUserStream.addTrack(tmpVideoTrack.current);
+    currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
+    currentUserStream.shareScreenObj.addTrack(tmpVideoTrack.current);
 
-    userVideo.current.srcObject = currentUserStream.obj;
+    shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
   };
 
   const selectSourceHandler = (selectedSource) => {
@@ -453,7 +454,7 @@ const MeetingRoom = (props) => {
   }, [allUserParticipantsLeft]);
 
   const addUser = (payload) => {
-    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream.obj, MessageType.USER_JOINED, audioMuted, videoMuted);
+    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted);
     joinInAudio.play();
 
     console.log("ADD USER : ", payload);
@@ -489,7 +490,7 @@ const MeetingRoom = (props) => {
 
     let userPeerMap = [];
     users.forEach((user) => {
-      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream.obj, MessageType.ALL_USERS, audioMuted, videoMuted))
+      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted))
     });
 
     let participants = [];
@@ -605,7 +606,7 @@ const MeetingRoom = (props) => {
   }, [streamsInitiated]);
 
   useEffect(() => {
-    if(meetingChat) {
+    if (meetingChat) {
       setSideBarTab('Chat');
       setSideBarOpen(true);
       setHasUnreadChats(false);
@@ -804,6 +805,12 @@ const MeetingRoom = (props) => {
   }, [audioMuted]);
 
   useEffect(() => {
+    if (shareScreenRef.current) {
+      shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
+    }
+  }, [shareScreenRef.current]);
+
+  useEffect(() => {
     if (userVideo && userVideo.current) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
@@ -928,27 +935,36 @@ const MeetingRoom = (props) => {
                               {'The ' + (isDirectCall ? 'call' : 'meeting') + ' has been ended' + (isDirectCall ? '' : ' by the host')}
                             </div>
                             :
-                            <MeetingParticipantGrid participants={participants}
-                                                    waitingList={lobbyWaitingList}
-                                                    mode={meetingParticipantGridMode}
-                                                    screenShared={screenShared}
-                                                    audioMuted={audioMuted}
-                                                    videoMuted={videoMuted}
-                                                    meetingTitle={selectedMeeting.title}
-                                                    userToCall={userToCall}
-                                                    step={step}
-                                                    isHost={isHost}
-                                                    allUserParticipantsLeft={allUserParticipantsLeft}
-                                                    userVideoChangeHandler={(ref) => setUserVideo(ref)}
-                                                    acceptUserHandler={
-                                                      (item) => {
-                                                        acceptUser(item);
-                                                      }}
-                                                    rejectUserHandler={
-                                                      (item) => {
-                                                        rejectUser(item);
-                                                      }}
-                            />
+                            <>
+                              <div style={{width: screenShared ? '400px' : '0', height: screenShared ? '400px' : 0, border: "4px solid red"}}>
+                                <video
+                                  hidden={false}
+                                  muted playsinline autoPlay ref={shareScreenRef}
+                                  style={{width: '100%', height: '100%'}}
+                                />
+                              </div>
+                              <MeetingParticipantGrid participants={participants}
+                                                      waitingList={lobbyWaitingList}
+                                                      mode={meetingParticipantGridMode}
+                                                      audioMuted={audioMuted}
+                                                      videoMuted={videoMuted}
+                                                      screenShared={screenShared}
+                                                      meetingTitle={selectedMeeting.title}
+                                                      userToCall={userToCall}
+                                                      step={step}
+                                                      isHost={isHost}
+                                                      allUserParticipantsLeft={allUserParticipantsLeft}
+                                                      userVideoChangeHandler={(ref) => setUserVideo(ref)}
+                                                      acceptUserHandler={
+                                                        (item) => {
+                                                          acceptUser(item);
+                                                        }}
+                                                      rejectUserHandler={
+                                                        (item) => {
+                                                          rejectUser(item);
+                                                        }}
+                              />
+                          </>
                         }
                       </div>
                     </div>
