@@ -470,6 +470,9 @@ const MeetingRoom = (props) => {
     };
 
     userToPeerItem.peer.on('stream', (stream) => {
+      console.log("\n\n\n\nADD USER ON STREAM");
+      console.log(stream.id);
+      console.log(payload);
       user.stream = stream;
       console.log("UPDATING PARTICIPANTS");
       setParticipants((participants) => [...participants, user]);
@@ -506,6 +509,9 @@ const MeetingRoom = (props) => {
       };
 
       mapItem.peer.on('stream', (stream) => {
+        console.log("\n\n\n\nCREATE PARTICIPANTS ON STREAM");
+        console.log(stream.id);
+        console.log(mapItem);
         user.stream = stream;
         participants.push(user);
 

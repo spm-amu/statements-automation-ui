@@ -145,6 +145,8 @@ class SocketManager {
         callerID: this.socket.id,
         signal,
         name: userDetails.name,
+        mainStreamId: stream.obj.id,
+        shareStreamId: stream.shareScreenObj,
         userAlias: userDetails.userId,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
         audioMuted: audioMuted,
@@ -201,7 +203,9 @@ class SocketManager {
         signal,
         callerID: callerId,
         audioMuted: audioMuted,
-        videoMuted: videoMuted
+        videoMuted: videoMuted,
+        mainStreamId: stream.obj.id,
+        shareStreamId: stream.shareScreenObj,
       });
     });
 
