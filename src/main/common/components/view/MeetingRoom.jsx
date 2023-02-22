@@ -729,8 +729,10 @@ const MeetingRoom = (props) => {
           message: participant.name + " started sharing"
         });
 
+        setSomeoneSharing(true);
         setMeetingParticipantGridMode('STRIP');
       } else {
+        setSomeoneSharing(false);
         setMeetingParticipantGridMode('DEFAULT');
       }
     }
@@ -961,7 +963,7 @@ const MeetingRoom = (props) => {
                             </div>
                             :
                             <>
-                              <div style={{width: screenShared || someoneSharing ? '400px' : '0', height: screenShared ? '400px' : 0, border: "4px solid red"}}>
+                              <div style={{width: screenShared || someoneSharing ? '400px' : '0', height: screenShared || someoneSharing ? '400px' : 0, border: "4px solid red"}}>
                                 <video
                                   hidden={false}
                                   muted playsinline autoPlay ref={shareScreenRef}
