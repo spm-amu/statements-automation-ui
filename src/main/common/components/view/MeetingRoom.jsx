@@ -479,6 +479,12 @@ const MeetingRoom = (props) => {
 
       if(stream.id === payload.mainStreamId) {
         user.stream = stream;
+      } else {
+        user.shareStream = stream;
+      }
+
+      let find = participants.find((p) => p.userId === user.userId);
+      if(!find) {
         console.log("UPDATING PARTICIPANTS");
         setParticipants((participants) => [...participants, user]);
         setAllUserParticipantsLeft(false);
@@ -518,9 +524,14 @@ const MeetingRoom = (props) => {
         console.log("\n\n\n\nCREATE PARTICIPANTS ON STREAM");
         console.log(stream.id);
         console.log(mapItem);
-
-        if(stream.id === mapItem.user.mainStreamId) {
+        if(stream.id === payload.mainStreamId) {
           user.stream = stream;
+        } else {
+          user.shareStream = stream;
+        }
+
+        let find = participants.find((p) => p.userId === user.userId);
+        if(!find) {
           participants.push(user);
 
           if (participants.length === userPeerMap.length) {
@@ -720,18 +731,20 @@ const MeetingRoom = (props) => {
     // TODO : Emit a separate event for screen sharing
     let participant = participants.find((p) => p.userId === payload.userId);
     if (participant) {
-      participant.screenShared = payload.screenShared;
+      /*participant.screenShared = payload.screenShared;
       participant.audioMuted = payload.audioMuted;
-      participant.videoMuted = payload.videoMuted;
+      participant.videoMuted = payload.videoMuted;*/
 
       if (payload.screenShared) {
         handleMessageArrived({
           message: participant.name + " started sharing"
         });
 
+        shareScreenRef.current.srcObject = participant.shareStream;
         setSomeoneSharing(true);
         setMeetingParticipantGridMode('STRIP');
       } else {
+        shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
         setSomeoneSharing(false);
         setMeetingParticipantGridMode('DEFAULT');
       }
