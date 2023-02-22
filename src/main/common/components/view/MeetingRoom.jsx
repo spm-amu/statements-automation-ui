@@ -477,12 +477,6 @@ const MeetingRoom = (props) => {
       console.log(stream.id);
       console.log(payload);
 
-      if(stream.id === payload.mainStreamId) {
-        user.stream = stream;
-      } else {
-        user.shareStream = stream;
-      }
-
       let find = participants.find((p) => p.userId === user.userId);
       if(!find) {
         console.log("UPDATING PARTICIPANTS");
@@ -492,6 +486,14 @@ const MeetingRoom = (props) => {
           setStep(Steps.SESSION);
           props.windowHandler.show();
         }
+
+        find = user;
+      }
+
+      if(stream.id === payload.mainStreamId) {
+        find.stream = stream;
+      } else {
+        find.shareStream = stream;
       }
     });
 
@@ -524,16 +526,10 @@ const MeetingRoom = (props) => {
         console.log("\n\n\n\nCREATE PARTICIPANTS ON STREAM");
         console.log(stream.id);
         console.log(mapItem);
-        if(stream.id === payload.mainStreamId) {
-          user.stream = stream;
-        } else {
-          user.shareStream = stream;
-        }
 
         let find = participants.find((p) => p.userId === user.userId);
         if(!find) {
           participants.push(user);
-
           if (participants.length === userPeerMap.length) {
             setParticipants(participants);
             setAllUserParticipantsLeft(false);
@@ -544,6 +540,14 @@ const MeetingRoom = (props) => {
               }
             }
           }
+
+          find = user;
+        }
+
+        if(stream.id === mapItem.user.mainStreamId) {
+          find.stream = stream;
+        } else {
+          find.shareStream = stream;
         }
       });
     }
