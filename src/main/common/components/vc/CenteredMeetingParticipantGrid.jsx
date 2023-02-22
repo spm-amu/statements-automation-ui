@@ -28,10 +28,6 @@ const MeetingParticipantGrid = (props) => {
   } = props;
 
   useEffect(() => {
-    setScreenShared(props.screenShared);
-  }, [props.screenShared]);
-
-  useEffect(() => {
     if (participants) {
       let currentUserParticipant = participants.find((p) => p.isCurrentUser);
       if (!currentUserParticipant) {

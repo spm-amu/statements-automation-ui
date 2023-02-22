@@ -88,6 +88,7 @@ const MeetingRoom = (props) => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [screenSources, setScreenSources] = useState();
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
+  const [someoneSharing, setSomeoneSharing] = useState(false);
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [whiteboardItems, setWhiteboardItems] = useState([]);
@@ -716,6 +717,7 @@ const MeetingRoom = (props) => {
   };
 
   const onAVSettingsChange = (payload) => {
+    // TODO : Emit a separate event for screen sharing
     let participant = participants.find((p) => p.userId === payload.userId);
     if (participant) {
       participant.screenShared = payload.screenShared;
@@ -725,7 +727,11 @@ const MeetingRoom = (props) => {
       if (payload.screenShared) {
         handleMessageArrived({
           message: participant.name + " started sharing"
-        })
+        });
+
+        setMeetingParticipantGridMode('STRIP');
+      } else {
+        setMeetingParticipantGridMode('DEFAULT');
       }
     }
 
@@ -955,7 +961,7 @@ const MeetingRoom = (props) => {
                             </div>
                             :
                             <>
-                              <div style={{width: screenShared ? '400px' : '0', height: screenShared ? '400px' : 0, border: "4px solid red"}}>
+                              <div style={{width: screenShared || someoneSharing ? '400px' : '0', height: screenShared ? '400px' : 0, border: "4px solid red"}}>
                                 <video
                                   hidden={false}
                                   muted playsinline autoPlay ref={shareScreenRef}
@@ -1003,7 +1009,6 @@ const MeetingRoom = (props) => {
                       handRaised={handRaised}
                       isRecording={isRecording}
                       displayState={displayState}
-                      screenShared={screenShared}
                       whiteBoardShown={showWhiteBoard}
                       isHost={isHost}
                       step={step}
