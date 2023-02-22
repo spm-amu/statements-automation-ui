@@ -295,8 +295,8 @@ const MeetingRoom = (props) => {
       );
     });
 
-    currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
-    currentUserStream.shareScreenObj.addTrack(stream.getVideoTracks()[0]);
+    //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
+    //currentUserStream.shareScreenObj.addTrack(stream.getVideoTracks()[0]);
     shareScreenRef.current.srcObject = stream;
 
     createMediaRecorder(stream);
@@ -791,6 +791,8 @@ const MeetingRoom = (props) => {
       props.onEndCall();
       props.closeHandler();
     } else {
+      setSomeoneSharing(false);
+      setScreenShared(false);
       setMeetingParticipantGridMode("DEFAULT");
       setStep(Steps.SESSION_ENDED)
     }
