@@ -136,7 +136,7 @@ class SocketManager {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj]
+      stream
     });
 
     peer.on('signal', (signal) => {
@@ -145,8 +145,6 @@ class SocketManager {
         callerID: this.socket.id,
         signal,
         name: userDetails.name,
-        mainStreamId: stream.obj.id,
-        shareStreamId: stream.shareScreenObj.id,
         userAlias: userDetails.userId,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
         audioMuted: audioMuted,
@@ -187,7 +185,7 @@ class SocketManager {
     const peer = new Peer({
       initiator: false,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj],
+      stream,
       config: {
         iceServers: [
           {urls: 'stun:stun.l.google.com:19302'},
@@ -203,9 +201,7 @@ class SocketManager {
         signal,
         callerID: callerId,
         audioMuted: audioMuted,
-        videoMuted: videoMuted,
-        mainStreamId: stream.obj.id,
-        shareStreamId: stream.shareScreenObj.id,
+        videoMuted: videoMuted
       });
     });
 
