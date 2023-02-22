@@ -16,7 +16,7 @@ export class Stream {
       .then((stream) => {
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
-            audio: false,
+            audio: true,
             video: true
           });
 

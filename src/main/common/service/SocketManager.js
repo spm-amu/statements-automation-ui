@@ -184,7 +184,6 @@ class SocketManager {
   };
 
   addPeer(callerId, stream, audioMuted, videoMuted) {
-    alert(stream.obj.id);
     const peer = new Peer({
       initiator: false,
       trickle: false,
