@@ -126,6 +126,8 @@ const MeetingRoom = (props) => {
                 userToCall: userToCall,
                 callerId: socketManager.socket.id,
                 name: appManager.getUserDetails().name,
+                mainStreamId: currentUserStream.obj.id,
+                shareStreamId: currentUserStream.shareScreenObj.id
               });
             }
 
@@ -473,13 +475,16 @@ const MeetingRoom = (props) => {
       console.log("\n\n\n\nADD USER ON STREAM");
       console.log(stream.id);
       console.log(payload);
-      user.stream = stream;
-      console.log("UPDATING PARTICIPANTS");
-      setParticipants((participants) => [...participants, user]);
-      setAllUserParticipantsLeft(false);
-      if (step === Steps.LOBBY) {
-        setStep(Steps.SESSION);
-        props.windowHandler.show();
+
+      if(stream.id === payload.mainStreamId) {
+        user.stream = stream;
+        console.log("UPDATING PARTICIPANTS");
+        setParticipants((participants) => [...participants, user]);
+        setAllUserParticipantsLeft(false);
+        if (step === Steps.LOBBY) {
+          setStep(Steps.SESSION);
+          props.windowHandler.show();
+        }
       }
     });
 
@@ -512,16 +517,19 @@ const MeetingRoom = (props) => {
         console.log("\n\n\n\nCREATE PARTICIPANTS ON STREAM");
         console.log(stream.id);
         console.log(mapItem);
-        user.stream = stream;
-        participants.push(user);
 
-        if (participants.length === userPeerMap.length) {
-          setParticipants(participants);
-          setAllUserParticipantsLeft(false);
-          if (userPeerMap.length > 0) {
-            if (step === Steps.LOBBY) {
-              setStep(Steps.SESSION);
-              props.windowHandler.show();
+        if(stream.id === mapItem.user.mainStreamId) {
+          user.stream = stream;
+          participants.push(user);
+
+          if (participants.length === userPeerMap.length) {
+            setParticipants(participants);
+            setAllUserParticipantsLeft(false);
+            if (userPeerMap.length > 0) {
+              if (step === Steps.LOBBY) {
+                setStep(Steps.SESSION);
+                props.windowHandler.show();
+              }
             }
           }
         }
@@ -564,6 +572,8 @@ const MeetingRoom = (props) => {
       isHost: isHost,
       audioMuted: audioMuted,
       videoMuted: videoMuted,
+      mainStreamId: currentUserStream.obj.id,
+      shareStreamId: currentUserStream.shareScreenObj.id,
       direct: isDirectCall,
       userToCall
     });
@@ -577,7 +587,9 @@ const MeetingRoom = (props) => {
       meetingJoinRequest: true,
       userToCall: requestedUser,
       callerUser: {
-        userId: userDetails.userId
+        userId: userDetails.userId,
+        mainStreamId: currentUserStream.obj.id,
+        shareStreamId: currentUserStream.shareScreenObj.id
       }
     });
   };

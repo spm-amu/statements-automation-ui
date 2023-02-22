@@ -146,7 +146,7 @@ class SocketManager {
         signal,
         name: userDetails.name,
         mainStreamId: stream.obj.id,
-        shareStreamId: stream.shareScreenObj,
+        shareStreamId: stream.shareScreenObj.id,
         userAlias: userDetails.userId,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
         audioMuted: audioMuted,
@@ -184,6 +184,7 @@ class SocketManager {
   };
 
   addPeer(callerId, stream, audioMuted, videoMuted) {
+    alert(stream.obj.id);
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -205,7 +206,7 @@ class SocketManager {
         audioMuted: audioMuted,
         videoMuted: videoMuted,
         mainStreamId: stream.obj.id,
-        shareStreamId: stream.shareScreenObj,
+        shareStreamId: stream.shareScreenObj.id,
       });
     });
 
