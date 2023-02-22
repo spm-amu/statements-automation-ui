@@ -14,26 +14,18 @@ export class Stream {
 
     userMedia
       .then((stream) => {
-        let shareUserMedia = navigator.mediaDevices
-          .getUserMedia({
-            audio: true,
-            video: true
-          });
 
-        this.obj = stream;
+        console.log("STREAM STARTED");
+
         if (!video) {
           stream.getVideoTracks()[0].enabled = false;
           //stream.getVideoTracks()[0].stop();
         }
 
-        shareUserMedia
-          .then((stream) => {
-            this.shareScreenObj = stream;
-            console.log("STREAM STARTED");
-            if (successHandler) {
-              successHandler(this.obj);
-            }
-          });
+        this.obj = stream;
+        if (successHandler) {
+          successHandler(this.obj);
+        }
       }).catch((e) => {
       console.log("STREAM FAILED");
       console.log(e);

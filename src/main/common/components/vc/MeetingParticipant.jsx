@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {forwardRef, useEffect, useRef} from "react";
+import React, {forwardRef, useEffect, useRef} from "react";
 import './MeetingParticipant.css'
 import Utils from '../../Utils';
 
@@ -19,6 +19,7 @@ const MeetingParticipant = (props) => {
     }
   }, [videoRef.current]);
 
+
   return (
     <div className={'col-*-* meeting-participant-container'}
          style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null}}>
@@ -27,7 +28,7 @@ const MeetingParticipant = (props) => {
           showVideo ?
             <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
               {
-                props.videoMuted &&
+                props.videoMuted && !props.screenShared &&
                 <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
                   <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
                        style={
@@ -42,13 +43,13 @@ const MeetingParticipant = (props) => {
               {
                 props.audioMuted || props.data.peer === null ?
                   <video
-                    hidden={props.videoMuted}
+                    hidden={props.videoMuted && !props.screenShared}
                     muted playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
                   />
                   :
                   <video
-                    hidden={props.videoMuted}
+                    hidden={props.videoMuted && !props.screenShared}
                     playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
                   />

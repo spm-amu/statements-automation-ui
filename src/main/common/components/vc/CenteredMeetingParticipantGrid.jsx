@@ -17,7 +17,6 @@ const MeetingParticipantGrid = (props) => {
   const {participants} = props;
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
-  // TODO : Get rid of screenShared in the whole component
   const [screenShared, setScreenShared] = React.useState(false);
   const {
     waitingList,
@@ -27,6 +26,10 @@ const MeetingParticipantGrid = (props) => {
     audioMuted,
     meetingTitle
   } = props;
+
+  useEffect(() => {
+    setScreenShared(props.screenShared);
+  }, [props.screenShared]);
 
   useEffect(() => {
     if (participants) {
@@ -165,6 +168,7 @@ const MeetingParticipantGrid = (props) => {
                                     props.userVideoChangeHandler(ref);
                                   } : null
                                 }
+                                screenShared={screenShared}
                                 showName={!participant.isCurrentUser}
                                 videoMuted={participant.videoMuted}
                                 audioMuted={participant.audioMuted} sizing={'sm'}/>

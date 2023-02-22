@@ -88,7 +88,6 @@ const MeetingRoom = (props) => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [screenSources, setScreenSources] = useState();
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
-  const [someoneSharing, setSomeoneSharing] = useState(false);
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [whiteboardItems, setWhiteboardItems] = useState([]);
@@ -101,7 +100,6 @@ const MeetingRoom = (props) => {
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
   const recordedChunks = [];
   const shareScreenSource = useRef();
-  const shareScreenRef = useRef();
   const tmpVideoTrack = useRef();
 
   const handler = () => {
@@ -127,8 +125,6 @@ const MeetingRoom = (props) => {
                 userToCall: userToCall,
                 callerId: socketManager.socket.id,
                 name: appManager.getUserDetails().name,
-                mainStreamId: currentUserStream.obj.id,
-                shareStreamId: currentUserStream.shareScreenObj.id
               });
             }
 
@@ -285,22 +281,21 @@ const MeetingRoom = (props) => {
   };
 
   const handleScreenShareStream = (stream) => {
-    tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
+    tmpVideoTrack.current = currentUserStream.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
-        currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+        currentUserStream.getVideoTracks()[0], // prev video track - webcam
         stream.getVideoTracks()[0], // current video track - screen track
-        currentUserStream.shareScreenObj
+        currentUserStream.obj
       );
     });
 
-    //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
-    //currentUserStream.shareScreenObj.addTrack(stream.getVideoTracks()[0]);
-    shareScreenRef.current.srcObject = stream;
+    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
+    currentUserStream.addTrack(stream.getVideoTracks()[0]);
+    userVideo.current.srcObject = currentUserStream.obj;
 
     createMediaRecorder(stream);
-    setMeetingParticipantGridMode('STRIP');
   };
 
   const handleDataAvailable = (e) => {
@@ -365,17 +360,16 @@ const MeetingRoom = (props) => {
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
-        currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+        currentUserStream.getVideoTracks()[0], // prev video track - webcam
         tmpVideoTrack.current, // current video track - screen track
-        currentUserStream.shareScreenObj.obj
+        currentUserStream.obj
       );
     });
 
-    currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
-    currentUserStream.shareScreenObj.addTrack(tmpVideoTrack.current);
+    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
+    currentUserStream.addTrack(tmpVideoTrack.current);
 
-    shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
-    setMeetingParticipantGridMode('DEFAULT');
+    userVideo.current.srcObject = currentUserStream.obj;
   };
 
   const selectSourceHandler = (selectedSource) => {
@@ -458,9 +452,8 @@ const MeetingRoom = (props) => {
     }
   }, [allUserParticipantsLeft]);
 
-  const newUserCache = React.useRef([]);
   const addUser = (payload) => {
-    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted);
+    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream.obj, MessageType.USER_JOINED, audioMuted, videoMuted);
     joinInAudio.play();
 
     console.log("ADD USER : ", payload);
@@ -475,30 +468,13 @@ const MeetingRoom = (props) => {
     };
 
     userToPeerItem.peer.on('stream', (stream) => {
-      console.log("\n\n\n\nADD USER ON STREAM");
-      console.log(stream.id);
-      console.log(payload);
-
-      let find = newUserCache.current.find((p) => p.userId === user.userId);
-      if (!find) {
-        find = user;
-        newUserCache.current.push(find);
-      }
-
-      if (stream.id === payload.mainStreamId) {
-        find.stream = stream;
-      } else {
-        find.shareStream = stream;
-      }
-
-      if (find.stream && find.shareStream) {
-        console.log("UPDATING PARTICIPANTS");
-        setParticipants((participants) => [...participants, user]);
-        setAllUserParticipantsLeft(false);
-        if (step === Steps.LOBBY) {
-          setStep(Steps.SESSION);
-          props.windowHandler.show();
-        }
+      user.stream = stream;
+      console.log("UPDATING PARTICIPANTS");
+      setParticipants((participants) => [...participants, user]);
+      setAllUserParticipantsLeft(false);
+      if (step === Steps.LOBBY) {
+        setStep(Steps.SESSION);
+        props.windowHandler.show();
       }
     });
 
@@ -513,7 +489,7 @@ const MeetingRoom = (props) => {
 
     let userPeerMap = [];
     users.forEach((user) => {
-      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted))
+      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream.obj, MessageType.ALL_USERS, audioMuted, videoMuted))
     });
 
     let participants = [];
@@ -528,31 +504,18 @@ const MeetingRoom = (props) => {
       };
 
       mapItem.peer.on('stream', (stream) => {
-        console.log("\n\n\n\nCREATE PARTICIPANTS ON STREAM");
-        console.log(stream.id);
-        console.log(mapItem);
+        user.stream = stream;
+        participants.push(user);
 
-        let find = participants.find((p) => p.userId === user.userId);
-        if (!find) {
-          participants.push(user);
-          if (participants.length === userPeerMap.length) {
-            setParticipants(participants);
-            setAllUserParticipantsLeft(false);
-            if (userPeerMap.length > 0) {
-              if (step === Steps.LOBBY) {
-                setStep(Steps.SESSION);
-                props.windowHandler.show();
-              }
+        if (participants.length === userPeerMap.length) {
+          setParticipants(participants);
+          setAllUserParticipantsLeft(false);
+          if (userPeerMap.length > 0) {
+            if (step === Steps.LOBBY) {
+              setStep(Steps.SESSION);
+              props.windowHandler.show();
             }
           }
-
-          find = user;
-        }
-
-        if (stream.id === mapItem.user.mainStreamId) {
-          find.stream = stream;
-        } else {
-          find.shareStream = stream;
         }
       });
     }
@@ -593,8 +556,6 @@ const MeetingRoom = (props) => {
       isHost: isHost,
       audioMuted: audioMuted,
       videoMuted: videoMuted,
-      mainStreamId: currentUserStream.obj.id,
-      shareStreamId: currentUserStream.shareScreenObj.id,
       direct: isDirectCall,
       userToCall
     });
@@ -608,9 +569,7 @@ const MeetingRoom = (props) => {
       meetingJoinRequest: true,
       userToCall: requestedUser,
       callerUser: {
-        userId: userDetails.userId,
-        mainStreamId: currentUserStream.obj.id,
-        shareStreamId: currentUserStream.shareScreenObj.id
+        userId: userDetails.userId
       }
     });
   };
@@ -646,7 +605,7 @@ const MeetingRoom = (props) => {
   }, [streamsInitiated]);
 
   useEffect(() => {
-    if (meetingChat) {
+    if(meetingChat) {
       setSideBarTab('Chat');
       setSideBarOpen(true);
       setHasUnreadChats(false);
@@ -737,25 +696,16 @@ const MeetingRoom = (props) => {
   };
 
   const onAVSettingsChange = (payload) => {
-    // TODO : Emit a separate event for screen sharing
     let participant = participants.find((p) => p.userId === payload.userId);
     if (participant) {
-      /*participant.screenShared = payload.screenShared;
+      participant.screenShared = payload.screenShared;
       participant.audioMuted = payload.audioMuted;
-      participant.videoMuted = payload.videoMuted;*/
+      participant.videoMuted = payload.videoMuted;
 
       if (payload.screenShared) {
         handleMessageArrived({
           message: participant.name + " started sharing"
-        });
-
-        shareScreenRef.current.srcObject = participant.shareStream;
-        setSomeoneSharing(true);
-        setMeetingParticipantGridMode('STRIP');
-      } else {
-        shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
-        setSomeoneSharing(false);
-        setMeetingParticipantGridMode('DEFAULT');
+        })
       }
     }
 
@@ -791,9 +741,6 @@ const MeetingRoom = (props) => {
       props.onEndCall();
       props.closeHandler();
     } else {
-      setSomeoneSharing(false);
-      setScreenShared(false);
-      setMeetingParticipantGridMode("DEFAULT");
       setStep(Steps.SESSION_ENDED)
     }
   };
@@ -855,12 +802,6 @@ const MeetingRoom = (props) => {
       emitAVSettingsChange();
     }
   }, [audioMuted]);
-
-  useEffect(() => {
-    if (shareScreenRef.current) {
-      shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
-    }
-  }, [shareScreenRef.current]);
 
   useEffect(() => {
     if (userVideo && userVideo.current) {
@@ -968,16 +909,6 @@ const MeetingRoom = (props) => {
                         </div>
                       </div>
                     }
-                    <div style={{
-                      width: screenShared || someoneSharing ? '100%' : '0',
-                      height: screenShared || someoneSharing ? 'calc(100% - 200px)' : 0
-                    }}>
-                      <video
-                        hidden={false}
-                        muted playsinline autoPlay ref={shareScreenRef}
-                        style={{width: '100%', height: '100%'}}
-                      />
-                    </div>
                     <div className={'row'} style={{
                       width: '100%',
                       height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : "160px",
@@ -1000,9 +931,9 @@ const MeetingRoom = (props) => {
                             <MeetingParticipantGrid participants={participants}
                                                     waitingList={lobbyWaitingList}
                                                     mode={meetingParticipantGridMode}
+                                                    screenShared={screenShared}
                                                     audioMuted={audioMuted}
                                                     videoMuted={videoMuted}
-                                                    screenShared={screenShared}
                                                     meetingTitle={selectedMeeting.title}
                                                     userToCall={userToCall}
                                                     step={step}
@@ -1037,6 +968,7 @@ const MeetingRoom = (props) => {
                       handRaised={handRaised}
                       isRecording={isRecording}
                       displayState={displayState}
+                      screenShared={screenShared}
                       whiteBoardShown={showWhiteBoard}
                       isHost={isHost}
                       step={step}
