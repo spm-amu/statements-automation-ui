@@ -20,6 +20,7 @@ const Toolbar = (props) => {
 
   const {
     participants,
+    participantsRaisedHands,
     hasUnreadChats,
     hasUnseenWhiteboardEvent,
     whiteBoardShown,
@@ -267,22 +268,29 @@ const Toolbar = (props) => {
               </div>
             }
 
-            <IconButton
-              onClick={(e) => {
-                if (handRaised) {
-                  lowerHand();
-                } else {
-                  raiseHand();
-                }
-              }}
-              style={{
-                backgroundColor: '#404239',
-                color: handRaised ? '#e2b030' : 'white',
-                marginRight: '4px'
-              }}
-            >
-              <Icon id={'PAN_TOOL'}/>
-            </IconButton>
+            <div>
+              {
+                participantsRaisedHands.length > 0 &&
+                <div className={'people-count-bubble'}>{participantsRaisedHands.length}</div>
+              }
+              <IconButton
+                onClick={(e) => {
+                  if (handRaised) {
+                    lowerHand();
+                  } else {
+                    raiseHand();
+                  }
+                }}
+                style={{
+                  backgroundColor: '#404239',
+                  color: handRaised ? '#e2b030' : 'white',
+                  marginRight: '4px'
+                }}
+              >
+                <Icon id={'PAN_TOOL'}/>
+              </IconButton>
+            </div>
+
             <div>
               {
                 hasUnseenWhiteboardEvent &&

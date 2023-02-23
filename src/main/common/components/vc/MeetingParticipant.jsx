@@ -3,8 +3,11 @@ import React, {forwardRef, useEffect, useRef} from "react";
 import './MeetingParticipant.css'
 import Utils from '../../Utils';
 import Icon from '../Icon';
+import { PanTool } from '@material-ui/icons';
 
 const MeetingParticipant = (props) => {
+  const [handRaised, setHandRaised] = React.useState(false);
+
   const videoRef = useRef();
   const showVideo = true;
 
@@ -13,6 +16,17 @@ const MeetingParticipant = (props) => {
       videoRef.current.srcObject = props.data.stream;
     }
   }, [props.data]);
+
+  useEffect(() => {
+    console.log('_____ \n\n participantsRaisedHands: ', props.participantsRaisedHands);
+
+    let raisedHandParticipants = props.participantsRaisedHands.find((user => user.userId === props.data.userId));
+    if (raisedHandParticipants) {
+      setHandRaised(true);
+    } else {
+      setHandRaised(false);
+    }
+  }, [props.participantsRaisedHands]);
 
   useEffect(() => {
     if (props.refChangeHandler) {
@@ -65,6 +79,12 @@ const MeetingParticipant = (props) => {
                     ) : (
                       <Icon id={'MIC'}/>
                     )}
+                  </span>
+                }
+                {
+                  props.showName &&
+                  <span style={{ marginLeft: '4px' }}>
+                    { handRaised && <PanTool fontSize={'small'} style={{ color: '#e2b030' }} /> }
                   </span>
                 }
               </div>

@@ -14,7 +14,7 @@ const MAX_ROWS = 2;
 const MAX_TILES = 6;
 
 const MeetingParticipantGrid = (props) => {
-  const {participants} = props;
+  const {participants, participantsRaisedHands} = props;
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
   const [screenShared, setScreenShared] = React.useState(false);
@@ -121,6 +121,7 @@ const MeetingParticipantGrid = (props) => {
             }
             >
               <MeetingParticipant data={participant}
+                                  participantsRaisedHands={participantsRaisedHands}
                                   refChangeHandler={
                                     participant.isCurrentUser ? (ref) => {
                                       props.userVideoChangeHandler(ref);

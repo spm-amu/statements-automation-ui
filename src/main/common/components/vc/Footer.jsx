@@ -18,7 +18,8 @@ const Footer = (props) => {
     whiteBoardShown,
     step,
     isHost,
-    autoPermit
+    autoPermit,
+    participantsRaisedHands
   } = props;
 
   return (
@@ -48,6 +49,7 @@ const Footer = (props) => {
                    hasUnreadChats={hasUnreadChats}
                    hasUnseenWhiteboardEvent={hasUnseenWhiteboardEvent}
                    participants={participants}
+                   participantsRaisedHands={participantsRaisedHands}
                    handRaised={handRaised}
                    whiteBoardShown={whiteBoardShown}
                    userVideo={userVideo}

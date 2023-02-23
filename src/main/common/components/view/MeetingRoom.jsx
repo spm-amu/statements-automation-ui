@@ -965,6 +965,7 @@ const MeetingRoom = (props) => {
                                                     userToCall={userToCall}
                                                     step={step}
                                                     isHost={isHost}
+                                                    participantsRaisedHands={participantsRaisedHands}
                                                     allUserParticipantsLeft={allUserParticipantsLeft}
                                                     userVideoChangeHandler={(ref) => setUserVideo(ref)}
                                                     acceptUserHandler={
@@ -1000,6 +1001,7 @@ const MeetingRoom = (props) => {
                       isHost={isHost}
                       step={step}
                       autoPermit={autoPermit}
+                      participantsRaisedHands={participantsRaisedHands}
                       toolbarEventHandler={
                         {
                           onMuteVideo: (muted) => {
