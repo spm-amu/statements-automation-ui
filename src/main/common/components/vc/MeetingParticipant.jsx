@@ -2,6 +2,7 @@
 import React, {forwardRef, useEffect, useRef} from "react";
 import './MeetingParticipant.css'
 import Utils from '../../Utils';
+import Icon from '../Icon';
 
 const MeetingParticipant = (props) => {
   const videoRef = useRef();
@@ -54,7 +55,19 @@ const MeetingParticipant = (props) => {
                     style={{width: '100%', height: '100%'}}
                   />
               }
-              <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}> {props.showName ? props.data.name : 'You'}</div>
+              <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}>
+                {props.showName ? props.data.name : 'You'}
+                {
+                  props.showName &&
+                  <span style={{ marginLeft: '4px' }}>
+                    { props.audioMuted ? (
+                      <Icon id={'MIC_OFF'}/>
+                    ) : (
+                      <Icon id={'MIC'}/>
+                    )}
+                  </span>
+                }
+              </div>
             </div>
             :
             <div className={'h-100'} style={{backgroundColor: 'rgb(40, 40, 43)'}}>

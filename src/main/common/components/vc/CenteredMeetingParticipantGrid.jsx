@@ -127,7 +127,8 @@ const MeetingParticipantGrid = (props) => {
                                     } : null
                                   }
                                   screenShared={screenShared}
-                                  showName={!participant.isCurrentUser} videoMuted={participant.videoMuted}
+                                  showName={!participant.isCurrentUser}
+                                  videoMuted={participant.videoMuted}
                                   audioMuted={participant.audioMuted}/>
             </Grid>
           })}
