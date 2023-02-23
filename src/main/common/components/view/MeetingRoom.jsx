@@ -189,7 +189,12 @@ const MeetingRoom = (props) => {
   const recordMeeting = () => {
     if (mediaRecorder != null) {
       mediaRecorder.start();
+      socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
+        roomID: selectedMeeting.id,
+        isRecording: true
+      });
       setIsRecording(true);
+      updateRecordingStatus(true);
     }
   };
 
@@ -223,7 +228,12 @@ const MeetingRoom = (props) => {
   const stopRecordingMeeting = () => {
     if (mediaRecorder != null) {
       mediaRecorder.stop();
+      socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
+        roomID: selectedMeeting.id,
+        isRecording: false
+      });
       setIsRecording(false);
+      updateRecordingStatus(false);
     }
   };
 
@@ -348,6 +358,23 @@ const MeetingRoom = (props) => {
       {
         meetingId: selectedMeeting.id,
         userId: participant.userId
+      },
+      '',
+      false
+    );
+  };
+
+  const updateRecordingStatus = (recordingStatus) => {
+    post(
+      `${appManager.getAPIHost()}/api/v1/meeting/updateRecordingStatus`,
+      () => {
+      },
+      (e) => {
+        console.error(e);
+      },
+      {
+        meetingId: selectedMeeting.id,
+        recording: recordingStatus
       },
       '',
       false

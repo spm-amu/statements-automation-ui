@@ -8,6 +8,7 @@ import appManager from "../../service/AppManager";
 import Icon from "../Icon";
 import {IconButton} from "@material-ui/core";
 import AlertDialog from "../AlertDialog";
+import LottieIcon from '../LottieIcon';
 
 const MeetingRoomToolbar = (props) => {
 
@@ -15,6 +16,7 @@ const MeetingRoomToolbar = (props) => {
   const [endMeetingPromiseContext, setEndMeetingPromiseContext] = useState(null);
   const [started, setStarted] = useState(false);
   const [isHost, setIsHost] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [remainingTime, setRemainingTime] = useState();
 
   const socketEventHandler = useState({});
@@ -27,16 +29,25 @@ const MeetingRoomToolbar = (props) => {
       on: (eventType, be) => {
         switch (eventType) {
           case MessageType.CHANGE_HOST:
-            updateHost(be);
+            onUpdateHost(be);
+            break;
+          case MessageType.TOGGLE_RECORD_MEETING:
+            onRecording(be.payload);
             break;
         }
       }
     }
   };
 
-  const updateHost = (args) => {
+  const onUpdateHost = (args) => {
     let userDetails = appManager.getUserDetails();
     setIsHost(userDetails.userId === args.payload.host);
+  };
+
+  const onRecording = (args) => {
+    if (selectedMeeting.id === args.roomID) {
+      setIsRecording(args.isRecording);
+    }
   };
 
   useEffect(() => {
@@ -44,8 +55,14 @@ const MeetingRoomToolbar = (props) => {
   });
 
   useEffect(() => {
-    socketManager.addSubscriptions(socketEventHandler, MessageType.CHANGE_HOST);
+    socketManager.addSubscriptions(socketEventHandler, MessageType.CHANGE_HOST, MessageType.TOGGLE_RECORD_MEETING);
     setIsHost(props.isHost);
+
+    get(`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetingRecording/${selectedMeeting.id}`, (response) => {
+      setIsRecording(response.recording);
+    }, (e) => {
+      console.error(e);
+    }, '', false)
   }, []);
 
   useEffect(() => {
@@ -134,43 +151,56 @@ const MeetingRoomToolbar = (props) => {
                      btnTextRight={'YES'}
         />
       }
-      {
-        isHost && !isDirectCall &&
-        <div className={'row'} style={{margin: '0 0 0 0', display: 'flex', alignItems: 'center'}}>
-          <div style={{margin: '0 8px 0 0'}}>
-            <IconButton
-              variant={'contained'}
-              disabled={started}
-              size="large"
-              color={'primary'}
-              onClick={(e) => startMeeting(e)}
-            >
-              <Icon id={'PLAY'}/>
-            </IconButton>
-            <IconButton
-              variant={'contained'}
-              disabled={!started}
-              size="large"
-              color={'primary'}
-              onClick={(e) => handleEndMeetingButton()}
-            >
-              <Icon id={'STOP'}/>
-            </IconButton>
-          </div>
-          <div className={'col no-margin'}>
-            {
-              started &&
-              <Timer onTimeLapse={
-                (extend) => {
-                  if (!extend) {
-                    endMeeting();
+      <div className={'row'} style={{margin: '0 0 0 0', display: 'flex', alignItems: 'center'}}>
+        {
+          isHost && !isDirectCall &&
+          <>
+            <div style={{margin: '0 8px 0 0'}}>
+              <IconButton
+                variant={'contained'}
+                disabled={started}
+                size="large"
+                color={'primary'}
+                onClick={(e) => startMeeting(e)}
+              >
+                <Icon id={'PLAY'}/>
+              </IconButton>
+              <IconButton
+                variant={'contained'}
+                disabled={!started}
+                size="large"
+                color={'primary'}
+                onClick={(e) => handleEndMeetingButton()}
+              >
+                <Icon id={'STOP'}/>
+              </IconButton>
+            </div>
+            <div className={'col no-margin'}>
+              {
+                started &&
+                <Timer onTimeLapse={
+                  (extend) => {
+                    if (!extend) {
+                      endMeeting();
+                    }
                   }
-                }
-              } time={remainingTime}/>
-            }
-          </div>
-        </div>
-      }
+                } time={remainingTime}/>
+              }
+            </div>
+          </>
+        }
+        {
+          isRecording &&
+          <>
+            <LottieIcon id={'recording'}/>
+            <span style={{ fontSize: '16px' }}>
+              {
+                isHost ? 'You are recording...' : 'Meeting ia being recorded...'
+              }
+            </span>
+          </>
+        }
+      </div>
     </div>
   );
 };
