@@ -523,7 +523,7 @@ const MeetingRoom = (props) => {
             audioMuted: item.user.audioMuted,
             videoMuted: item.user.videoMuted,
             stream: item.mainStream,
-            shareStream: item.item.ShareStream,
+            shareStream: item.shareStream,
           };
 
           participants.push(user);
