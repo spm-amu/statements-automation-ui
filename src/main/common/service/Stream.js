@@ -17,7 +17,10 @@ export class Stream {
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
             audio: true,
-            video: true
+            video: {
+              width: 240,
+              height: 240,
+            }
           });
 
         this.obj = stream;

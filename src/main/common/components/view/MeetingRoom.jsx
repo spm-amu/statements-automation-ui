@@ -482,7 +482,7 @@ const MeetingRoom = (props) => {
   }, [allUserParticipantsLeft]);
 
   const addUser = (payload) => {
-    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream.obj, MessageType.USER_JOINED, audioMuted, videoMuted);
+    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted);
     joinInAudio.play();
 
     console.log("ADD USER : ", payload);
@@ -520,7 +520,7 @@ const MeetingRoom = (props) => {
 
     let userPeerMap = [];
     users.forEach((user) => {
-      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream.obj, MessageType.ALL_USERS, audioMuted, videoMuted))
+      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted))
     });
 
     let participants = [];
