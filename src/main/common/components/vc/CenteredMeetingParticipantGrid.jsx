@@ -17,6 +17,7 @@ const MeetingParticipantGrid = (props) => {
   const {participants, participantsRaisedHands} = props;
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
+  // TODO : Get rid of screenShared in the whole component
   const [screenShared, setScreenShared] = React.useState(false);
   const {
     waitingList,
