@@ -528,7 +528,7 @@ const MeetingRoom = (props) => {
 
           participants.push(user);
 
-          if (participants.length === userPeerMap.length) {
+          if (participants.length === socketManager.userPeerMap.length) {
             setParticipants(participants);
             setAllUserParticipantsLeft(false);
             if (userPeerMap.length > 0) {
@@ -540,7 +540,7 @@ const MeetingRoom = (props) => {
           }
 
           handleMessageArrived({
-            message: userToPeerItem.user.name + " has joined"
+            message: item.user.name + " has joined"
           });
         })
     });
