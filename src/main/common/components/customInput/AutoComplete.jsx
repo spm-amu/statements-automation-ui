@@ -129,7 +129,10 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       autoHighlight
       value={props.value ? props.value : []}
       multiple={!Utils.isNull(props.multiple) ? props.multiple : false}
-      getOptionLabel={(option) => props.labelClickHandler ? <span className={'option-label'} onClick={(e) => props.labelClickHandler(option.id)}>{option.label}</span> : option.label}
+      getOptionLabel={(option) => props.labelClickHandler ?
+        <span className={'option-label'} onClick={(e) => props.labelClickHandler(option.id)}>{option.label}</span>
+        : option ? option.label : ''
+      }
       open={open}
       onOpen={handleOpen}
       disabled={props.enableFile ? false : props.disabled}

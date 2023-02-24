@@ -233,6 +233,7 @@ const Meeting = (props) => {
   };
 
   const createMeetingObject = (hostAttendee) => {
+    console.log('____________ NEW HOST: ', hostAttendee);
     let newAttendees = [].concat(value.attendees);
     newAttendees.push(hostAttendee);
 
@@ -354,7 +355,7 @@ const Meeting = (props) => {
         const updatedHost = newHostAttendee[0];
         const userDetails = appManager.getUserDetails();
 
-        if (userDetails.userId !== updatedHost.userId) {
+        if (updatedHost && userDetails.userId !== updatedHost.userId) {
           let currentHost = data.attendees.find((attendee) => attendee.type === 'HOST');
           currentHost.type = 'REQUIRED';
 
