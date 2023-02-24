@@ -275,7 +275,10 @@ class SocketManager {
       });
     });
 
-    peer.signal(payload.signal);
+    if(eventType === MessageType.USER_JOINED) {
+      peer.signal(payload.signal);
+    }
+
     return promise;
   };
 
