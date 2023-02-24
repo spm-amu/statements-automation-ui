@@ -261,7 +261,22 @@ class SocketManager {
     };
 
     this.userPeerMap.push(item);
-    return item;
+    let promise = new Promise((resolve, reject) => {
+      peer.on('stream', (stream) => {
+        if (stream.id === payload.mainStreamId) {
+          item.mainStream = stream;
+        } else if (stream.id === payload.shareStreamId) {
+          item.shareStream = stream;
+        }
+
+        if(item.mainStream && item.shareStream) {
+          resolve(item);
+        }
+      });
+    });
+
+    peer.signal(payload.signal);
+    return promise;
   };
 
   endCall = (isDirect = false, caller = null) => {

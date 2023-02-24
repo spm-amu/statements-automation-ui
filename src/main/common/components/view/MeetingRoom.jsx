@@ -482,61 +482,50 @@ const MeetingRoom = (props) => {
   }, [allUserParticipantsLeft]);
 
   const addUser = (payload) => {
-    let userToPeerItem = socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted);
-    joinInAudio.play();
+    socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted)
+      .then((item) => {
+        console.log("ADD USER : ", payload);
+        let user = {
+          peerID: item.user.callerID,
+          userId: item.user.userAlias,
+          peer: item.peer,
+          name: item.user.name,
+          avatar: item.user.avatar,
+          audioMuted: payload.audioMuted,
+          videoMuted: payload.videoMuted,
+          stream: item.mainStream,
+          shareStream: item.shareStream
+        };
 
-    console.log("ADD USER : ", payload);
-    let user = {
-      peerID: userToPeerItem.user.callerID,
-      userId: userToPeerItem.user.userAlias,
-      peer: userToPeerItem.peer,
-      name: userToPeerItem.user.name,
-      avatar: userToPeerItem.user.avatar,
-      audioMuted: payload.audioMuted,
-      videoMuted: payload.videoMuted
-    };
-
-    userToPeerItem.peer.on('stream', (stream) => {
-      if (stream.id === payload.mainStreamId) {
-        user.stream = stream;
-        console.log("UPDATING PARTICIPANTS");
         setParticipants((participants) => [...participants, user]);
         setAllUserParticipantsLeft(false);
         if (step === Steps.LOBBY) {
           setStep(Steps.SESSION);
           props.windowHandler.show();
         }
-      }
-    });
 
-    userToPeerItem.peer.signal(payload.signal);
-    handleMessageArrived({
-      message: userToPeerItem.user.name + " has joined"
-    });
+        joinInAudio.play();
+      });
   };
 
   const createParticipants = (users, socket) => {
     socketManager.clearUserToPeerMap();
-
-    let userPeerMap = [];
     users.forEach((user) => {
-      userPeerMap.push(socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted))
-    });
+      socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted)
+        .then((item) => {
+          console.log("ADDING ITEM TO PARTICIPANTS : ", item);
 
-    let participants = [];
-    for (const mapItem of userPeerMap) {
-      let user = {
-        userId: mapItem.user.userAlias,
-        peer: mapItem.peer,
-        name: mapItem.user.name,
-        avatar: mapItem.user.avatar,
-        audioMuted: mapItem.user.audioMuted,
-        videoMuted: mapItem.user.videoMuted
-      };
+          let user = {
+            userId: item.user.userAlias,
+            peer: item.peer,
+            name: item.user.name,
+            avatar: item.user.avatar,
+            audioMuted: item.user.audioMuted,
+            videoMuted: item.user.videoMuted,
+            stream: item.mainStream,
+            shareStream: item.item.ShareStream,
+          };
 
-      mapItem.peer.on('stream', (stream) => {
-        if (stream.id === mapItem.user.mainStreamId) {
-          user.stream = stream;
           participants.push(user);
 
           if (participants.length === userPeerMap.length) {
@@ -549,9 +538,12 @@ const MeetingRoom = (props) => {
               }
             }
           }
-        }
-      });
-    }
+
+          handleMessageArrived({
+            message: userToPeerItem.user.name + " has joined"
+          });
+        })
+    });
   };
 
   const addUserToLobby = (data) => {
