@@ -19,7 +19,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import {useNavigate} from 'react-router-dom';
-import {Checkbox} from '@material-ui/core';
+import { Checkbox, Switch } from '@material-ui/core';
 import appManager from "../../../common/service/AppManager";
 import AlertDialog from "../AlertDialog";
 import SelectItem from "../customInput/SelectItem";
@@ -167,6 +167,7 @@ const Meeting = (props) => {
         locations: [],
         documents: [],
         privacyType: 'PRIVATE',
+        askToJoin: true
       });
     }
 
@@ -243,6 +244,7 @@ const Meeting = (props) => {
       locations: value.locations,
       description: value.description,
       privacyType: value.privacyType,
+      askToJoin: value.askToJoin,
       schedule: {
         id: props.selectedEvent ? props.selectedEvent.scheduleId : null,
         startDate: recurrenceRepetition !== 'NONE' ? Utils.getFormattedDate(value.recurringDtstart) : Utils.getFormattedDate(value.startDate),
@@ -831,6 +833,19 @@ const Meeting = (props) => {
                 />
               </RadioGroup>
             </FormControl>
+            <div style={{margin: '0'}}>
+              <FormControlLabel control={
+                <Switch
+                  disabled={readOnly}
+                  checked={value.askToJoin}
+                  value={value.askToJoin}
+                  color="primary"
+                  onChange={(e, val) => {
+                    handleFormValueChange(val, 'askToJoin', true);
+                  }}
+                />
+              } label="Auto permit"/>
+            </div>
             <div style={{margin: '0'}}>
               <div className={'col-*-*'} style={{width: '20%'}}>
                 <SelectItem
