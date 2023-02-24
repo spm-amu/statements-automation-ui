@@ -510,6 +510,7 @@ const MeetingRoom = (props) => {
 
   const createParticipants = (users, socket) => {
     socketManager.clearUserToPeerMap();
+    let newParticipants = [];
     users.forEach((user) => {
       socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted)
         .then((item) => {
@@ -526,22 +527,22 @@ const MeetingRoom = (props) => {
             shareStream: item.shareStream,
           };
 
-          participants.push(user);
+          newParticipants.push(user);
 
-          if (participants.length === socketManager.userPeerMap.length) {
-            setParticipants(participants);
+          if (newParticipants.length === socketManager.userPeerMap.length) {
+            setParticipants(newParticipants);
             setAllUserParticipantsLeft(false);
-            if (userPeerMap.length > 0) {
+            if (socketManager.userPeerMap.length > 0) {
               if (step === Steps.LOBBY) {
                 setStep(Steps.SESSION);
                 props.windowHandler.show();
               }
             }
-          }
 
-          handleMessageArrived({
-            message: item.user.name + " has joined"
-          });
+            handleMessageArrived({
+              message: item.user.name + " has joined"
+            });
+          }
         })
     });
   };
