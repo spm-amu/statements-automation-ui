@@ -19,7 +19,23 @@
   background-color: rgba(1, 71, 108, 0.2) !important;
 }
 
+.app-calendar .fc-day-past .fc-daygrid-day-number,
+.app-calendar .fc-day-future .fc-daygrid-day-number {
+  color: #6e6b7b;
+}
+
+.fc .fc-day-other .fc-daygrid-day-top,
+.fc .fc-day-other .fc-daygrid-day-botton {
+  opacity: .5;
+}
+
 .fc-button:hover {
+}
+
+.fc-v-event {
+  display: block;
+  border: none !important;
+  background-color: unset !important;
 }
 
 .modal-title {

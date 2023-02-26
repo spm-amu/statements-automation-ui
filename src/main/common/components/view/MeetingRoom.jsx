@@ -202,6 +202,11 @@ const MeetingRoom = (props) => {
       });
       setIsRecording(true);
       updateRecordingStatus(true);
+
+      emitSystemEvent("MEETING_RECORDING", {
+        recording: true,
+        userId: appManager.getUserDetails().userId
+      });
     }
   };
 
@@ -241,6 +246,11 @@ const MeetingRoom = (props) => {
       });
       setIsRecording(false);
       updateRecordingStatus(false);
+
+      emitSystemEvent("MEETING_RECORDING", {
+        recording: false,
+        userId: appManager.getUserDetails().userId
+      });
     }
   };
 
@@ -313,6 +323,15 @@ const MeetingRoom = (props) => {
           shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
           setSomeoneSharing(false);
           setMeetingParticipantGridMode('DEFAULT');
+        }
+      }
+    } else if (payload.systemEventType === "MEETING_RECORDING") {
+      let participant = participants.find((p) => p.userId === payload.data.userId);
+      if (participant) {
+        if(payload.data.recording) {
+          alert(participang.name + " has started recording");
+        } else {
+          alert(participang.name + " has stoped recording");
         }
       }
     }
