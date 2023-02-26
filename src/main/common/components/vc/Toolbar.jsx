@@ -166,6 +166,7 @@ const Toolbar = (props) => {
               </IconButton>
             }
             {
+              step === 'SESSION' &&
               <IconButton
                 onClick={() => {
                   muteVideo();
@@ -183,23 +184,25 @@ const Toolbar = (props) => {
                 )}
               </IconButton>
             }
-
-            <IconButton
-              onClick={() => {
-                muteAudio();
-              }}
-              style={{
-                backgroundColor: audioMuted ? "#eb3f21" : "#404239",
-                color: 'white',
-                marginRight: '4px'
-              }}
-            >
-              {audioMuted ? (
-                <Icon id={'MIC_OFF'}/>
-              ) : (
-                <Icon id={'MIC'}/>
-              )}
-            </IconButton>
+            {
+              step === 'SESSION' &&
+              <IconButton
+                onClick={() => {
+                  muteAudio();
+                }}
+                style={{
+                  backgroundColor: audioMuted ? "#eb3f21" : "#404239",
+                  color: 'white',
+                  marginRight: '4px'
+                }}
+              >
+                {audioMuted ? (
+                  <Icon id={'MIC_OFF'}/>
+                ) : (
+                  <Icon id={'MIC'}/>
+                )}
+              </IconButton>
+            }
             {" "}
             {
               step === 'SESSION' && displayState === 'MAXIMIZED' && !whiteBoardShown && !someoneSharing &&
