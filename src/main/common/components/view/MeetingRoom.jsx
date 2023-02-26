@@ -87,6 +87,7 @@ const MeetingRoom = (props) => {
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [recordingParticipant, setRecordingParticipant] = useState(null);
   const [screenSources, setScreenSources] = useState();
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
@@ -329,9 +330,9 @@ const MeetingRoom = (props) => {
       let participant = participants.find((p) => p.userId === payload.data.userId);
       if (participant) {
         if(payload.data.recording) {
-          alert(participang.name + " has started recording");
+          setRecordingParticipant(participant.name);
         } else {
-          alert(participang.name + " has stoped recording");
+          setRecordingParticipant(null);
         }
       }
     }
@@ -986,8 +987,8 @@ const MeetingRoom = (props) => {
 
   return (
     <Fragment>
-      {screenShared && shareScreenSource.current ? (
-        <div style={{position: 'absolute', widht: '100%', margin: '16px 0 8px 30%'}}>
+      {screenShared && shareScreenSource.current && (
+        <div style={{position: 'absolute', width: '320px', margin: '8px 0 8px 30%'}}>
           <Alert style={{marginBottom: '16px'}} severity="error">
             {
               (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
@@ -995,7 +996,16 @@ const MeetingRoom = (props) => {
             }
           </Alert>
         </div>
-      ) : null}
+      )}
+      {recordingParticipant && (
+        <div style={{position: 'absolute', widht: '100%', margin: '8px 0 8px calc(30% + 336px)'}}>
+          <Alert style={{marginBottom: '16px'}} severity="error">
+            {
+              recordingParticipant + " is recording"
+            }
+          </Alert>
+        </div>
+      )}
       <div className={'row meeting-container'} style={{
         height: displayState === 'MAXIMIZED' ? '100%' : '90%',
         maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
