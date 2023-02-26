@@ -298,7 +298,7 @@ const MeetingRoom = (props) => {
   };
 
   const onSystemEvent = (payload) => {
-    if(payload.systemEventType === "SHARE_SCREEN") {
+    if (payload.systemEventType === "SHARE_SCREEN") {
       let participant = participants.find((p) => p.userId === payload.data.userId);
       if (participant) {
         if (payload.data.shared) {
@@ -334,7 +334,7 @@ const MeetingRoom = (props) => {
     shareScreenRef.current.srcObject = stream;
 
     createMediaRecorder(stream);
-    setMeetingParticipantGridMode('STRIP');
+    //setMeetingParticipantGridMode('STRIP');
 
     setSomeoneSharing(false);
   };
@@ -630,7 +630,9 @@ const MeetingRoom = (props) => {
   const emitSystemEvent = (eventType, data) => {
     let participantIds = [];
     for (const participant of participants) {
-      participantIds.push(participant.userId);
+      if (participant.userId !== appManager.getUserDetails().userId) {
+        participantIds.push(participant.userId);
+      }
     }
 
     socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
@@ -665,6 +667,13 @@ const MeetingRoom = (props) => {
       socketManager.removeSubscriptions(eventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
       appManager.remove('CURRENT_MEETING');
+
+      if (screenShared) {
+        emitSystemEvent("SHARE_SCREEN", {
+          shared: false,
+          userId: appManager.getUserDetails().userId
+        });
+      }
     };
   }, []);
 
@@ -686,7 +695,7 @@ const MeetingRoom = (props) => {
   }, [streamsInitiated]);
 
   useEffect(() => {
-    if(meetingChat) {
+    if (meetingChat) {
       setSideBarTab('Chat');
       setSideBarOpen(true);
       setHasUnreadChats(false);
@@ -818,18 +827,9 @@ const MeetingRoom = (props) => {
       setSomeoneSharing(false);
       setMeetingParticipantGridMode("DEFAULT");
       setStep(Steps.SESSION_ENDED);
-
-      if(screenShared) {
-        emitSystemEvent("SHARE_SCREEN", {
-          shared: false,
-          userId: appManager.getUserDetails().userId
-        });
-      }
-
       setScreenShared(false);
     }
   };
-
 
   const removeFromLobbyWaiting = (item) => {
     setLobbyWaitingList(lobbyWaitingList.filter((i) => i.user !== item.user));
@@ -1000,8 +1000,8 @@ const MeetingRoom = (props) => {
                       </div>
                     }
                     <div style={{
-                      width: screenShared || someoneSharing ? '100%' : '0',
-                      height: screenShared || someoneSharing ? 'calc(100% - 200px)' : 0
+                      width: someoneSharing ? '100%' : '0',
+                      height: someoneSharing ? 'calc(100% - 200px)' : 0
                     }}>
                       <video
                         hidden={false}
@@ -1028,28 +1028,33 @@ const MeetingRoom = (props) => {
                               {'The ' + (isDirectCall ? 'call' : 'meeting') + ' has been ended' + (isDirectCall ? '' : ' by the host')}
                             </div>
                             :
-                            <MeetingParticipantGrid participants={participants}
-                                                    waitingList={lobbyWaitingList}
-                                                    mode={meetingParticipantGridMode}
-                                                    audioMuted={audioMuted}
-                                                    videoMuted={videoMuted}
-                                                    meetingTitle={selectedMeeting.title}
-                                                    userToCall={userToCall}
-                                                    userStream={currentUserStream.obj}
-                                                    step={step}
-                                                    isHost={isHost}
-                                                    participantsRaisedHands={participantsRaisedHands}
-                                                    allUserParticipantsLeft={allUserParticipantsLeft}
-                                                    userVideoChangeHandler={(ref) => setUserVideo(ref)}
-                                                    acceptUserHandler={
-                                                      (item) => {
-                                                        acceptUser(item);
-                                                      }}
-                                                    rejectUserHandler={
-                                                      (item) => {
-                                                        rejectUser(item);
-                                                      }}
-                            />
+                            <>
+                              { screenShared && shareScreenSource.current ? (
+                                <Alert style={{ marginBottom: '16px' }} severity="error">{shareScreenSource.current.name + ' is beign shared with other participants'}</Alert>
+                              ) : null }
+                              <MeetingParticipantGrid participants={participants}
+                                                      waitingList={lobbyWaitingList}
+                                                      mode={meetingParticipantGridMode}
+                                                      audioMuted={audioMuted}
+                                                      videoMuted={videoMuted}
+                                                      meetingTitle={selectedMeeting.title}
+                                                      userToCall={userToCall}
+                                                      userStream={currentUserStream.obj}
+                                                      step={step}
+                                                      isHost={isHost}
+                                                      participantsRaisedHands={participantsRaisedHands}
+                                                      allUserParticipantsLeft={allUserParticipantsLeft}
+                                                      userVideoChangeHandler={(ref) => setUserVideo(ref)}
+                                                      acceptUserHandler={
+                                                        (item) => {
+                                                          acceptUser(item);
+                                                        }}
+                                                      rejectUserHandler={
+                                                        (item) => {
+                                                          rejectUser(item);
+                                                        }}
+                              />
+                            </>
                         }
                       </div>
                     </div>
