@@ -783,6 +783,7 @@ const MeetingRoom = (props) => {
   const onAVSettingsChange = (payload) => {
     console.log("\n\n\n\n\nAV CHANGE : ", payload);
     let participant = participants.find((p) => p.userId === payload.userId);
+    console.log(participant);
     if (participant) {
       participant.audioMuted = payload.audioMuted;
       participant.videoMuted = payload.videoMuted;
