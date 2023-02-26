@@ -656,7 +656,6 @@ const ChatRoom = (props) => {
                       participantIds.push(participant.userId);
                     }
 
-                    console.log("\n\n\n\n\nMSG : ", message);
                     socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
                       systemEventType: "NEW_POLL_VOTE",
                       recipients: participantIds,

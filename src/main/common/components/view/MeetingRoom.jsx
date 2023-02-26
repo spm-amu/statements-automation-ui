@@ -162,6 +162,9 @@ const MeetingRoom = (props) => {
             updateWhiteboardEvents(be.payload);
             appManager.fireEvent(SystemEventType.WHITEBOARD_EVENT_ARRIVED, be.payload);
             break;
+          case MessageType.SYSTEM_EVENT:
+            onSystemEvent(be.payload);
+            break;
           case MessageType.WHITEBOARD:
             if (be.payload) {
               setWhiteboardItems(be.payload.items);
@@ -294,6 +297,27 @@ const MeetingRoom = (props) => {
     }
   };
 
+  const onSystemEvent = (payload) => {
+    if(payload.systemEventType === "SHARE_SCREEN") {
+      let participant = participants.find((p) => p.userId === payload.data.userId);
+      if (participant) {
+        if (payload.data.shared) {
+          handleMessageArrived({
+            message: participant.name + " started sharing"
+          });
+
+          shareScreenRef.current.srcObject = participant.shareStream;
+          setSomeoneSharing(true);
+          setMeetingParticipantGridMode('STRIP');
+        } else {
+          shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
+          setSomeoneSharing(false);
+          setMeetingParticipantGridMode('DEFAULT');
+        }
+      }
+    }
+  };
+
   const handleScreenShareStream = (stream) => {
     tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
@@ -404,6 +428,11 @@ const MeetingRoom = (props) => {
     shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
     setMeetingParticipantGridMode('DEFAULT');
     setScreenShared(false);
+
+    emitSystemEvent("SHARE_SCREEN", {
+      shared: screenShared,
+      userId: appManager.getUserDetails().userId
+    });
   };
 
   const selectSourceHandler = (selectedSource) => {
@@ -466,7 +495,10 @@ const MeetingRoom = (props) => {
         });
     }
 
-    emitAVSettingsChange();
+    emitSystemEvent("SHARE_SCREEN", {
+      shared: screenShared,
+      userId: appManager.getUserDetails().userId
+    });
   }, [screenShared]);
 
   useEffect(() => {
@@ -594,6 +626,19 @@ const MeetingRoom = (props) => {
     });
   };
 
+  const emitSystemEvent = (eventType, data) => {
+    let participantIds = [];
+    for (const participant of participants) {
+      participantIds.push(participant.userId);
+    }
+
+    socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
+      systemEventType: eventType,
+      recipients: participantIds,
+      data: data
+    });
+  };
+
   const requestUserToJoin = (requestedUser) => {
     let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.REQUEST_TO_JOIN, {
@@ -627,7 +672,7 @@ const MeetingRoom = (props) => {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
         MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD,
-        MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE);
+        MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT);
 
       if (isHost || isDirectCall) {
         join();
@@ -731,27 +776,13 @@ const MeetingRoom = (props) => {
   };
 
   const onAVSettingsChange = (payload) => {
-    // TODO : Emit a separate event for screen sharing instead of using the AV one
     let participant = participants.find((p) => p.userId === payload.userId);
     if (participant) {
-      /*participant.screenShared = payload.screenShared;
       participant.audioMuted = payload.audioMuted;
-      participant.videoMuted = payload.videoMuted;*/
-
-      if (payload.screenShared) {
-        handleMessageArrived({
-          message: participant.name + " started sharing"
-        });
-
-        shareScreenRef.current.srcObject = participant.shareStream;
-        setSomeoneSharing(true);
-        setMeetingParticipantGridMode('STRIP');
-      } else {
-        shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
-        setSomeoneSharing(false);
-        setMeetingParticipantGridMode('DEFAULT');
-      }
+      participant.videoMuted = payload.videoMuted;
     }
+
+    setParticipants([].concat(participants));
   };
 
   const onLowerHand = (payload) => {
@@ -820,8 +851,7 @@ const MeetingRoom = (props) => {
       meetingId: selectedMeeting.id,
       userId: userDetails.userId,
       audioMuted: audioMuted,
-      videoMuted: screenShared ? false : videoMuted,
-      screenShared: screenShared
+      videoMuted: screenShared ? false : videoMuted
     });
   }
 
