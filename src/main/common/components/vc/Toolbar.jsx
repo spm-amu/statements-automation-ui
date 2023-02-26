@@ -31,6 +31,10 @@ const Toolbar = (props) => {
     someoneSharing
   } = props;
 
+  useEffect(() => {
+    setScreenShared(props.screenShared);
+  }, [props.screenShared]);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -83,12 +87,12 @@ const Toolbar = (props) => {
 
   const shareScreen = () => {
     eventHandler.shareScreen();
-    setScreenShared(true);
+    //setScreenShared(true);
   };
 
   const stopShareScreen = () => {
     eventHandler.stopShareScreen();
-    setScreenShared(false);
+    //setScreenShared(false);
   };
 
   const endCall = () => {
@@ -145,7 +149,7 @@ const Toolbar = (props) => {
           :
           <div className={'row centered-flex-box'}>
             {
-              isHost &&
+              isHost && step === 'SESSION' &&
               <IconButton
                 onClick={() => {
                   toggleRecorder();
@@ -268,52 +272,56 @@ const Toolbar = (props) => {
                 </IconButton>
               </div>
             }
-
-            <div>
-              {
-                participantsRaisedHands.length > 0 &&
-                <div className={'people-count-bubble'}>{participantsRaisedHands.length}</div>
-              }
-              <IconButton
-                onClick={(e) => {
-                  if (handRaised) {
-                    lowerHand();
-                  } else {
-                    raiseHand();
-                  }
-                }}
-                style={{
-                  backgroundColor: '#404239',
-                  color: handRaised ? '#e2b030' : 'white',
-                  marginRight: '4px'
-                }}
-              >
-                <Icon id={'PAN_TOOL'}/>
-              </IconButton>
-            </div>
-
-            <div>
-              {
-                hasUnseenWhiteboardEvent &&
-                <div className={'unread-dot'}/>
-              }
-              <Tooltip title="More Actions">
+            {
+              step === 'SESSION' &&
+              <div>
+                {
+                  participantsRaisedHands.length > 0 &&
+                  <div className={'people-count-bubble'}>{participantsRaisedHands.length}</div>
+                }
                 <IconButton
-                  onClick={handleClick}
-                  sx={{ml: 2}}
-                  aria-controls={openMoreActions ? 'account-menu' : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={openMoreActions ? 'true' : undefined}
+                  onClick={(e) => {
+                    if (handRaised) {
+                      lowerHand();
+                    } else {
+                      raiseHand();
+                    }
+                  }}
                   style={{
                     backgroundColor: '#404239',
-                    color: 'white',
+                    color: handRaised ? '#e2b030' : 'white',
                     marginRight: '4px'
                   }}
                 >
-                  <Icon id={'MORE'}/>
+                  <Icon id={'PAN_TOOL'}/>
                 </IconButton>
-              </Tooltip>
-            </div>
+              </div>
+            }
+            {
+              step === 'SESSION' &&
+              <div>
+                {
+                  hasUnseenWhiteboardEvent &&
+                  <div className={'unread-dot'}/>
+                }
+                <Tooltip title="More Actions">
+                  <IconButton
+                    onClick={handleClick}
+                    sx={{ml: 2}}
+                    aria-controls={openMoreActions ? 'account-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={openMoreActions ? 'true' : undefined}
+                    style={{
+                      backgroundColor: '#404239',
+                      color: 'white',
+                      marginRight: '4px'
+                    }}
+                  >
+                    <Icon id={'MORE'}/>
+                  </IconButton>
+                </Tooltip>
+              </div>
+            }
           </div>
       }
 

@@ -335,6 +335,8 @@ const MeetingRoom = (props) => {
 
     createMediaRecorder(stream);
     setMeetingParticipantGridMode('STRIP');
+
+    setSomeoneSharing(false);
   };
 
   const handleDataAvailable = (e) => {
@@ -427,7 +429,6 @@ const MeetingRoom = (props) => {
 
     shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
     setMeetingParticipantGridMode('DEFAULT');
-    setScreenShared(false);
 
     emitSystemEvent("SHARE_SCREEN", {
       shared: screenShared,
@@ -815,9 +816,17 @@ const MeetingRoom = (props) => {
       props.closeHandler();
     } else {
       setSomeoneSharing(false);
-      setScreenShared(false);
       setMeetingParticipantGridMode("DEFAULT");
-      setStep(Steps.SESSION_ENDED)
+      setStep(Steps.SESSION_ENDED);
+
+      if(screenShared) {
+        emitSystemEvent("SHARE_SCREEN", {
+          shared: false,
+          userId: appManager.getUserDetails().userId
+        });
+      }
+
+      setScreenShared(false);
     }
   };
 

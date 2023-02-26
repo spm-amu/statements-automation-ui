@@ -1,10 +1,12 @@
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "./Footer.css"
 import Toolbar from './Toolbar'
 import MeetingParticipant from "./MeetingParticipant";
 import appManager from "../../../common/service/AppManager";
 
 const Footer = (props) => {
+  const [screenShared, setScreenShared] = useState(false);
+
   const {
     participants,
     hasUnreadChats,
@@ -22,6 +24,10 @@ const Footer = (props) => {
     participantsRaisedHands,
     someoneSharing
   } = props;
+
+  useEffect(() => {
+    setScreenShared(props.screenShared);
+  }, [props.screenShared]);
 
   return (
     <div className={'vc-footer'}
@@ -62,6 +68,7 @@ const Footer = (props) => {
                    isHost={isHost}
                    autoPermit={autoPermit}
                    someoneSharing={someoneSharing}
+                   screenShared={screenShared}
           />
         </div>
         {
