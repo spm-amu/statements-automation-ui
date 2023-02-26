@@ -87,7 +87,6 @@ const MeetingRoom = (props) => {
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [recordingParticipant, setRecordingParticipant] = useState(null);
   const [screenSources, setScreenSources] = useState();
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
@@ -993,15 +992,6 @@ const MeetingRoom = (props) => {
             {
               (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
               + ' is beign shared with other participants'
-            }
-          </Alert>
-        </div>
-      )}
-      {recordingParticipant && (
-        <div style={{position: 'absolute', widht: '100%', margin: '8px 0 8px calc(30% + 336px)'}}>
-          <Alert style={{marginBottom: '16px'}} severity="error">
-            {
-              recordingParticipant + " is recording"
             }
           </Alert>
         </div>
