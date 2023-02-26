@@ -101,6 +101,7 @@ const MeetingRoom = (props) => {
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
   const recordedChunks = [];
   const shareScreenSource = useRef();
+  const shareScreenRef = useRef();
   const tmpVideoTrack = useRef();
 
   const handler = () => {
@@ -294,21 +295,22 @@ const MeetingRoom = (props) => {
   };
 
   const handleScreenShareStream = (stream) => {
-    tmpVideoTrack.current = currentUserStream.getVideoTracks()[0];
+    tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
-        currentUserStream.getVideoTracks()[0], // prev video track - webcam
+        currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
         stream.getVideoTracks()[0], // current video track - screen track
-        currentUserStream.obj
+        currentUserStream.shareScreenObj
       );
     });
 
-    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
-    currentUserStream.addTrack(stream.getVideoTracks()[0]);
-    userVideo.current.srcObject = currentUserStream.obj;
+    //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
+    //currentUserStream.shareScreenObj.addTrack(stream.getVideoTracks()[0]);
+    shareScreenRef.current.srcObject = stream;
 
     createMediaRecorder(stream);
+    setMeetingParticipantGridMode('STRIP');
   };
 
   const handleDataAvailable = (e) => {
@@ -390,16 +392,18 @@ const MeetingRoom = (props) => {
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
-        currentUserStream.getVideoTracks()[0], // prev video track - webcam
+        currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
         tmpVideoTrack.current, // current video track - screen track
-        currentUserStream.obj
+        currentUserStream.shareScreenObj
       );
     });
 
-    currentUserStream.removeTrack(currentUserStream.getVideoTracks()[0]);
-    currentUserStream.addTrack(tmpVideoTrack.current);
+    currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
+    currentUserStream.shareScreenObj.addTrack(tmpVideoTrack.current);
 
-    userVideo.current.srcObject = currentUserStream.obj;
+    shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
+    setMeetingParticipantGridMode('DEFAULT');
+    setScreenShared(false);
   };
 
   const selectSourceHandler = (selectedSource) => {
@@ -836,6 +840,12 @@ const MeetingRoom = (props) => {
       audioMuted
     });
   }
+
+  useEffect(() => {
+    if (shareScreenRef.current) {
+      shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
+    }
+  }, [shareScreenRef.current]);
 
   useEffect(() => {
     if (audioMuted !== null) {
