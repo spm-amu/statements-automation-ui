@@ -82,6 +82,7 @@ const MeetingRoom = (props) => {
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
   const [screenShared, setScreenShared] = useState(false);
+  const [someoneSharing, setSomeoneSharing] = useState(false);
   const [autoPermit, setAutoPermit] = useState(false);
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -726,20 +727,27 @@ const MeetingRoom = (props) => {
   };
 
   const onAVSettingsChange = (payload) => {
+    // TODO : Emit a separate event for screen sharing instead of using the AV one
     let participant = participants.find((p) => p.userId === payload.userId);
     if (participant) {
-      participant.screenShared = payload.screenShared;
+      /*participant.screenShared = payload.screenShared;
       participant.audioMuted = payload.audioMuted;
-      participant.videoMuted = payload.videoMuted;
+      participant.videoMuted = payload.videoMuted;*/
 
       if (payload.screenShared) {
         handleMessageArrived({
           message: participant.name + " started sharing"
-        })
+        });
+
+        shareScreenRef.current.srcObject = participant.shareStream;
+        setSomeoneSharing(true);
+        setMeetingParticipantGridMode('STRIP');
+      } else {
+        shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
+        setSomeoneSharing(false);
+        setMeetingParticipantGridMode('DEFAULT');
       }
     }
-
-    setParticipants([].concat(participants));
   };
 
   const onLowerHand = (payload) => {
@@ -771,6 +779,9 @@ const MeetingRoom = (props) => {
       props.onEndCall();
       props.closeHandler();
     } else {
+      setSomeoneSharing(false);
+      setScreenShared(false);
+      setMeetingParticipantGridMode("DEFAULT");
       setStep(Steps.SESSION_ENDED)
     }
   };
@@ -939,6 +950,16 @@ const MeetingRoom = (props) => {
                         </div>
                       </div>
                     }
+                    <div style={{
+                      width: screenShared || someoneSharing ? '100%' : '0',
+                      height: screenShared || someoneSharing ? 'calc(100% - 200px)' : 0
+                    }}>
+                      <video
+                        hidden={false}
+                        muted playsinline autoPlay ref={shareScreenRef}
+                        style={{width: '100%', height: '100%'}}
+                      />
+                    </div>
                     <div className={'row'} style={{
                       width: '100%',
                       height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : "160px",
