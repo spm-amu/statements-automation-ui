@@ -301,6 +301,7 @@ const MeetingRoom = (props) => {
     if (payload.systemEventType === "SHARE_SCREEN") {
       let participant = participants.find((p) => p.userId === payload.data.userId);
       if (participant) {
+        alert(payload.data.shared);
         if (payload.data.shared) {
           handleMessageArrived({
             message: participant.name + " started sharing"
@@ -429,11 +430,6 @@ const MeetingRoom = (props) => {
 
     shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
     setMeetingParticipantGridMode('DEFAULT');
-
-    emitSystemEvent("SHARE_SCREEN", {
-      shared: screenShared,
-      userId: appManager.getUserDetails().userId
-    });
   };
 
   const selectSourceHandler = (selectedSource) => {
@@ -1030,7 +1026,12 @@ const MeetingRoom = (props) => {
                             :
                             <>
                               { screenShared && shareScreenSource.current ? (
-                                <Alert style={{ marginBottom: '16px' }} severity="error">{shareScreenSource.current.name + ' is beign shared with other participants'}</Alert>
+                                <Alert style={{ marginBottom: '16px' }} severity="error">
+                                  {
+                                    (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
+                                    + ' is beign shared with other participants'
+                                  }
+                                </Alert>
                               ) : null }
                               <MeetingParticipantGrid participants={participants}
                                                       waitingList={lobbyWaitingList}
