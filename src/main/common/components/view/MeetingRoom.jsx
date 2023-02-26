@@ -301,7 +301,6 @@ const MeetingRoom = (props) => {
     if (payload.systemEventType === "SHARE_SCREEN") {
       let participant = participants.find((p) => p.userId === payload.data.userId);
       if (participant) {
-        alert(payload.data.shared);
         if (payload.data.shared) {
           handleMessageArrived({
             message: participant.name + " started sharing"
