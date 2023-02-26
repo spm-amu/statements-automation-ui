@@ -63,5 +63,14 @@
   background: black;
 }
 
-@media  screen and (max-width:800px) {
+@media (max-device-width: 820px) {
+  .meetingParticipantContainer {
+    min-width: 100% !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .meetingParticipantContainer {
+    min-width: 100% !important;
+  }
 }

@@ -159,5 +159,10 @@
   margin-top: 8px;
 }
 
+.footer-container {
+  background-color: #000000;
+  margin: 0 16px;
+}
+
 @media screen and (max-width:800px) {
 }

@@ -662,13 +662,6 @@ const MeetingRoom = (props) => {
       socketManager.removeSubscriptions(eventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
       appManager.remove('CURRENT_MEETING');
-
-      if (screenShared) {
-        emitSystemEvent("SHARE_SCREEN", {
-          shared: false,
-          userId: appManager.getUserDetails().userId
-        });
-      }
     };
   }, []);
 
@@ -940,8 +933,50 @@ const MeetingRoom = (props) => {
     });
   }
 
+  const handleEndCall = () => {
+    if (screenShared) {
+      socketManager.userPeerMap.forEach((peerObj) => {
+        peerObj.peer.replaceTrack(
+          currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+          tmpVideoTrack.current, // current video track - screen track
+          currentUserStream.shareScreenObj
+        );
+      });
+
+      emitSystemEvent("SHARE_SCREEN", {
+        shared: false,
+        userId: appManager.getUserDetails().userId
+      });
+    }
+
+    if (userToCall && isDirectCall && participants.length <= 1) {
+      console.log("USER TO CALL : ", userToCall);
+      socketManager.emitEvent(MessageType.CANCEL_CALL, {
+        userId: userToCall.userId,
+        userDescription: userToCall.name,
+        callerId: appManager.getUserDetails().userId,
+        callerDescription: appManager.getUserDetails().name,
+        meetingId: selectedMeeting.id
+      });
+      onCallEnded();
+    } else {
+      endCall();
+      props.closeHandler();
+    }
+  };
+
   return (
     <Fragment>
+      {screenShared && shareScreenSource.current ? (
+        <div style={{position: 'absolute', widht: '100%', margin: '16px 0 8px 30%'}}>
+          <Alert style={{marginBottom: '16px'}} severity="error">
+            {
+              (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
+              + ' is beign shared with other participants'
+            }
+          </Alert>
+        </div>
+      ) : null}
       <div className={'row meeting-container'} style={{
         height: displayState === 'MAXIMIZED' ? '100%' : '90%',
         maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
@@ -953,7 +988,7 @@ const MeetingRoom = (props) => {
           maxHeight: '100%',
           height: displayState === 'MAXIMIZED' ? null : '100%'
         }}>
-          <div style={{height: '100%'}}>
+          <div style={{height: '100%', maxHeight: '100%', backgroundColor: '#000000'}}>
             <div className={displayState === 'MAXIMIZED' ? 'workspace-max' : 'workspace-min'}>
               {
                 displayState === 'MAXIMIZED' ?
@@ -1020,14 +1055,6 @@ const MeetingRoom = (props) => {
                             </div>
                             :
                             <>
-                              {screenShared && shareScreenSource.current ? (
-                                <Alert style={{marginBottom: '16px'}} severity="error">
-                                  {
-                                    (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
-                                    + ' is beign shared with other participants'
-                                  }
-                                </Alert>
-                              ) : null}
                               <MeetingParticipantGrid participants={participants}
                                                       waitingList={lobbyWaitingList}
                                                       mode={meetingParticipantGridMode}
@@ -1059,99 +1086,6 @@ const MeetingRoom = (props) => {
                   <MeetingRoomSummary participants={participants} participantsRaisedHands={participantsRaisedHands}/>
               }
             </div>
-            {
-              currentUserStream &&
-              <Footer audioMuted={audioMuted}
-                      hasUnreadChats={hasUnreadChats}
-                      hasUnseenWhiteboardEvent={hasUnseenWhiteboardEvent}
-                      participants={participants}
-                      videoMuted={videoMuted}
-                      userStream={currentUserStream.obj}
-                      handRaised={handRaised}
-                      isRecording={isRecording}
-                      displayState={displayState}
-                      screenShared={screenShared}
-                      someoneSharing={someoneSharing}
-                      whiteBoardShown={showWhiteBoard}
-                      isHost={isHost}
-                      step={step}
-                      autoPermit={autoPermit}
-                      participantsRaisedHands={participantsRaisedHands}
-                      toolbarEventHandler={
-                        {
-                          onMuteVideo: (muted) => {
-                            setVideoMuted(muted);
-                          },
-                          onMuteAudio: (muted) => {
-                            setAudioMuted(muted);
-                          },
-                          recordMeeting: () => {
-                            recordMeeting();
-                          },
-                          stopRecording: () => {
-                            stopRecordingMeeting();
-                          },
-                          endCall: () => {
-                            if (userToCall && isDirectCall && participants.length <= 1) {
-                              console.log("USER TO CALL : ", userToCall);
-                              socketManager.emitEvent(MessageType.CANCEL_CALL, {
-                                userId: userToCall.userId,
-                                userDescription: userToCall.name,
-                                callerId: appManager.getUserDetails().userId,
-                                callerDescription: appManager.getUserDetails().name,
-                                meetingId: selectedMeeting.id
-                              });
-                              onCallEnded();
-                            } else {
-                              endCall();
-                              props.closeHandler();
-                            }
-                          },
-                          shareScreen: () => {
-                            if (currentUserStream.obj) {
-                              shareScreen();
-                            }
-                          },
-                          stopShareScreen: () => {
-                            if (currentUserStream.obj) {
-                              stopShareScreen();
-                            }
-                          },
-                          showPeople: () => {
-                            setSideBarTab('People');
-                            setSideBarOpen(true);
-                          },
-                          showWhiteboard: () => {
-                            if (meetingParticipantGridMode === 'DEFAULT') {
-                              setMeetingParticipantGridMode('STRIP');
-                              setShowWhiteBoard(true);
-                            } else {
-                              setMeetingParticipantGridMode('DEFAULT');
-                              setShowWhiteBoard(false);
-                            }
-
-                            setHasUnseenWhiteboardEvent(false);
-                          },
-                          showChat: () => {
-                            fetchChats();
-                          },
-                          raiseHand: () => {
-                            raiseHand();
-                          },
-                          lowerHand: () => {
-                            lowerHand();
-                          },
-                          toggleAutoPermit: () => {
-                            persistMeetingSettings()
-                          },
-                          closeWindow: () => {
-                            endCall();
-                            props.closeHandler();
-                          },
-                        }
-                      }
-              />
-            }
           </div>
         </div>
         {
@@ -1192,6 +1126,88 @@ const MeetingRoom = (props) => {
           />
         }
       </div>
+      {
+        currentUserStream &&
+        <div className={'footer-container'}>
+          <Footer audioMuted={audioMuted}
+                  hasUnreadChats={hasUnreadChats}
+                  hasUnseenWhiteboardEvent={hasUnseenWhiteboardEvent}
+                  participants={participants}
+                  videoMuted={videoMuted}
+                  userStream={currentUserStream.obj}
+                  handRaised={handRaised}
+                  isRecording={isRecording}
+                  displayState={displayState}
+                  screenShared={screenShared}
+                  someoneSharing={someoneSharing}
+                  whiteBoardShown={showWhiteBoard}
+                  isHost={isHost}
+                  step={step}
+                  autoPermit={autoPermit}
+                  participantsRaisedHands={participantsRaisedHands}
+                  toolbarEventHandler={
+                    {
+                      onMuteVideo: (muted) => {
+                        setVideoMuted(muted);
+                      },
+                      onMuteAudio: (muted) => {
+                        setAudioMuted(muted);
+                      },
+                      recordMeeting: () => {
+                        recordMeeting();
+                      },
+                      stopRecording: () => {
+                        stopRecordingMeeting();
+                      },
+                      endCall: () => {
+                        handleEndCall();
+                      },
+                      shareScreen: () => {
+                        if (currentUserStream.obj) {
+                          shareScreen();
+                        }
+                      },
+                      stopShareScreen: () => {
+                        if (currentUserStream.obj) {
+                          stopShareScreen();
+                        }
+                      },
+                      showPeople: () => {
+                        setSideBarTab('People');
+                        setSideBarOpen(true);
+                      },
+                      showWhiteboard: () => {
+                        if (meetingParticipantGridMode === 'DEFAULT') {
+                          setMeetingParticipantGridMode('STRIP');
+                          setShowWhiteBoard(true);
+                        } else {
+                          setMeetingParticipantGridMode('DEFAULT');
+                          setShowWhiteBoard(false);
+                        }
+
+                        setHasUnseenWhiteboardEvent(false);
+                      },
+                      showChat: () => {
+                        fetchChats();
+                      },
+                      raiseHand: () => {
+                        raiseHand();
+                      },
+                      lowerHand: () => {
+                        lowerHand();
+                      },
+                      toggleAutoPermit: () => {
+                        persistMeetingSettings()
+                      },
+                      closeWindow: () => {
+                        endCall();
+                        props.closeHandler();
+                      },
+                    }
+                  }
+          />
+        </div>
+      }
       <div style={{
         padding: '0 32px 0 32px',
         maxHeight: '64px',

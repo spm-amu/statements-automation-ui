@@ -101,20 +101,20 @@ const MeetingParticipantGrid = (props) => {
   const renderRow = (row, index) => {
     return (
       <Grid
-        style={{height: screenShared ? "100%" : null,}}
+        style={{height: null,}}
         direction="row"
         justifyContent="center"
         alignItems="center" container item spacing={2}>
         <React.Fragment>
           {row.map((participant, index) => {
-            return <Grid item xs={4} key={index} style={
+            return <Grid item xs={4} key={index} className={'meetingParticipantContainer'} style={
               {
                 borderRadius: '4px',
-                width: screenShared ? "100%" : "33vh",
-                height: screenShared ? "100%" : "33vh",
-                maxHeight: screenShared ? "100%" : "33vh",
-                flexBasis: screenShared ? "100%" : null,
-                maxWidth: screenShared ? "100%" : null
+                width: "33vh",
+                height: "33vh",
+                maxHeight: "33vh",
+                flexBasis: null,
+                maxWidth: null
               }
             }
             >
@@ -125,8 +125,6 @@ const MeetingParticipantGrid = (props) => {
                                       props.userVideoChangeHandler(ref);
                                     } : null
                                   }
-                                  userStream={userStream}
-                                  screenShared={screenShared}
                                   showName={!participant.isCurrentUser}
                                   videoMuted={participant.videoMuted}
                                   audioMuted={participant.audioMuted}/>
@@ -170,7 +168,6 @@ const MeetingParticipantGrid = (props) => {
                                   } : null
                                 }
                                 userStream={userStream}
-                                screenShared={screenShared}
                                 showName={!participant.isCurrentUser}
                                 videoMuted={participant.videoMuted}
                                 audioMuted={participant.audioMuted} sizing={'sm'}/>
