@@ -23,6 +23,7 @@ const MeetingParticipantGrid = (props) => {
     waitingList,
     mode,
     step,
+    userStream,
     videoMuted,
     audioMuted,
     meetingTitle
@@ -128,6 +129,7 @@ const MeetingParticipantGrid = (props) => {
                                       props.userVideoChangeHandler(ref);
                                     } : null
                                   }
+                                  userStream={userStream}
                                   screenShared={screenShared}
                                   showName={!participant.isCurrentUser}
                                   videoMuted={participant.videoMuted}
@@ -171,6 +173,7 @@ const MeetingParticipantGrid = (props) => {
                                     props.userVideoChangeHandler(ref);
                                   } : null
                                 }
+                                userStream={userStream}
                                 screenShared={screenShared}
                                 showName={!participant.isCurrentUser}
                                 videoMuted={participant.videoMuted}
