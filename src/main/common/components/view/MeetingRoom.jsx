@@ -781,6 +781,7 @@ const MeetingRoom = (props) => {
   };
 
   const onAVSettingsChange = (payload) => {
+    console.log("\n\n\n\n\nAV CHANGE : ", payload);
     let participant = participants.find((p) => p.userId === payload.userId);
     if (participant) {
       participant.audioMuted = payload.audioMuted;
@@ -861,9 +862,7 @@ const MeetingRoom = (props) => {
 
   function toggleVideo() {
     if (currentUserStream.obj) {
-      if (userVideo && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
-        currentUserStream.enableVideo(!videoMuted, socketManager);
-      }
+      currentUserStream.enableVideo(!videoMuted, socketManager);
     }
 
     onAVSettingsChange({
