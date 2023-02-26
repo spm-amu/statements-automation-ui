@@ -742,10 +742,10 @@ const MeetingRoom = (props) => {
   }, [userVideo]);
 
   useEffect(() => {
-    if (streamsInitiated) {
+    if (streamsInitiated && userVideo.current) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
-  }, [streamsInitiated]);
+  }, [streamsInitiated, userVideo.current]);
 
   const persistMeetingSettings = () => {
     post(
