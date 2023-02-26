@@ -1061,6 +1061,7 @@ const MeetingRoom = (props) => {
                       isRecording={isRecording}
                       displayState={displayState}
                       screenShared={screenShared}
+                      someoneSharing={someoneSharing}
                       whiteBoardShown={showWhiteBoard}
                       isHost={isHost}
                       step={step}
@@ -1172,7 +1173,8 @@ const MeetingRoom = (props) => {
           screenSharePopupVisible &&
           <SelectScreenShareDialog
             handleCloseHandler={() => {
-              setScreenSharePopupVisible(false)
+              setScreenSharePopupVisible(false);
+              setScreenShared(false);
             }}
             open={screenSharePopupVisible}
             sources={screenSources}

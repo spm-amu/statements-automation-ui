@@ -27,7 +27,8 @@ const Toolbar = (props) => {
     displayState,
     eventHandler,
     handRaised,
-    isHost
+    isHost,
+    someoneSharing
   } = props;
 
   const handleClick = (event) => {
@@ -160,7 +161,7 @@ const Toolbar = (props) => {
                 }
               </IconButton>
             }
-            {!screenShared && (
+            {
               <IconButton
                 onClick={() => {
                   muteVideo();
@@ -177,7 +178,7 @@ const Toolbar = (props) => {
                   <Icon id={'VIDEOCAM'}/>
                 )}
               </IconButton>
-            )}
+            }
 
             <IconButton
               onClick={() => {
@@ -197,7 +198,7 @@ const Toolbar = (props) => {
             </IconButton>
             {" "}
             {
-              step === 'SESSION' && displayState === 'MAXIMIZED' && !whiteBoardShown &&
+              step === 'SESSION' && displayState === 'MAXIMIZED' && !whiteBoardShown && !someoneSharing &&
               <IconButton
                 onClick={() => {
                   if (screenShared) {

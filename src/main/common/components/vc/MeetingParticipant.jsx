@@ -31,9 +31,12 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     if (props.refChangeHandler) {
       props.refChangeHandler(videoRef);
+
+      if(videoRef.current) {
+        videoRef.current.srcObject = props.userStream;
+      }
     }
   }, [videoRef.current]);
-
 
   return (
     <div className={'col-*-* meeting-participant-container'}

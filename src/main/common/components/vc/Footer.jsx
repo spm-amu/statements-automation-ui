@@ -19,7 +19,8 @@ const Footer = (props) => {
     step,
     isHost,
     autoPermit,
-    participantsRaisedHands
+    participantsRaisedHands,
+    someoneSharing
   } = props;
 
   return (
@@ -60,6 +61,7 @@ const Footer = (props) => {
                    step={step}
                    isHost={isHost}
                    autoPermit={autoPermit}
+                   someoneSharing={someoneSharing}
           />
         </div>
         {
