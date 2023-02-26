@@ -16,7 +16,7 @@ export class Stream {
       .then((stream) => {
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
-            audio: true,
+            audio: false,
             video: {
               width: 240,
               height: 240,
