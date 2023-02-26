@@ -18,13 +18,13 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
-    console.log('_____ \n\n participantsRaisedHands: ', props.participantsRaisedHands);
-
-    let raisedHandParticipants = props.participantsRaisedHands.find((user => user.userId === props.data.userId));
-    if (raisedHandParticipants) {
-      setHandRaised(true);
-    } else {
-      setHandRaised(false);
+    if(props.participantsRaisedHands) {
+      let raisedHandParticipants = props.participantsRaisedHands.find((user => user.userId === props.data.userId));
+      if (raisedHandParticipants) {
+        setHandRaised(true);
+      } else {
+        setHandRaised(false);
+      }
     }
   }, [props.participantsRaisedHands]);
 
