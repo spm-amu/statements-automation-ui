@@ -16,7 +16,7 @@ export class Stream {
       .then((stream) => {
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
-            audio: false,
+            audio: true,
             video: {
               width: 240,
               height: 240,
@@ -32,6 +32,7 @@ export class Stream {
         shareUserMedia
           .then((stream) => {
             this.shareScreenObj = stream;
+            stream.getAudioTracks()[0].enabled = false;
             stream.getVideoTracks()[0].enabled = false;
             console.log("STREAM STARTED");
             if (successHandler) {
