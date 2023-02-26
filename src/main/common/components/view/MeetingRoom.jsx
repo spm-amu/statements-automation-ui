@@ -398,8 +398,8 @@ const MeetingRoom = (props) => {
       );
     });
 
-    currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
-    currentUserStream.shareScreenObj.addTrack(tmpVideoTrack.current);
+    //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
+    //currentUserStream.shareScreenObj.addTrack(tmpVideoTrack.current);
 
     shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
     setMeetingParticipantGridMode('DEFAULT');
