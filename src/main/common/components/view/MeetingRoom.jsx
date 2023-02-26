@@ -862,9 +862,7 @@ const MeetingRoom = (props) => {
   function toggleVideo() {
     if (currentUserStream.obj) {
       if (userVideo && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
-        if (!screenShared) {
-          currentUserStream.enableVideo(!videoMuted, socketManager);
-        }
+        currentUserStream.enableVideo(!videoMuted, socketManager);
       }
     }
 
@@ -1024,14 +1022,14 @@ const MeetingRoom = (props) => {
                             </div>
                             :
                             <>
-                              { screenShared && shareScreenSource.current ? (
-                                <Alert style={{ marginBottom: '16px' }} severity="error">
+                              {screenShared && shareScreenSource.current ? (
+                                <Alert style={{marginBottom: '16px'}} severity="error">
                                   {
                                     (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
                                     + ' is beign shared with other participants'
                                   }
                                 </Alert>
-                              ) : null }
+                              ) : null}
                               <MeetingParticipantGrid participants={participants}
                                                       waitingList={lobbyWaitingList}
                                                       mode={meetingParticipantGridMode}
