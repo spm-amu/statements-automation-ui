@@ -39,7 +39,7 @@ const People = (props) => {
       {
         "parameters": [
           {
-            "name": 'emailAddress',
+            "name": 'name',
             "value": searchValue
           },
           {
