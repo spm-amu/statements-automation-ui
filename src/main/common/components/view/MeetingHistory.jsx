@@ -4,6 +4,7 @@ import SearchBar from "../SearchBar";
 import {DataGrid} from "../DataGrid";
 import {useNavigate} from "react-router-dom";
 import appManager from "../../service/AppManager";
+const { electron } = window;
 
 const grid = {
   "id": "meetingList",

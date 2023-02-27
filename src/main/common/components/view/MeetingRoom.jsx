@@ -325,15 +325,6 @@ const MeetingRoom = (props) => {
           setMeetingParticipantGridMode('DEFAULT');
         }
       }
-    } else if (payload.systemEventType === "MEETING_RECORDING") {
-      let participant = participants.find((p) => p.userId === payload.data.userId);
-      if (participant) {
-        if(payload.data.recording) {
-          setRecordingParticipant(participant.name);
-        } else {
-          setRecordingParticipant(null);
-        }
-      }
     }
   };
 
