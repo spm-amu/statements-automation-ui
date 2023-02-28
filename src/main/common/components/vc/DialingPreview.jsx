@@ -8,8 +8,8 @@ import Button from '../RegularButton';
 
 const {electron} = window;
 
-//const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
-//const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
+const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
+const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
 
 const DialingPreview = (props) => {
   const [callPayload, setCallPayload] = useState(null);
@@ -23,10 +23,10 @@ const DialingPreview = (props) => {
       if (args.payload.type) {
         setSystemAlert(args.payload);
         soundInterval.current = null;
-        //permitAudio.play();
+        permitAudio.play();
       } else {
         soundInterval.current = setInterval(() => {
-          //waitingAudio.play();
+          waitingAudio.play();
         }, 100);
 
         if (args.payload.meetingJoinRequest) {
@@ -38,7 +38,7 @@ const DialingPreview = (props) => {
     });
 
     electron.ipcRenderer.on('cancelCall', args => {
-      //waitingAudio.pause();
+      waitingAudio.pause();
       clearInterval(soundInterval.current);
     });
   }, []);
@@ -56,7 +56,7 @@ const DialingPreview = (props) => {
   }, [meetingRequest]);
 
   const onAnswerCall = () => {
-    //waitingAudio.pause();
+    waitingAudio.pause();
     clearInterval(soundInterval.current);
 
     electron.ipcRenderer.sendMessage('answerCall', {
@@ -65,7 +65,7 @@ const DialingPreview = (props) => {
   };
 
   const onDeclineCall = () => {
-    //waitingAudio.pause();
+    waitingAudio.pause();
     clearInterval(soundInterval.current);
 
     electron.ipcRenderer.sendMessage('declineCall', {

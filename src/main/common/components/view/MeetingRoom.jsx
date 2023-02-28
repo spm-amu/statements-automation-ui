@@ -60,9 +60,9 @@ const Steps = {
   SESSION_ENDED: 'SESSION_ENDED'
 };
 
-//const hangUpAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/hangupsound.mp3');
-//const joinInAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/joinsound.mp3');
-//const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
+const hangUpAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/hangupsound.mp3');
+const joinInAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/joinsound.mp3');
+const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
 //const errorAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/error.mp3');
 //const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
 
@@ -200,8 +200,8 @@ const MeetingRoom = (props) => {
         roomID: selectedMeeting.id,
         isRecording: true
       });
+
       setIsRecording(true);
-      updateRecordingStatus(true);
 
       emitSystemEvent("MEETING_RECORDING", {
         recording: true,
@@ -245,7 +245,6 @@ const MeetingRoom = (props) => {
         isRecording: false
       });
       setIsRecording(false);
-      updateRecordingStatus(false);
 
       emitSystemEvent("MEETING_RECORDING", {
         recording: false,
@@ -405,23 +404,6 @@ const MeetingRoom = (props) => {
     );
   };
 
-  const updateRecordingStatus = (recordingStatus) => {
-    post(
-      `${appManager.getAPIHost()}/api/v1/meeting/updateRecordingStatus`,
-      () => {
-      },
-      (e) => {
-        console.error(e);
-      },
-      {
-        meetingId: selectedMeeting.id,
-        recording: recordingStatus
-      },
-      '',
-      false
-    );
-  };
-
   const stopShareScreen = () => {
     shareScreenSource.current = null;
     setScreenShared(false);
@@ -547,7 +529,7 @@ const MeetingRoom = (props) => {
           props.windowHandler.show();
         }
 
-        //joinInAudio.play();
+        joinInAudio.play();
       });
   };
 
@@ -591,7 +573,7 @@ const MeetingRoom = (props) => {
   };
 
   const addUserToLobby = (data) => {
-    //permitAudio.play();
+    permitAudio.play();
     let item = {
       user: data.userAlias,
       socketId: data.id
@@ -807,7 +789,7 @@ const MeetingRoom = (props) => {
   };
 
   const closeStreams = () => {
-    //hangUpAudio.play();
+    hangUpAudio.play();
     currentUserStream.close();
   };
 
