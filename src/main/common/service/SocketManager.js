@@ -133,7 +133,10 @@ class SocketManager {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj]
+      streams: [stream.obj, stream.shareScreenObj],
+      config: {
+        iceServers: []
+      }
     });
 
     peer.on('signal', (signal) => {
@@ -184,7 +187,10 @@ class SocketManager {
     const peer = new Peer({
       initiator: false,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj]
+      streams: [stream.obj, stream.shareScreenObj],
+      config: {
+        iceServers: []
+      }
     });
 
     peer.on('signal', (signal) => {
