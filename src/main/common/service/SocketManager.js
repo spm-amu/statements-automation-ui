@@ -257,8 +257,10 @@ class SocketManager {
     };
 
     this.userPeerMap.push(item);
+    alert(1);
     let promise = new Promise((resolve, reject) => {
       peer.on('stream', (stream) => {
+      alert(payload.mainStreamId);
         if (stream.id === payload.mainStreamId) {
           item.mainStream = stream;
         } else if (stream.id === payload.shareStreamId) {
