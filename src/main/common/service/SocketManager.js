@@ -139,6 +139,7 @@ class SocketManager {
       }
     });
 
+
     peer.on('signal', (signal) => {
       this.socket.emit(MessageType.SENDING_SIGNAL, {
         userToSignal,
