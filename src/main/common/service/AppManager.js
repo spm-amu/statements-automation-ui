@@ -25,6 +25,14 @@ class AppManager {
     return this.store.signalingServerHost;
   };
 
+  setOnline = (online) => {
+    this.store.online = online;
+  };
+
+  isOnline = () => {
+    return this.store.online;
+  };
+
   setUserDetails = (userDetails) => {
     this.store.userDetails = userDetails;
   };

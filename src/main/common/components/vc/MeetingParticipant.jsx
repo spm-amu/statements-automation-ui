@@ -1,12 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {forwardRef, useEffect, useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import './MeetingParticipant.css'
 import Utils from '../../Utils';
 import Icon from '../Icon';
-import { PanTool } from '@material-ui/icons';
+import {PanTool} from '@material-ui/icons';
+import IconButton from "@material-ui/core/IconButton";
 
 const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
+  const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
 
   const videoRef = useRef();
   const showVideo = true;
@@ -18,7 +20,7 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
-    if(props.participantsRaisedHands) {
+    if (props.participantsRaisedHands) {
       let raisedHandParticipants = props.participantsRaisedHands.find((user => user.userId === props.data.userId));
       if (raisedHandParticipants) {
         setHandRaised(true);
@@ -32,7 +34,7 @@ const MeetingParticipant = (props) => {
     if (props.refChangeHandler) {
       props.refChangeHandler(videoRef);
 
-      if(videoRef.current) {
+      if (videoRef.current) {
         videoRef.current.srcObject = props.userStream;
       }
     }
@@ -72,22 +74,58 @@ const MeetingParticipant = (props) => {
                     style={{width: '100%', height: '100%'}}
                   />
               }
+
               <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}>
                 {props.showName ? props.data.name : 'You'}
                 {
                   props.showName &&
-                  <span style={{ marginLeft: '4px' }}>
-                    { props.audioMuted ? (
-                      <Icon id={'MIC_OFF'}/>
-                    ) : (
-                      <Icon id={'MIC'}/>
-                    )}
+                  <span style={{marginLeft: '4px'}}>
+                    {
+                      props.isHost && !props.audioMuted ?
+                        <IconButton
+                          onClick={(e) => {
+                            props.onHostAudioMute(props.data)
+                          }}
+                          style={{
+                            marginRight: '4px',
+                            width: '16px',
+                            height: '16px',
+                            color: 'white'
+                          }}
+                        >
+                          <Icon id={'MIC'} />
+                        </IconButton>
+                        :
+                        <>
+                          {props.audioMuted ? (
+                            <Icon id={'MIC_OFF'}/>
+                          ) : (
+                            <Icon id={'MIC'}/>
+                          )}
+                        </>
+                    }
+                    {
+                      props.isHost && !props.videoMuted &&
+                        <IconButton
+                          onClick={(e) => {
+                            props.onHostVideoMute(props.data)
+                          }}
+                          style={{
+                            marginRight: '4px',
+                            width: '16px',
+                            height: '16px',
+                            color: 'white'
+                          }}
+                        >
+                          <Icon id={'CAMERA'} />
+                        </IconButton>
+                    }
                   </span>
                 }
                 {
                   props.showName &&
-                  <span style={{ marginLeft: '4px' }}>
-                    { handRaised && <PanTool fontSize={'small'} style={{ color: '#e2b030' }} /> }
+                  <span style={{marginLeft: '4px'}}>
+                    {handRaised && <PanTool fontSize={'small'} style={{color: '#e2b030'}}/>}
                   </span>
                 }
               </div>
@@ -104,7 +142,12 @@ const MeetingParticipant = (props) => {
                     justifyContent: 'center'
                   }}>
                   <img src={props.data.avatar}
-                       style={{width: props.sizing === 'sm' ? '40px' : '80px', height: props.sizing === 'sm' ? '40px' : '80px', borderRadius: '50%', backgroundColor: '#FFFFFF'}}/>
+                       style={{
+                         width: props.sizing === 'sm' ? '40px' : '80px',
+                         height: props.sizing === 'sm' ? '40px' : '80px',
+                         borderRadius: '50%',
+                         backgroundColor: '#FFFFFF'
+                       }}/>
                 </div>
               </div>
               <div className={'name-label'}>

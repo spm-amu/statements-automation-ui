@@ -22,6 +22,10 @@
   padding-left: 0;
 }
 
+.host-mic {
+  cursor: pointer;
+}
+
 video {
   object-fit: cover;
   height: unset;

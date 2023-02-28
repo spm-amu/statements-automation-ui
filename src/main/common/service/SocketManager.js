@@ -134,7 +134,17 @@ class SocketManager {
       initiator: true,
       trickle: false,
       streams: [stream.obj, stream.shareScreenObj],
-      config: {
+      config: appManager.isOnline() ?
+        {
+          iceServers: [
+            {urls: 'stun:stun.l.google.com:19302'},
+            {urls: 'stun:stun1.l.google.com:19302'},
+            {urls: 'stun:stun2.l.google.com:19302'},
+            {urls: 'stun:stun3.l.google.com:19302'},
+            {urls: 'stun:stun4.l.google.com:19302'}]
+        }
+        :
+        {
         iceServers: []
       }
     });
@@ -189,9 +199,19 @@ class SocketManager {
       initiator: false,
       trickle: false,
       streams: [stream.obj, stream.shareScreenObj],
-      config: {
-        iceServers: []
-      }
+      config: appManager.isOnline() ?
+        {
+          iceServers: [
+            {urls: 'stun:stun.l.google.com:19302'},
+            {urls: 'stun:stun1.l.google.com:19302'},
+            {urls: 'stun:stun2.l.google.com:19302'},
+            {urls: 'stun:stun3.l.google.com:19302'},
+            {urls: 'stun:stun4.l.google.com:19302'}]
+        }
+        :
+        {
+          iceServers: []
+        }
     });
 
     peer.on('signal', (signal) => {
