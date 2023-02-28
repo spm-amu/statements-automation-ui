@@ -19,7 +19,7 @@ const MeetingRoomToolbar = (props) => {
   const [isRecording, setIsRecording] = useState(false);
   const [remainingTime, setRemainingTime] = useState();
 
-  const socketEventHandler = useState({});
+  const [socketEventHandler] = useState({});
 
   const handler = () => {
     return {
@@ -56,13 +56,10 @@ const MeetingRoomToolbar = (props) => {
 
   useEffect(() => {
     socketManager.addSubscriptions(socketEventHandler, MessageType.CHANGE_HOST, MessageType.TOGGLE_RECORD_MEETING);
+    socketManager.emitEvent(MessageType.POLL_RECORDING_STATUS, {
+      roomID: selectedMeeting.id
+    })
     setIsHost(props.isHost);
-
-    get(`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetingRecording/${selectedMeeting.id}`, (response) => {
-      setIsRecording(response.recording);
-    }, (e) => {
-      console.error(e);
-    }, '', false)
   }, []);
 
   useEffect(() => {
@@ -195,7 +192,7 @@ const MeetingRoomToolbar = (props) => {
             <LottieIcon id={'recording'}/>
             <span style={{ fontSize: '16px' }}>
               {
-                isHost ? 'You are recording...' : 'Meeting ia being recorded...'
+                isHost ? 'You are recording...' : 'Meeting is being recorded...'
               }
             </span>
           </>

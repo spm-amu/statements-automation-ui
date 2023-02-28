@@ -200,8 +200,8 @@ const MeetingRoom = (props) => {
         roomID: selectedMeeting.id,
         isRecording: true
       });
+
       setIsRecording(true);
-      updateRecordingStatus(true);
 
       emitSystemEvent("MEETING_RECORDING", {
         recording: true,
@@ -245,7 +245,6 @@ const MeetingRoom = (props) => {
         isRecording: false
       });
       setIsRecording(false);
-      updateRecordingStatus(false);
 
       emitSystemEvent("MEETING_RECORDING", {
         recording: false,
@@ -399,23 +398,6 @@ const MeetingRoom = (props) => {
       {
         meetingId: selectedMeeting.id,
         userId: participant.userId
-      },
-      '',
-      false
-    );
-  };
-
-  const updateRecordingStatus = (recordingStatus) => {
-    post(
-      `${appManager.getAPIHost()}/api/v1/meeting/updateRecordingStatus`,
-      () => {
-      },
-      (e) => {
-        console.error(e);
-      },
-      {
-        meetingId: selectedMeeting.id,
-        recording: recordingStatus
       },
       '',
       false
