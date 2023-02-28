@@ -28,7 +28,7 @@ const {electron} = window;
 let ps;
 
 const MODE = "PROD";
-//const newMessageAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/message.mp3');
+const newMessageAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/message.mp3');
 
 const BasicBusinessAppDashboard = (props) => {
   const [navDrawerOpen, setNavDrawerOpen] = React.useState(true);
@@ -248,7 +248,7 @@ const BasicBusinessAppDashboard = (props) => {
   const onChatMessage = (payload) => {
     let loggedInUser = appManager.getUserDetails();
     if (payload.chatMessage.participant.userId !== loggedInUser.userId) {
-      //newMessageAudio.play();
+      newMessageAudio.play();
 
       let currentchat = appManager.get('CURRENT_CHAT');
       let isChatScreenOpen = appManager.getCurrentView() === 'chats';
