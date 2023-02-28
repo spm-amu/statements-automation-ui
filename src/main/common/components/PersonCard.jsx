@@ -45,7 +45,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
   useEffect(() => {
     setOnline(socketManager.isUserOnline(props.data));
     socketManager.addSubscriptions(socketEventHandler, MessageType.USER_ONLINE, MessageType.USERS_ONLINE, MessageType.USER_OFFLINE)
-  }, []);
+  }, [props.data]);
 
   useEffect(() => {
     return () => {

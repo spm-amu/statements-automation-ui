@@ -506,7 +506,7 @@ const BasicBusinessAppDashboard = (props) => {
 
   function loadHost(apiHost, signalingServerHost) {
     appManager.setAPIHost(apiHost);
-    appManager.setSignalingServerHost(apiHost, signalingServerHost);
+    appManager.setSignalingServerHost(signalingServerHost);
     setNetworErrorMessage(null);
     init();
   }
@@ -514,7 +514,7 @@ const BasicBusinessAppDashboard = (props) => {
   React.useEffect(() => {
     if (MODE === 'PROD') {
       get("http://DEVHOVC03/vc/api/v1/system/ping", (e) => {
-        loadHost("http://DEVHOVC03/vc", "http://DEVHOVC03:8000");
+        loadHost("http://DEVHOVC03/vc", "http://DEVHOVC03");
       }, (e) => {
         get("https://svn.agilemotion.co.za/vc/api/v1/system/ping", (e) => {
           loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
@@ -523,7 +523,7 @@ const BasicBusinessAppDashboard = (props) => {
         }, "", true, false);
       }, "", true, false);
     } else {
-      loadHost("http://localhost:8080/vc", "http://localhost:8000");
+      loadHost("http://localhost:8080/vc", "https://svn.agilemotion.co.za");
     }
   }, []);
 
