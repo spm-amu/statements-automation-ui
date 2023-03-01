@@ -30,6 +30,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import PollResult from './PollResult';
 import File from "../customInput/File";
 import Icon from '../Icon';
+import PollContainer from './PollContainer';
 const { electron } = window;
 
 const ChatRoom = (props) => {
@@ -68,52 +69,11 @@ const ChatRoom = (props) => {
     }
   };
 
-  const calculatePercentage = (poll, option) => {
-    if (poll.totalVotes === 0) {
-      return 0;
-    }
-    return (option.voteCount * 100) / (poll.totalVotes);
-  };
-
-  const winningOptions = (options) => {
-    return options.reduce((prevOption, currentOption) =>
-        currentOption.voteCount > prevOption.voteCount ? currentOption : prevOption,
-      {voteCount: -Infinity}
-    );
-  };
-
-  const pollRemainingTime = (expirationDateTime) => {
-    const expirationTime = new Date(expirationDateTime).getTime();
-    const currentTime = new Date().getTime();
-
-    const difference_ms = expirationTime - currentTime;
-    const seconds = Math.floor((difference_ms / 1000) % 60);
-    const minutes = Math.floor((difference_ms / 1000 / 60) % 60);
-    const hours = Math.floor((difference_ms / (1000 * 60 * 60)) % 24);
-    const days = Math.floor(difference_ms / (1000 * 60 * 60 * 24));
-
-    let timeRemaining;
-
-    if (days > 0) {
-      timeRemaining = days + " days left";
-    } else if (hours > 0) {
-      timeRemaining = hours + " hours left";
-    } else if (minutes > 0) {
-      timeRemaining = minutes + " minutes left";
-    } else if (seconds > 0) {
-      timeRemaining = seconds + " seconds left";
-    } else {
-      timeRemaining = "less than a second left";
-    }
-
-    return timeRemaining;
-  };
-
-  const closePoll = (e, poll) => {
+  const closePollHandler = (e, poll) => {
     post(
       `${appManager.getAPIHost()}/api/v1/poll/close`,
       (response) => {
-        sendMessage(e, `Poll ${poll.question} has been closed.`);
+        sendMessage(e, `Poll: ${poll.question} has been closed.`);
         props.addedPeopleHandler();
       },
       (e) => {
@@ -124,7 +84,9 @@ const ChatRoom = (props) => {
     );
   };
 
-  const submitPollVote = (poll, chatParticipant) => {
+  const submitPollVoteHandler = (poll) => {
+    let chatParticipant = selectedChat.participants.find(p => p.userId === currentUser.userId);
+
     const date = {
       pollId: poll.id,
       optionId: poll.selectedOption,
@@ -207,7 +169,6 @@ const ChatRoom = (props) => {
   }, [messages]);
 
   useEffect(() => {
-    console.log('_______ Chat Updated!!!!');
     setMessage('');
     setDocument(null);
     loadMessages();
@@ -544,170 +505,16 @@ const ChatRoom = (props) => {
         </div>
       );
     } else {
-      const poll = message.poll;
-
-      const pollOptions = [];
-
-      const pollClosed = poll.isExpired || !poll.open;
-
-      if (pollClosed) {
-        const winningOpt = winningOptions(message.poll.options);
-
-        poll.options.forEach(option => {
-          pollOptions.push(
-            <PollResult
-              key={option.id}
-              option={option}
-              isWinner={winningOpt && option.id === winningOpt.id}
-              isSelected={poll.selectedOption === option.id}
-              percentVote={calculatePercentage(poll, option)}
-            />
-          );
-        });
-      } else {
-        poll.options.forEach(option => {
-          pollOptions.push(
-            <FormControlLabel
-              key={option.id}
-              className="poll-choice-radio"
-              value={option.id}
-              control={
-                <Radio/>
-              }
-              label={option.text}
-            />
-          )
-        })
-      }
-
-      return (
-        <div className="poll-content">
-          <div className="poll-header">
-            <div className="poll-creator-info">
-              <div>
-                <Avatar
-                  className="poll-creator-avatar"
-                  style={{backgroundColor: Utils.getAvatarColor(message.participant.name)}}>
-                  {message.participant.name.toUpperCase()}
-                </Avatar>
-                <span className="poll-creator-name">
-                    {message.participant.name}
-                </span>
-                <span className="poll-creation-date">
-                    {Utils.formatDateTime(message.createdDate)}
-                </span>
-              </div>
-            </div>
-            <div className="poll-question">
-              {poll.question}
-            </div>
-            <div className="poll-creation-date">
-              Results are visible after the poll has closed / expired.
-            </div>
-          </div>
-          <div className="poll-choices">
-            <FormControl style={{width: '100%'}}>
-              <RadioGroup
-                className="poll-choice-radio-group"
-                value={currentVote.find(c => c.id === poll.id) ? currentVote.find(c => c.id === poll.id).value : poll.selectedOption}
-                onChange={(e) => {
-                  if (!currentVote.find(c => c.id === poll.id)) {
-                    let newValue = {
-                      id: poll.id,
-                      value: e.target.value
-                    };
-                    setCurrentVote(oldArray => [...oldArray, newValue]);
-                  } else {
-                    const newArray = currentVote.map(it => {
-                      if (it.id === poll.id) {
-                        return {
-                          ...it,
-                          value: e.target.value
-                        };
-                      } else {
-                        return it;
-                      }
-                    });
-
-                    setCurrentVote(newArray);
-                  }
-                }}
-              >
-                {pollOptions}
-              </RadioGroup>
-            </FormControl>
-          </div>
-
-          {
-            !pollClosed ?
-              <div className="poll-footer">
-                <Button
-                  className="vote-button"
-                  variant={'outlined'}
-                  onClick={() => {
-                    let currentParticipant = selectedChat.participants.find(p => p.userId === currentUser.userId);
-                    let selectedVote = currentVote.find(it => it.id === poll.id);
-                    poll.selectedOption = selectedVote ? selectedVote.value : null;
-                    console.log('poll: ', poll);
-                    submitPollVote(poll, currentParticipant);
-
-                    let participantIds = [];
-                    for (const participant of selectedChat.participants) {
-                      participantIds.push(participant.userId);
-                    }
-
-                    socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
-                      systemEventType: "NEW_POLL_VOTE",
-                      recipients: participantIds,
-                      data: {
-                        pollId: poll.id
-                      }
-                    });
-                  }}
-                >
-                  Submit Vote
-                </Button>
-
-                {
-                  currentUser.userId === message.participant.userId &&
-                  <Button
-                    className="vote-button"
-                    variant={'outlined'}
-                    onClick={(e) => {
-                      closePoll(e, poll);
-                    }}
-                    style={{marginLeft: '8px'}}
-                  >
-                    Close Poll
-                  </Button>
-                }
-
-               {/* <span style={{marginLeft: '8px'}} className="time-left">
-                {poll.totalVotes ? `${poll.totalVotes} out of ${selectedChat.participants.length}` : `0 out of ${selectedChat.participants.length}`} votes
-              </span>*/}
-                <span className="separator">•</span>
-                <span className="time-left" style={{marginLeft: '4px'}}>
-                {
-                  pollRemainingTime(poll.expirationDateTime)
-                }
-              </span>
-
-                {
-                  poll.selectedOption &&
-                  <div className="poll-creation-date">
-                    <span style={{color: '#945c33'}}>You have Voted</span>
-                  </div>
-                }
-              </div> :
-              <div className="poll-footer">
-                <span style={{marginLeft: '4px'}}
-                      className="time-left">{`${poll.totalVotes} voted out of ${selectedChat.participants.length}`}</span>
-                <span className="separator">•</span>
-                <span className="time-left" style={{marginLeft: '4px'}}>Closed / Expired</span>
-              </div>
-          }
-        </div>
-      )
+      return <PollContainer
+        poll={message.poll}
+        pollCreator={message.participant}
+        createdDate={message.createdDate}
+        submitPollVoteHandler={(poll) => submitPollVoteHandler(poll)}
+        pollParticipantIDs={selectedChat.participants.map(p => p.userId)}
+        currentUser={currentUser}
+        closePollHandler={(e, poll) => closePollHandler(e, poll)}
+        numberOfPollParticipants={selectedChat.participants.length}
+      />
     }
   };
 
