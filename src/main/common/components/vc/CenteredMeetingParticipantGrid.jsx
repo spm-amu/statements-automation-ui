@@ -126,8 +126,8 @@ const MeetingParticipantGrid = (props) => {
                                       props.userVideoChangeHandler(ref);
                                     } : null
                                   }
-                                  onHostAudioMute={() => alert('You been shut')}
-                                  onHostVideoMute={() => alert('You been ghosted')}
+                                  onHostAudioMute={() => props.onHostAudioMute(participant)}
+                                  onHostVideoMute={() => props.onHostVideoMute(participant)}
                                   showName={!participant.isCurrentUser}
                                   videoMuted={participant.videoMuted}
                                   isHost={isHost}
@@ -171,8 +171,8 @@ const MeetingParticipantGrid = (props) => {
                                     props.userVideoChangeHandler(ref);
                                   } : null
                                 }
-                                onHostAudioMute={() => {}}
-                                onHostVideoMute={() => {}}
+                                onHostAudioMute={() => props.onHostAudioMute(participant)}
+                                onHostVideoMute={() => props.onHostVideoMute(participant)}
                                 userStream={userStream}
                                 isHost={isHost}
                                 showName={!participant.isCurrentUser}

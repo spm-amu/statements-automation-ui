@@ -324,6 +324,11 @@ const MeetingRoom = (props) => {
           setMeetingParticipantGridMode('DEFAULT');
         }
       }
+    } else if (payload.systemEventType === "HOST_CHANGED_AV_SETTINGS") {
+      if(payload.data.userId === appManager.getUserDetails().userId) {
+        setAudioMuted(payload.data.audioMuted);
+        setVideoMuted(payload.data.videoMuted);
+      }
     }
   };
 
@@ -957,6 +962,16 @@ const MeetingRoom = (props) => {
     }
   };
 
+  const changeOtherParticipantAVSettings = (userId, audioMuted, videoMuted) => {
+    socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
+      systemEventType: "HOST_CHANGED_AV_SETTINGS",
+      recipients: [userId],
+      data: {
+        audioMuted,
+        videoMuted
+      }
+    });
+  };
   return (
     <Fragment>
       {screenShared && shareScreenSource.current && (
@@ -1060,6 +1075,11 @@ const MeetingRoom = (props) => {
                                                       participantsRaisedHands={participantsRaisedHands}
                                                       allUserParticipantsLeft={allUserParticipantsLeft}
                                                       userVideoChangeHandler={(ref) => setUserVideo(ref)}
+                                                      onHostAudioMute={(participant) => {
+                                                        changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
+                                                      }}
+                                                      onHostVideoMute={(participant) => {
+                                                      }}
                                                       acceptUserHandler={
                                                         (item) => {
                                                           acceptUser(item);
