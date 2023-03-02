@@ -1091,6 +1091,7 @@ const MeetingRoom = (props) => {
                                                         changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
                                                       }}
                                                       onHostVideoMute={(participant) => {
+                                                        changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
                                                       }}
                                                       acceptUserHandler={
                                                         (item) => {
