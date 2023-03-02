@@ -289,6 +289,11 @@ class Sidebar extends React.Component {
                         Copyrights &copy; {1900 + new Date().getYear()} {" "}
                       </td>
                     </tr>
+                    <tr>
+                      <td className={'copyright'} style={{ alignItems: 'center', justifyContent: 'center', display: "flex" }}>
+                        <span style={{ fontWeight: 'bold' }}>v1.1.0</span>
+                      </td>
+                    </tr>
                     </tbody>
                   </table>
                 </div>
