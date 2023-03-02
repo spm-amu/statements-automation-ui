@@ -329,11 +329,11 @@ const MeetingRoom = (props) => {
         setAudioMuted(payload.data.audioMuted);
         setVideoMuted(payload.data.videoMuted);
 
-        if(!payload.data.audioMuted) {
+        if(payload.data.audioMuted) {
           handleMessageArrived({
             message: "You have been muted by the meeting host"
           })
-        } else if(!payload.data.videoMuted) {
+        } else if(payload.data.videoMuted) {
           handleMessageArrived({
             message: "Your video has been turned off by the meeting host"
           })
