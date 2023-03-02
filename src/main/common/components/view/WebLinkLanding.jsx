@@ -11,6 +11,7 @@ import {ACCESS_TOKEN_PROPERTY, REFRESH_TOKEN_PROPERTY} from '../../service/Token
 import {Alert} from "@material-ui/lab";
 
 const WebLinkLanding = (props) => {
+  const MODE = "PROD";
   const navigate = useNavigate();
 
   const [meetingId, setMeetingId] = useState('');
@@ -26,12 +27,37 @@ const WebLinkLanding = (props) => {
   }, [urlToken, meetingId]);
 
   useEffect(() => {
+    loadHostAPIs();
+
     const _meetingId = queryParameters.get("meetingId");
     const _urlToken = queryParameters.get("accessToken");
 
     setMeetingId(_meetingId);
     setUrlToken(_urlToken);
   }, []);
+
+  function loadHost(apiHost, signalingServerHost, online = true) {
+    appManager.setAPIHost(apiHost);
+    appManager.setSignalingServerHost(signalingServerHost);
+    appManager.setOnline(online);
+  }
+
+  const loadHostAPIs = () => {
+    if (MODE === 'PROD') {
+      get("http://DEVHOVC03/vc/api/v1/system/ping", (e) => {
+        loadHost("http://DEVHOVC03/vc", "http://DEVHOVC03", false);
+      }, (e) => {
+        get("https://svn.agilemotion.co.za/vc/api/v1/system/ping", (e) => {
+          loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
+        }, (e) => {
+        }, "", true, false);
+      }, "", true, false);
+    } else {
+      loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
+    }
+
+    console.log('___ appManager.getAPIHost(): ', appManager.getAPIHost());
+  }
 
   const openApp = () => {
     window.location.href = `armscor-connect://meetingId=${meetingId}&accessToken=${urlToken}`;

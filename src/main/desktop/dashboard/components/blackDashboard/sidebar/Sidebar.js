@@ -11,6 +11,7 @@ import MenuLink from "../../../../../common/components/menu/MenuLink";
 import {lighten} from "@material-ui/core";
 import Icon from "../../../../../common/components/Icon";
 import NotificationListener from "../../NoticationListener";
+import packageJson from '../../../../../../../release/app/package.json';
 
 let ps;
 
@@ -291,7 +292,9 @@ class Sidebar extends React.Component {
                     </tr>
                     <tr>
                       <td className={'copyright'} style={{ alignItems: 'center', justifyContent: 'center', display: "flex" }}>
-                        <span style={{ fontWeight: 'bold' }}>v1.1.0</span>
+                        <span style={{ fontWeight: 'bold' }}>
+                          { `v${packageJson.version}` }
+                        </span>
                       </td>
                     </tr>
                     </tbody>
