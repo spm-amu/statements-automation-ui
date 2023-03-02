@@ -299,6 +299,7 @@ const Meeting = (props) => {
 
     let errorState = {
       title: Utils.isNull(value.title),
+      attendees: value.attendees.length === 0,
       startDate: Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
       startTime: Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
       endDate: Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime,
@@ -1243,6 +1244,10 @@ const Meeting = (props) => {
                 disabled={readOnly}
                 invalidText={'invalid attendee'}
                 value={value.attendees}
+                hasError={errors.attendees}
+                errorMessage={
+                  'At least one attendees required'
+                }
                 multiple={true}
                 showImages={true}
                 searchAttribute={'name'}

@@ -1,4 +1,4 @@
-import { webFrame, contextBridge, ipcRenderer, IpcRendererEvent, desktopCapturer } from 'electron';
+import { webFrame, contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels = 'ipc-armscor';
 

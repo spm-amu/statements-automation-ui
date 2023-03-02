@@ -190,18 +190,19 @@ const PollContainer = (props) => {
               className="vote-button"
               variant={'outlined'}
               onClick={() => {
+                const hasVoted = !!poll.selectedOption;
                 poll.selectedOption = currentVote ? currentVote : '';
                 props.submitPollVoteHandler(poll);
 
-                console.log('### IDs: ', props.pollParticipantIDs);
-
-                socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
-                  systemEventType: "NEW_POLL_VOTE",
-                  recipients: props.pollParticipantIDs,
-                  data: {
-                    pollId: poll.id
-                  }
-                });
+                if (!hasVoted) {
+                  socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
+                    systemEventType: "NEW_POLL_VOTE",
+                    recipients: props.pollParticipantIDs,
+                    data: {
+                      pollId: poll.id
+                    }
+                  });
+                }
               }}
             >
               Submit Vote

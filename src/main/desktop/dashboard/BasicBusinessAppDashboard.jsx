@@ -302,7 +302,7 @@ const BasicBusinessAppDashboard = (props) => {
     systemEventHandler.api = systemEventHandlerApi();
   });
 
-  function setup(response, isGuest = false) {
+  function setup(response, isRedirect = false) {
     appManager.setUserDetails(response);
     setUserDetails(response);
     initDashboardSettings();
@@ -314,7 +314,7 @@ const BasicBusinessAppDashboard = (props) => {
       setTokenRefreshMonitorStarted(true);
     }
 
-    if (isGuest) {
+    if (isRedirect) {
       window.history.replaceState({}, document.title); // clear location.state
       redirectToMeeting(location.state);
     }
@@ -328,7 +328,8 @@ const BasicBusinessAppDashboard = (props) => {
       navigate('/login');
     } else {
       get(`${appManager.getAPIHost()}/api/v1/auth/userInfo`, (response) => {
-        setup(response);
+        const isRedirect = location.state && location.state.meetingId;
+        setup(response, isRedirect);
       }, (e) => {
         if (e.status === 401) {
           console.log("DASHBOARD REFRESH");
@@ -492,6 +493,8 @@ const BasicBusinessAppDashboard = (props) => {
     } else {
       const guestNaviationData = location.state;
 
+      console.log('_____ guestNaviationData: ', guestNaviationData);
+
       if (guestNaviationData && guestNaviationData.accessToken && guestNaviationData.refreshToken) {
         appManager.add(ACCESS_TOKEN_PROPERTY, guestNaviationData.accessToken);
         appManager.add(REFRESH_TOKEN_PROPERTY, guestNaviationData.refreshToken);
@@ -528,7 +531,7 @@ const BasicBusinessAppDashboard = (props) => {
         }, "", true, false);
       }, "", true, false);
     } else {
-      loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
+      loadHost("http://localhost:8080/vc", "https://svn.agilemotion.co.za");
     }
   }, []);
 

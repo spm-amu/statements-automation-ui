@@ -155,6 +155,8 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
           className={props.className}
           {...params}
           label={props.label}
+          error={!Utils.isNull(props.hasError) ? props.hasError : false}
+          helperText={!Utils.isNull(props.errorMessage) && !Utils.isNull(props.hasError) ? props.errorMessage : ''}
           variant={props.borderless ? 'standard' : 'outlined'}
           inputProps={{
             ...params.inputProps,
