@@ -189,7 +189,7 @@ const MeetingParticipantGrid = (props) => {
            style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
         {
           step === "LOBBY" &&
-          <Lobby userToCall={props.userToCall} displayState={props.displayState} meetingTitle={props.meetingTitle}/>
+          <Lobby isHost={isHost} userToCall={props.userToCall} displayState={props.displayState} meetingTitle={props.meetingTitle}/>
         }
         {
           grid && grid.length > 0 &&
