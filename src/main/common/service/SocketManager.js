@@ -307,8 +307,8 @@ class SocketManager {
     }
   };
 
-  declineDirectCall = (callerSocketId, callRoom) => {
-    this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId, roomID: callRoom, direct: true, reject: true});
+  declineDirectCall = (callerSocketId, callRoom, reason) => {
+    this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId, roomID: callRoom, direct: true, reject: true, reason: reason});
   }
 }
 

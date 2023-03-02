@@ -288,9 +288,13 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   const receiveCall = (payload) => {
-    electron.ipcRenderer.sendMessage('receivingCall', {
-      payload: payload
-    });
+    if (appManager.get('CURRENT_MEETING')) {
+      socketManager.declineDirectCall(payload.callerUser.socketId, payload.roomId, "I am in another meeting");
+    } else {
+      electron.ipcRenderer.sendMessage('receivingCall', {
+        payload: payload
+      });
+    }
   };
 
   useEffect(() => {

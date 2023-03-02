@@ -95,6 +95,14 @@ const ActivityCardComponent = React.memo(React.forwardRef((props, ref) => {
             </div>
           </div>
           {
+            activity.data && activity.data.reason &&
+            <div className={'row'} style={{fontWeight: 600, marginLeft: '0px', marginRight: '0px'}}>
+              {
+                `REJECTION REASON: ${activity.data.reason}`
+              }
+            </div>
+          }
+          {
             activity.vcActivityTitle &&
             <div className={'row'} style={{fontWeight: 600, marginLeft: '0px', marginRight: '0px'}}>
               {
