@@ -19,10 +19,10 @@ const DialingPreview = (props) => {
   const [callPayload, setCallPayload] = useState(null);
   const [meetingRequest, setMeetingRequest] = useState(null);
   const [initials, setInitials] = useState('');
-  const [mode, setMode] = useState('DEFAULT');
   const [rejectionReason, setRejectionReason] = useState('');
   const [systemAlert, setSystemAlert] = useState(null);
   const soundInterval = useRef();
+  const [mode, setMode] = useState('DEFAULT');
 
   useEffect(() => {
     electron.ipcRenderer.on('dialingViewContent', args => {
@@ -31,6 +31,9 @@ const DialingPreview = (props) => {
         soundInterval.current = null;
         permitAudio.play();
       } else {
+        setMode('DEFAULT');
+        setRejectionReason('');
+
         soundInterval.current = setInterval(() => {
           waitingAudio.play();
         }, 100);
@@ -73,7 +76,6 @@ const DialingPreview = (props) => {
   const declineCall = () => {
     waitingAudio.pause();
     clearInterval(soundInterval.current);
-
     electron.ipcRenderer.sendMessage('declineCall', {
       payload: {
         callerId: callPayload ? callPayload.callerUser.socketId : null,
