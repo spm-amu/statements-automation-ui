@@ -10,11 +10,12 @@ import ThemeProvider from "@material-ui/styles/ThemeProvider";
 // ** Fake Database
 import '../main/@fake-db';
 import SignIn from '../main/common/components/view/security/SignIn';
-import DialingPreview from '../main/common/components/vc/DialingPreview';
+import InComingCallWindow from '../main/common/components/vc/InComingCallWindow';
 import MessagePreview from '../main/common/components/vc/MessagePreview';
 import ExternalMeetingAttendee from "../main/common/components/view/security/ExternalMeetingAttendee";
 import WebLinkLanding from '../main/common/components/view/WebLinkLanding';
 import Guest from '../main/common/components/view/security/Guest';
+import SystemAlertWindow from "../main/common/components/vc/SystemAlertWindow";
 
 const armscorTheme = createTheme({
     palette: {
@@ -39,10 +40,18 @@ const Login = () => {
   );
 };
 
-const Dialing = () => {
+const InComingCall = () => {
   return (
     <div style={{width: '99vw', height: '100vh', backgroundColor: '#E5E5E5', overflow: 'hidden'}}>
-      <DialingPreview />
+      <InComingCallWindow />
+    </div>
+  );
+};
+
+const SystemAlert = () => {
+  return (
+    <div style={{width: '99vw', height: '100vh', backgroundColor: '#E5E5E5', overflow: 'hidden'}}>
+      <SystemAlertWindow />
     </div>
   );
 };
@@ -103,7 +112,7 @@ export default function App() {
             <Route path="*" element={<Dashboard />}/>
             <Route path="/dashboard/*" element={<Dashboard />}/>
             <Route path="/login" element={<Login />}/>
-            <Route path="/dialingPreview" element={<Dialing />}/>
+            <Route path="/incomingCall" element={<InComingCall />}/>
             <Route path="/messagePreview" element={<Message />}/>
             <Route path="/webLink" element={<WebLink />}/>
             <Route path="/guest" element={<GuestLink />}/>

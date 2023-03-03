@@ -1,39 +1,40 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useRef, useState} from "react";
-import './DialingPreview.css';
+import './InComingCallWindow.css';
 import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
 import Utils from '../../Utils';
 import Button from '../RegularButton';
 import {Form} from "reactstrap";
 import TextField from "../customInput/TextField";
-import AutoComplete from "../customInput/AutoComplete";
-import appManager from "../../service/AppManager";
 
 const {electron} = window;
 
 const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
 const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
 
-const DialingPreview = (props) => {
+const InComingCallWindow = (props) => {
   const [callPayload, setCallPayload] = useState(null);
   const [meetingRequest, setMeetingRequest] = useState(null);
   const [initials, setInitials] = useState('');
-  const [rejectionReason, setRejectionReason] = useState('');
-  const [systemAlert, setSystemAlert] = useState(null);
+  const rejectionReason = useRef('');
   const soundInterval = useRef();
-  const [mode, setMode] = useState('DEFAULT');
+  const [refresher, setRefresher] = useState(false);
+  const [state] = useState({
+    systemAlert: null,
+    mode: 'DEFAULT',
+    rejectionReason: ''
+  });
 
   useEffect(() => {
     electron.ipcRenderer.on('dialingViewContent', args => {
+      resetValues();
+      console.log("\n\n\n\nPAYLOAD : ", args.payload);
       if (args.payload.type) {
-        setSystemAlert(args.payload);
+        state.systemAlert = args.payload;
         soundInterval.current = null;
         permitAudio.play();
       } else {
-        setMode('DEFAULT');
-        setRejectionReason('');
-
         soundInterval.current = setInterval(() => {
           waitingAudio.play();
         }, 100);
@@ -44,6 +45,8 @@ const DialingPreview = (props) => {
           setCallPayload(args.payload);
         }
       }
+
+      setRefresher(!refresher);
     });
 
     electron.ipcRenderer.on('cancelCall', args => {
@@ -71,6 +74,8 @@ const DialingPreview = (props) => {
     electron.ipcRenderer.sendMessage('answerCall', {
       payload: callPayload ? callPayload : meetingRequest
     });
+
+    resetValues();
   };
 
   const declineCall = () => {
@@ -80,46 +85,57 @@ const DialingPreview = (props) => {
       payload: {
         callerId: callPayload ? callPayload.callerUser.socketId : null,
         callPayload: meetingRequest ? meetingRequest : callPayload,
-        reason: rejectionReason
+        reason: state.rejectionReason
       }
     });
+
+    resetValues();
   };
 
   const joinMeeting = () => {
     electron.ipcRenderer.sendMessage('joinMeetingEvent', {
-      payload: systemAlert
+      payload: state.systemAlert
     });
+
+    resetValues();
   };
 
   const closeWindow = () => {
     electron.ipcRenderer.sendMessage('closeWindowEvent');
+    resetValues();
+  };
+
+  const resetValues = () => {
+    state.systemAlert = null;
+    state.mode = 'DEFAULT';
+    state.rejectionReason = '';
   };
 
   return (
     <>
       {
-        mode === 'DEFAULT' ?
+        state.mode === 'DEFAULT' ?
           <>
             {
-              (callPayload || meetingRequest || systemAlert) &&
+              (callPayload || meetingRequest || state.systemAlert) &&
               <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
                 <div className={'centered-flex-box w-100'}
                      style={{height: '72px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
                   {
-                    systemAlert ? systemAlert.message :
+                    state.systemAlert ? state.systemAlert.message :
                       callPayload ? `${callPayload.callerUser.name} is trying to call you` : `${meetingRequest.callerName} wants you to join meeting`
                   }
                 </div>
                 <div className={'centered-flex-box w-100'} style={{height: 'calc(100% - 180px)'}}>
                   {
-                    systemAlert ?
+                    state.systemAlert ?
                       <div>
                         <div className={'avatar'} data-label={initials}>
                           <Icon id={'CALENDAR'} style={{color: '#FFFFFF'}} fontSize={'large'}/>
                         </div>
                         <div className={'centered-flex-box w-100'}
                              style={{marginTop: '8px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
-                          {systemAlert.params.meetingTitle}
+                          {state.systemAlert.params.meetingTitle}
                         </div>
                       </div>
                       :
@@ -128,7 +144,7 @@ const DialingPreview = (props) => {
                 </div>
                 <div className={'centered-flex-box w-100'} style={{marginTop: '32px'}}>
                   {
-                    systemAlert ?
+                    state.systemAlert ?
                       <div style={{padding: '8px'}} className={'row no-margin w-100'}>
                         <div className={'col no-margin'} style={{paddingRight: '8px'}}>
                           <Button
@@ -164,7 +180,10 @@ const DialingPreview = (props) => {
                           <Icon id={'CALL'}/>
                         </IconButton>
                         <IconButton
-                          onClick={() => setMode('CAPTURE_REJECT_REASON')}
+                          onClick={() => {
+                            state.mode = 'CAPTURE_REJECT_REASON';
+                            setRefresher(!refresher);
+                          }}
                           style={{
                             backgroundColor: '#eb3f21',
                             color: 'white',
@@ -178,7 +197,7 @@ const DialingPreview = (props) => {
                 </div>
               </div>
             }
-            </>
+          </>
           :
           <div
             className={'reject-reason-form'}
@@ -198,12 +217,15 @@ const DialingPreview = (props) => {
             </h5>
             <Form>
               <div>
-                <div style={{ marginTop: '8px' }}>
+                <div style={{marginTop: '8px'}}>
                   <TextField
                     label="Title"
                     id="title"
-                    value={rejectionReason}
-                    valueChangeHandler={(e) => setRejectionReason(e.target.value)}
+                    value={state.rejectionReason}
+                    valueChangeHandler={(e) => {
+                      state.rejectionReason = e.target.value;
+                      setRefresher(!refresher);
+                    }}
                   />
                 </div>
               </div>
@@ -216,9 +238,12 @@ const DialingPreview = (props) => {
                 margin: '16px 0',
               }}
             >
-              <div style={{ marginRight: '4px' }}>
+              <div style={{marginRight: '4px'}}>
                 <Button
-                  onClick={(e) => setMode('DEFAULT')}
+                  onClick={(e) => {
+                    state.mode = 'DEFAULT';
+                    setRefresher(!refresher);
+                  }}
                   variant={'contained'}
                   size="large"
                   color={'primary'}
@@ -226,10 +251,10 @@ const DialingPreview = (props) => {
                   BACK
                 </Button>
               </div>
-              <div style={{ marginRight: '4px' }}>
+              <div style={{marginRight: '4px'}}>
                 <IconButton
                   onClick={() => declineCall()}
-                  disabled={!rejectionReason || rejectionReason.length === 0}
+                  disabled={!state.rejectionReason || state.rejectionReason.length === 0}
                   style={{
                     backgroundColor: '#eb3f21',
                     color: 'white',
@@ -246,4 +271,4 @@ const DialingPreview = (props) => {
   );
 };
 
-export default DialingPreview;
+export default InComingCallWindow;

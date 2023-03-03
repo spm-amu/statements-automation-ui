@@ -28,7 +28,7 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-let dialWindow: BrowserWindow | null = null;
+let inComingCallWindow: BrowserWindow | null = null;
 let messageWindow: BrowserWindow | null = null;
 let meetingRoomWindow: BrowserWindow | null = null;
 let screenWidth: number;
@@ -92,7 +92,7 @@ const installExtensions = async () => {
 
 const createDialWindow = () => {
   // Create the browser window.
-  dialWindow = new BrowserWindow({
+  inComingCallWindow = new BrowserWindow({
     title: "Armscor",
     width: 550,
     height: 300,
@@ -119,7 +119,7 @@ const createDialWindow = () => {
     show: false,
   });
 
-  // preventRefresh(dialWindow);
+  // preventRefresh(inComingCallWindow);
 
   const dev = app.commandLine.hasSwitch("dev");
   if (!dev) {
@@ -130,10 +130,10 @@ const createDialWindow = () => {
       level = "floating";
     }
 
-    dialWindow.setAlwaysOnTop(true, level);
+    inComingCallWindow.setAlwaysOnTop(true, level);
   }
 
-  dialWindow.loadURL(resolveWindowHtmlPath('index.html#/dialingPreview'));
+  inComingCallWindow.loadURL(resolveWindowHtmlPath('index.html#/incomingCall'));
 };
 
 const createMeetingRoomWindow = () => {
@@ -165,7 +165,7 @@ const createMeetingRoomWindow = () => {
     hasShadow: false,
     show: false,
   });
-  // preventRefresh(dialWindow);
+  // preventRefresh(inComingCallWindow);
 
   const dev = app.commandLine.hasSwitch("dev");
   if (!dev) {
@@ -210,7 +210,7 @@ const createMessageWindow = () => {
     show: false,
   });
 
-  // preventRefresh(dialWindow);
+  // preventRefresh(inComingCallWindow);
 
   const dev = app.commandLine.hasSwitch("dev");
   if (!dev) {
@@ -273,7 +273,7 @@ const createWindow = async () => {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
-    dialWindow = null;
+    inComingCallWindow = null;
     messageWindow = null;
   });
 
@@ -296,24 +296,24 @@ const createWindow = async () => {
  */
 
 ipcMain.on("receivingCall", async (_event, args) => {
-  if (!dialWindow) {
-    throw new Error('"dialingWindow" is not defined');
+  if (!inComingCallWindow) {
+    throw new Error('"incomingCallWindowContent" is not defined');
   }
 
-  dialWindow.webContents.send('dialingViewContent', args);
-  dialWindow.show();
-  dialWindow.focus();
+  inComingCallWindow.webContents.send('incomingCallWindowContent', args);
+  inComingCallWindow.show();
+  inComingCallWindow.focus();
 });
 
 ipcMain.on("systemAlert", async (_event, args) => {
   if(!(args.currentMeetingId && args.payload.type === 'MEETING_STARTED_ALERT')) {
-    if (!dialWindow) {
+    if (!inComingCallWindow) {
       throw new Error('"dialingWindow" is not defined');
     }
 
-    dialWindow.webContents.send('dialingViewContent', args);
-    dialWindow.show();
-    dialWindow.focus();
+    inComingCallWindow.webContents.send('dialingViewContent', args);
+    inComingCallWindow.show();
+    inComingCallWindow.focus();
   }
 });
 
@@ -344,7 +344,7 @@ ipcMain.on("joinMeetingEvent", async (_event, args) => {
 
   mainWindow.webContents.send('joinMeetingEvent', args);
 
-  dialWindow?.hide();
+  inComingCallWindow?.hide();
 });
 
 ipcMain.on("replyMessage", async (_event, args) => {
@@ -364,7 +364,7 @@ ipcMain.on("closeWindowEvent", async (_event) => {
     throw new Error('"mainWindow" is not defined');
   }
 
-  dialWindow?.hide();
+  inComingCallWindow?.hide();
 });
 
 ipcMain.on("answerCall", async (_event, args) => {
@@ -374,7 +374,7 @@ ipcMain.on("answerCall", async (_event, args) => {
 
   mainWindow.webContents.send('answerCall', args);
 
-  dialWindow?.hide();
+  inComingCallWindow?.hide();
 });
 
 ipcMain.on("readTokens", async (_event, args) => {
@@ -386,7 +386,7 @@ ipcMain.on("readTokens", async (_event, args) => {
   tokens.accessToken = store.get('accessToken');
   tokens.refreshToken = store.get('refreshToken');
 
-  tokens.pathResolve = resolveWindowHtmlPath('index.html#/dialingPreview');
+  tokens.pathResolve = resolveWindowHtmlPath('index.html#/incomingCall');
 
   let lastLogin = store.get('lastLogin') as string;
   tokens.lastLogin = new Date(parseFloat(lastLogin)).getTime();
@@ -427,17 +427,17 @@ ipcMain.on("declineCall", async (_event, args) => {
 
   mainWindow.webContents.send('declineCall', args);
 
-  dialWindow?.hide();
+  inComingCallWindow?.hide();
 });
 
 ipcMain.on("cancelCall", async (_event, args) => {
-  if (!dialWindow) {
+  if (!inComingCallWindow) {
     throw new Error('"mainWindow" is not defined');
   }
 
-  dialWindow.webContents.send('cancelCall', args);
+  inComingCallWindow.webContents.send('cancelCall', args);
 
-  dialWindow?.hide();
+  inComingCallWindow?.hide();
 });
 
 ipcMain.on("hideMessagePreview", async (_event, args) => {

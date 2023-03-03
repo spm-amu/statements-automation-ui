@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useRef, useState} from "react";
-import './DialingPreview.css';
+import './InComingCallWindow.css';
 import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
 import Utils from '../../Utils';
