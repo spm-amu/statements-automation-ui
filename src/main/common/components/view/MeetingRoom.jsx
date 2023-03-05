@@ -497,7 +497,9 @@ const MeetingRoom = (props) => {
         .catch(e => {
           console.log(e)
         });
+    }
 
+    if(!Utils.isNull(screenShared)) {
       emitSystemEvent("SHARE_SCREEN", {
         shared: screenShared,
         userId: appManager.getUserDetails().userId
