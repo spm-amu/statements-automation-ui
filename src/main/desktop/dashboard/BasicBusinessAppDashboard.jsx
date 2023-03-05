@@ -284,7 +284,11 @@ const BasicBusinessAppDashboard = (props) => {
       args.currentMeetingId = appManager.get('CURRENT_MEETING').id;
     }
 
-    electron.ipcRenderer.sendMessage('systemAlert', args);
+    console.log(payload);
+
+    if (!(appManager.get('CURRENT_MEETING') && payload.type === 'MEETING_START_ALERT')) {
+      electron.ipcRenderer.sendMessage('systemAlert', args);
+    }
   };
 
   const receiveCall = (payload) => {

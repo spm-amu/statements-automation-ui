@@ -9,8 +9,8 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, systemPreferences, screen, desktopCapturer } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import {app, BrowserWindow, desktopCapturer, ipcMain, screen, shell, systemPreferences} from 'electron';
+import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import {resolveHtmlPath, resolveWindowHtmlPath} from './util';
@@ -29,6 +29,7 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 let inComingCallWindow: BrowserWindow | null = null;
+let alertWindow: BrowserWindow | null = null;
 let messageWindow: BrowserWindow | null = null;
 let meetingRoomWindow: BrowserWindow | null = null;
 let screenWidth: number;
@@ -38,7 +39,7 @@ let deeplinkingUrl: string | undefined;
 
 ipcMain.handle('get-sources', () => {
   return desktopCapturer
-    .getSources({ types: ['window', 'screen', 'audio'] })
+    .getSources({types: ['window', 'screen', 'audio']})
     .then(async sources => {
       if (mainWindow) {
         return sources.map((source) => ({
@@ -46,13 +47,13 @@ ipcMain.handle('get-sources', () => {
           name: source.name,
           appIconUrl: source?.appIcon?.toDataURL(),
           thumbnailUrl: source?.thumbnail
-            ?.resize({ height: 160 })
+            ?.resize({height: 160})
             .toDataURL(),
         }));
       }
 
       return null;
-  })
+    })
 });
 
 ipcMain.on('ipc-armscor', async (event, arg) => {
@@ -61,7 +62,7 @@ ipcMain.on('ipc-armscor', async (event, arg) => {
   event.reply('ipc-armscor', msgTemplate('pong'));
 });
 
-ipcMain.on('downloadFile', async (_event, { payload }) => {
+ipcMain.on('downloadFile', async (_event, {payload}) => {
   mainWindow?.webContents.downloadURL(payload.fileURL)
 });
 
@@ -134,6 +135,52 @@ const createDialWindow = () => {
   }
 
   inComingCallWindow.loadURL(resolveWindowHtmlPath('index.html#/incomingCall'));
+};
+
+const createAlertWindow = () => {
+  // Create the browser window.
+  alertWindow = new BrowserWindow({
+    title: "Armscor",
+    width: 550,
+    height: 300,
+    maxWidth: 550,
+    maxHeight: 300,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    parent: mainWindow,
+    roundedCorners: false,
+    x: screenWidth - 600,
+    y: screenHeight - 300,
+    webPreferences: {
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
+    },
+    frame: false,
+    autoHideMenuBar: true,
+    transparent: true,
+    skipTaskbar: true,
+    hasShadow: false,
+    show: false,
+  });
+
+  // preventRefresh(inComingCallWindow);
+
+  const dev = app.commandLine.hasSwitch("dev");
+  if (!dev) {
+    let level = "normal";
+    // Mac OS requires a different level for our drag/drop and overlay
+    // functionality to work as expected.
+    if (process.platform === "darwin") {
+      level = "floating";
+    }
+
+    alertWindow.setAlwaysOnTop(true, level);
+  }
+
+  alertWindow.loadURL(resolveWindowHtmlPath('index.html#/systemAlert'));
 };
 
 const createMeetingRoomWindow = () => {
@@ -283,7 +330,7 @@ const createWindow = async () => {
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
-    return { action: 'deny' };
+    return {action: 'deny'};
   });
 
   // Remove this if your app does not use auto updates
@@ -306,15 +353,13 @@ ipcMain.on("receivingCall", async (_event, args) => {
 });
 
 ipcMain.on("systemAlert", async (_event, args) => {
-  if(!(args.currentMeetingId && args.payload.type === 'MEETING_STARTED_ALERT')) {
-    if (!inComingCallWindow) {
-      throw new Error('"dialingWindow" is not defined');
-    }
-
-    inComingCallWindow.webContents.send('dialingViewContent', args);
-    inComingCallWindow.show();
-    inComingCallWindow.focus();
+  if (!alertWindow) {
+    throw new Error('"alertWindow" is not defined');
   }
+
+  alertWindow.webContents.send('systemAlertWindowContent', args);
+  alertWindow.show();
+  alertWindow.focus();
 });
 
 ipcMain.on("receivingMessage", async (_event, args) => {
@@ -344,7 +389,7 @@ ipcMain.on("joinMeetingEvent", async (_event, args) => {
 
   mainWindow.webContents.send('joinMeetingEvent', args);
 
-  inComingCallWindow?.hide();
+  alertWindow?.hide();
 });
 
 ipcMain.on("replyMessage", async (_event, args) => {
@@ -364,7 +409,7 @@ ipcMain.on("closeWindowEvent", async (_event) => {
     throw new Error('"mainWindow" is not defined');
   }
 
-  inComingCallWindow?.hide();
+  alertWindow?.hide();
 });
 
 ipcMain.on("answerCall", async (_event, args) => {
@@ -391,7 +436,7 @@ ipcMain.on("readTokens", async (_event, args) => {
   let lastLogin = store.get('lastLogin') as string;
   tokens.lastLogin = new Date(parseFloat(lastLogin)).getTime();
 
-  if(mainWindow) {
+  if (mainWindow) {
     mainWindow.webContents.send('tokensRead', tokens);
   }
 });
@@ -523,12 +568,13 @@ app
   .whenReady()
   .then(() => {
     const primaryDisplay = screen.getPrimaryDisplay();
-    const { width, height } = primaryDisplay.workAreaSize;
+    const {width, height} = primaryDisplay.workAreaSize;
     screenWidth = width;
     screenHeight = height;
 
     createWindow();
     createDialWindow();
+    createAlertWindow();
     createMessageWindow();
     createMeetingRoomWindow();
 

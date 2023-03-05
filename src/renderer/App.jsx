@@ -113,6 +113,7 @@ export default function App() {
             <Route path="/dashboard/*" element={<Dashboard />}/>
             <Route path="/login" element={<Login />}/>
             <Route path="/incomingCall" element={<InComingCall />}/>
+            <Route path="/systemAlert" element={<SystemAlert />}/>
             <Route path="/messagePreview" element={<Message />}/>
             <Route path="/webLink" element={<WebLink />}/>
             <Route path="/guest" element={<GuestLink />}/>
