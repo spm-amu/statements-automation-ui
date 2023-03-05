@@ -184,6 +184,7 @@ const ViewContainer = (props) => {
             isHost={attributes.data.isHost}
             autoPermit={attributes.data.autoPermit}
             isDirectCall={attributes.data.isDirectCall}
+            isRequestToJoin={attributes.data.isRequestToJoin}
             userToCall={attributes.data.userToCall}
           />
         </Window>
