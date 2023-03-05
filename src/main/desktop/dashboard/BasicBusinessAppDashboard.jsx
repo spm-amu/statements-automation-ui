@@ -430,8 +430,8 @@ const BasicBusinessAppDashboard = (props) => {
                 },
                 videoMuted: true,
                 audioMuted: false,
-                isDirectCall: true,
-                callerUser: args.payload.callerUser
+                isDirectCall: !args.payload.meetingJoinRequest,
+                callerUser: args.payload.meetingJoinRequest ? null : args.payload.callerUser
               }
             })
           },
