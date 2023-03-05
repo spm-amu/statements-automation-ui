@@ -553,7 +553,7 @@ const MeetingRoom = (props) => {
   };
 
   const createParticipants = (users, socket) => {
-    console.log("ALL_USERS received and creating participants : ", users)
+    console.log("ALL_USERS received and creating participants : ", users);
     socketManager.clearUserToPeerMap();
     let newParticipants = [];
     users.forEach((user) => {
