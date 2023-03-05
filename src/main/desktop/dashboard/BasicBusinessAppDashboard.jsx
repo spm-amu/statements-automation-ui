@@ -531,7 +531,7 @@ const BasicBusinessAppDashboard = (props) => {
         }, "", true, false);
       }, "", true, false);
     } else {
-      loadHost("http://localhost:8080/vc", "https://svn.agilemotion.co.za");
+      loadHost("http://localhost:8080/vc", "http://localhost:8000");
     }
   }, []);
 

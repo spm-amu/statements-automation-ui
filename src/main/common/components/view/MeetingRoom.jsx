@@ -497,12 +497,12 @@ const MeetingRoom = (props) => {
         .catch(e => {
           console.log(e)
         });
-    }
 
-    emitSystemEvent("SHARE_SCREEN", {
-      shared: screenShared,
-      userId: appManager.getUserDetails().userId
-    });
+      emitSystemEvent("SHARE_SCREEN", {
+        shared: screenShared,
+        userId: appManager.getUserDetails().userId
+      });
+    }
   }, [screenShared]);
 
   useEffect(() => {
