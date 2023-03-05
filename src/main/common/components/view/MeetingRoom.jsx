@@ -326,15 +326,15 @@ const MeetingRoom = (props) => {
         }
       }
     } else if (payload.systemEventType === "HOST_CHANGED_AV_SETTINGS") {
-      if(payload.data.userId === appManager.getUserDetails().userId) {
+      if (payload.data.userId === appManager.getUserDetails().userId) {
         setAudioMuted(payload.data.audioMuted);
         setVideoMuted(payload.data.videoMuted);
 
-        if(payload.data.audioMuted) {
+        if (payload.data.audioMuted) {
           handleMessageArrived({
             message: "You have been muted by the meeting host"
           })
-        } else if(payload.data.videoMuted) {
+        } else if (payload.data.videoMuted) {
           handleMessageArrived({
             message: "Your video has been turned off by the meeting host"
           })
@@ -500,7 +500,7 @@ const MeetingRoom = (props) => {
         });
     }
 
-    if(!Utils.isNull(screenShared)) {
+    if (!Utils.isNull(screenShared)) {
       emitSystemEvent("SHARE_SCREEN", {
         shared: screenShared,
         userId: appManager.getUserDetails().userId
@@ -541,9 +541,7 @@ const MeetingRoom = (props) => {
           shareStream: item.shareStream
         };
 
-        participants.push(user);
-        setParticipants([].concat(participants));
-        //setParticipants((participants) => [...participants, user]);
+        setParticipants((participants) => [...participants, user]);
         setAllUserParticipantsLeft(false);
         if (step === Steps.LOBBY) {
           setStep(Steps.SESSION);
@@ -555,7 +553,7 @@ const MeetingRoom = (props) => {
   };
 
   const createParticipants = (users, socket) => {
-  console.log("ALL_USERS received and creating participants : ", users)
+    console.log("ALL_USERS received and creating participants : ", users)
     socketManager.clearUserToPeerMap();
     let newParticipants = [];
     users.forEach((user) => {
