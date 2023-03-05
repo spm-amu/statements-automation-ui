@@ -163,7 +163,7 @@ const MeetingParticipantGrid = (props) => {
                         height: "120px",
                         maxHeight: "120px",
                         minWidth: "200px",
-                        marginRight: '8px'
+                        padding: '4px'
                       }}>
             <MeetingParticipant data={participant}
                                 refChangeHandler={
