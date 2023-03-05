@@ -574,7 +574,7 @@ const MeetingRoom = (props) => {
           newParticipants.push(user);
 
           if (newParticipants.length === socketManager.userPeerMap.length) {
-            setParticipants(newParticipants);
+            setParticipants(newParticipants.concat(participants));
             setAllUserParticipantsLeft(false);
             if (socketManager.userPeerMap.length > 0) {
               if (step === Steps.LOBBY) {
@@ -601,7 +601,8 @@ const MeetingRoom = (props) => {
     if (isHost && autoPermit === false) {
       acceptUser(item);
     } else {
-      setLobbyWaitingList(lobbyWaitingList.concat([item]));
+      lobbyWaitingList.push(item);
+      setLobbyWaitingList([].concat(lobbyWaitingList));
     }
   };
 
