@@ -541,7 +541,9 @@ const MeetingRoom = (props) => {
           shareStream: item.shareStream
         };
 
-        setParticipants((participants) => [...participants, user]);
+        participants.push(user);
+        setParticipants([].concat(participants));
+        //setParticipants((participants) => [...participants, user]);
         setAllUserParticipantsLeft(false);
         if (step === Steps.LOBBY) {
           setStep(Steps.SESSION);
