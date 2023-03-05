@@ -298,11 +298,12 @@ class SocketManager {
     return promise;
   };
 
-  endCall = (isDirect = false, caller = null) => {
+  endCall = (isDirect = false, caller = null, roomId) => {
     if (this.socket) {
       this.emitEvent(MessageType.END_CALL, {
         callerID: isDirect && caller ? caller.socketId : this.socket.id,
-        direct: isDirect
+        direct: isDirect,
+        roomID: roomId
       });
     }
   };

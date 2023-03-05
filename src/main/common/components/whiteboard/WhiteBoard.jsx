@@ -266,6 +266,7 @@ const WhiteBoard = (props) => {
                   <IconButton component="span"
                               disabled={selectedItem === null || props.readOnly}
                               variant={'contained'}
+                              style={{color: 'white'}}
                               size="large"
                               onClick={handleDelete}
                   >
@@ -276,6 +277,7 @@ const WhiteBoard = (props) => {
                     <IconButton component="span"
                                 disabled={props.items.length === 0}
                                 variant={'contained'}
+                                style={{color: 'white'}}
                                 size="large"
                                 onClick={handleSave}
                     >

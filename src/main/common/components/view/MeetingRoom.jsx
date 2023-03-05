@@ -802,7 +802,7 @@ const MeetingRoom = (props) => {
 
   const endCall = () => {
     if (currentUserStream.obj) {
-      socketManager.endCall(isDirectCall, callerUser);
+      socketManager.endCall(isDirectCall, callerUser, selectedMeeting.id);
     }
 
     closeStreams();
