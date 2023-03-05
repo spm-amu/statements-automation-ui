@@ -185,6 +185,7 @@ const MeetingRoom = (props) => {
     selectedMeeting,
     userToCall,
     isDirectCall,
+    isRequestToJoin,
     callerUser
   } = props;
 
@@ -682,7 +683,7 @@ const MeetingRoom = (props) => {
         MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD,
         MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT);
 
-      if (isHost || isDirectCall) {
+      if (isHost || isDirectCall || isRequestToJoin) {
         join();
       } else {
         askForPermission();
