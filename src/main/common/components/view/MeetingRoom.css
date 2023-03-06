@@ -6,8 +6,8 @@
 
 .closable-panel-container {
   width: 25%;
-  height: 98%;
-  margin: 0 8px;
+  height: 96%;
+  margin: 16px;
 }
 
 .workspace-max {
@@ -149,6 +149,7 @@
   padding-right: 0;
   margin-left: 16px !important;
   margin-right: 16px !important;
+  background-color: black;
 }
 
 #meeting-description {
