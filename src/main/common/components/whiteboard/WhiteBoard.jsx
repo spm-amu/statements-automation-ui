@@ -318,7 +318,7 @@ const WhiteBoard = (props) => {
                   <div style={{
                     border: "1px solid #e1e1e1",
                     borderRadius: "4px",
-                    margin: "0 12px",
+                    margin: "4px 12px",
                     height: "100%",
                     width: "calc(100% - 310px)",
                     backgroundColor: '#FFFFFF'
