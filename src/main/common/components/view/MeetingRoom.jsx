@@ -1043,6 +1043,9 @@ const MeetingRoom = (props) => {
                                     filtered[0][property] = item[property];
                                   }
                                 }
+                              },
+                              onSystemEvent: (eventType, data) => {
+                                emitSystemEvent(eventType, data);
                               }
                             }
                           }/>

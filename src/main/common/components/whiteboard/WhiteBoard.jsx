@@ -80,6 +80,7 @@ const WhiteBoard = (props) => {
   const classes = useStyles();
   const idCounter = useRef(0);
   const [systemEventHandler] = useState({});
+  const [socketEventHandler] = useState({});
   const [designData] = React.useState({
     items: [
       {
@@ -91,6 +92,22 @@ const WhiteBoard = (props) => {
   });
   const [grabbedItem, setGrabbedItem] = React.useState(null);
   const [selectedItem, setSelectedItem] = React.useState(null);
+
+  const socketEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'whiteboard-socket-event-handler-api';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case MessageType.SYSTEM_EVENT:
+            handleSocketSystemEvent(be.payload);
+            break;
+        }
+      }
+    }
+  };
+
   const systemEventHandlerApi = () => {
     return {
       get id() {
@@ -106,6 +123,23 @@ const WhiteBoard = (props) => {
     }
   };
 
+  const handleSocketSystemEvent = (payload) => {
+    if (payload.systemEventType === "WHITEBOARD_ITEM_EDIT_START") {
+      console.log("SOCKET SYSTEM EVENT : ", payload);
+    } else if (payload.systemEventType === "WHITEBOARD_ITEM_EDIT_START") {
+      console.log("SOCKET SYSTEM EVENT : ", payload);
+    }
+  };
+
+  const itemFocusHandler = (item, focused) => {
+    props.eventHandler.onSystemEvent(focused ? "WHITEBOARD_ITEM_EDIT_START" : "WHITEBOARD_ITEM_EDIT_START_END",
+      {
+        itemId: item.id,
+        editor: appManager.getUserDetails().name
+      }
+    )
+  };
+
   const handleEvent = (data) => {
     switch (data.eventType) {
       case "INPUT_VALUE_CHANGE":
@@ -116,7 +150,7 @@ const WhiteBoard = (props) => {
         //data.metadata.style.top = (50 + parseFloat(data.metadata.style.top.replace('px', ''))) + 'px';
         eventHandler.createNode(data.metadata, (id) => {
           setSelectedItem(id);
-        }, props.readOnly, false);
+        }, itemFocusHandler, props.readOnly);
 
         props.eventHandler.onAddItem(data.metadata);
         break;
@@ -135,21 +169,24 @@ const WhiteBoard = (props) => {
 
   useEffect(() => {
     systemEventHandler.api = systemEventHandlerApi();
+    socketEventHandler.api = socketEventHandlerApi();
   });
 
   React.useEffect(() => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.WHITEBOARD_EVENT_ARRIVED);
+    socketManager.addSubscriptions(socketEventHandler, MessageType.SYSTEM_EVENT);
 
     eventHandler.setId(props.id);
 
     for (const item of props.items) {
       eventHandler.createNode(item, (id) => {
         setSelectedItem(id);
-      }, props.readOnly, false);
+      }, itemFocusHandler, props.readOnly);
     }
 
     return () => {
       appManager.removeSubscriptions(systemEventHandler);
+      socketManager.removeSubscriptions(socketEventHandler);
     };
   }, []);
 
@@ -239,7 +276,7 @@ const WhiteBoard = (props) => {
           setSelectedItem(id);
         }, (item) => {
           props.eventHandler.onAddItem(item);
-        });
+        }, itemFocusHandler);
     }
 
     setGrabbedItem(null);

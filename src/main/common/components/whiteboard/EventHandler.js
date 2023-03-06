@@ -113,7 +113,7 @@ export default class EventHandler {
     })
   };
 
-  createNode = (metadata, selectionHandler, readOnly = false, test = false) => {
+  createNode = (metadata, selectionHandler, focusHandler, readOnly = false) => {
     let dropTarget = document.getElementsByClassName('dropTarget')[0];
 
     if (dropTarget) {
@@ -149,12 +149,20 @@ export default class EventHandler {
         node.style.border = 'none';
       }
 
-      if(!test && !readOnly) {
+      if(!readOnly) {
         node.addEventListener('dragend', (event) => this.handleItemDrop(event, dropTarget), false);
         node.addEventListener('mousemove', (event) => this.handleItemMouseMove(event, dropTarget), false);
         node.addEventListener('mouseout', this.handleItemMouseOut, false);
         node.addEventListener('mouseup', (event) => this.handleItemMouseClick(node, metadata.id, selectionHandler), false);
         node.addEventListener('keyup', (event) => this.handleInputValueChange(event), false);
+        node.addEventListener('focus', (event) => {
+          focusHandler(metadata, true);
+          event.preventDefault();
+        }, false);
+        node.addEventListener('focusout', (event) => {
+          focusHandler(metadata, false);
+          event.preventDefault();
+        }, false);
       }
 
       dropTarget.appendChild(node);
@@ -163,7 +171,7 @@ export default class EventHandler {
     }
   };
 
-  handleGrabRelease = (event, props, selectionHandler, successHandler) => {
+  handleGrabRelease = (event, props, selectionHandler, successHandler, focusHandler) => {
     let width = props.width;
     let height = props.height;
 
@@ -185,7 +193,7 @@ export default class EventHandler {
       }
     };
 
-    this.selectedNode = this.createNode(nodeMetadata, selectionHandler);
+    this.selectedNode = this.createNode(nodeMetadata, selectionHandler, focusHandler);
     this.setSelectedInitNodePos();
 
     socketManager.emitEvent(MessageType.WHITEBOARD_EVENT, {
