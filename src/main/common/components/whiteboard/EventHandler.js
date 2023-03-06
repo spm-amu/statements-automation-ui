@@ -96,7 +96,21 @@ export default class EventHandler {
 
   updateInputItemValue(metadata) {
     let elementById = document.getElementById(metadata.id);
-    elementById.value = metadata.value;
+    elementById.value = metadata.value + elementById.getAttribute("editorTip");
+  }
+
+  lockItem(id, editor) {
+    let elementById = document.getElementById(id);
+    elementById.value = elementById.value + " - [" + editor + " - is editing]";
+    elementById.setAttribute("editorTip", " - [" + editor + " - is editing]");
+    elementById.setAttribute("readOnly", true);
+  }
+
+  unLockItem(id, editor) {
+    let elementById = document.getElementById(id);
+    elementById.value = elementById.value.replace(" - [" + editor + " - is editing]", "");
+    elementById.setAttribute("editorTip", "");
+    elementById.setAttribute("readOnly", false);
   }
 
   handleInputValueChange = (event) => {
@@ -118,7 +132,6 @@ export default class EventHandler {
 
     if (dropTarget) {
       let node = document.createElement(metadata.type);
-
       node.value = "TEXT";
       const properties = Object.getOwnPropertyNames(metadata);
       for (const property of properties) {
@@ -142,11 +155,7 @@ export default class EventHandler {
       }
 
       if(readOnly) {
-        node.setAttribute("readOnly", true);
-        node.setAttribute("disabled", true);
-        node.style.backgroundColor = '#FFFFFF';
-        node.style.outline = 'none';
-        node.style.border = 'none';
+        this.makeNodeReadOnly(node);
       }
 
       if(!readOnly) {
@@ -166,10 +175,23 @@ export default class EventHandler {
       }
 
       dropTarget.appendChild(node);
-
       return node;
     }
   };
+
+  makeNodeReadOnly(node, readOnly = true) {
+    node.setAttribute("readOnly", readOnly);
+    node.setAttribute("disabled", readOnly);
+
+    if(readOnly) {
+      node.style.backgroundColor = '#FFFFFF';
+      node.style.outline = 'none';
+      node.style.border = 'none';
+    } else {
+      node.style.outline = 'default';
+      node.style.border = 'default';
+    }
+  }
 
   handleGrabRelease = (event, props, selectionHandler, successHandler, focusHandler) => {
     let width = props.width;

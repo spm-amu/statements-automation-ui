@@ -125,9 +125,9 @@ const WhiteBoard = (props) => {
 
   const handleSocketSystemEvent = (payload) => {
     if (payload.systemEventType === "WHITEBOARD_ITEM_EDIT_START") {
-      console.log("SOCKET SYSTEM EVENT : ", payload);
-    } else if (payload.systemEventType === "WHITEBOARD_ITEM_EDIT_START") {
-      console.log("SOCKET SYSTEM EVENT : ", payload);
+      eventHandler.lockItem(payload.data.itemId, payload.data.editor);
+    } else if (payload.systemEventType === "WHITEBOARD_ITEM_EDIT_START_END") {
+      eventHandler.unLockItem(payload.data.itemId, payload.data.editor);
     }
   };
 
