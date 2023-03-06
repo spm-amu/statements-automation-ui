@@ -8,7 +8,6 @@ import IconButton from "@material-ui/core/IconButton";
 
 const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
-  const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
 
   const videoRef = useRef();
   const showVideo = true;
@@ -38,7 +37,7 @@ const MeetingParticipant = (props) => {
         videoRef.current.srcObject = props.userStream;
       }
     }
-  }, [videoRef.current]);
+  }, [videoRef.current, props.userStream]);
 
   return (
     <div className={'col-*-* meeting-participant-container'}

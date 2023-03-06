@@ -129,6 +129,7 @@ const MeetingParticipantGrid = (props) => {
                                   onHostAudioMute={() => props.onHostAudioMute(participant)}
                                   onHostVideoMute={() => props.onHostVideoMute(participant)}
                                   showName={!participant.isCurrentUser}
+                                  userStream={userStream}
                                   videoMuted={participant.videoMuted}
                                   isHost={isHost}
                                   audioMuted={participant.audioMuted}/>
