@@ -5,7 +5,7 @@ import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from '@material-ui/core/Tooltip';
 import {ListItemIcon, Menu, MenuItem} from '@material-ui/core';
-import {Note, PersonAdd} from '@material-ui/icons';
+import { GroupAdd, Note, PersonAdd } from '@material-ui/icons';
 import LottieIcon from '../LottieIcon';
 
 const Toolbar = (props) => {
@@ -133,99 +133,109 @@ const Toolbar = (props) => {
       {
         step === 'SESSION_ENDED' ?
           <div className={'row centered-flex-box'}>
-            <IconButton
-              onClick={() => {
-                closeWindow();
-              }}
-              style={{
-                backgroundColor: '#eb3f21',
-                color: 'white',
-                marginRight: '4px'
-              }}
-            >
-              <Icon id={'CLOSE'}/>
-            </IconButton>
+            <Tooltip title="Close">
+              <IconButton
+                onClick={() => {
+                  closeWindow();
+                }}
+                style={{
+                  backgroundColor: '#eb3f21',
+                  color: 'white',
+                  marginRight: '4px'
+                }}
+              >
+                <Icon id={'CLOSE'}/>
+              </IconButton>
+            </Tooltip>
           </div>
           :
           <div className={'row centered-flex-box'}>
             {
               isHost && step === 'SESSION' &&
-              <IconButton
-                onClick={() => {
-                  toggleRecorder();
-                }}
-                style={{
-                  backgroundColor: isRecording ? 'white' : '#404239',
-                  color: 'white',
-                  marginRight: '4px'
-                }}
-              >
-                {
-                  isRecording ? <LottieIcon id={'recording'}/> : <Icon id={'RECORD'}/>
-                }
-              </IconButton>
+              <Tooltip title="Record">
+                <IconButton
+                  onClick={() => {
+                    toggleRecorder();
+                  }}
+                  style={{
+                    backgroundColor: isRecording ? 'white' : '#404239',
+                    color: 'white',
+                    marginRight: '4px'
+                  }}
+                >
+                  {
+                    isRecording ? <LottieIcon id={'recording'}/> : <Icon id={'RECORD'}/>
+                  }
+                </IconButton>
+              </Tooltip>
             }
             {
               step === 'SESSION' &&
-              <IconButton
-                onClick={() => {
-                  muteVideo();
-                }}
-                style={{
-                  backgroundColor: videoMuted ? "#eb3f21" : "#404239",
-                  color: 'white',
-                  marginRight: '4px'
-                }}
-              >
-                {videoMuted ? (
-                  <Icon id={'VIDEOCAM_OFF'}/>
-                ) : (
-                  <Icon id={'VIDEOCAM'}/>
-                )}
-              </IconButton>
+              <Tooltip title="Video">
+                <IconButton
+                  onClick={() => {
+                    muteVideo();
+                  }}
+                  style={{
+                    backgroundColor: videoMuted ? "#eb3f21" : "#404239",
+                    color: 'white',
+                    marginRight: '4px'
+                  }}
+                >
+                  {videoMuted ? (
+                    <Icon id={'VIDEOCAM_OFF'}/>
+                  ) : (
+                    <Icon id={'VIDEOCAM'}/>
+                  )}
+                </IconButton>
+              </Tooltip>
             }
             {
               step === 'SESSION' &&
-              <IconButton
-                onClick={() => {
-                  muteAudio();
-                }}
-                style={{
-                  backgroundColor: audioMuted ? "#eb3f21" : "#404239",
-                  color: 'white',
-                  marginRight: '4px'
-                }}
-              >
-                {audioMuted ? (
-                  <Icon id={'MIC_OFF'}/>
-                ) : (
-                  <Icon id={'MIC'}/>
-                )}
-              </IconButton>
+              <Tooltip title="Audio">
+                <IconButton
+                  onClick={() => {
+                    muteAudio();
+                  }}
+                  style={{
+                    backgroundColor: audioMuted ? "#eb3f21" : "#404239",
+                    color: 'white',
+                    marginRight: '4px'
+                  }}
+                >
+                  {audioMuted ? (
+                    <Icon id={'MIC_OFF'}/>
+                  ) : (
+                    <Icon id={'MIC'}/>
+                  )}
+                </IconButton>
+              </Tooltip>
             }
             {" "}
             {
               step === 'SESSION' && displayState === 'MAXIMIZED' && !whiteBoardShown && !someoneSharing &&
-              <IconButton
-                onClick={() => {
-                  if (screenShared) {
-                    stopShareScreen();
-                  } else {
-                    shareScreen();
-                  }
-                }}
-                style={{
-                  backgroundColor: screenShared ? '#8eb2f5' : '#404239',
-                  color: 'white',
-                  marginRight: '4px'
-                }}
-              >
-                {screenShared ? (
-                  <Icon id={'CANCEL_PRESENTATION'}/>
-                ) : (
-                  <Icon id={'PRESENT_TO_ALL'}/>
-                )}
-              </IconButton>
+              <Tooltip title="Share">
+                <IconButton
+                  onClick={() => {
+                    if (screenShared) {
+                      stopShareScreen();
+                    } else {
+                      shareScreen();
+                    }
+                  }}
+                  style={{
+                    backgroundColor: screenShared ? '#8eb2f5' : '#404239',
+                    color: 'white',
+                    marginRight: '4px'
+                  }}
+                >
+                  {screenShared ? (
+                    <Icon id={'CANCEL_PRESENTATION'}/>
+                  ) : (
+                    <Icon id={'PRESENT_TO_ALL'}/>
+                  )}
+                </IconButton>
+              </Tooltip>
             }
             {
               step === 'SESSION' && displayState === 'MAXIMIZED' &&
@@ -234,28 +244,32 @@ const Toolbar = (props) => {
                   hasUnreadChats &&
                   <div className={'unread-dot'}/>
                 }
-                <IconButton
-                  style={{
-                    backgroundColor: '#404239',
-                    color: 'white',
-                    marginRight: '4px'
-                  }}
-                  onClick={(e) => showChat()}
-                >
-                  <Icon id={'CHAT_BUBBLE'}/>
-                </IconButton>
+                <Tooltip title="Chat">
+                  <IconButton
+                    style={{
+                      backgroundColor: '#404239',
+                      color: 'white',
+                      marginRight: '4px'
+                    }}
+                    onClick={(e) => showChat()}
+                  >
+                    <Icon id={'CHAT_BUBBLE'}/>
+                  </IconButton>
+                </Tooltip>
               </div>
             }
-            <IconButton
-              onClick={endCall}
-              style={{
-                backgroundColor: '#eb3f21',
-                color: 'white',
-                marginRight: '4px'
-              }}
-            >
-              <Icon id={'CALL_END'}/>
-            </IconButton>
+            <Tooltip title="Call">
+              <IconButton
+                onClick={endCall}
+                style={{
+                  backgroundColor: '#eb3f21',
+                  color: 'white',
+                  marginRight: '4px'
+                }}
+              >
+                <Icon id={'CALL_END'}/>
+              </IconButton>
+            </Tooltip>
             {
               step === 'SESSION' && displayState === 'MAXIMIZED' &&
               <div>
@@ -263,16 +277,18 @@ const Toolbar = (props) => {
                   participants.length > 1 &&
                   <div className={'people-count-bubble'}>{participants.length}</div>
                 }
-                <IconButton
-                  onClick={(e) => showPeople()}
-                  style={{
-                    backgroundColor: '#404239',
-                    color: 'white',
-                    marginRight: '4px'
-                  }}
-                >
-                  <Icon id={'PEOPLE'}/>
-                </IconButton>
+                <Tooltip title="People">
+                  <IconButton
+                    onClick={(e) => showPeople()}
+                    style={{
+                      backgroundColor: '#404239',
+                      color: 'white',
+                      marginRight: '4px'
+                    }}
+                  >
+                    <Icon id={'PEOPLE'}/>
+                  </IconButton>
+                </Tooltip>
               </div>
             }
             {
@@ -282,22 +298,24 @@ const Toolbar = (props) => {
                   participantsRaisedHands.length > 0 &&
                   <div className={'people-count-bubble'}>{participantsRaisedHands.length}</div>
                 }
-                <IconButton
-                  onClick={(e) => {
-                    if (handRaised) {
-                      lowerHand();
-                    } else {
-                      raiseHand();
-                    }
-                  }}
-                  style={{
-                    backgroundColor: '#404239',
-                    color: handRaised ? '#e2b030' : 'white',
-                    marginRight: '4px'
-                  }}
-                >
-                  <Icon id={'PAN_TOOL'}/>
-                </IconButton>
+                <Tooltip title="Raise hand">
+                  <IconButton
+                    onClick={(e) => {
+                      if (handRaised) {
+                        lowerHand();
+                      } else {
+                        raiseHand();
+                      }
+                    }}
+                    style={{
+                      backgroundColor: '#404239',
+                      color: handRaised ? '#e2b030' : 'white',
+                      marginRight: '4px'
+                    }}
+                  >
+                    <Icon id={'PAN_TOOL'}/>
+                  </IconButton>
+                </Tooltip>
               </div>
             }
             {
