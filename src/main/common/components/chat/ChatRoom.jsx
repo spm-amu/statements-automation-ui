@@ -13,7 +13,7 @@ import LottieIcon from '../LottieIcon';
 import {Calendar} from 'react-feather';
 import Utils from '../../Utils';
 import socketManager from '../../service/SocketManager';
-import {MessageType} from '../../types';
+import { MessageType, SystemEventType } from '../../types';
 import appManager from "../../../common/service/AppManager";
 import {GroupAdd, Info, Poll} from '@material-ui/icons';
 import AutoComplete from '../customInput/AutoComplete';
@@ -129,10 +129,19 @@ const ChatRoom = (props) => {
     }
   };
 
-  const onDownload = (documentId) => {
+  const onDownload = (document) => {
+    let documentFileUrl = '';
+
+    if (document.id) {
+      documentFileUrl = `${appManager.getAPIHost()}/api/v1/document/download/${document.id}`;
+    } else {
+      const encodedDocumentLocation = encodeURIComponent(document.location);
+      documentFileUrl = `${appManager.getAPIHost()}/api/v1/document/download/location?documentLocation=${encodedDocumentLocation}`
+    }
+
     electron.ipcRenderer.sendMessage('downloadFile', {
       payload: {
-        fileURL: `${appManager.getAPIHost()}/api/v1/document/download/${documentId}`,
+        fileURL: documentFileUrl,
       },
     });
   };
@@ -214,6 +223,14 @@ const ChatRoom = (props) => {
       let mType = 'TEXT';
 
       if (document && document.length > 0) {
+        if (parseInt(document[0].size) > 7500000) {
+          appManager.fireEvent(SystemEventType.API_ERROR, {
+            message: 'Attachment should be not more than 7.5MB.'
+          });
+
+          return;
+        }
+
         mType = 'FILE';
       } else if (poll) {
         mType = 'POLL';
@@ -422,17 +439,12 @@ const ChatRoom = (props) => {
                 renderFileThumbnail(message)
               }
               <p key={index}>{message.content}</p>
-              <div>
-                {
-                  message.document.id &&
-                  <IconButton
-                    component="span"
-                    onClick={() => onDownload(message.document.id)}
-                  >
-                    <Icon id={'DOWNLOAD'}/>
-                  </IconButton>
-                }
-              </div>
+              <IconButton
+                component="span"
+                onClick={() => onDownload(message.document)}
+              >
+                <Icon id={'DOWNLOAD'}/>
+              </IconButton>
             </div>
           </div>
         );
@@ -454,7 +466,7 @@ const ChatRoom = (props) => {
               <p key={index}>{message.content}</p>
               <IconButton
                 component="span"
-                onClick={() => onDownload(message.document.id)}
+                onClick={() => onDownload(message.document)}
               >
                 <Icon id={'DOWNLOAD'}/>
               </IconButton>

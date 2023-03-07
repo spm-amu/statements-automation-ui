@@ -23,6 +23,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
           label: file.name,
           type: file.type,
           size: file.size,
+          location: file.path,
           payload: reader.result
         };
 
@@ -56,8 +57,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
     <div className={'row'} style={{alignItems: 'center', margin: '0', width: '100%'}}>
       <div className={'col-*-*'} style={{marginLeft: '0', width: '72px'}}>
         <input
-          accept={props.style === 'IMAGE' ? "image/jpeg,image/gif,image/png,image/x-eps"
-            : "image/*,application/*"}
+          accept={"*/*"}
           id={`file-upload-input`}
           multiple={false}
           style={{display: 'none'}}
