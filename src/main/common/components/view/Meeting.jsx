@@ -292,10 +292,13 @@ const Meeting = (props) => {
   };
 
   const handleAdd = () => {
-    const meetingStartDateTime = !Utils.isNull(value.startDate) && !Utils.isNull(value.startTime) ?
-      moment(Utils.getFormattedDate(value.startDate) + " " + value.startTime.toLocaleTimeString()) : null;
-    const meetingEndDateTime = !Utils.isNull(value.endDate) && !Utils.isNull(value.endTime) ?
-      moment(Utils.getFormattedDate(value.endDate) + " " + value.endTime.toLocaleTimeString()) : null;
+    const checkStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringDtstart : value.startDate;
+    const endStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringUntil : value.endDate;
+
+    const meetingStartDateTime = !Utils.isNull(checkStartDate) && !Utils.isNull(value.startTime) ?
+      moment(Utils.getFormattedDate(checkStartDate) + " " + value.startTime.toLocaleTimeString()) : null;
+    const meetingEndDateTime = !Utils.isNull(endStartDate) && !Utils.isNull(value.endTime) ?
+      moment(Utils.getFormattedDate(endStartDate) + " " + value.endTime.toLocaleTimeString()) : null;
 
     let errorState = {
       title: Utils.isNull(value.title),
@@ -303,8 +306,10 @@ const Meeting = (props) => {
       startDate: Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
       startTime: Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
       endDate: Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime,
-      endTime: Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= (meetingStartDateTime),
-    };
+      endTime: Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime
+    }
+
+    console.log('*****: ', errorState);
 
     setErrors(errorState);
 
@@ -331,16 +336,16 @@ const Meeting = (props) => {
       getMeetingObject(_hostAttendee, isUpdate)
         .then((data) => validateAttendees(data))
         .then((data) => {
-          post(
-            `${appManager.getAPIHost()}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
-            (response) => {
-              handleClose();
-            },
-            (e) => {
-            },
-            data,
-            "The meeting details have been saved successfully"
-          );
+          // post(
+          //   `${appManager.getAPIHost()}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
+          //   (response) => {
+          //     handleClose();
+          //   },
+          //   (e) => {
+          //   },
+          //   data,
+          //   "The meeting details have been saved successfully"
+          // );
       }, () => {
       });
 
@@ -563,10 +568,13 @@ const Meeting = (props) => {
   };
 
   const validateStartAndEndtime = () => {
-    const meetingStartDateTime = !Utils.isNull(value.startDate) && !Utils.isNull(value.startTime) ?
-      moment(Utils.getFormattedDate(value.startDate) + " " + value.startTime.toLocaleTimeString()) : null;
-    const meetingEndDateTime = !Utils.isNull(value.endDate) && !Utils.isNull(value.endTime) ?
-      moment(Utils.getFormattedDate(value.endDate) + " " + value.endTime.toLocaleTimeString()) : null;
+    const checkStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringDtstart : value.startDate;
+    const endStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringUntil : value.endDate;
+
+    const meetingStartDateTime = !Utils.isNull(checkStartDate) && !Utils.isNull(value.startTime) ?
+      moment(Utils.getFormattedDate(checkStartDate) + " " + value.startTime.toLocaleTimeString()) : null;
+    const meetingEndDateTime = !Utils.isNull(endStartDate) && !Utils.isNull(value.endTime) ?
+      moment(Utils.getFormattedDate(endStartDate) + " " + value.endTime.toLocaleTimeString()) : null;
 
     return meetingStartDateTime !== null && meetingEndDateTime !== null && meetingStartDateTime.isBefore(meetingEndDateTime);
   };
@@ -912,6 +920,7 @@ const Meeting = (props) => {
                         type={'number'}
                         value={recurrence.numberOfOccurences}
                         required={true}
+                        inputProps={{ min: 0 }}
                         valueChangeHandler={(e) => {
                           console.log(e.target.value);
                           // if(e.target.value > 0 && e.target.value < 100) {
