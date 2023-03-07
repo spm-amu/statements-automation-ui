@@ -11,10 +11,15 @@ const {electron} = window;
 const MessagePreview = (props) => {
   const [messenger, setMessenger] = useState(null);
   const [initials, setInitials] = useState('');
-  const [counter, setCounter] = useState(5);
+  const [counter, setCounter] = useState(0);
+  const [startCounter, setStartCounter] = useState(false);
+
+  const countRef = useRef(counter);
+  countRef.current = counter;
 
   useEffect(() => {
     electron.ipcRenderer.on('messageViewContent', args => {
+      setStartCounter(true);
       setMessenger(args.payload);
     });
   }, []);
@@ -26,10 +31,23 @@ const MessagePreview = (props) => {
   }, [messenger]);
 
   useEffect(() => {
-    if (counter > 0) {
-      setTimeout(() => setCounter(counter - 1), 5000);
-    } else {
-      electron.ipcRenderer.sendMessage('hideMessagePreview', {});
+    let interval;
+    if (startCounter) {
+      interval = setInterval(() => {
+        let currCount = countRef.current;
+        setCounter(currCount => currCount + 1);
+        console.log('In setInterval', currCount, counter);
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [startCounter]);
+
+  useEffect(() => {
+    if (counter > 10) {
+      setCounter(0);
+      setStartCounter(false);
+      close();
     }
   }, [counter]);
 
@@ -40,9 +58,7 @@ const MessagePreview = (props) => {
   }
 
   const close = () => {
-    electron.ipcRenderer.sendMessage('hideMessagePreview', {
-      chatId: messenger.roomId
-    });
+    electron.ipcRenderer.sendMessage('hideMessagePreview', {});
   }
 
   return (
@@ -55,7 +71,7 @@ const MessagePreview = (props) => {
         {messenger.chatMessage.content}
       </div>
       <div className={'centered-flex-box w-100'} style={{height: 'calc(100% - 180px)'}}>
-        <div className={'avatar'} data-label={initials}/>
+        {/*<div className={'avatar'} data-label={initials}/>*/}
       </div>
       <div className={'centered-flex-box '} style={{marginTop: '24px'}}>
         <div style={{ padding: '8px' }}>
@@ -64,21 +80,9 @@ const MessagePreview = (props) => {
             variant="contained"
             color="primary"
             fullWidth={true}
-            style={{ float: 'right', backgroundColor: '#01476C' }}
+            style={{ float: 'center', backgroundColor: '#01476C' }}
           >
-            REPLY
-          </Button>
-        </div>
-
-        <div style={{ padding: '8px' }}>
-          <Button
-            onClick={() => close()}
-            variant="contained"
-            color="primary"
-            fullWidth={true}
-            style={{ float: 'right', backgroundColor: 'red' }}
-          >
-            CLOSE
+            READ
           </Button>
         </div>
       </div>

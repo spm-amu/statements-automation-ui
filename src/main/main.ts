@@ -95,9 +95,9 @@ const createDialWindow = () => {
   // Create the browser window.
   inComingCallWindow = new BrowserWindow({
     title: "Armscor",
-    width: 550,
+    width: 300,
     height: 300,
-    maxWidth: 550,
+    maxWidth: 300,
     maxHeight: 300,
     resizable: false,
     minimizable: false,
@@ -105,7 +105,7 @@ const createDialWindow = () => {
     fullscreenable: false,
     parent: mainWindow,
     roundedCorners: false,
-    x: screenWidth - 600,
+    x: screenWidth - 320,
     y: screenHeight - 300,
     webPreferences: {
       preload: app.isPackaged
@@ -141,9 +141,9 @@ const createAlertWindow = () => {
   // Create the browser window.
   alertWindow = new BrowserWindow({
     title: "Armscor",
-    width: 550,
+    width: 300,
     height: 300,
-    maxWidth: 550,
+    maxWidth: 300,
     maxHeight: 300,
     resizable: false,
     minimizable: false,
@@ -151,7 +151,7 @@ const createAlertWindow = () => {
     fullscreenable: false,
     parent: mainWindow,
     roundedCorners: false,
-    x: screenWidth - 600,
+    x: screenWidth - 320,
     y: screenHeight - 300,
     webPreferences: {
       preload: app.isPackaged
@@ -232,9 +232,9 @@ const createMeetingRoomWindow = () => {
 const createMessageWindow = () => {
   messageWindow = new BrowserWindow({
     title: "Armscor",
-    width: 550,
+    width: 300,
     height: 300,
-    maxWidth: 550,
+    maxWidth: 300,
     maxHeight: 300,
     resizable: false,
     minimizable: false,
@@ -242,7 +242,7 @@ const createMessageWindow = () => {
     fullscreenable: false,
     parent: mainWindow,
     roundedCorners: false,
-    x: screenWidth - 600,
+    x: screenWidth - 320,
     y: screenHeight - 300,
     webPreferences: {
       preload: app.isPackaged

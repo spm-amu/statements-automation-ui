@@ -923,14 +923,14 @@ const Meeting = (props) => {
                         inputProps={{ min: 0 }}
                         valueChangeHandler={(e) => {
                           console.log(e.target.value);
-                          // if(e.target.value > 0 && e.target.value < 100) {
-                          setRecurrence(existingValues => ({
-                            ...existingValues,
-                            numberOfOccurences: e.target.value
-                          }));
+                          if (e.target.value > 0 && e.target.value < 100) {
+                            setRecurrence(existingValues => ({
+                              ...existingValues,
+                              numberOfOccurences: e.target.value
+                            }));
 
-                          validateRecurrence();
-                          // }
+                            validateRecurrence();
+                          }
                         }}
                         errorMessage={
                           'Specify number of occurences required. Please enter a number'
