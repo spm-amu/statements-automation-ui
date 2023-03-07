@@ -336,16 +336,16 @@ const Meeting = (props) => {
       getMeetingObject(_hostAttendee, isUpdate)
         .then((data) => validateAttendees(data))
         .then((data) => {
-          // post(
-          //   `${appManager.getAPIHost()}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
-          //   (response) => {
-          //     handleClose();
-          //   },
-          //   (e) => {
-          //   },
-          //   data,
-          //   "The meeting details have been saved successfully"
-          // );
+          post(
+            `${appManager.getAPIHost()}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
+            (response) => {
+              handleClose();
+            },
+            (e) => {
+            },
+            data,
+            "The meeting details have been saved successfully"
+          );
       }, () => {
       });
 
