@@ -292,6 +292,8 @@ const Meeting = (props) => {
   };
 
   const handleAdd = () => {
+    console.log('______ V: ', value);
+
     const checkStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringDtstart : value.startDate;
     const endStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringUntil : value.endDate;
 
@@ -303,10 +305,10 @@ const Meeting = (props) => {
     let errorState = {
       title: Utils.isNull(value.title),
       attendees: value.attendees.length === 0,
-      startDate: Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
-      startTime: Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
-      endDate: Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime,
-      endTime: Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime
+      startDate: !moment(checkStartDate).isValid() || Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
+      startTime: !moment(value.startTime).isValid() || Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
+      endDate: !moment(endStartDate).isValid() || Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime,
+      endTime: !moment(value.endTime).isValid() || Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime
     }
 
     console.log('*****: ', errorState);

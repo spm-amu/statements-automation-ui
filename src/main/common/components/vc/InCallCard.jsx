@@ -8,6 +8,7 @@ import { Autorenew, Note, PersonAdd, Settings } from '@material-ui/icons';
 import Tooltip from '@material-ui/core/Tooltip';
 import { useNavigate } from 'react-router-dom';
 import appManager from "../../service/AppManager";
+import Utils from '../../Utils';
 
 const InCall = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -38,6 +39,16 @@ const InCall = (props) => {
     setAnchorEl(null);
   };
 
+  const computeParticipantName = () => {
+    let name = participant.name;
+
+    if (Utils.isNull(participant.userId)) {
+      name = `${name} (Guest)`;
+    }
+
+    return name;
+  }
+
   return (
     <div
       className={'col person-card-wrapper'}
@@ -57,7 +68,7 @@ const InCall = (props) => {
               style={{borderRadius: '50%'}}
             />
           </div>
-          <div className={'col user-details'}>{participant.name}</div>
+          <div className={'col user-details'}>{ computeParticipantName() }</div>
           <div style={{
             marginTop: '4px',
             marginLeft: '0',
@@ -147,7 +158,10 @@ const InCall = (props) => {
               anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
             >
 
-              <MenuItem onClick={() => props.onChangeMeetingHostHandler(participant)}>
+              <MenuItem
+                disabled={Utils.isNull(participant.userId)}
+                onClick={() => props.onChangeMeetingHostHandler(participant)}
+              >
                 <ListItemIcon>
                   <PersonAdd fontSize="small" />
                 </ListItemIcon>
