@@ -383,19 +383,10 @@ const MeetingRoom = (props) => {
         name: selectedMeeting.title,
         type: blob.type,
         size: blob.size,
-        payload: result
+        recordedData: result
       };
 
-      post(
-        `${appManager.getAPIHost()}/api/v1/document/saveToFile`,
-        (response) => {
-        },
-        (e) => {
-        },
-        data,
-        '',
-        false
-      );
+      socketManager.emitEvent(MessageType.SAVE_RECORDING, data);
     }
   };
 
