@@ -149,14 +149,12 @@ class SocketManager {
       }
     });
 
-
     peer.on('signal', (signal) => {
       this.socket.emit(MessageType.SENDING_SIGNAL, {
         userToSignal,
-        callerID: this.socket.id,
+        callerId: userDetails.userId,
         signal,
         name: userDetails.name,
-        userAlias: userDetails.userId,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
         audioMuted: audioMuted,
         videoMuted: videoMuted,
@@ -217,7 +215,7 @@ class SocketManager {
     peer.on('signal', (signal) => {
       this.socket.emit(MessageType.RETURNING_SIGNAL, {
         signal,
-        callerID: callerId,
+        callerId: callerId,
         audioMuted: audioMuted,
         videoMuted: videoMuted,
         mainStreamId: stream.obj.id,
@@ -268,8 +266,8 @@ class SocketManager {
   };
 
   mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted) => {
-    const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.id, stream, audioMuted, videoMuted) :
-      this.addPeer(payload.callerID, stream, audioMuted, videoMuted);
+    const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.userId, stream, audioMuted, videoMuted) :
+      this.addPeer(payload.userId, stream, audioMuted, videoMuted);
 
     let item = {
       peer: peer,

@@ -62,9 +62,10 @@ const MeetingParticipant = (props) => {
                   <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
                        style={
                          {
-                           width: props.sizing === 'sm' ? '64px' : null,
-                           height: props.sizing === 'sm' ? '64px' : null,
-                           fontSize: props.sizing === 'sm' ? '14px' : null
+                           width: props.sizing === 'sm' ? '52px' : null,
+                           height: props.sizing === 'sm' ? '52px' : null,
+                           fontSize: props.sizing === 'sm' ? '14px' : null,
+                           marginBottom: props.sizing === 'sm' ? '16px' : null
                          }
                        }/>
                 </div>
