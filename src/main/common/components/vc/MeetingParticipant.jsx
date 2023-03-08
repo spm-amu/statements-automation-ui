@@ -39,6 +39,16 @@ const MeetingParticipant = (props) => {
     }
   }, [videoRef.current, props.userStream]);
 
+  const computeParticipantName = () => {
+    let name = props.data.name;
+
+    if (Utils.isNull(props.data.userId)) {
+      name = `${name} (Guest)`;
+    }
+
+    return name;
+  }
+
   return (
     <div className={'col-*-* meeting-participant-container'}
          style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null}}>
@@ -76,7 +86,7 @@ const MeetingParticipant = (props) => {
               }
 
               <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}>
-                {props.showName ? props.data.name : 'You'}
+                {props.showName ? computeParticipantName() : 'You'}
                 {
                   props.showName &&
                   <span style={{marginLeft: '4px'}}>

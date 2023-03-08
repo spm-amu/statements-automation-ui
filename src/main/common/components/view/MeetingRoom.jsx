@@ -609,7 +609,7 @@ const MeetingRoom = (props) => {
 
   const askForPermission = () => {
     let userDetails = appManager.getUserDetails();
-    const userAlias = userDetails.userId;
+    const userAlias = Utils.isNull(userDetails.userId) ? `${userDetails.name} (Guest)` : userDetails.userId;
     socketManager.emitEvent(MessageType.PERMISSION, {
       user: userAlias,
       room: selectedMeeting.id,
