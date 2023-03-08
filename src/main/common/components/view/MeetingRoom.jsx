@@ -595,8 +595,8 @@ const MeetingRoom = (props) => {
   const addUserToLobby = (data) => {
     permitAudio.play();
     let item = {
-      user: data.userAlias,
-      socketId: data.id
+      user: data.userId,
+      socketId: data.socketId
     };
 
     if (isHost && autoPermit === false) {
