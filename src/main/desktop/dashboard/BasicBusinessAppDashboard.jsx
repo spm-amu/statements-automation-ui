@@ -27,7 +27,7 @@ const {electron} = window;
 
 let ps;
 
-const MODE = "DEBUG";
+const MODE = "PROD";
 const newMessageAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/message.mp3');
 
 const BasicBusinessAppDashboard = (props) => {
