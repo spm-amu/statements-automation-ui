@@ -278,9 +278,9 @@ const MeetingRoom = (props) => {
 
   const removeUser = (user) => {
     if (selectedMeeting.id === user.meetingId) {
-      socketManager.removeFromUserToPeerMap(user.id);
+      socketManager.removeFromUserToPeerMap(user.socketId);
 
-      const userId = user.alias;
+      const userId = user.userId;
       const newParticipants = participants.filter((p) => p.userId !== userId);
 
       if (newParticipants.length === 1 && isDirectCall) {

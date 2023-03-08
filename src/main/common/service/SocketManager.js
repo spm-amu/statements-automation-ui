@@ -233,7 +233,7 @@ class SocketManager {
 
   removeFromUserToPeerMap = (id) => {
     //this.destroyPeer(id);
-    let filtered = this.userPeerMap.filter((item) => item.user.id !== id);
+    let filtered = this.userPeerMap.filter((item) => item.user.socketId !== id);
     this.userPeerMap.splice(0, this.userPeerMap.length);
 
     for (const filteredElement of filtered) {
@@ -250,10 +250,6 @@ class SocketManager {
   };
 
   signal = (payload) => {
-    console.log("\n\n\\n\n\n\n========================== SIGNAL");
-    console.log(payload);
-    console.log(this.userPeerMap);
-
     const item = this.userPeerMap.find((p) => p.user.socketId === payload.socketId);
     item.peer.signal(payload.signal);
   };
@@ -267,9 +263,6 @@ class SocketManager {
       peer: peer,
       user: payload
     };
-
-    console.log("\n\n\n\n================================ PAYLOAD");
-    console.log(payload);
 
     this.userPeerMap.push(item);
     let promise = new Promise((resolve, reject) => {
