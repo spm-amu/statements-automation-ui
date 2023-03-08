@@ -145,9 +145,9 @@ class SocketManager {
     peer.on('signal', (signal) => {
       this.socket.emit(MessageType.SENDING_SIGNAL, {
         userToSignal,
-        callerId: userDetails.userId,
+        signallerUserId: userDetails.userId,
         signal,
-        name: userDetails.name,
+        signallerName: userDetails.name,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
         audioMuted: audioMuted,
         videoMuted: videoMuted,
