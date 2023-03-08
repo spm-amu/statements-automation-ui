@@ -530,8 +530,8 @@ const MeetingRoom = (props) => {
       .then((item) => {
         console.log("ADD USER : ", payload);
         let user = {
-          peerID: item.user.callerID,
-          userId: item.user.userAlias,
+          peerID: item.user.callerSocketId,
+          userId: item.user.userId,
           peer: item.peer,
           name: item.user.name,
           avatar: item.user.avatar,
@@ -562,7 +562,7 @@ const MeetingRoom = (props) => {
           console.log("ADDING ITEM TO PARTICIPANTS : ", item);
 
           let user = {
-            userId: item.user.userAlias,
+            userId: item.user.userId,
             peer: item.peer,
             name: item.user.name,
             avatar: item.user.avatar,

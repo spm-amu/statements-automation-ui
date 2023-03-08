@@ -133,21 +133,14 @@ class SocketManager {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj],
-      config: appManager.isOnline() ?
-        {
-          iceServers: [
-            {urls: 'stun:stun.l.google.com:19302'},
-            {urls: 'stun:stun1.l.google.com:19302'},
-            {urls: 'stun:stun2.l.google.com:19302'},
-            {urls: 'stun:stun3.l.google.com:19302'},
-            {urls: 'stun:stun4.l.google.com:19302'}]
-        }
-        :
-        {
+      streams: [stream.obj, stream.shareScreenObj]
+    });
+
+    if(!appManager.isOnline()) {
+      opts.config = {
         iceServers: []
       }
-    });
+    }
 
     peer.on('signal', (signal) => {
       this.socket.emit(MessageType.SENDING_SIGNAL, {
@@ -164,6 +157,7 @@ class SocketManager {
     });
 
     peer.on('close', () => {
+      alert("Connection closed")
     });
 
     return peer;
@@ -193,25 +187,19 @@ class SocketManager {
   };
 
   addPeer(callerId, stream, audioMuted, videoMuted) {
-    const peer = new Peer({
+    let opts = {
       initiator: false,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj],
-      config: appManager.isOnline() ?
-        {
-          iceServers: [
-            {urls: 'stun:stun.l.google.com:19302'},
-            {urls: 'stun:stun1.l.google.com:19302'},
-            {urls: 'stun:stun2.l.google.com:19302'},
-            {urls: 'stun:stun3.l.google.com:19302'},
-            {urls: 'stun:stun4.l.google.com:19302'}]
-        }
-        :
-        {
-          iceServers: []
-        }
-    });
+      streams: [stream.obj, stream.shareScreenObj]
+    };
 
+    if(!appManager.isOnline()) {
+      opts.config = {
+        iceServers: []
+      }
+    }
+
+    const peer = new Peer(opts);
     peer.on('signal', (signal) => {
       this.socket.emit(MessageType.RETURNING_SIGNAL, {
         signal,
@@ -224,6 +212,7 @@ class SocketManager {
     });
 
     peer.on('close', () => {
+      alert("Connection closed")
     });
 
     return peer;
@@ -261,7 +250,7 @@ class SocketManager {
   };
 
   signal = (payload) => {
-    const item = this.userPeerMap.find((p) => p.user.id === payload.id);
+    const item = this.userPeerMap.find((p) => p.user.socketId === payload.socketId);
     item.peer.signal(payload.signal);
   };
 
@@ -275,8 +264,12 @@ class SocketManager {
     };
 
     this.userPeerMap.push(item);
+    peer.on('stream', (stream) => {
+      alert(3424234);
+    });
     let promise = new Promise((resolve, reject) => {
       peer.on('stream', (stream) => {
+        alert(3424234);
         if (stream.id === payload.mainStreamId) {
           item.mainStream = stream;
         } else if (stream.id === payload.shareStreamId) {
