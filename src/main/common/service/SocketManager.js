@@ -260,7 +260,7 @@ class SocketManager {
 
   mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted) => {
     const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.userId, stream, audioMuted, videoMuted) :
-      this.addPeer(payload.userId, stream, audioMuted, videoMuted);
+      this.addPeer(payload.userToSignal, stream, audioMuted, videoMuted);
 
     let itemUser = JSON.parse(JSON.stringify(payload));
 
