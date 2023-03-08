@@ -33,7 +33,7 @@ const newMessageAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/
 const BasicBusinessAppDashboard = (props) => {
   const [navDrawerOpen, setNavDrawerOpen] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
-  const [networErrorMessage, setNetworErrorMessage] = React.useState(true);
+  const [networkErrorMessage, setNetworkErrorMessage] = React.useState(true);
   const [userDetails, setUserDetails] = React.useState(null);
   const [activeColor, setActiveColor] = React.useState("blue");
   const [secondaryThemeColor, setSecondaryThemeColor] = React.useState("");
@@ -520,7 +520,7 @@ const BasicBusinessAppDashboard = (props) => {
     appManager.setAPIHost(apiHost);
     appManager.setSignalingServerHost(signalingServerHost);
     appManager.setOnline(online);
-    setNetworErrorMessage(null);
+    setNetworkErrorMessage(null);
     init();
   }
 
@@ -532,7 +532,7 @@ const BasicBusinessAppDashboard = (props) => {
         get("https://svn.agilemotion.co.za/vc/api/v1/system/ping", (e) => {
           loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
         }, (e) => {
-          setNetworErrorMessage("A network error has occurred while connecting to the server. Please contact your system administrator");
+          setNetworkErrorMessage("A network error has occurred while connecting to the server. Please contact your system administrator");
         }, "", true, false);
       }, "", true, false);
     } else {
@@ -704,9 +704,9 @@ const BasicBusinessAppDashboard = (props) => {
         <LottieIcon id={'waiting'}/>
       </div>
       :
-      networErrorMessage ?
+      networkErrorMessage ?
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', color: 'red'}}>
-          {networErrorMessage}
+          {networkErrorMessage}
         </div>
         :
         userDetails &&
