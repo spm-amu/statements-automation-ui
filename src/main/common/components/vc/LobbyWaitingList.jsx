@@ -6,7 +6,7 @@ const HOST_WAITING_MESSAGE = 'Waiting for others to join';
 const ATTENDEE_WAITING_MESSAGE = 'Waiting for the meeting host to let you in';
 
 
-const Lobby = (props) => {
+const LobbyWaitingList = (props) => {
   const {
     waitingList
   } = props;
@@ -72,4 +72,4 @@ const Lobby = (props) => {
   );
 };
 
-export default Lobby;
+export default LobbyWaitingList;
