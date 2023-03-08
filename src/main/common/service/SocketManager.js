@@ -250,6 +250,10 @@ class SocketManager {
   };
 
   signal = (payload) => {
+    console.log("\n\n\\n\n\n\n========================== SIGNAL");
+    console.log(payload);
+    console.log(this.userPeerMap);
+
     const item = this.userPeerMap.find((p) => p.user.socketId === payload.socketId);
     item.peer.signal(payload.signal);
   };
@@ -263,13 +267,12 @@ class SocketManager {
       user: payload
     };
 
+    console.log("\n\n\n\n================================ PAYLOAD");
+    console.log(payload);
+
     this.userPeerMap.push(item);
-    peer.on('stream', (stream) => {
-      alert(3424234);
-    });
     let promise = new Promise((resolve, reject) => {
       peer.on('stream', (stream) => {
-        alert(3424234);
         if (stream.id === payload.mainStreamId) {
           item.mainStream = stream;
         } else if (stream.id === payload.shareStreamId) {
