@@ -124,7 +124,7 @@ const MeetingHistory = (props) => {
       <div style={{ marginRight: '4px' }}>
         <ul>
           <li>
-            <h3>Meeting History</h3>
+            <h3 style={{ color: 'black' }}>Meeting History</h3>
           </li>
           <div className={'searchbar'}>
             <SearchBar onSearch={(searchValue) => {
@@ -139,7 +139,7 @@ const MeetingHistory = (props) => {
                     dataUrl={`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetingHistory`}
                     actionHandler={(e) => {
                       if(e.id === 'downloadRecording') {
-                        onDownload(e.data.id);
+                        navigate("/view/recordings", {state: e.data.id})
                       }
 
                       if(e.id === 'meetingLink') {

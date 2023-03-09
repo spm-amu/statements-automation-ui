@@ -15,6 +15,7 @@ import "./ViewContainer.css"
 import Activity from "../view/Activity";
 import WhiteboardView from "../view/WhiteboardView";
 import MeetingRoomToolbar from "../vc/MeetingRoomToolbar";
+import RecordingView from '../view/RecordingView';
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -109,6 +110,9 @@ const ViewContainer = (props) => {
           break;
         case 'whiteboard':
           element = <WhiteboardView id={location.state}/>;
+          break;
+        case 'recordings':
+          element = <RecordingView meetingId={location.state}/>;
           break;
         case 'people':
           element = <People dialEnabled={true} chatEnabled={false}/>;
