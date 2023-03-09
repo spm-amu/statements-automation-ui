@@ -516,28 +516,56 @@ const MeetingRoom = (props) => {
     }
   }, [allUserParticipantsLeft]);
 
+  function addUserToParticipants(item, peerId = null) {
+    // Typically, a user shoud not exist. We are ensuring that there are never duplicates
+    let user = participants.find((u) => u.userId === item.user.userId);
+
+    if (user) {
+      if(peerId) {
+        user.peerID = peerId;
+      }
+
+      user.peer = item.peer;
+      user.name = item.user.name;
+      user.avatar = item.user.avatar;
+      user.audioMuted = item.user.audioMuted;
+      user.videoMuted = item.user.videoMuted;
+      user.stream = item.mainStream;
+      user.shareStream = item.shareStream;
+    } else {
+      user = {
+        userId: item.user.userId,
+        peer: item.peer,
+        name: item.user.name,
+        avatar: item.user.avatar,
+        audioMuted: item.user.audioMuted,
+        videoMuted: item.user.videoMuted,
+        stream: item.mainStream,
+        shareStream: item.shareStream
+      };
+
+      if(peerId) {
+        user.peerID = peerId;
+      }
+
+      setParticipants((participants) => [...participants, user]);
+    }
+  }
+
   const addUser = (payload) => {
     socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted)
       .then((item) => {
         console.log("ADD USER : ", payload);
-        let user = {
-          peerID: item.user.callerSocketId,
-          userId: item.user.userId,
-          peer: item.peer,
-          name: item.user.name,
-          avatar: item.user.avatar,
-          audioMuted: payload.audioMuted,
-          videoMuted: payload.videoMuted,
-          stream: item.mainStream,
-          shareStream: item.shareStream
-        };
-
-        setParticipants((participants) => [...participants, user]);
+        addUserToParticipants(item, item.user.callerSocketId);
         setAllUserParticipantsLeft(false);
         if (step === Steps.LOBBY) {
           setStep(Steps.SESSION);
           props.windowHandler.show();
         }
+
+        handleMessageArrived({
+          message: item.user.name + " has joined"
+        });
 
         joinInAudio.play();
       });
@@ -551,40 +579,19 @@ const MeetingRoom = (props) => {
       socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted)
         .then((item) => {
           console.log("ADDING ITEM TO PARTICIPANTS : ", item);
-
-          let user = {
-            userId: item.user.userId,
-            peer: item.peer,
-            name: item.user.name,
-            avatar: item.user.avatar,
-            audioMuted: item.user.audioMuted,
-            videoMuted: item.user.videoMuted,
-            stream: item.mainStream,
-            shareStream: item.shareStream,
-          };
-
-          newParticipants.push(user);
-
-          if (newParticipants.length === socketManager.userPeerMap.length) {
-            setParticipants(newParticipants.concat(participants));
-            setAllUserParticipantsLeft(false);
-            if (socketManager.userPeerMap.length > 0) {
-              if (step === Steps.LOBBY) {
-                setStep(Steps.SESSION);
-                props.windowHandler.show();
-              }
+          addUserToParticipants(item);
+          setAllUserParticipantsLeft(false);
+          if (socketManager.userPeerMap.length > 0) {
+            if (step === Steps.LOBBY) {
+              setStep(Steps.SESSION);
+              props.windowHandler.show();
             }
-
-            handleMessageArrived({
-              message: item.user.name + " has joined"
-            });
           }
         })
     });
   };
 
   const addUserToLobby = (data) => {
-    console.log("\n\n\n\n=================================== PERMIT DATA : ", data);
     permitAudio.play();
     let item = {
       user: data.userId,
