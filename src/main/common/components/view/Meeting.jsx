@@ -19,7 +19,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import {useNavigate} from 'react-router-dom';
-import { Checkbox, Switch } from '@material-ui/core';
+import {Checkbox, Switch} from '@material-ui/core';
 import appManager from "../../../common/service/AppManager";
 import AlertDialog from "../AlertDialog";
 import SelectItem from "../customInput/SelectItem";
@@ -294,8 +294,8 @@ const Meeting = (props) => {
   const handleAdd = () => {
     console.log('______ V: ', value);
 
-    const checkStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringDtstart : value.startDate;
-    const endStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringUntil : value.endDate;
+    const checkStartDate = recurrenceRepetition !== 'NONE' ? value.recurringDtstart : value.startDate;
+    const endStartDate = recurrenceRepetition !== 'NONE' ? value.recurringUntil : value.endDate;
 
     const meetingStartDateTime = !Utils.isNull(checkStartDate) && !Utils.isNull(value.startTime) ?
       moment(Utils.getFormattedDate(checkStartDate) + " " + value.startTime.toLocaleTimeString()) : null;
@@ -348,8 +348,8 @@ const Meeting = (props) => {
             data,
             "The meeting details have been saved successfully"
           );
-      }, () => {
-      });
+        }, () => {
+        });
 
     }
   };
@@ -404,8 +404,8 @@ const Meeting = (props) => {
 
       let invalidAttendeesSelectedWarning = attendeeElement.value && attendeeElement.value.length > 0;
 
-      for(let i = 0; i < data.attendees.length; i++) {
-        if(Utils.isNull(data.attendees[i].type)) {
+      for (let i = 0; i < data.attendees.length; i++) {
+        if (Utils.isNull(data.attendees[i].type)) {
           invalidAttendeesSelectedWarning = true;
           data.attendees.splice(i, 1);
         }
@@ -509,11 +509,11 @@ const Meeting = (props) => {
         recurrenceValue.monthlyDayType = 'monthlyWeekDay';
       }
 
-      if(value.recurringDtstart) {
+      if (value.recurringDtstart) {
         value.recurringDtstart = props.selectedEvent.startDate;
       }
 
-      if(value.recurringUntil) {
+      if (value.recurringUntil) {
         value.recurringUntil = props.selectedEvent.endDate;
       }
 
@@ -570,8 +570,8 @@ const Meeting = (props) => {
   };
 
   const validateStartAndEndtime = () => {
-    const checkStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringDtstart : value.startDate;
-    const endStartDate = recurrenceRepetition !== 'NONE' ?  value.recurringUntil : value.endDate;
+    const checkStartDate = recurrenceRepetition !== 'NONE' ? value.recurringDtstart : value.startDate;
+    const endStartDate = recurrenceRepetition !== 'NONE' ? value.recurringUntil : value.endDate;
 
     const meetingStartDateTime = !Utils.isNull(checkStartDate) && !Utils.isNull(value.startTime) ?
       moment(Utils.getFormattedDate(checkStartDate) + " " + value.startTime.toLocaleTimeString()) : null;
@@ -579,6 +579,13 @@ const Meeting = (props) => {
       moment(Utils.getFormattedDate(endStartDate) + " " + value.endTime.toLocaleTimeString()) : null;
 
     return meetingStartDateTime !== null && meetingEndDateTime !== null && meetingStartDateTime.isBefore(meetingEndDateTime);
+  };
+
+  const getRecurrenceRepetitionlabel = () => {
+    if (recurrence && recurrenceRepetition) {
+      let option = recurrenceIntervalOptions.find((opt) => opt.id === recurrenceRepetition);
+      return option ? parseInt(recurrence.numberOfOccurences) === 1 ? option.label : option.label + 's' : '';
+    }
   };
 
   const JoinAction = () => {
@@ -896,8 +903,26 @@ const Meeting = (props) => {
                     </div>
                     <div className={'col-*-*'}
                          style={{paddingLeft: '8px'}}>
+                      <DatePicker
+                        label="Until"
+                        id="recurringUntil"
+                        disabled={readOnly}
+                        hasError={errors.recurringUntil}
+                        value={value.recurringUntil}
+                        required={true}
+                        valueChangeHandler={(date, id) =>
+                          handleFormValueChange(date, id, true)
+                        }
+                        errorMessage={
+                          'A recurring end date is required. Please select a value'
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className={'row no-margin'}>
+                    <div className={'col-*-*'}>
                       <CustomTimePicker
-                        label={"At"}
+                        label={"Starting at"}
                         disabled={readOnly}
                         id="startTime"
                         hasError={errors.startTime}
@@ -907,8 +932,25 @@ const Meeting = (props) => {
                           handleFormValueChange(date, id, true)
                         }
                         errorMessage={
-                          'A recurring end time is required. Please select a value'
+                          'A recurring start time is required. Please select a value'
                         }
+                      />
+                    </div>
+                    <div className={'col-*-*'}
+                         style={{paddingLeft: '8px'}}>
+                      <CustomTimePicker
+                        label={"Ending at"}
+                        disabled={readOnly}
+                        id="endTime"
+                        hasError={errors.endTime}
+                        value={value.endTime}
+                        required={true}
+                        valueChangeHandler={(date, id) =>
+                          handleFormValueChange(date, id, true)
+                        }
+                        errorMessage={() => {
+                          return Utils.isNull(value.endTime) ? 'A recurring end time is required' : 'Recurring end should not be in the past'
+                        }}
                       />
                     </div>
                   </div>
@@ -922,7 +964,7 @@ const Meeting = (props) => {
                         type={'number'}
                         value={recurrence.numberOfOccurences}
                         required={true}
-                        inputProps={{ min: 0 }}
+                        inputProps={{min: 1}}
                         valueChangeHandler={(e) => {
                           console.log(e.target.value);
                           if (e.target.value > 0 && e.target.value < 100) {
@@ -940,15 +982,15 @@ const Meeting = (props) => {
                       />
                     </div>
                     <div>
-                      <SelectItem
-                        style={{width: '100%'}}
-                        labelId="event-recurrence-label"
-                        id="setEventRecurrenceSelect"
-                        value={recurrenceRepetition}
-                        disabled={true}
-                        valueChangeHandler={handleEventRecurring}
-                        options={recurrenceIntervalOptions}
-                      />
+                      {
+                        <div style={{height: '100%', width: '80px', display: 'flex', alignItems: 'center'}}>
+                          <span>
+                            {
+                              getRecurrenceRepetitionlabel()
+                            }
+                          </span>
+                        </div>
+                      }
                     </div>
                     {recurrenceRepetition === 'WEEKLY' ? (
                       <div className={'col-*-*'} style={{margin: '8px 0 0 8px'}}>
@@ -1115,42 +1157,6 @@ const Meeting = (props) => {
                       </RadioGroup>
                     </div>
                   ) : null}
-
-                  <div className={'row no-margin'}>
-                    <div className={'col-*-*'}>
-                      <DatePicker
-                        label="Until"
-                        id="recurringUntil"
-                        disabled={readOnly}
-                        hasError={errors.recurringUntil}
-                        value={value.recurringUntil}
-                        required={true}
-                        valueChangeHandler={(date, id) =>
-                          handleFormValueChange(date, id, true)
-                        }
-                        errorMessage={
-                          'A recurring end date is required. Please select a value'
-                        }
-                      />
-                    </div>
-                    <div className={'col-*-*'}
-                         style={{paddingLeft: '8px'}}>
-                      <CustomTimePicker
-                        label={"At"}
-                        disabled={readOnly}
-                        id="endTime"
-                        hasError={errors.endTime}
-                        value={value.endTime}
-                        required={true}
-                        valueChangeHandler={(date, id) =>
-                          handleFormValueChange(date, id, true)
-                        }
-                        errorMessage={() => {
-                          return Utils.isNull(value.endTime) ? 'A recurring end time is required' : 'Recurring end should not be in the past'
-                        }}
-                      />
-                    </div>
-                  </div>
                 </div>
               }
             </div>
