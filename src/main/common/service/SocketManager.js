@@ -150,9 +150,7 @@ class SocketManager {
         signallerName: userDetails.name,
         avatar: require('../../desktop/dashboard/images/noimage-person.png'),
         audioMuted: audioMuted,
-        videoMuted: videoMuted,
-        mainStreamId: stream.obj.id,
-        shareStreamId: stream.shareScreenObj.id
+        videoMuted: videoMuted
       });
     });
 
@@ -205,9 +203,7 @@ class SocketManager {
         signal,
         callerId: callerId,
         audioMuted: audioMuted,
-        videoMuted: videoMuted,
-        mainStreamId: stream.obj.id,
-        shareStreamId: stream.shareScreenObj.id
+        videoMuted: videoMuted
       });
     });
 
@@ -267,9 +263,9 @@ class SocketManager {
     this.userPeerMap.push(item);
     let promise = new Promise((resolve, reject) => {
       peer.on('stream', (stream) => {
-        if (stream.id === payload.mainStreamId) {
+        if (!item.mainStream) {
           item.mainStream = stream;
-        } else if (stream.id === payload.shareStreamId) {
+        } else {
           item.shareStream = stream;
         }
 

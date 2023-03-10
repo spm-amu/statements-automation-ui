@@ -126,9 +126,7 @@ const MeetingRoom = (props) => {
                 room: selectedMeeting.id,
                 userToCall: userToCall,
                 callerId: socketManager.socket.id,
-                name: appManager.getUserDetails().name,
-                mainStreamId: currentUserStream.obj.id,
-                shareStreamId: currentUserStream.shareScreenObj.id
+                name: appManager.getUserDetails().name
               });
             }
 
@@ -627,8 +625,6 @@ const MeetingRoom = (props) => {
       isHost: isHost,
       audioMuted: audioMuted,
       videoMuted: videoMuted,
-      mainStreamId: currentUserStream.obj.id,
-      shareStreamId: currentUserStream.shareScreenObj.id,
       direct: isDirectCall,
       userToCall
     });
@@ -657,9 +653,7 @@ const MeetingRoom = (props) => {
       meetingJoinRequest: true,
       userToCall: requestedUser,
       callerUser: {
-        userId: userDetails.userId,
-        mainStreamId: currentUserStream.obj.id,
-        shareStreamId: currentUserStream.shareScreenObj.id
+        userId: userDetails.userId
       }
     });
   };
