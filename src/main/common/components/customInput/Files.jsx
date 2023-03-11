@@ -13,6 +13,9 @@ const Files = React.memo(React.forwardRef((props, ref) => {
 
   const handleChange = () => event => {
     let targetFiles = event.target.files;
+
+    console.log('########## : ', targetFiles);
+
     var allFiles = [];
     for (var i = 0; i < targetFiles.length; i++) {
       let file = targetFiles[i];
@@ -53,10 +56,9 @@ const Files = React.memo(React.forwardRef((props, ref) => {
     <div className={'row'}>
       <div className={'col-*-*'} style={{marginLeft: '12px', width: '48px'}}>
         <input
-          accept={props.style === 'IMAGE' ? "image/jpeg,image/gif,image/png,image/x-eps"
-            : "image/*,application/*"}
+          accept={"*/*"}
           id={`file-upload-input`}
-          multiple={false}
+          multiple={true}
           style={{display: 'none'}}
           onChange={handleChange()}
           type="file"
