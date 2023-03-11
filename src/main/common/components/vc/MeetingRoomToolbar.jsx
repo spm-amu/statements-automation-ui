@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import Timer from "./Timer";
 import {get, post} from "../../service/RestService";
 import socketManager from "../../service/SocketManager";
-import {MessageType} from "../../types";
+import { MessageType, SystemEventType } from '../../types';
 import appManager from "../../service/AppManager";
 import Icon from "../Icon";
 import {IconButton} from "@material-ui/core";
@@ -41,7 +41,12 @@ const MeetingRoomToolbar = (props) => {
 
   const onUpdateHost = (args) => {
     let userDetails = appManager.getUserDetails();
-    setIsHost(userDetails.userId === args.payload.host);
+    const iamHost = userDetails.userId === args.payload.host;
+    setIsHost(iamHost);
+
+    if (iamHost) {
+      appManager.fireEvent(SystemEventType.API_SUCCESS, {message: 'You have been assigned as host of this meeting.'});
+    }
   };
 
   const onRecording = (args) => {
