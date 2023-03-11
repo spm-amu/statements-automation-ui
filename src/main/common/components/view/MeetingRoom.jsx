@@ -750,9 +750,6 @@ const MeetingRoom = (props) => {
         MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT);
       appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT);
       initMeetingSession();
-    } else {
-      socketManager.removeSubscriptions(eventHandler);
-      appManager.removeSubscriptions(systemEventHandler);
     }
   }, [streamsInitiated]);
 
