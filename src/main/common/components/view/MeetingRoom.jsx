@@ -184,6 +184,7 @@ const MeetingRoom = (props) => {
             } else if (preErrorStep === Steps.SESSION) {
               socketManager.clearUserToPeerMap();
               participants.splice(0, participants.length);
+              console.log("\n\n\n\n\n\nRE-JOINING MEETING");
               join();
             }
             break;
@@ -727,6 +728,7 @@ const MeetingRoom = (props) => {
     return () => {
       endCall();
       socketManager.removeSubscriptions(eventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
       appManager.remove('CURRENT_MEETING');
     };
@@ -750,6 +752,7 @@ const MeetingRoom = (props) => {
       initMeetingSession();
     } else {
       socketManager.removeSubscriptions(eventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
     }
   }, [streamsInitiated]);
 
@@ -876,6 +879,7 @@ const MeetingRoom = (props) => {
     closeStreams();
 
     socketManager.removeSubscriptions(eventHandler);
+    appManager.removeSubscriptions(systemEventHandler);
     socketManager.clearUserToPeerMap();
     socketManager.disconnectSocket();
     socketManager.init();
