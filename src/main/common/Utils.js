@@ -9,12 +9,15 @@ const colors = [
   '#4CAF50', '#ffeb3b', '#ffc107',
 ];
 
+export const SYSTEM_ERROR_MESSAGE =
+  'A system error has occured. Please contact your system administrator';
+
+export const CONNECTION_ERROR_MESSAGE =
+  'There seems to be a problem with your connection. We are trying to re-connect you';
+
 export default class Utils {
   constructor() {
   }
-
-  SYSTEM_ERROR_MESSAGE =
-    'A system error has accured. Please contact your system administrator';
 
   static isNull(value) {
     return value === null || typeof value === 'undefined';

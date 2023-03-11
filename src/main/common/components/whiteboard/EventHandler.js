@@ -124,6 +124,7 @@ export default class EventHandler {
       metadata: metadata,
       eventType: "INPUT_VALUE_CHANGE",
       whiteboardId: this.id
+    }).catch((error) => {
     })
   };
 
@@ -223,6 +224,7 @@ export default class EventHandler {
       metadata: nodeMetadata,
       eventType: "ADD_INPUT_FIELD",
       whiteboardId: this.id
+    }).catch((error) => {
     });
 
     if (typeof event.target.className === 'string' && !event.target.className.includes("paletteButton")
@@ -289,6 +291,7 @@ export default class EventHandler {
       metadata: metadata,
       eventType: "MOVE_ITEM",
       whiteboardId: this.id
+    }).catch((error) => {
     });
   };
 

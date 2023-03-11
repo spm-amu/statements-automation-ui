@@ -58,7 +58,9 @@ const MeetingRoomToolbar = (props) => {
     socketManager.addSubscriptions(socketEventHandler, MessageType.CHANGE_HOST, MessageType.TOGGLE_RECORD_MEETING);
     socketManager.emitEvent(MessageType.POLL_RECORDING_STATUS, {
       roomID: selectedMeeting.id
-    })
+    }).catch((error) => {
+    });
+
     setIsHost(props.isHost);
   }, []);
 
@@ -89,6 +91,7 @@ const MeetingRoomToolbar = (props) => {
       socketManager.emitEvent(MessageType.END_MEETING, {
         meetingId: selectedMeeting.id,
         userId: appManager.getUserDetails().userId
+      }).catch((error) => {
       });
 
       get(

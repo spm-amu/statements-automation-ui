@@ -201,6 +201,7 @@ const PollContainer = (props) => {
                     data: {
                       pollId: poll.id
                     }
+                  }).catch((error) => {
                   });
                 }
               }}

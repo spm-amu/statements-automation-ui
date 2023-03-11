@@ -9,7 +9,7 @@ import Draggable from "react-draggable";
 import Footer from "../vc/Footer";
 import socketManager from "../../service/SocketManager";
 import {MessageType, SystemEventType} from "../../types";
-import Utils from "../../Utils";
+import Utils, {CONNECTION_ERROR_MESSAGE, SYSTEM_ERROR_MESSAGE} from "../../Utils";
 import MeetingParticipantGrid from '../vc/CenteredMeetingParticipantGrid';
 import ClosablePanel from "../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
@@ -22,6 +22,7 @@ import {Stream} from "../../service/Stream";
 import WhiteBoard from "../whiteboard/WhiteBoard";
 import Alert from "react-bootstrap/Alert";
 import Icon from "../Icon";
+import LottieIcon from "../LottieIcon";
 
 const {electron} = window;
 
@@ -57,7 +58,9 @@ const PaperComponent = (props) => (
 const Steps = {
   LOBBY: 'LOBBY',
   SESSION: 'SESSION',
-  SESSION_ENDED: 'SESSION_ENDED'
+  SESSION_ENDED: 'SESSION_ENDED',
+  SYSTEM_ERROR: 'SYSTEM_ERROR',
+  CONNECTION_ERROR: 'CONNECTION_ERROR'
 };
 
 const hangUpAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/hangupsound.mp3');
@@ -76,6 +79,7 @@ const MeetingRoom = (props) => {
   const [participantsRaisedHands, setParticipantsRaisedHands] = useState([]);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
+  const [preErrorStep, setPreErrorStep] = useState('');
   const [currentUserStream] = useState(new Stream());
   const [streamsInitiated, setStreamsInitiated] = useState(false);
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
@@ -93,6 +97,7 @@ const MeetingRoom = (props) => {
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [whiteboardItems, setWhiteboardItems] = useState([]);
   const [eventHandler] = useState({});
+  const [systemEventHandler] = useState({});
   const [userVideo, setUserVideo] = useState(null);
   const [activityMessage, setActivityMessage] = useState(null);
   const [chatMessage, setChatMessage] = useState(null);
@@ -127,6 +132,7 @@ const MeetingRoom = (props) => {
                 userToCall: userToCall,
                 callerId: socketManager.socket.id,
                 name: appManager.getUserDetails().name
+              }).catch((error) => {
               });
             }
 
@@ -179,6 +185,34 @@ const MeetingRoom = (props) => {
     }
   };
 
+
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'meeting-room-system-event-handler-api';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.SOCKET_CONNECT:
+            if (preErrorStep === Steps.LOBBY) {
+              initMeetingSession();
+            } else if (preErrorStep === Steps.SESSION) {
+              participants.splice(0, participants.length);
+              join();
+            }
+            break;
+          case SystemEventType.SOCKET_DISCONNECT:
+            if(step !== Steps.SYSTEM_ERROR && step !== Steps.CONNECTION_ERROR) {
+              setPreErrorStep(step);
+            }
+
+            setStep(Steps.CONNECTION_ERROR);
+            break;
+        }
+      }
+    }
+  };
+
   const {
     selectedMeeting,
     userToCall,
@@ -198,6 +232,7 @@ const MeetingRoom = (props) => {
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
         roomID: selectedMeeting.id,
         isRecording: true
+      }).catch((error) => {
       });
 
       setIsRecording(true);
@@ -242,7 +277,9 @@ const MeetingRoom = (props) => {
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
         roomID: selectedMeeting.id,
         isRecording: false
+      }).catch((error) => {
       });
+
       setIsRecording(false);
 
       emitSystemEvent("MEETING_RECORDING", {
@@ -258,6 +295,7 @@ const MeetingRoom = (props) => {
     socketManager.emitEvent(MessageType.RAISE_HAND, {
       userId: userDetails.userId,
       roomID: selectedMeeting.id
+    }).catch((error) => {
     });
 
     setHandRaised(!handRaised)
@@ -269,6 +307,7 @@ const MeetingRoom = (props) => {
     socketManager.emitEvent(MessageType.LOWER_HAND, {
       userId: userDetails.userId,
       roomID: selectedMeeting.id
+    }).catch((error) => {
     });
 
     setHandRaised(!handRaised)
@@ -384,7 +423,8 @@ const MeetingRoom = (props) => {
         recordedData: result
       };
 
-      socketManager.emitEvent(MessageType.SAVE_RECORDING, data);
+      socketManager.emitEvent(MessageType.SAVE_RECORDING, data).catch((error) => {
+      });
     }
   };
 
@@ -395,6 +435,7 @@ const MeetingRoom = (props) => {
         socketManager.emitEvent(MessageType.CHANGE_HOST, {
           roomID: selectedMeeting.id,
           host: participant.userId
+        }).catch((error) => {
         });
 
         setIsHost(!isHost);
@@ -519,7 +560,7 @@ const MeetingRoom = (props) => {
     let user = participants.find((u) => u.userId === item.user.userId);
 
     if (user) {
-      if(peerId) {
+      if (peerId) {
         user.peerID = peerId;
       }
 
@@ -542,7 +583,7 @@ const MeetingRoom = (props) => {
         shareStream: item.shareStream
       };
 
-      if(peerId) {
+      if (peerId) {
         user.peerID = peerId;
       }
 
@@ -611,6 +652,8 @@ const MeetingRoom = (props) => {
       user: userAlias,
       room: selectedMeeting.id,
       email: userDetails.emailAddress,
+    }).then((data) => {
+    }).error((exp) => {
     });
   };
 
@@ -627,8 +670,19 @@ const MeetingRoom = (props) => {
       videoMuted: videoMuted,
       direct: isDirectCall,
       userToCall
+    }).then((data) => {
+      if (data.status === 'SUCCESS') {
+
+      } else {
+        setPreErrorStep(step);
+        setStep(data.status);
+      }
+    }).catch((error) => {
+      setPreErrorStep(step);
+      setStep(error.message);
     });
   };
+
 
   const emitSystemEvent = (eventType, data) => {
     let participantIds = [];
@@ -642,6 +696,7 @@ const MeetingRoom = (props) => {
       systemEventType: eventType,
       recipients: participantIds,
       data: data
+    }).catch((error) => {
     });
   };
 
@@ -655,11 +710,16 @@ const MeetingRoom = (props) => {
       callerUser: {
         userId: userDetails.userId
       }
+    }).catch((error) => {
     });
   };
 
   useEffect(() => {
     eventHandler.api = handler();
+  });
+
+  useEffect(() => {
+    systemEventHandler.api = systemEventHandlerApi();
   });
 
   useEffect(() => {
@@ -671,18 +731,22 @@ const MeetingRoom = (props) => {
     };
   }, []);
 
+  function initMeetingSession() {
+    if (isHost || isDirectCall || isRequestToJoin) {
+      join();
+    } else {
+      askForPermission();
+    }
+  }
+
   useEffect(() => {
     if (currentUserStream.obj) {
       socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
         MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
         MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD,
         MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT);
-
-      if (isHost || isDirectCall || isRequestToJoin) {
-        join();
-      } else {
-        askForPermission();
-      }
+      appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT);
+      initMeetingSession();
     } else {
       socketManager.removeSubscriptions(eventHandler);
     }
@@ -746,7 +810,7 @@ const MeetingRoom = (props) => {
   }, [userVideo]);
 
   useEffect(() => {
-    if (streamsInitiated) {
+    if (streamsInitiated && userVideo.current) {
       userVideo.current.srcObject = currentUserStream.obj;
     }
   }, [streamsInitiated]);
@@ -833,6 +897,7 @@ const MeetingRoom = (props) => {
     socketManager.emitEvent(MessageType.PERMIT_STATUS, {
       allowed: true,
       id: item.socketId
+    }).catch((error) => {
     });
 
     removeFromLobbyWaiting(item);
@@ -843,6 +908,7 @@ const MeetingRoom = (props) => {
       allowed: false,
       id: item.socketId,
       meetingId: selectedMeeting.id
+    }).catch((error) => {
     });
 
     removeFromLobbyWaiting(item);
@@ -855,6 +921,7 @@ const MeetingRoom = (props) => {
       userId: userDetails.userId,
       audioMuted: audioMuted,
       videoMuted: videoMuted
+    }).catch((error) => {
     });
   }
 
@@ -963,6 +1030,7 @@ const MeetingRoom = (props) => {
         callerId: appManager.getUserDetails().userId,
         callerDescription: appManager.getUserDetails().name,
         meetingId: selectedMeeting.id
+      }).catch((error) => {
       });
       onCallEnded();
     } else {
@@ -980,8 +1048,10 @@ const MeetingRoom = (props) => {
         audioMuted,
         videoMuted
       }
+    }).catch((error) => {
     });
   };
+
   return (
     <Fragment>
       {screenShared && shareScreenSource.current && (
@@ -1074,36 +1144,61 @@ const MeetingRoom = (props) => {
                               {'The ' + (isDirectCall ? 'call' : 'meeting') + ' has been ended' + (isDirectCall ? '' : ' by the host')}
                             </div>
                             :
-                            <>
-                              <MeetingParticipantGrid participants={participants}
-                                                      waitingList={lobbyWaitingList}
-                                                      mode={meetingParticipantGridMode}
-                                                      audioMuted={audioMuted}
-                                                      videoMuted={videoMuted}
-                                                      meetingTitle={selectedMeeting.title}
-                                                      userToCall={userToCall}
-                                                      userStream={currentUserStream.obj}
-                                                      step={step}
-                                                      isHost={isHost}
-                                                      participantsRaisedHands={participantsRaisedHands}
-                                                      allUserParticipantsLeft={allUserParticipantsLeft}
-                                                      userVideoChangeHandler={(ref) => setUserVideo(ref)}
-                                                      onHostAudioMute={(participant) => {
-                                                        changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
-                                                      }}
-                                                      onHostVideoMute={(participant) => {
-                                                        changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
-                                                      }}
-                                                      acceptUserHandler={
-                                                        (item) => {
-                                                          acceptUser(item);
-                                                        }}
-                                                      rejectUserHandler={
-                                                        (item) => {
-                                                          rejectUser(item);
-                                                        }}
-                              />
-                            </>
+                            step === Steps.SYSTEM_ERROR ?
+                              <div style={{
+                                backgroundColor: 'rgb(40, 40, 43)',
+                                color: 'rgb(235, 63, 33)',
+                                fontSize: '24px',
+                                width: '100%',
+                                height: '100%'
+                              }} className={'centered-flex-box'}>
+                                {SYSTEM_ERROR_MESSAGE}
+                              </div>
+                              :
+                              step === Steps.CONNECTION_ERROR ?
+                                <div style={{
+                                  backgroundColor: 'rgb(40, 40, 43)',
+                                  color: 'rgb(235, 63, 33)',
+                                  fontSize: '24px',
+                                  width: '100%',
+                                  height: '100%'
+                                }} className={'centered-flex-box'}>
+                                  <div>
+                                    <LottieIcon id={'waiting'}/>
+                                    {CONNECTION_ERROR_MESSAGE}
+                                  </div>
+                                </div>
+                                :
+                                <>
+                                  <MeetingParticipantGrid participants={participants}
+                                                          waitingList={lobbyWaitingList}
+                                                          mode={meetingParticipantGridMode}
+                                                          audioMuted={audioMuted}
+                                                          videoMuted={videoMuted}
+                                                          meetingTitle={selectedMeeting.title}
+                                                          userToCall={userToCall}
+                                                          userStream={currentUserStream.obj}
+                                                          step={step}
+                                                          isHost={isHost}
+                                                          participantsRaisedHands={participantsRaisedHands}
+                                                          allUserParticipantsLeft={allUserParticipantsLeft}
+                                                          userVideoChangeHandler={(ref) => setUserVideo(ref)}
+                                                          onHostAudioMute={(participant) => {
+                                                            changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
+                                                          }}
+                                                          onHostVideoMute={(participant) => {
+                                                            changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
+                                                          }}
+                                                          acceptUserHandler={
+                                                            (item) => {
+                                                              acceptUser(item);
+                                                            }}
+                                                          rejectUserHandler={
+                                                            (item) => {
+                                                              rejectUser(item);
+                                                            }}
+                                  />
+                                </>
                         }
                       </div>
                     </div>

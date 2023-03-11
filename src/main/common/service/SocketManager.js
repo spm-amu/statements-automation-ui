@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import {MessageType} from "../types";
+import {MessageType, SystemEventType} from "../types";
 import Peer from "simple-peer";
 import appManager from "./AppManager";
 
@@ -17,9 +17,23 @@ class SocketManager {
   }
 
   emitEvent = (eventType, data) => {
-    if (this.socket) {
-      this.socket.emit(eventType, data);
-    }
+    return new Promise((resolve, reject) => {
+      if (this.socket) {
+        let response = this.socket.emit(eventType, data, (data) => {
+          if(data.status === 'SUCCESS') {
+            resolve(data);
+          } else {
+            reject(new Error(data.status));
+          }
+        });
+
+        if (!response.connected) {
+          reject(new Error("CONNECTION_ERROR"));
+        }
+      } else {
+        reject(new Error("CONNECTION_ERROR"));
+      }
+    });
   };
 
   disconnectSocket = () => {
@@ -54,7 +68,13 @@ class SocketManager {
     }
 
     socket.on("connect", () => {
-      socket.emit(MessageType.REGISTER_ONLINE, {id: userDetails.userId, name: userDetails.name});
+      this.emitEvent(MessageType.REGISTER_ONLINE, {id: userDetails.userId, name: userDetails.name}).then((data) => {
+        appManager.fireEvent(SystemEventType.SOCKET_CONNECT, {});
+      });
+    });
+
+    socket.on('disconnect', function () {
+      appManager.fireEvent(SystemEventType.SOCKET_DISCONNECT, {});
     });
 
     socket.on(MessageType.USERS_ONLINE, (payload) => {
@@ -136,7 +156,7 @@ class SocketManager {
       streams: [stream.obj, stream.shareScreenObj]
     });
 
-    if(!appManager.isOnline()) {
+    if (!appManager.isOnline()) {
       opts.config = {
         iceServers: []
       }
@@ -155,7 +175,6 @@ class SocketManager {
     });
 
     peer.on('close', () => {
-      alert("Connection closed")
     });
 
     return peer;
@@ -191,7 +210,7 @@ class SocketManager {
       streams: [stream.obj, stream.shareScreenObj]
     };
 
-    if(!appManager.isOnline()) {
+    if (!appManager.isOnline()) {
       opts.config = {
         iceServers: []
       }
@@ -208,7 +227,6 @@ class SocketManager {
     });
 
     peer.on('close', () => {
-      alert("Connection closed")
     });
 
     return peer;
@@ -269,13 +287,13 @@ class SocketManager {
           item.shareStream = stream;
         }
 
-        if(item.mainStream && item.shareStream) {
+        if (item.mainStream && item.shareStream) {
           resolve(item);
         }
       });
     });
 
-    if(eventType === MessageType.USER_JOINED) {
+    if (eventType === MessageType.USER_JOINED) {
       peer.signal(payload.signal);
     }
 
@@ -288,12 +306,21 @@ class SocketManager {
         callerID: isDirect && caller ? caller.socketId : this.socket.id,
         direct: isDirect,
         roomID: roomId
+      }).catch((error) => {
       });
     }
   };
 
   declineDirectCall = (callerSocketId, callRoom, reason) => {
-    this.emitEvent(MessageType.END_CALL, {callerID: callerSocketId, roomID: callRoom, direct: true, reject: true, reason: reason});
+    this.emitEvent(MessageType.END_CALL,
+      {
+        callerID: callerSocketId,
+        roomID: callRoom,
+        direct: true,
+        reject: true,
+        reason: reason
+      }).catch((error) => {
+    });
   }
 }
 

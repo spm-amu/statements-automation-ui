@@ -266,6 +266,7 @@ const ChatRoom = (props) => {
         skipAlert: props.chatTab || finalMessage,
         newChat: selectedChat.messages.length === 0,
         meetingId: props.meetingId ? props.meetingId : null
+      }).catch((error) => {
       });
 
       setMessages(oldMsgs => [...oldMsgs, msg]);
@@ -296,6 +297,7 @@ const ChatRoom = (props) => {
           usersToCall: participantsToSignalIds,
           callerId: socketManager.socket.id,
           name: currentUser.name,
+        }).catch((error) => {
         });
 
         navigate("/view/meetingRoom", {

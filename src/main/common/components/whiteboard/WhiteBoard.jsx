@@ -240,7 +240,8 @@ const WhiteBoard = (props) => {
         id: selectedItem
       },
       eventType: "DELETE_ITEM"
-    })
+    }).catch((error) => {
+    });
   };
 
   const handleSave = () => {
