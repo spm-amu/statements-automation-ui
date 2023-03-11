@@ -125,19 +125,6 @@ const MeetingRoom = (props) => {
           case MessageType.PERMIT:
             addUserToLobby(be.payload);
             break;
-          case MessageType.ALL_USERS:
-            if (userToCall && isHost && isDirectCall) {
-              socketManager.emitEvent(MessageType.CALL_USER, {
-                room: selectedMeeting.id,
-                userToCall: userToCall,
-                callerId: socketManager.socket.id,
-                name: appManager.getUserDetails().name
-              }).catch((error) => {
-              });
-            }
-
-            createParticipants(be.payload);
-            break;
           case MessageType.USER_JOINED:
             addUser(be.payload);
             break;
@@ -169,11 +156,6 @@ const MeetingRoom = (props) => {
           case MessageType.SYSTEM_EVENT:
             onSystemEvent(be.payload);
             break;
-          case MessageType.WHITEBOARD:
-            if (be.payload) {
-              setWhiteboardItems(be.payload.items);
-            }
-            break;
           case MessageType.CHANGE_HOST:
             onChangeHost(be);
             break;
@@ -185,7 +167,6 @@ const MeetingRoom = (props) => {
     }
   };
 
-
   const systemEventHandlerApi = () => {
     return {
       get id() {
@@ -194,6 +175,10 @@ const MeetingRoom = (props) => {
       on: (eventType, be) => {
         switch (eventType) {
           case SystemEventType.SOCKET_CONNECT:
+            if(preErrorStep) {
+              setStep(preErrorStep);
+            }
+
             if (preErrorStep === Steps.LOBBY) {
               initMeetingSession();
             } else if (preErrorStep === Steps.SESSION) {
@@ -653,7 +638,9 @@ const MeetingRoom = (props) => {
       room: selectedMeeting.id,
       email: userDetails.emailAddress,
     }).then((data) => {
-    }).error((exp) => {
+    }).catch((exp) => {
+      setPreErrorStep(step);
+      setStep(exp.message);
     });
   };
 
@@ -670,9 +657,23 @@ const MeetingRoom = (props) => {
       videoMuted: videoMuted,
       direct: isDirectCall,
       userToCall
-    }).then((data) => {
-      if (data.status === 'SUCCESS') {
+    }).then((result) => {
+      if (result.status === 'SUCCESS') {
+        if (userToCall && isHost && isDirectCall) {
+          socketManager.emitEvent(MessageType.CALL_USER, {
+            room: selectedMeeting.id,
+            userToCall: userToCall,
+            callerId: socketManager.socket.id,
+            name: appManager.getUserDetails().name
+          }).catch((error) => {
+          });
+        }
 
+        console.log("JOIN FROMISE FULFILLED");
+        createParticipants(result.data.usersInRoom);
+        if(result.data.whiteboard) {
+          setWhiteboardItems(result.data.whiteboard.items);
+        }
       } else {
         setPreErrorStep(step);
         setStep(data.status);
@@ -682,7 +683,6 @@ const MeetingRoom = (props) => {
       setStep(error.message);
     });
   };
-
 
   const emitSystemEvent = (eventType, data) => {
     let participantIds = [];
