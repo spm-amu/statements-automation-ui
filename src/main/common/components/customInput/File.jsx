@@ -6,7 +6,7 @@ import appManager from '../../service/AppManager'
 
 const {electron} = window;
 
-const Files = React.memo(React.forwardRef((props, ref) => {
+const File = React.memo(React.forwardRef((props, ref) => {
 
   const [files, setFiles] = React.useState(!props.value ? [] : props.value);
 
@@ -59,7 +59,7 @@ const Files = React.memo(React.forwardRef((props, ref) => {
         <input
           accept={"*/*"}
           id={`file-upload-input`}
-          multiple={false}
+          multiple={true}
           style={{display: 'none'}}
           onChange={handleChange()}
           type="file"
@@ -80,25 +80,39 @@ const Files = React.memo(React.forwardRef((props, ref) => {
                style={{padding: '8px 0 16px 8px', width: 'calc(100% - 88px)', marginLeft: '-24px'}}>
             {
               files && files.length > 0 &&
-              <div className={'row no-margin no-padding'}>
-                <div>
-                  <div className={'row no-margin file-label'}>
-                    <table>
-                      <tbody>
-                      <tr>
-                        <td>{files[0].name}</td>
-                        <td>
-                          <div style={{float: 'right'}} className={'close-button'} onClick={(e) => {
-                            setFiles([]);
-                            props.valueChangeHandler(null, props.id);
-                          }}>x
-                          </div>
-                        </td>
-                      </tr>
-                      </tbody>
+              files.map((file, index) => {
+                return (
+                  <div key={index} className={'row no-margin no-padding'}>
+                    <div>
+                      <div className={'row no-margin file-label'}>
+                        <table>
+                          <tbody>
+                          <tr>
+                            <td>{files[index].name}</td>
+                            <td>
+                              <div style={{float: 'right'}} className={'close-button'} onClick={(e) => {
+                                for (const f of files) {
+                                  if (files[index].name === f.name) {
+                                    files.splice(index, 1);
+                                    break;
+                                  }
+                                }
 
-                    </table>
-                    {/*<div style={{float: 'left'}}>
+                                setFiles([].concat(files));
+
+                                console.log('###: ', files);
+
+                                const updatedFiles = files.length > 0 ? files : null;
+
+                                props.valueChangeHandler(updatedFiles, props.id);
+                              }}>x
+                              </div>
+                            </td>
+                          </tr>
+                          </tbody>
+
+                        </table>
+                        {/*<div style={{float: 'left'}}>
                       {files[0].name}
                     </div>
                     <div style={{float: 'right'}} className={'close-button'} onClick={(e) => {
@@ -106,10 +120,12 @@ const Files = React.memo(React.forwardRef((props, ref) => {
                       props.valueChangeHandler(null, props.id);
                     }}>x
                     </div>*/}
+                      </div>
+                    </div>
+                    <div className={'col spacer'}>&nbsp;</div>
                   </div>
-                </div>
-                <div className={'col spacer'}>&nbsp;</div>
-              </div>
+                )
+              })
             }
           </div>
           :
@@ -119,4 +135,4 @@ const Files = React.memo(React.forwardRef((props, ref) => {
   </>
 }));
 
-export default Files;
+export default File;

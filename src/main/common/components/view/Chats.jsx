@@ -142,6 +142,8 @@ const Chats = (props) => {
 
   const loadChats = () => {
     get(`${appManager.getAPIHost()}/api/v1/chat/fetchChats`, (response) => {
+      console.log('CHATS: ', response);
+
       const filteredChatEvents = response.filter(chat => {
         if (chat.type === 'DIRECT') {
           return true;

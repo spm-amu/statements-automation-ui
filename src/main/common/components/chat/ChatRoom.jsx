@@ -39,7 +39,7 @@ const ChatRoom = (props) => {
   const [currentUser, setCurrentUser] = useState(appManager.getUserDetails());
   const [message, setMessage] = useState('');
   const [selectedChat, setSelectedChat] = useState(props.selectedChat);
-  const [document, setDocument] = useState(null);
+  const [documents, setDocuments] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newParticipants, setNewParticipants] = useState([]);
   const [confirm, setImgUploadConfirm] = useState('');
@@ -179,7 +179,7 @@ const ChatRoom = (props) => {
 
   useEffect(() => {
     setMessage('');
-    setDocument(null);
+    setDocuments(null);
     loadMessages();
   }, [selectedChat]);
 
@@ -218,12 +218,17 @@ const ChatRoom = (props) => {
       e.preventDefault();
     }
 
-    if (message || document || finalMessage || poll) {
+    if (message || documents || finalMessage || poll) {
 
       let mType = 'TEXT';
 
-      if (document && document.length > 0) {
-        if (parseInt(document[0].size) > 7500000) {
+      if (documents && documents.length > 0) {
+        let combinedSize = 0;
+        for (const doc of documents) {
+          combinedSize = combinedSize + parseInt(doc.size);
+        }
+
+        if (combinedSize > 7500000) {
           appManager.fireEvent(SystemEventType.API_ERROR, {
             message: 'Attachment should be not more than 7.5MB.'
           });
@@ -246,8 +251,8 @@ const ChatRoom = (props) => {
         participant: currentUser
       };
 
-      if (document && document.length > 0) {
-        msg.document = document[0];
+      if (documents && documents.length > 0) {
+        msg.documents = documents;
         setClearUploadedFileSwitch(!clearUploadedFileSwitch);
       }
 
@@ -278,7 +283,7 @@ const ChatRoom = (props) => {
     }
     setMessage('');
     setImgUploadConfirm('');
-    setDocument(null)
+    setDocuments(null)
   };
 
   const callNow = (e) => {
@@ -353,81 +358,134 @@ const ChatRoom = (props) => {
   };
 
   const renderFileThumbnail = (message) => {
-    const {document} = message;
-    if (document.type.includes('image')) {
-      return (
-        <>
-          <img
-            src={document.payload}
-            alt=""
-            style={{width: 250, height: 'auto'}}
-          />
-        </>
-      )
-    }
+    const { documents } = message;
+    const thumbnails = [];
 
-    if (document.type.includes('pdf')) {
-      return (
-        <div className={'col'}>
-          <img
-            src={require('../../assets/img/files/pdf.png')}
-            alt=""
-            style={{width: 80, height: 80}}
-          />
-          <p>{document.name}</p>
-        </div>
-      )
-    }
+    documents.forEach((doc, index) => {
+      if (doc.type.includes('image')) {
+        return (
+          thumbnails.push(
+            <div style={{ borderBottom: '5px solid black' }}>
+              <div key={index} className={'col'}>
+                <img
+                  key={index}
+                  src={document.payload}
+                  alt=""
+                  style={{width: 250, height: 'auto'}}
+                />
+              </div>
+              <IconButton
+                component="span"
+                onClick={() => onDownload(message.document[index])}
+              >
+                <Icon id={'DOWNLOAD'}/>
+              </IconButton>
+            </div>
+          )
+        )
+      }
 
-    if (document.type.includes('doc')) {
-      return (
-        <div className={'col'}>
-          <img
-            src={require('../../assets/img/files/doc.png')}
-            alt=""
-            style={{width: 80, height: 80}}
-          />
-          <p>{document.name}</p>
-        </div>
-      )
-    }
+      if (doc.type.includes('pdf')) {
+        thumbnails.push(
+          <div key={index} style={{ borderBottom: '0.7px solid black' }}>
+            <div className={'col'}>
+              <img
+                key={index}
+                src={require('../../assets/img/files/pdf.png')}
+                alt=""
+                style={{width: 250, height: 'auto'}}
+              />
+            </div>
+            <IconButton
+              component="span"
+              onClick={() => onDownload(documents[index])}
+            >
+              <Icon id={'DOWNLOAD'}/>
+            </IconButton>
+          </div>
+        )
+      } else if (doc.type.includes('doc')) {
+        thumbnails.push(
+          <div key={index} style={{ borderBottom: '5px solid black' }}>
+            <div className={'col'}>
+              <img
+                key={index}
+                src={require('../../assets/img/files/doc.png')}
+                alt=""
+                style={{width: 250, height: 'auto'}}
+              />
+            </div>
+            <IconButton
+              component="span"
+              onClick={() => onDownload(documents[index])}
+            >
+              <Icon id={'DOWNLOAD'}/>
+            </IconButton>
+          </div>
+        )
+      } else if (doc.type.includes('word')) {
+        thumbnails.push(
+          <div key={index} style={{ borderBottom: '5px solid black' }}>
+            <div className={'col'}>
+              <img
+                key={index}
+                src={require('../../assets/img/files/word.png')}
+                alt=""
+                style={{width: 250, height: 'auto'}}
+              />
+            </div>
+            <IconButton
+              component="span"
+              onClick={() => onDownload(documents[index])}
+            >
+              <Icon id={'DOWNLOAD'}/>
+            </IconButton>
+          </div>
+        )
+      } else if (doc.type.includes('xls')) {
+        thumbnails.push(
+          <div key={index} style={{ borderBottom: '5px solid black' }}>
+            <div className={'col'}>
+              <img
+                key={index}
+                src={require('../../assets/img/files/xls.png')}
+                alt=""
+                style={{width: 250, height: 'auto'}}
+              />
+            </div>
+            <IconButton
+              component="span"
+              onClick={() => onDownload(documents[index])}
+            >
+              <Icon id={'DOWNLOAD'}/>
+            </IconButton>
+          </div>
+        )
+      } else {
+        thumbnails.push(
+          <div key={index}>
+            <div className={'col'} style={{ borderBottom: '0.7px solid black', paddingBottom: '8px', borderWidth: '50%' }} >
+              <img
+                key={index}
+                src={require('../../assets/img/files/php.png')}
+                alt=""
+                style={{width: 100, height: 'auto'}}
+              />
 
-    if (document.type.includes('word')) {
-      return (
-        <div className={'col'}>
-          <img
-            src={require('../../assets/img/files/word.png')}
-            alt=""
-            style={{width: 80, height: 80}}
-          />
-          <p>{document.name}</p>
-        </div>
-      )
-    }
+              <p style={{ marginTop: '4px' }}>{ documents[index].name }</p>
+            </div>
+            <IconButton
+              component="span"
+              onClick={() => onDownload(documents[index])}
+            >
+              <Icon id={'DOWNLOAD'}/>
+            </IconButton>
+          </div>
+        )
+      }
+    });
 
-    if (document.type.includes('xls')) {
-      return (
-        <div className={'col'}>
-          <img
-            src={require('../../assets/img/files/xls.png')}
-            alt=""
-            style={{width: 80, height: 80}}
-          />
-          <p>{document.name}</p>
-        </div>
-      )
-    }
-
-    return (
-      <div className={'col'}>
-        <img
-          src={require('../../assets/img/files/php.png')}
-          alt=""
-          style={{width: 80, height: 80}}
-        />
-        <p>{document.name}</p>
-      </div>
-    )
+    return thumbnails;
   };
 
   const renderMessages = (message, index) => {
@@ -441,12 +499,6 @@ const ChatRoom = (props) => {
                 renderFileThumbnail(message)
               }
               <p key={index}>{message.content}</p>
-              <IconButton
-                component="span"
-                onClick={() => onDownload(message.document)}
-              >
-                <Icon id={'DOWNLOAD'}/>
-              </IconButton>
             </div>
           </div>
         );
@@ -466,12 +518,6 @@ const ChatRoom = (props) => {
                 }
               </div>
               <p key={index}>{message.content}</p>
-              <IconButton
-                component="span"
-                onClick={() => onDownload(message.document)}
-              >
-                <Icon id={'DOWNLOAD'}/>
-              </IconButton>
             </div>
           </div>
         </div>
@@ -663,22 +709,22 @@ const ChatRoom = (props) => {
                 className="message__imageSelector" style={{width: '72px'}}
               />
               <div className={'chat-input'} style={{position: 'relative'}}>
-                <div className={"file-upload chats-file-upload"} style={{zIndex: !Utils.isNull(document) ? 1 : 0}}>
+                <div className={"file-upload chats-file-upload"} style={{zIndex: !Utils.isNull(documents) ? 1 : 0}}>
                   <File
                     enableFile={true}
-                    multiple={false}
+                    multiple={true}
                     id={'documents'}
-                    value={document}
+                    value={documents}
                     clearUploadedFileSwitch={clearUploadedFileSwitch}
                     valueChangeHandler={(value, id) => {
-                      setDocument(value);
+                      setDocuments(value);
                     }}
                   />
                 </div>
                 <CustomInput
-                  style={{zIndex: !Utils.isNull(document) ? 0 : 1}}
-                  labelText={document ? "" : "Type a new message"}
-                  disabled={!Utils.isNull(document)}
+                  style={{zIndex: !Utils.isNull(documents) ? 0 : 1}}
+                  labelText={documents ? "" : "Type a new message"}
+                  disabled={!Utils.isNull(documents)}
                   id="message"
                   formControlProps={{fullWidth: true}}
                   autoFocus

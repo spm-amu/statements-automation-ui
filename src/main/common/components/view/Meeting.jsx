@@ -67,6 +67,7 @@ const Meeting = (props) => {
   const {selectedEvent: selectedMeeting} = props;
   const [value, setValue] = useState(null);
   const [errors, setErrors] = useState({});
+  const [errorMessages, setErrorMessages] = useState({});
   const [edited, setEdited] = useState(false);
   const [bysetpos, setBysetpos] = React.useState(1);
   const [byWeekDay, setByWeekDay] = React.useState('MO');
@@ -291,24 +292,142 @@ const Meeting = (props) => {
     return eventData;
   };
 
+  const basicValidation = (date, fieldMessagePrefix) => {
+    if (Utils.isNull(date) || date.length === 0) {
+      return `${fieldMessagePrefix} is required`;
+
+    }
+
+    if (!moment(date).isValid()) {
+      return `${fieldMessagePrefix} is not valid`;
+    }
+
+    return null;
+  }
+
+  const validateStartTime = () => {
+    let validation = basicValidation(value.startTime, 'Start time');
+
+    if (!Utils.isNull(validation)) {
+      setErrorMessages(existingValues => ({
+        ...existingValues,
+        startTime: validation
+      }));
+
+      return true;
+    }
+
+    return false;
+  }
+
+  const validateStartDate = () => {
+    const startDate = recurrenceRepetition !== 'NONE' ? value.recurringDtstart : value.startDate;
+    const prefix = recurrenceRepetition !== 'NONE' ? 'From date' : 'Start date';
+    let validation = basicValidation(startDate, prefix);
+
+    if (!Utils.isNull(validation)) {
+      setErrorMessages(existingValues => ({
+        ...existingValues,
+        startDate: validation
+      }));
+
+      return true;
+    }
+
+    return false;
+  }
+
+  const validateEndTime = () => {
+    let validation = basicValidation(value.endTime, 'End time');
+
+    if (!Utils.isNull(validation)) {
+      setErrorMessages(existingValues => ({
+        ...existingValues,
+        endTime: validation
+      }));
+
+      return true;
+    }
+
+    return false;
+  }
+
+  const validateEndDate = () => {
+    const endDate = recurrenceRepetition !== 'NONE' ? value.recurringUntil : value.endDate;
+    let validation = basicValidation(endDate, 'End date');
+
+    if (!Utils.isNull(validation)) {
+      setErrorMessages(existingValues => ({
+        ...existingValues,
+        endDate: validation
+      }));
+
+      return true;
+    }
+
+    return false;
+  }
+
+  const validateStartDateTime = () => {
+    const startDate = recurrenceRepetition !== 'NONE' ? value.recurringDtstart : value.startDate;
+    const startTime = value.startTime;
+
+    if (!Utils.isNull(startDate) && !Utils.isNull(startTime)) {
+      let startDateTime = moment(Utils.getFormattedDate(startDate) + " " + startTime.toLocaleTimeString());
+
+      let isBeforeCurrent = startDateTime.isBefore(moment());
+
+      if (isBeforeCurrent) {
+        setErrorMessages(existingValues => ({
+          ...existingValues,
+          startDate: 'Start date and time cannot be before current date.',
+          startTime: 'Start date and time cannot be before current date.'
+        }));
+      }
+
+      return isBeforeCurrent;
+    }
+
+    return false;
+  }
+
+  const validateEndDateTime = () => {
+    const startDate = recurrenceRepetition !== 'NONE' ? value.recurringDtstart : value.startDate;
+    const startTime = value.startTime;
+
+    const endDate = recurrenceRepetition !== 'NONE' ? value.recurringUntil : value.endDate;
+    const endTime = value.endTime;
+
+    if (!Utils.isNull(endDate) && !Utils.isNull(endTime) && !Utils.isNull(startDate) && !Utils.isNull(startTime)) {
+      let startDateTime = moment(Utils.getFormattedDate(startDate) + " " + startTime.toLocaleTimeString());
+      let endDateTime = moment(Utils.getFormattedDate(endDate) + " " + endTime.toLocaleTimeString());
+
+      let isSameOrBeforeStart = endDateTime.isSameOrBefore(startDateTime);
+
+      if (isSameOrBeforeStart) {
+        setErrorMessages(existingValues => ({
+          ...existingValues,
+          endDate: 'Cannot be before or the same as start date.',
+          endTime: 'Cannot be before or the same as start date.'
+        }));
+      }
+
+      return isSameOrBeforeStart;
+    }
+
+    return false;
+  }
+
   const handleAdd = () => {
     console.log('______ V: ', value);
 
-    const checkStartDate = recurrenceRepetition !== 'NONE' ? value.recurringDtstart : value.startDate;
-    const endStartDate = recurrenceRepetition !== 'NONE' ? value.recurringUntil : value.endDate;
-
-    const meetingStartDateTime = !Utils.isNull(checkStartDate) && !Utils.isNull(value.startTime) ?
-      moment(Utils.getFormattedDate(checkStartDate) + " " + value.startTime.toLocaleTimeString()) : null;
-    const meetingEndDateTime = !Utils.isNull(endStartDate) && !Utils.isNull(value.endTime) ?
-      moment(Utils.getFormattedDate(endStartDate) + " " + value.endTime.toLocaleTimeString()) : null;
-
     let errorState = {
       title: Utils.isNull(value.title),
+      startDate: validateStartDate() || validateStartDateTime(),
+      startTime: validateStartTime() || validateStartDateTime(),
+      endDate: validateEndDate() || validateEndDateTime(),
+      endTime: validateEndTime() || validateEndDateTime(),
       attendees: value.attendees.length === 0,
-      startDate: !moment(checkStartDate).isValid() || Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
-      startTime: !moment(value.startTime).isValid() || Utils.isNull(meetingStartDateTime) || meetingStartDateTime.isBefore(moment()),
-      endDate: !moment(endStartDate).isValid() || Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime,
-      endTime: !moment(value.endTime).isValid() || Utils.isNull(meetingEndDateTime) || meetingEndDateTime.isBefore(moment()) || meetingEndDateTime <= meetingStartDateTime
     }
 
     console.log('*****: ', errorState);
@@ -350,7 +469,6 @@ const Meeting = (props) => {
           );
         }, () => {
         });
-
     }
   };
 
@@ -890,15 +1008,13 @@ const Meeting = (props) => {
                         label="From"
                         id="recurringDtstart"
                         disabled={readOnly}
-                        hasError={errors.recurringDtstart}
+                        hasError={errors.startDate}
                         value={value.recurringDtstart}
                         required={true}
                         valueChangeHandler={(date, id) =>
                           handleFormValueChange(date, id, true)
                         }
-                        errorMessage={
-                          'A recurring start date is required. Please select a value'
-                        }
+                        errorMessage={errorMessages.startDate ? errorMessages.startDate : 'From date is required'}
                       />
                     </div>
                     <div className={'col-*-*'}
@@ -907,15 +1023,13 @@ const Meeting = (props) => {
                         label="Until"
                         id="recurringUntil"
                         disabled={readOnly}
-                        hasError={errors.recurringUntil}
+                        hasError={errors.endDate}
                         value={value.recurringUntil}
                         required={true}
                         valueChangeHandler={(date, id) =>
                           handleFormValueChange(date, id, true)
                         }
-                        errorMessage={
-                          'A recurring end date is required. Please select a value'
-                        }
+                        errorMessage={errorMessages.endDate ? errorMessages.endDate : 'Until date is required'}
                       />
                     </div>
                   </div>
@@ -931,9 +1045,7 @@ const Meeting = (props) => {
                         valueChangeHandler={(date, id) =>
                           handleFormValueChange(date, id, true)
                         }
-                        errorMessage={
-                          'A recurring start time is required. Please select a value'
-                        }
+                        errorMessage={errorMessages.startTime ? errorMessages.startTime : 'Starting at time is required'}
                       />
                     </div>
                     <div className={'col-*-*'}
@@ -948,9 +1060,7 @@ const Meeting = (props) => {
                         valueChangeHandler={(date, id) =>
                           handleFormValueChange(date, id, true)
                         }
-                        errorMessage={() => {
-                          return Utils.isNull(value.endTime) ? 'A recurring end time is required' : 'Recurring end should not be in the past'
-                        }}
+                        errorMessage={errorMessages.endTime ? errorMessages.endTime : 'Ending at time is required'}
                       />
                     </div>
                   </div>
@@ -1177,9 +1287,7 @@ const Meeting = (props) => {
                           valueChangeHandler={(date, id) =>
                             handleFormValueChange(date, id, true)
                           }
-                          errorMessage={() => {
-                            return Utils.isNull(value.startDate) ? 'A start date is required' : 'Start date should not be in the past'
-                          }}
+                          errorMessage={errorMessages.startDate ? errorMessages.startDate : 'Start date is required'}
                         />
                       </div>
                       {
@@ -1196,9 +1304,7 @@ const Meeting = (props) => {
                             valueChangeHandler={(date, id) =>
                               handleFormValueChange(date, id, true)
                             }
-                            errorMessage={() => {
-                              return Utils.isNull(value.startTime) ? 'A start time is required' : 'Start time should not be in the past'
-                            }}
+                            errorMessage={errorMessages.startTime ? errorMessages.startTime : 'Start time is required'}
                           />
                         </div>
                       }
@@ -1222,10 +1328,7 @@ const Meeting = (props) => {
                           valueChangeHandler={(date, id) =>
                             handleFormValueChange(date, id, true)
                           }
-                          errorMessage={() => {
-                            return Utils.isNull(value.endDate) ? 'An end date is required' : !validateStartAndEndtime() ?
-                              'The end date must be after the start time' : 'End date should not be in the past'
-                          }}
+                          errorMessage={errorMessages.endDate ? errorMessages.endDate : 'End date is required'}
                         />
                       </div>
                       {
@@ -1242,10 +1345,7 @@ const Meeting = (props) => {
                             valueChangeHandler={(date, id) =>
                               handleFormValueChange(date, id, true)
                             }
-                            errorMessage={() => {
-                              return Utils.isNull(value.endTime) ? 'A end time is required' : !validateStartAndEndtime() ?
-                                'The end time must be after the start time' : 'End time should not be in the past'
-                            }}
+                            errorMessage={errorMessages.endTime ? errorMessages.endTime : 'End time is required'}
                           />
                         </div>
                       }
