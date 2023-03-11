@@ -182,6 +182,7 @@ const MeetingRoom = (props) => {
             if (preErrorStep === Steps.LOBBY) {
               initMeetingSession();
             } else if (preErrorStep === Steps.SESSION) {
+              socketManager.clearUserToPeerMap();
               participants.splice(0, participants.length);
               join();
             }
