@@ -113,10 +113,11 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
   const [page, setPage] = React.useState(0);
   const [rows, setRows] = React.useState(!Utils.isNull(props.rows) ? props.rows : []);
   const [deletedRows, setDeletedRows] = React.useState([]);
+  const [originalData, setOriginalData] = React.useState([]);
   const [editable, setEditable] = React.useState(false);
   const [scrollWidth, setScrollWidth] = React.useState(0);
   const [rowsPerPageOptions] = React.useState([15, 30, 45, 60, 75]);
-  const [rowsPerPage, setRowsPerPage] = React.useState(null);
+  const [rowsPerPage, setRowsPerPage] = React.useState(15);
   const [cells] = React.useState([]);
   const {actionsToolbar} = props;
   const [headingHandle] = React.useState({});
@@ -267,6 +268,7 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
   const search = () => {
     post(props.dataUrl, (response) => {
         console.log('RESPONSE: ', response);
+        setOriginalData(response.records)
         processData(response);
       }, (e) => {
 
@@ -658,7 +660,11 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
                                   actionHandler={
                                     (e) => {
                                       if(props.actionHandler) {
-                                        props.actionHandler(e);
+                                        if (!Utils.isNull(props.retrieveOriginalData) && props.retrieveOriginalData) {
+                                          props.actionHandler(e, originalData);
+                                        } else {
+                                          props.actionHandler(e);
+                                        }
                                       }
                                     }
                                   }

@@ -72,14 +72,15 @@ const ChatPoll = (props) => {
   };
 
   const handleFormValueChange = (fieldValue, id, required) => {
+    if (id === 'pollQuestion') {
+      setPollQuestion(fieldValue);
+    }
+
     if (required && !validateField(id, fieldValue)) {
       return;
     }
 
     setErrors({...errors, [id]: false});
-    if (id === 'pollQuestion') {
-      setPollQuestion(fieldValue);
-    }
   };
 
   const validateField = (fieldId, fieldValue) => {

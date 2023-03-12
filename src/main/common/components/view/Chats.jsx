@@ -147,7 +147,7 @@ const Chats = (props) => {
       const filteredChatEvents = response.filter(chat => {
         if (chat.type === 'DIRECT') {
           return true;
-        } else if (chat.type === 'CALENDAR_MEETING' && chat.status === 'ACTIVE' && chat.messages.length > 0) {
+        } else if (chat.type === 'CALENDAR_MEETING' && chat.messages.length > 0) {
           return true;
         }
 

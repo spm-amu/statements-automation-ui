@@ -69,12 +69,26 @@ const ChatRoom = (props) => {
     }
   };
 
+  const fetchChat = () => {
+    get(`${appManager.getAPIHost()}/api/v1/chat/fetchMeetingChat/${selectedChat.meetingId}`, (response) => {
+      if (response && response.id) {
+        setSelectedChat(response);
+      }
+    }, (e) => {
+
+    }, '', false)
+  };
+
   const closePollHandler = (e, poll) => {
     post(
       `${appManager.getAPIHost()}/api/v1/poll/close`,
       (response) => {
         sendMessage(e, `Poll: ${poll.question} has been closed.`);
-        props.addedPeopleHandler();
+        if (props.chatTab) {
+          fetchChat();
+        } else {
+          props.addedPeopleHandler();
+        }
       },
       (e) => {
       },
@@ -96,7 +110,9 @@ const ChatRoom = (props) => {
     post(
       `${appManager.getAPIHost()}/api/v1/poll/vote`,
       (response) => {
-        props.addedPeopleHandler();
+        if (!props.chatTab) {
+          props.addedPeopleHandler();
+        }
       },
       (e) => {
       },
@@ -118,9 +134,13 @@ const ChatRoom = (props) => {
     if (selectedChat && selectedChat.id === payload.roomId) {
       if (props.onMessage) {
         props.onMessage(payload.chatMessage, selectedChat);
+      }
 
-        if (payload.chatMessage.type === 'EVENT') {
-          props.addedPeopleHandler()
+      if (payload.chatMessage.type === 'EVENT') {
+        if (props.chatTab) {
+          fetchChat();
+        } else {
+          props.addedPeopleHandler();
         }
       }
 

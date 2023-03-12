@@ -51,7 +51,7 @@ import {
   TextFields,
   PlayArrow,
   Stop,
-  Note, MoreHoriz, PersonAdd
+  Note, MoreHoriz, PersonAdd, Poll
 } from '@material-ui/icons';
 import SendIcon from "./chat/ChatRoom";
 
@@ -96,6 +96,8 @@ class Icon extends Component {
       return <Download/>
     } else if (this.props.id === 'LINK') {
       return <Link/>
+    } else if (this.props.id === 'POLL') {
+      return <Poll/>
     } else if (this.props.id === 'HELP') {
       return <Help/>
     } else if (this.props.id === 'CALENDAR') {

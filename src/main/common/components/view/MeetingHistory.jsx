@@ -36,7 +36,7 @@ const grid = {
       "id": "viewActions",
       "attributes": {
         "filterable": false,
-        "width": "20.0%",
+        "width": "10.0%",
         "label": "View Meeting",
         "toolbar": {
           "items": [
@@ -44,6 +44,25 @@ const grid = {
               "id": "meetingLink",
               "type": "iconButton",
               "icon": "LINK"
+            }
+          ]
+        },
+        "sortable": false
+      }
+    },
+    {
+      "type": "gridColumn",
+      "id": "viewActions",
+      "attributes": {
+        "filterable": false,
+        "width": "10.0%",
+        "label": "Chat Polls",
+        "toolbar": {
+          "items": [
+            {
+              "id": "chatPollLink",
+              "type": "iconButton",
+              "icon": "POLL"
             }
           ]
         },
@@ -90,7 +109,7 @@ const grid = {
     }
 
   ],
-  "pageSize": 75
+  "pageSize": 15
 };
 
 const MeetingHistory = (props) => {
@@ -140,6 +159,10 @@ const MeetingHistory = (props) => {
                     actionHandler={(e) => {
                       if(e.id === 'downloadRecording') {
                         navigate("/view/recordings", {state: e.data.id})
+                      }
+
+                      if(e.id === 'chatPollLink') {
+                        navigate("/view/pollsHistory", {state: e.data.id})
                       }
 
                       if(e.id === 'meetingLink') {

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './ChatRooms.scss';
 import { CheckCircle } from '@material-ui/icons';
 
