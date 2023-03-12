@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {components} from 'react-select';
 import {Form} from 'reactstrap';
 import Button from '@material-ui/core/Button';
@@ -24,6 +24,8 @@ import appManager from "../../../common/service/AppManager";
 import AlertDialog from "../AlertDialog";
 import SelectItem from "../customInput/SelectItem";
 import moment from 'moment';
+import socketManager from '../../service/SocketManager';
+import { MessageType } from '../../types';
 
 const options = ['NONE', 'TEST'];
 const recurrenceOptions = [
@@ -234,7 +236,6 @@ const Meeting = (props) => {
   };
 
   const createMeetingObject = (hostAttendee) => {
-    console.log('____________ NEW HOST: ', hostAttendee);
     let newAttendees = [].concat(value.attendees);
     newAttendees.push(hostAttendee);
 
@@ -461,6 +462,31 @@ const Meeting = (props) => {
             `${appManager.getAPIHost()}/api/v1/meeting/${isUpdate ? 'update' : 'create'}`,
             (response) => {
               handleClose();
+
+              let userDetails = appManager.getUserDetails();
+
+              const onlineAttendeesIds = [];
+
+              for (const attendeeElement of data.attendees) {
+                let onlineAttendee = socketManager.usersOnline
+                  .find(online => online.userId !== userDetails.userId && online.userId === attendeeElement.userId);
+
+                if (onlineAttendee) {
+                  onlineAttendeesIds.push(onlineAttendee.userId);
+                }
+              }
+
+              console.log('onlineAttendeesIds: ', onlineAttendeesIds);
+              console.log('attendees: ', data.attendees);
+
+              if (onlineAttendeesIds.length > 0) {
+                socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
+                  systemEventType: MessageType.UPDATE_CALENDAR,
+                  recipients: onlineAttendeesIds,
+                  data: {}
+                }).catch((error) => {
+                });
+              }
             },
             (e) => {
             },

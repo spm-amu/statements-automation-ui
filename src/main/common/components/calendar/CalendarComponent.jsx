@@ -18,6 +18,8 @@ import Utils from '../../Utils';
 import {useNavigate} from 'react-router-dom';
 import moment from "moment";
 import appManager from '../../service/AppManager'
+import { MessageType } from '../../types';
+import socketManager from '../../service/SocketManager';
 
 const eventTemplate = {
   id: '',
@@ -60,14 +62,50 @@ const CalendarComponent = (props) => {
   const calendarRef = useRef(null);
   const navigate = useNavigate();
 
+  const [socketEventHandler] = useState({});
+
+  const handler = () => {
+    return {
+      get id() {
+        return 'meeting-calendar';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case MessageType.SYSTEM_EVENT:
+            onSystemEvent(be.payload);
+            break;
+        }
+      }
+    }
+  };
+
+  const onSystemEvent = (payload) => {
+    if (payload.systemEventType === MessageType.UPDATE_CALENDAR) {
+      console.log('******* EVENT: ', payload);
+      loadEvents(false);
+    }
+  }
+
   useEffect(() => {
+    socketEventHandler.api = handler();
+  });
+
+  useEffect(() => {
+    return () => {
+      socketManager.removeSubscriptions(socketEventHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    socketManager.addSubscriptions(socketEventHandler, MessageType.SYSTEM_EVENT);
+
     if (loading) {
       setLoading(false);
       loadEvents();
     }
   }, []);
 
-  const loadEvents = () => {
+  const loadEvents = (track = true) => {
     get(`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetings`, (response) => {
       // FREQ=MONTHLY;BYSETPOS=3;BYDAY=WE;INTERVAL=1
      // let myEvent = {
@@ -88,11 +126,10 @@ const CalendarComponent = (props) => {
      //  };
      //
      //  setEvents(myEvent.events);
-      console.log("\n\n\n\n\n\nEVENTS : ", response);
       setEvents(response);
     }, (e) => {
 
-    })
+    }, '', track);
   };
 
   useEffect(() => {
