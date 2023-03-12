@@ -70,6 +70,8 @@ class SocketManager {
     socket.on("connect", () => {
       this.emitEvent(MessageType.REGISTER_ONLINE, {id: userDetails.userId, name: userDetails.name}).then((data) => {
         appManager.fireEvent(SystemEventType.SOCKET_CONNECT, {});
+      }).catch((exp) => {
+        alert(exp.message);
       });
     });
 

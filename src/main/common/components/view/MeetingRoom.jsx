@@ -167,11 +167,10 @@ const MeetingRoom = (props) => {
     }
   };
 
-
   const systemEventHandlerApi = () => {
     return {
       get id() {
-        return 'meeting-room-system-event-handler-api';
+        return 'meeting-room-system-event-handler-api-' + selectedMeeting.id;
       },
       on: (eventType, be) => {
         switch (eventType) {
@@ -578,7 +577,9 @@ const MeetingRoom = (props) => {
         user.peerID = peerId;
       }
 
-      setParticipants((participants) => [...participants, user]);
+      participants.push(user);
+      setParticipants([].concat(participants));
+      //setParticipants((participants) => [...participants, user]);
     }
   }
 
@@ -729,6 +730,9 @@ const MeetingRoom = (props) => {
   });
 
   useEffect(() => {
+    socketManager.removeSubscriptions(eventHandler);
+    appManager.removeSubscriptions(systemEventHandler);
+
     socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
       MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
       MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD,
