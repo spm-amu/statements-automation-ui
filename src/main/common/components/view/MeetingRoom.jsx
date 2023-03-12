@@ -181,7 +181,6 @@ const MeetingRoom = (props) => {
             }
 
             if (preErrorStep === Steps.LOBBY) {
-              alert("INITIALIZING SESSION");
               initMeetingSession();
             } else if (preErrorStep === Steps.SESSION) {
               socketManager.clearUserToPeerMap();
@@ -630,10 +629,8 @@ const MeetingRoom = (props) => {
     };
 
     if (isHost && autoPermit === false) {
-      alert(1);
       acceptUser(item);
     } else {
-      alert(2);
       lobbyWaitingList.push(item);
       setLobbyWaitingList([].concat(lobbyWaitingList));
     }

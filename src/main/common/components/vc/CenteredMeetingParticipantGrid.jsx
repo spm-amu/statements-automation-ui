@@ -17,8 +17,6 @@ const MeetingParticipantGrid = (props) => {
   const {participants, participantsRaisedHands} = props;
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
-  // TODO : Get rid of screenShared in the whole component
-  const [screenShared, setScreenShared] = React.useState(false);
   const {
     waitingList,
     mode,
@@ -46,24 +44,13 @@ const MeetingParticipantGrid = (props) => {
 
         participants.splice(0, 0, currentUserParticipant);
       }
-
-      if(!screenShared) {
-        let sharingParticipant = participants.find((p) => p.screenShared);
-        if (sharingParticipant) {
-          let sharingParticipantIndex = participants.findIndex((p) => p.screenShared);
-          setScreenShared(true);
-          participants.unshift(participants.splice(sharingParticipantIndex, 1)[0]);
-        } else {
-          setScreenShared(false);
-        }
-      }
     }
 
     console.log("\n\n\nPARTS : ", participants);
     let gridData = createGrid();
     setGrid(gridData.mainGrid);
     setOverflowGrid(gridData.overflowGrid);
-  }, [participants, props.mode, screenShared]);
+  }, [participants, props.mode]);
 
   const createGrid = () => {
     let itemGrid = {
@@ -72,11 +59,6 @@ const MeetingParticipantGrid = (props) => {
     };
 
     let numRows = participants.length < MAX_ROWS ? participants.length : MAX_ROWS;
-
-    if (screenShared) {
-      numRows = 1;
-    }
-
     if (mode === 'DEFAULT') {
       for (let i = 0; i < numRows; i++) {
         itemGrid.mainGrid.push([]);
@@ -84,9 +66,8 @@ const MeetingParticipantGrid = (props) => {
     }
 
     let currentRowIndex = 0;
-    let maxTiles = screenShared ? 1 : MAX_TILES;
     for (let i = 0; i < participants.length; i++) {
-      if (i < maxTiles && mode === 'DEFAULT') {
+      if (i < MAX_TILES && mode === 'DEFAULT') {
         itemGrid.mainGrid[currentRowIndex].push(participants[i]);
         if (currentRowIndex++ === MAX_ROWS - 1 || participants.length === 2) {
           currentRowIndex = 0;
@@ -147,13 +128,12 @@ const MeetingParticipantGrid = (props) => {
           overflowX: 'auto',
           maxWidth: '100%',
           width: '100%',
-          height: !screenShared ? '96%' : null,
+          height: '96%',
           borderRadius: '4px',
           overflowY: 'hidden',
-          margin: screenShared || mode === 'STRIP' ? "0" : "12px 8px",
+          margin: mode === 'STRIP' ? "0" : "12px 8px",
           backgroundColor: 'rgb(40, 40, 43)',
           display: 'flex',
-          padding: screenShared ? '0 16px' : null,
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
@@ -203,17 +183,10 @@ const MeetingParticipantGrid = (props) => {
             display: 'flex',
             padding: '32px'
           }}>
-            <Grid container spacing={2} style={{width: '100%', height: screenShared ? "100%" : null}}>
+            <Grid container spacing={2} style={{width: '100%'}}>
               {grid.map((row, index) => {
                 return <>
                   {
-                    screenShared ?
-                      <div key={index} style={{width: '100%', height: screenShared ? "calc(75% + 40px)" : null}}>
-                        {
-                          renderRow(row, index)
-                        }
-                      </div>
-                      :
                       <Fragment key={index}>
                         {
                           renderRow(row, index)
