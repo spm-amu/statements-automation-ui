@@ -81,7 +81,6 @@ const CalendarComponent = (props) => {
 
   const onSystemEvent = (payload) => {
     if (payload.systemEventType === MessageType.UPDATE_CALENDAR) {
-      console.log('******* EVENT: ', payload);
       loadEvents(false);
     }
   }
