@@ -19,26 +19,29 @@ export default class EventHandler {
   };
 
   dragStart = (event) => {
-    if (this.selectedNode === event.target) {
+    let element = event.target;
+    let selectedNodeId = this.selectedNode ? this.selectedNode.id : null;
+
+    if (this.selectedNode === element || selectedNodeId === element.id + "_INPUT_TEXT") {
       if (document.body.style.cursor !== "move" || this.resizingTableColumn) {
         if (!this.resizingTableColumn || this.resizingBoundaryTableColumn) {
-          this.currentResizeNode = event.target;
+          this.currentResizeNode = element;
         }
 
         event.preventDefault();
       }
 
-      let parentLeft = event.target.parentElement.offsetLeft;
-      let parentTop = event.target.parentElement.offsetTop;
+      let parentLeft = element.parentElement.offsetLeft;
+      let parentTop = element.parentElement.offsetTop;
 
       console.log("\n====================================");
       console.log(event.clientY );
       console.log(parentTop);
-      console.log(event.target.style.top);
+      console.log(element.style.top);
       console.log("====================================");
 
-      this.dragOffset.x = event.clientX - (parentLeft + parseFloat(event.target.style.left.replace('px', '')));
-      this.dragOffset.y = event.clientY - (parentTop + parseFloat(event.target.style.top.replace('px', '')));
+      this.dragOffset.x = event.clientX - (parentLeft + parseFloat(element.style.left.replace('px', '')));
+      this.dragOffset.y = event.clientY - (parentTop + parseFloat(element.style.top.replace('px', '')));
     }
   };
 
@@ -132,8 +135,14 @@ export default class EventHandler {
     let dropTarget = document.getElementsByClassName('dropTarget')[0];
 
     if (dropTarget) {
-      let node = document.createElement(metadata.type);
-      node.value = "TEXT";
+      let node = document.createElement("div");
+      let inputItem = document.createElement(metadata.type);
+      inputItem.style.height = '100%';
+      inputItem.style.width = '100%';
+      inputItem.value = "TEXT";
+      inputItem.id = metadata.id + "_INPUT_TEXT";
+      inputItem.setAttribute('draggable', false);
+
       const properties = Object.getOwnPropertyNames(metadata);
       for (const property of properties) {
         if(property !== 'style' && property !== 'attributes' && property !== 'offsetLeft' && property !== 'offsetTop') {
@@ -144,38 +153,43 @@ export default class EventHandler {
       if(metadata.style) {
         const properties = Object.getOwnPropertyNames(metadata.style);
         for (const property of properties) {
-            node.style[property] = metadata.style[property];
+          node.style[property] = metadata.style[property];
         }
       }
 
       if(metadata.attributes) {
         const properties = Object.getOwnPropertyNames(metadata.attributes);
         for (const property of properties) {
-            node.setAttribute(property, metadata.attributes[property]);
+          node.setAttribute(property, metadata.attributes[property]);
         }
       }
 
       if(readOnly) {
-        this.makeNodeReadOnly(node);
+        this.makeNodeReadOnly(inputItem);
       }
 
       if(!readOnly) {
+        //inputItem.addEventListener('dragstart', (e) => {e.preventDefault(); e.stopPropagation()});
         node.addEventListener('dragend', (event) => this.handleItemDrop(event, dropTarget), false);
         node.addEventListener('mousemove', (event) => this.handleItemMouseMove(event, dropTarget), false);
         node.addEventListener('mouseout', this.handleItemMouseOut, false);
         node.addEventListener('mouseup', (event) => this.handleItemMouseClick(node, metadata.id, selectionHandler), false);
-        node.addEventListener('keyup', (event) => this.handleInputValueChange(event), false);
-        node.addEventListener('focus', (event) => {
+        inputItem.addEventListener('mouseup', (event) => this.handleItemMouseClick(node, metadata.id, selectionHandler), false);
+        inputItem.addEventListener('keyup', (event) => this.handleInputValueChange(event), false);
+        inputItem.addEventListener('focus', (event) => {
           focusHandler(metadata, true);
           event.preventDefault();
         }, false);
-        node.addEventListener('focusout', (event) => {
+        inputItem.addEventListener('focusout', (event) => {
           focusHandler(metadata, false);
           event.preventDefault();
         }, false);
       }
 
+      node.style.border = '2px solid red';
       dropTarget.appendChild(node);
+      node.appendChild(inputItem);
+
       return node;
     }
   };
@@ -201,7 +215,6 @@ export default class EventHandler {
     let nodeMetadata = {
       type: "input",
       id: props.id,
-      innerText: props.description,
       className: "_draggable_",
       style: {
         lineHeight: event.target.style.lineHeight,
@@ -212,7 +225,8 @@ export default class EventHandler {
         width: width + 'px',
       },
       attributes: {
-        draggable: true
+        draggable: true,
+        description: props.description
       }
     };
 
@@ -252,7 +266,7 @@ export default class EventHandler {
   }
 
   moveItem = (item, metaData) => {
-    console.log("DO : ", this.dragOffset);
+    console.log("MOVE ITEM METADATA : ", metaData);
     item.style.left = ((metaData.clientX - metaData.offsetLeft) - metaData.dragOffset.x) + 'px';
     item.style.top = ((metaData.clientY - metaData.offsetTop) - metaData.dragOffset.y) + 'px';
   };

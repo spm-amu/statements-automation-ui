@@ -268,7 +268,7 @@ const WhiteBoard = (props) => {
       eventHandler.handleGrabRelease(event,
         {
           id: window.btoa(appManager.getUserDetails().userId) + "-" + idCounter.current++,
-          width: 400,
+          width: 300,
           height: 48,
           description: grabbedItem.description,
           type: grabbedItem.placeHolderType,
