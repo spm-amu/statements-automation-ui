@@ -167,6 +167,7 @@ const MeetingRoom = (props) => {
     }
   };
 
+
   const systemEventHandlerApi = () => {
     return {
       get id() {
@@ -180,6 +181,7 @@ const MeetingRoom = (props) => {
             }
 
             if (preErrorStep === Steps.LOBBY) {
+              alert("INITIALIZING SESSION");
               initMeetingSession();
             } else if (preErrorStep === Steps.SESSION) {
               socketManager.clearUserToPeerMap();
@@ -543,9 +545,12 @@ const MeetingRoom = (props) => {
 
   function addUserToParticipants(item, peerId = null) {
     // Typically, a user shoud not exist. We are ensuring that there are never duplicates
+    console.log("\n\n\n\n\n\nSEARCHING USER : " + item.user.userId);
+    console.log(participants);
     let user = participants.find((u) => u.userId === item.user.userId);
 
     if (user) {
+      console.log("FOUND EXISTING USER : ", user);
       if (peerId) {
         user.peerID = peerId;
       }
@@ -558,6 +563,7 @@ const MeetingRoom = (props) => {
       user.stream = item.mainStream;
       user.shareStream = item.shareStream;
     } else {
+      console.log("DID NOT FIND EXISTING USER : ", user);
       user = {
         userId: item.user.userId,
         peer: item.peer,
@@ -624,8 +630,10 @@ const MeetingRoom = (props) => {
     };
 
     if (isHost && autoPermit === false) {
+      alert(1);
       acceptUser(item);
     } else {
+      alert(2);
       lobbyWaitingList.push(item);
       setLobbyWaitingList([].concat(lobbyWaitingList));
     }

@@ -10,7 +10,7 @@ const colors = [
 ];
 
 export const SYSTEM_ERROR_MESSAGE =
-  'A system error has occured. Please contact your system administrator';
+  'A system error has occured. Please try again later or contact your system administrator';
 
 export const CONNECTION_ERROR_MESSAGE =
   'There seems to be a problem with your connection. We are trying to re-connect you';
