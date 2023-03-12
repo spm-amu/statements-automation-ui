@@ -120,6 +120,7 @@ const MeetingRoom = (props) => {
       on: (eventType, be) => {
         switch (eventType) {
           case MessageType.ALLOWED:
+            console.log("CALLING JOIN AFTER ALLOWED EVENT");
             join();
             break;
           case MessageType.PERMIT:
@@ -179,11 +180,14 @@ const MeetingRoom = (props) => {
               setStep(preErrorStep);
             }
 
-            if (preErrorStep === Steps.LOBBY) {
-              initMeetingSession();
-            } else if (preErrorStep === Steps.SESSION) {
+            //if (preErrorStep === Steps.LOBBY) {
+              //console.log("RE-JOINING FROM LOBBY AFTER CONNECT");
+              //initMeetingSession();
+            //} else
+            if (preErrorStep === Steps.SESSION) {
               socketManager.clearUserToPeerMap();
               participants.splice(0, participants.length);
+              console.log("RE-JOINING FROM SESSION AFTER CONNECT");
               join();
             }
             break;
@@ -652,6 +656,7 @@ const MeetingRoom = (props) => {
   };
 
   const join = () => {
+    console.log("\n\n\n\n\n\nJOINING");
     let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
@@ -750,6 +755,7 @@ const MeetingRoom = (props) => {
 
   function initMeetingSession() {
     if (isHost || isDirectCall || isRequestToJoin) {
+      console.log("CALLING JOIN FROM INIT initMeetingSession()");
       join();
     } else {
       askForPermission();
