@@ -99,7 +99,7 @@ export default class EventHandler {
 
   updateInputItemValue(metadata) {
     let elementById = document.getElementById(metadata.id);
-    elementById.value = metadata.value + elementById.getAttribute("editorTip");
+    elementById.value = metadata.value;
   }
 
   lockItem(id, editor) {
