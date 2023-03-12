@@ -184,7 +184,6 @@ const MeetingRoom = (props) => {
             } else if (preErrorStep === Steps.SESSION) {
               socketManager.clearUserToPeerMap();
               participants.splice(0, participants.length);
-              console.log("\n\n\n\n\n\nRE-JOINING MEETING");
               join();
             }
             break;
@@ -678,7 +677,7 @@ const MeetingRoom = (props) => {
         }
       } else {
         setPreErrorStep(step);
-        setStep(data.status);
+        setStep(result.status);
       }
     }).catch((error) => {
       setPreErrorStep(step);
