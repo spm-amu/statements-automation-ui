@@ -245,6 +245,8 @@ const WhiteBoard = (props) => {
   };
 
   const handleSave = () => {
+    let htmlContent = btoa(document.getElementById("workspaceContainerWrapper").innerHTML);
+
     post(
       `${appManager.getAPIHost()}/api/v1/meeting/whiteboard/save`,
       (response) => {
@@ -255,10 +257,11 @@ const WhiteBoard = (props) => {
         data: JSON.stringify({
           items: props.items
         }),
+        htmlContent,
         id: props.id
       },
       'Whiteboard data saved successfully',
-      false
+      true
     );
   };
 
@@ -300,7 +303,8 @@ const WhiteBoard = (props) => {
           {
             designData ?
               <>
-                <div style={{height: '64px'}}>
+                <div style={{height: '64px', marginLeft: '8px'}} className={"row"}>
+                  <div>
                   <IconButton component="span"
                               disabled={selectedItem === null || props.readOnly}
                               variant={'contained'}
@@ -310,8 +314,10 @@ const WhiteBoard = (props) => {
                   >
                     <Icon id={'DELETE'}/>
                   </IconButton>
+                  </div>
                   {
                     props.isHost && !props.readOnly &&
+                    <div>
                     <IconButton component="span"
                                 disabled={props.items.length === 0}
                                 variant={'contained'}
@@ -321,6 +327,26 @@ const WhiteBoard = (props) => {
                     >
                       <Icon id={'SAVE'}/>
                     </IconButton>
+                    </div>
+                  }
+                  {
+                    designData.items.map((placeHolder, index) => {
+                      return <div>
+                        <Button
+                          variant={'contained'}
+                          disabled={props.readOnly}
+                          size="large"
+                          style={{width: '48px'}}
+                          key={index}
+                          className={grabbedItem && grabbedItem.placeHolder === placeHolder.placeHolder ? classes.paletteButtonSelected : classes.paletteButton}
+                          onClick={() => grabPalleteItem(placeHolder)}
+                        >
+                          {
+                            placeHolder.description
+                          }
+                        </Button>
+                      </div>
+                    })
                   }
                 </div>
                 <div className={"row"} style={{
@@ -330,41 +356,18 @@ const WhiteBoard = (props) => {
                   marginLeft: '0'
                 }}>
                   <div style={{
-                    width: '280px',
-                    minWidth: '280px',
-                  }} className={'col-*-*'}>
-                    {
-                      designData.items.map((placeHolder, index) => {
-                        return <div>
-                          <Button
-                            variant={'contained'}
-                            disabled={props.readOnly}
-                            size="large"
-                            style={{width: '100%'}}
-                            key={index}
-                            className={grabbedItem && grabbedItem.placeHolder === placeHolder.placeHolder ? classes.paletteButtonSelected : classes.paletteButton}
-                            onClick={() => grabPalleteItem(placeHolder)}
-                          >
-                            {
-                              placeHolder.description
-                            }
-                          </Button>
-                        </div>
-                      })
-                    }
-                  </div>
-                  <div style={{
                     border: "1px solid #e1e1e1",
                     borderRadius: "4px",
                     margin: "4px 12px",
                     height: "100%",
-                    width: "calc(100% - 310px)",
+                    width: "100%",
                     backgroundColor: '#FFFFFF'
                   }} className={'col-*-* dropTarget'}
-                       onClick={(e) => mouseClickHandler(e)}>
+                       onClick={(e) => mouseClickHandler(e)} id={"workspaceContainerWrapper"}>
                     <canvas style={{height: "100%", width: '100%', overflow: "auto"}}
                             className={'col-*-*'} id={"workspaceContainer"}
                     >
+                      &nbsp;
                     </canvas>
                   </div>
                 </div>

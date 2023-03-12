@@ -268,7 +268,7 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
   const search = () => {
     post(props.dataUrl, (response) => {
         console.log('RESPONSE: ', response);
-        setOriginalData(response.records)
+        setOriginalData(response.records);
         processData(response);
       }, (e) => {
 

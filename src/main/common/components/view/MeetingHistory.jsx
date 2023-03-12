@@ -4,7 +4,8 @@ import SearchBar from "../SearchBar";
 import {DataGrid} from "../DataGrid";
 import {useNavigate} from "react-router-dom";
 import appManager from "../../service/AppManager";
-const { electron } = window;
+
+const {electron} = window;
 
 const grid = {
   "id": "meetingList",
@@ -123,7 +124,6 @@ const MeetingHistory = (props) => {
       navigate("/view/meeting", {state: response})
     }, (e) => {
     }, '', false);
-
   };
 
   const viewMeeting = (selectedMeeting) => {
@@ -139,11 +139,11 @@ const MeetingHistory = (props) => {
   };
 
   return (
-    <div style={{ width: '100%', display: 'flex', margin: '16px 0' }}>
-      <div style={{ marginRight: '4px' }}>
+    <div style={{width: '100%', display: 'flex', margin: '16px 0'}}>
+      <div style={{marginRight: '4px'}}>
         <ul>
           <li>
-            <h3 style={{ color: 'black' }}>Meeting History</h3>
+            <h3 style={{color: 'black'}}>Meeting History</h3>
           </li>
           <div className={'searchbar'}>
             <SearchBar onSearch={(searchValue) => {
@@ -157,20 +157,22 @@ const MeetingHistory = (props) => {
                     criteriaParams={criteriaParams}
                     dataUrl={`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetingHistory`}
                     actionHandler={(e) => {
-                      if(e.id === 'downloadRecording') {
+                      if (e.id === 'downloadRecording') {
                         navigate("/view/recordings", {state: e.data.id})
                       }
 
-                      if(e.id === 'chatPollLink') {
+                      if (e.id === 'chatPollLink') {
                         navigate("/view/pollsHistory", {state: e.data.id})
                       }
 
-                      if(e.id === 'meetingLink') {
+                      if (e.id === 'meetingLink') {
                         viewMeeting(e.data);
                       }
 
-                      if(e.id === 'viewWhiteboard') {
-                        navigate("/view/whiteboard", {state: e.data.id})
+                      if (e.id === 'viewWhiteboard') {
+                        if(e.data.whiteboardDocumentId) {
+                          onDownload(e.data.whiteboardDocumentId);
+                        }
                       }
                     }}
           />
