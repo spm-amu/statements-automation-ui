@@ -14,7 +14,8 @@ const MAX_ROWS = 2;
 const MAX_TILES = 6;
 
 const MeetingParticipantGrid = (props) => {
-  const {participants, participantsRaisedHands} = props;
+  const {participantsRaisedHands} = props;
+  const [participants, setParticipants] = React.useState([]);
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
   const {
@@ -29,8 +30,9 @@ const MeetingParticipantGrid = (props) => {
   } = props;
 
   useEffect(() => {
-    if (participants) {
-      let currentUserParticipant = participants.find((p) => p.isCurrentUser);
+    if (props.participants && props.mode) {
+      let newParticipants = [];
+      let currentUserParticipant = props.participants.find((p) => p.isCurrentUser);
       if (!currentUserParticipant) {
         currentUserParticipant = {
           isCurrentUser: true,
@@ -42,17 +44,25 @@ const MeetingParticipantGrid = (props) => {
           audioMuted
         };
 
-        participants.splice(0, 0, currentUserParticipant);
+        newParticipants.push(currentUserParticipant);
       }
+
+      for (const participant of props.participants) {
+        if (!participant.isCurrentUser) {
+          newParticipants.push(participant);
+        }
+      }
+
+      console.log("\n\n\nPARTS : ", props.participants);
+
+      setParticipants(newParticipants);
+      let gridData = createGrid(newParticipants);
+      setGrid(gridData.mainGrid);
+      setOverflowGrid(gridData.overflowGrid);
     }
+  }, [props.participants, props.mode]);
 
-    console.log("\n\n\nPARTS : ", participants);
-    let gridData = createGrid();
-    setGrid(gridData.mainGrid);
-    setOverflowGrid(gridData.overflowGrid);
-  }, [participants, props.mode]);
-
-  const createGrid = () => {
+  const createGrid = (participants) => {
     let itemGrid = {
       mainGrid: [],
       overflowGrid: []
