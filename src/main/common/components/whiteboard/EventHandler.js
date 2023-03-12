@@ -103,16 +103,24 @@ export default class EventHandler {
   }
 
   lockItem(id, editor) {
-    let elementById = document.getElementById(id);
-    elementById.value = elementById.value + " - [" + editor + " - is editing]";
-    elementById.setAttribute("editorTip", " - [" + editor + " - is editing]");
+    let elementById = document.getElementById(id + "_INPUT_TEXT");
+
+    let helperTextElement = document.getElementById(id + '_HELPER_TEXT');
+    if(helperTextElement) {
+      helperTextElement.innerText = "[" + editor + " is editing]";
+    }
+
     elementById.setAttribute("readOnly", true);
   }
 
   unLockItem(id, editor) {
-    let elementById = document.getElementById(id);
-    elementById.value = elementById.value.replace(" - [" + editor + " - is editing]", "");
-    elementById.setAttribute("editorTip", "");
+    let elementById = document.getElementById(id + "_INPUT_TEXT");
+
+    let helperTextElement = document.getElementById(id + '_HELPER_TEXT');
+    if(helperTextElement) {
+      helperTextElement.innerText = "";
+    }
+
     elementById.setAttribute("readOnly", false);
   }
 
@@ -136,6 +144,9 @@ export default class EventHandler {
 
     if (dropTarget) {
       let node = document.createElement("div");
+      let helperText = document.createElement("div");
+      helperText.id = metadata.id + "_HELPER_TEXT";
+      helperText.style.color = 'rgb(235, 63, 33)';
       let inputItem = document.createElement(metadata.type);
       inputItem.style.height = '100%';
       inputItem.style.width = '100%';
@@ -186,8 +197,8 @@ export default class EventHandler {
         }, false);
       }
 
-      node.style.border = '2px solid red';
       dropTarget.appendChild(node);
+      node.appendChild(helperText);
       node.appendChild(inputItem);
 
       return node;
