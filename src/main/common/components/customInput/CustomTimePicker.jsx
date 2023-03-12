@@ -6,6 +6,7 @@ import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker
 } from '@material-ui/pickers';
+import { AccessTime } from '@material-ui/icons';
 
 const CustomTimePickerComponent = React.memo(React.forwardRef((props, ref) => {
 
@@ -33,6 +34,7 @@ const CustomTimePickerComponent = React.memo(React.forwardRef((props, ref) => {
                     inputVariant="outlined"
                     style={{textAlign: 'left'}}
                     onChange={handleDateChange}
+                    keyboardIcon={<AccessTime />}
                     size="small"
                     KeyboardButtonProps={{
                         'aria-label': 'change time',
