@@ -1283,6 +1283,7 @@ const MeetingRoom = (props) => {
                   step={step}
                   autoPermit={autoPermit}
                   participantsRaisedHands={participantsRaisedHands}
+                  meetingTitle={selectedMeeting.title}
                   toolbarEventHandler={
                     {
                       onMuteVideo: (muted) => {
