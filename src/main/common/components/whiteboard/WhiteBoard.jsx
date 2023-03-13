@@ -178,6 +178,7 @@ const WhiteBoard = (props) => {
 
     eventHandler.setId(props.id);
 
+    console.log("INIT WB : ", props.items);
     for (const item of props.items) {
       eventHandler.createNode(item, (id) => {
         setSelectedItem(id);

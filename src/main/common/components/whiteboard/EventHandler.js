@@ -126,7 +126,7 @@ export default class EventHandler {
 
   handleInputValueChange = (event) => {
     let metadata = {
-      id: event.target.id,
+      id: event.target.id.replace("_INPUT_TEXT", ""),
       value: event.target.value
     };
 
@@ -150,7 +150,7 @@ export default class EventHandler {
       let inputItem = document.createElement(metadata.type);
       inputItem.style.height = '100%';
       inputItem.style.width = '100%';
-      inputItem.value = "TEXT";
+      inputItem.value = metadata.value ? metadata.value : "TEXT";
       inputItem.id = metadata.id + "_INPUT_TEXT";
       inputItem.setAttribute('draggable', false);
 
