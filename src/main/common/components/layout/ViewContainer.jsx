@@ -90,6 +90,7 @@ const ViewContainer = (props) => {
         attributes.data = data;
       }
 
+      console.log("\n\n\n\n\n\nNAV : ", attributes);
       switch (attributes.currentView) {
         case 'calendar':
           element = <Calendar/>;
@@ -181,7 +182,6 @@ const ViewContainer = (props) => {
               attributes.windowDisplayState = 'MAXIMIZED';
               attributes.currentWindow = null;
               attributes.data = null;
-
               setWindowOpen(false);
             }}
             displayState={attributes.windowDisplayState}

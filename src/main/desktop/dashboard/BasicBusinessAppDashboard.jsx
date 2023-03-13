@@ -299,7 +299,11 @@ const BasicBusinessAppDashboard = (props) => {
   const handleCallRejection = (payload) => {
     handleMessageArrived({
       message: payload.rejectedBy + ' rejected the call with this reason : ' + payload.reason
-    })
+    });
+
+    // TODO : We had to do this as a temporary major. Without this hack the call re-dials itself. Remove the lines below to observe
+    navigate('/view/calendar');
+    navigate('/view/people');
   };
 
   const receiveCall = (payload) => {
@@ -658,9 +662,9 @@ const BasicBusinessAppDashboard = (props) => {
 
   const handleMessageArrived = (event) => {
     if (event.message && event.message.length > 0) {
-      //
+      setActivityMessage(event.message);
       const messageTimeout = setTimeout(() => {
-        //setActivityMessage(null);
+        setActivityMessage(null);
         clearTimeout(messageTimeout);
       }, 4000)
     }
