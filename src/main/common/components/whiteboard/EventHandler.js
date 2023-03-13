@@ -98,30 +98,38 @@ export default class EventHandler {
   };
 
   updateInputItemValue(metadata) {
-    let elementById = document.getElementById(metadata.id);
-    elementById.value = metadata.value;
+    let elementById = document.getElementById(metadata.id + "_INPUT_TEXT");
+    if(elementById) {
+      elementById.value = metadata.value;
+    }
   }
 
   lockItem(id, editor) {
     let elementById = document.getElementById(id + "_INPUT_TEXT");
 
-    let helperTextElement = document.getElementById(id + '_HELPER_TEXT');
-    if(helperTextElement) {
-      helperTextElement.innerText = "[" + editor + " is editing]";
-    }
+    if(elementById) {
+      if(!elementById.setAttribute("readOnly")) {
+        let helperTextElement = document.getElementById(id + '_HELPER_TEXT');
+        if (helperTextElement) {
+          helperTextElement.innerText = "[" + editor + " is editing]";
+        }
 
-    elementById.setAttribute("readOnly", true);
+        elementById.setAttribute("readOnly", true);
+      }
+    }
   }
 
   unLockItem(id, editor) {
     let elementById = document.getElementById(id + "_INPUT_TEXT");
 
-    let helperTextElement = document.getElementById(id + '_HELPER_TEXT');
-    if(helperTextElement) {
-      helperTextElement.innerText = "";
-    }
+    if(elementById) {
+      let helperTextElement = document.getElementById(id + '_HELPER_TEXT');
+      if (helperTextElement) {
+        helperTextElement.innerText = "";
+      }
 
-    elementById.setAttribute("readOnly", false);
+      elementById.setAttribute("readOnly", false);
+    }
   }
 
   handleInputValueChange = (event) => {
