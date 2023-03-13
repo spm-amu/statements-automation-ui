@@ -108,7 +108,7 @@ export default class EventHandler {
     let elementById = document.getElementById(id + "_INPUT_TEXT");
 
     if(elementById) {
-      if(!elementById.setAttribute("readOnly")) {
+      if(!elementById.getAttribute("readOnly")) {
         let helperTextElement = document.getElementById(id + '_HELPER_TEXT');
         if (helperTextElement) {
           helperTextElement.innerText = "[" + editor + " is editing]";
