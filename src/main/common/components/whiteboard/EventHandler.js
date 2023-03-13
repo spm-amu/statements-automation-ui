@@ -108,13 +108,13 @@ export default class EventHandler {
     let elementById = document.getElementById(id + "_INPUT_TEXT");
 
     if(elementById) {
-      if(!elementById.getAttribute("readOnly")) {
+      if(!elementById.getAttribute("disabled")) {
         let helperTextElement = document.getElementById(id + '_HELPER_TEXT');
         if (helperTextElement) {
           helperTextElement.innerText = "[" + editor + " is editing]";
         }
 
-        elementById.setAttribute("readOnly", true);
+        elementById.setAttribute("disabled", true);
       }
     }
   }
@@ -128,7 +128,7 @@ export default class EventHandler {
         helperTextElement.innerText = "";
       }
 
-      elementById.setAttribute("readOnly", false);
+      elementById.removeAttribute("disabled");
     }
   }
 
@@ -196,14 +196,14 @@ export default class EventHandler {
         inputItem.addEventListener('mouseup', (event) => this.handleItemMouseClick(node, metadata.id, selectionHandler), false);
         inputItem.addEventListener('keyup', (event) => this.handleInputValueChange(event), false);
         inputItem.addEventListener('focus', (event) => {
-          if(!inputItem.getAttribute("readOnly")) {
+          if(!inputItem.getAttribute("disabled")) {
             focusHandler(metadata, true);
           }
 
           event.preventDefault();
         }, false);
         inputItem.addEventListener('focusout', (event) => {
-          if(!inputItem.getAttribute("readOnly")) {
+          if(!inputItem.getAttribute("disabled")) {
             focusHandler(metadata, false);
           }
 
