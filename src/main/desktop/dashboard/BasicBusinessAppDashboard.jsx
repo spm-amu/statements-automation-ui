@@ -52,6 +52,7 @@ const BasicBusinessAppDashboard = (props) => {
   const [systemEventHandler] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
+  const [activityMessage, setActivityMessage] = useState(null);
 
   //const dispatch = useDispatch();
 
@@ -231,6 +232,9 @@ const BasicBusinessAppDashboard = (props) => {
           case MessageType.RECEIVING_CALL:
             receiveCall(be.payload);
             break;
+          case MessageType.CALL_REJECTED:
+            handleCallRejection(be.payload);
+            break;
           case MessageType.CANCEL_CALL:
             cancelCall(be.payload);
             break;
@@ -291,6 +295,13 @@ const BasicBusinessAppDashboard = (props) => {
     }
   };
 
+
+  const handleCallRejection = (payload) => {
+    handleMessageArrived({
+      message: payload.rejectedBy + ' rejected the call with this reason : ' + payload.reason
+    })
+  };
+
   const receiveCall = (payload) => {
     if (appManager.get('CURRENT_MEETING')) {
       socketManager.declineDirectCall(payload.callerUser.socketId, payload.roomId, "I am in another meeting");
@@ -311,7 +322,7 @@ const BasicBusinessAppDashboard = (props) => {
     setUserDetails(response);
     initDashboardSettings();
     socketManager.init();
-    socketManager.addSubscriptions(socketEventHandler, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
+    socketManager.addSubscriptions(socketEventHandler, MessageType.CALL_REJECTED, MessageType.RECEIVING_CALL, MessageType.CANCEL_CALL, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_ALERT);
 
     if (!tokenRefreshMonitorStarted) {
       tokenManager.startTokenRefreshMonitor(`${appManager.getAPIHost()}/api/v1/auth/refresh`, response.username);
@@ -558,28 +569,6 @@ const BasicBusinessAppDashboard = (props) => {
     };
   }, []);
 
-  const getViews = (menus, level) => {
-    let newViews = [];
-
-    for (let i = 0; i < menus.length; i++) {
-      let createView = {};
-      createView.name = menus[i].attributes.label;
-      createView.mini = "SS";
-      createView.layout = "/admin";
-      createView.level = level;
-
-      if (menus[i].items && menus[i].items.length > 0) {
-        createView.collapse = true;
-        createView.state = menus[i].id + "Collapse";
-        createView.views = getItems(menus[i].items, level + 1);
-      }
-
-      newViews.push(createView);
-    }
-
-    return newViews;
-  };
-
   const getItems = (items, level) => {
     let newItems = [];
 
@@ -667,36 +656,20 @@ const BasicBusinessAppDashboard = (props) => {
     return activeRoute;
   };
 
-  const handleActiveClick = (color) => {
-    setActiveColor(color)
-  };
-
-  const handleMiniClick = () => {
-    let notifyMessage = "Sidebar mini ";
-    if (document.body.classList.contains("sidebar-mini")) {
-      setSidebarMini(false);
-      notifyMessage += "deactivated...";
-    } else {
-      setSidebarMini(true);
-      notifyMessage += "activated...";
+  const handleMessageArrived = (event) => {
+    if (event.message && event.message.length > 0) {
+      //
+      const messageTimeout = setTimeout(() => {
+        //setActivityMessage(null);
+        clearTimeout(messageTimeout);
+      }, 4000)
     }
-    let options = {};
-    options = {
-      place: "tr",
-      message: notifyMessage,
-      type: "primary",
-      icon: "tim-icons icon-bell-55",
-      autoDismiss: 7,
-    };
-    document.body.classList.toggle("sidebar-mini");
-
   };
 
   const closeSidebar = () => {
     setSidebarOpened(false);
     document.documentElement.classList.remove("nav-open");
   };
-
 
   return (
     loading ?
@@ -788,11 +761,18 @@ const BasicBusinessAppDashboard = (props) => {
                       >
                         <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
                       </Alert>
+
+                      <Alert
+                        variant={'danger'}
+                        show={activityMessage !== null}
+                        fade={true}
+                      >
+                        <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{activityMessage}</p>
+                      </Alert>
                     </div>
                     <ViewPort/>
                   </div>
                 </div>
-
                 {/*<HomeFooter fluid /> {" "}*/}
               </div>
               {" "}
