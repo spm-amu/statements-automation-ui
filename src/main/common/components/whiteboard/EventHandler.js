@@ -196,11 +196,17 @@ export default class EventHandler {
         inputItem.addEventListener('mouseup', (event) => this.handleItemMouseClick(node, metadata.id, selectionHandler), false);
         inputItem.addEventListener('keyup', (event) => this.handleInputValueChange(event), false);
         inputItem.addEventListener('focus', (event) => {
-          focusHandler(metadata, true);
+          if(!inputItem.getAttribute("readOnly")) {
+            focusHandler(metadata, true);
+          }
+
           event.preventDefault();
         }, false);
         inputItem.addEventListener('focusout', (event) => {
-          focusHandler(metadata, false);
+          if(!inputItem.getAttribute("readOnly")) {
+            focusHandler(metadata, false);
+          }
+
           event.preventDefault();
         }, false);
       }
