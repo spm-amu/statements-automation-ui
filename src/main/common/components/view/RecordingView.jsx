@@ -1,7 +1,9 @@
 import React, {useState} from 'react';
 import {DataGrid} from "../DataGrid";
 import appManager from "../../service/AppManager";
-const { electron } = window;
+import './Views.css'
+
+const {electron} = window;
 
 const grid = {
   "id": "meetingList",
@@ -64,21 +66,17 @@ const RecordingView = (props) => {
   };
 
   return (
-    <div style={{ width: '100%', display: 'flex', margin: '16px 0' }}>
-      <div style={{ marginRight: '4px' }}>
-        <ul>
-          <li>
-            <h3 style={{ color: 'black' }}>Recordings</h3>
-          </li>
-          <DataGrid config={grid}
-                    bodyMaxHeight={"65vh"}
-                    criteriaParams={criteriaParams}
-                    dataUrl={`${appManager.getAPIHost()}/api/v1/document/fetchMeetingRecordings/${props.meetingId}`}
-                    actionHandler={(e) => {
-                      onDownload(e.data.id);
-                    }}
-          />
-        </ul>
+    <div style={{width: '100%', display: 'flex', padding: '32px'}}>
+      <div style={{marginRight: '4px'}}>
+        <div className={'view-header'}>Recordings</div>
+        <DataGrid config={grid}
+                  bodyMaxHeight={"65vh"}
+                  criteriaParams={criteriaParams}
+                  dataUrl={`${appManager.getAPIHost()}/api/v1/document/fetchMeetingRecordings/${props.meetingId}`}
+                  actionHandler={(e) => {
+                    onDownload(e.data.id);
+                  }}
+        />
       </div>
     </div>
   );

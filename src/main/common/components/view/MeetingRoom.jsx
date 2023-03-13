@@ -1039,6 +1039,7 @@ const MeetingRoom = (props) => {
       });
     }
 
+
     if (userToCall && isDirectCall && participants.length <= 1) {
       console.log("USER TO CALL : ", userToCall);
       socketManager.emitEvent(MessageType.CANCEL_CALL, {

@@ -27,7 +27,7 @@ const {electron} = window;
 
 let ps;
 
-const MODE = "PROD";
+const MODE = "DEBUG";
 const newMessageAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/message.mp3');
 
 const BasicBusinessAppDashboard = (props) => {
@@ -551,7 +551,7 @@ const BasicBusinessAppDashboard = (props) => {
         }, "", true, false);
       }, "", true, false);
     } else {
-      loadHost("http://localhost:8080/vc", "http://localhost:8000");
+      loadHost("http://localhost:8080/vc", "https://svn.agilemotion.co.za");
     }
   }, []);
 

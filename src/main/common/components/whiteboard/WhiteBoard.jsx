@@ -244,6 +244,7 @@ const WhiteBoard = (props) => {
     });
   };
 
+
   const handleSave = () => {
     let htmlContent = btoa(document.getElementById("workspaceContainerWrapper").innerHTML);
 

@@ -4,6 +4,7 @@ import SearchBar from "../SearchBar";
 import {DataGrid} from "../DataGrid";
 import {useNavigate} from "react-router-dom";
 import appManager from "../../service/AppManager";
+import './Views.css';
 
 const {electron} = window;
 
@@ -139,44 +140,40 @@ const MeetingHistory = (props) => {
   };
 
   return (
-    <div style={{width: '100%', display: 'flex', margin: '16px 0'}}>
+    <div style={{width: '100%', display: 'flex', padding: '32px'}} className={'meetingHistoryContainer'}>
       <div style={{marginRight: '4px'}}>
-        <ul>
-          <li>
-            <h3 style={{color: 'black'}}>Meeting History</h3>
-          </li>
-          <div className={'searchbar'}>
-            <SearchBar onSearch={(searchValue) => {
-              setCriteriaParams({
-                title: searchValue
-              })
-            }}/>
-          </div>
-          <DataGrid config={grid}
-                    bodyMaxHeight={"65vh"}
-                    criteriaParams={criteriaParams}
-                    dataUrl={`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetingHistory`}
-                    actionHandler={(e) => {
-                      if (e.id === 'downloadRecording') {
-                        navigate("/view/recordings", {state: e.data.id})
-                      }
+        <div className={'view-header'}>Meeting history</div>
+        <div className={'searchbar'}>
+          <SearchBar onSearch={(searchValue) => {
+            setCriteriaParams({
+              title: searchValue
+            })
+          }}/>
+        </div>
+        <DataGrid config={grid}
+                  bodyMaxHeight={"65vh"}
+                  criteriaParams={criteriaParams}
+                  dataUrl={`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetingHistory`}
+                  actionHandler={(e) => {
+                    if (e.id === 'downloadRecording') {
+                      navigate("/view/recordings", {state: e.data.id})
+                    }
 
-                      if (e.id === 'chatPollLink') {
-                        navigate("/view/pollsHistory", {state: e.data.id})
-                      }
+                    if (e.id === 'chatPollLink') {
+                      navigate("/view/pollsHistory", {state: e.data.id})
+                    }
 
-                      if (e.id === 'meetingLink') {
-                        viewMeeting(e.data);
-                      }
+                    if (e.id === 'meetingLink') {
+                      viewMeeting(e.data);
+                    }
 
-                      if (e.id === 'viewWhiteboard') {
-                        if(e.data.whiteboardDocumentId) {
-                          onDownload(e.data.whiteboardDocumentId);
-                        }
+                    if (e.id === 'viewWhiteboard') {
+                      if (e.data.whiteboardDocumentId) {
+                        onDownload(e.data.whiteboardDocumentId);
                       }
-                    }}
-          />
-        </ul>
+                    }
+                  }}
+        />
       </div>
     </div>
   );

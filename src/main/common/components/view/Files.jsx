@@ -5,6 +5,7 @@ import '../../assets/scss/flatpickr/flatpickr.scss';
 import {DataGrid} from "../DataGrid";
 import SearchBar from "../SearchBar";
 import "./Files.css";
+import './Views.css';
 
 const { electron } = window;
 
@@ -79,12 +80,9 @@ const Files = (props) => {
   };
 
   return (
-    <div style={{ width: '100%', display: 'flex', margin: '16px 0' }}>
+    <div style={{ width: '100%', display: 'flex', padding: '32px' }}>
       <div style={{ marginRight: '4px' }}>
-        <ul>
-          <li>
-            <h3>Files</h3>
-          </li>
+          <div className={'view-header'}>Files</div>
           <div className={'searchbar'}>
             <SearchBar onSearch={(searchValue) => {
               setCriteriaParams({
@@ -99,7 +97,6 @@ const Files = (props) => {
                          onDownload(e.data.documentId);
                     }}
           />
-        </ul>
       </div>
     </div>
   );
