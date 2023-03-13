@@ -106,7 +106,7 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
   const classes = useStyles();
   const [order, setOrder] = React.useState('desc');
   const [config] = React.useState(props.config);
-  const [orderBy, setOrderBy] = React.useState('id');
+  const [orderBy, setOrderBy] = React.useState(props.defaultOrderField);
   const [selected, setSelected] = React.useState([]);
   const [totalNumberOfRows, setTotalNumberOfRows] = React.useState(0);
   const [criteria] = React.useState({});

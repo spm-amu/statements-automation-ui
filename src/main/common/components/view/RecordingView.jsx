@@ -16,7 +16,7 @@ const grid = {
         "filterValueTemplate": "%${value}%",
         "width": "32.0%",
         "label": "Name",
-        "sortable": false
+        "sortable": true
       }
     },
     {
@@ -71,6 +71,7 @@ const RecordingView = (props) => {
         <div className={'view-header'}>Recordings</div>
         <DataGrid config={grid}
                   bodyMaxHeight={"65vh"}
+                  defaultOrderField={'name'}
                   criteriaParams={criteriaParams}
                   dataUrl={`${appManager.getAPIHost()}/api/v1/document/fetchMeetingRecordings/${props.meetingId}`}
                   actionHandler={(e) => {

@@ -19,7 +19,7 @@ const grid = {
         "filterValueTemplate": "%${value}%",
         "width": "35.0%",
         "label": "Title",
-        "sortable": false
+        "sortable": true
       }
     },
     {
@@ -30,7 +30,7 @@ const grid = {
         "filterable": false,
         "width": "25.0%",
         "label": "Meeting Date",
-        "sortable": false
+        "sortable": true
       }
     },
     {
@@ -152,6 +152,7 @@ const MeetingHistory = (props) => {
         </div>
         <DataGrid config={grid}
                   bodyMaxHeight={"65vh"}
+                  defaultOrderField={'start'}
                   criteriaParams={criteriaParams}
                   dataUrl={`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetingHistory`}
                   actionHandler={(e) => {

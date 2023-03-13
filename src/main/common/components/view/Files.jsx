@@ -20,7 +20,7 @@ const grid = {
         "filterValueTemplate": "%${value}%",
         "width": "35.0%",
         "label": "Name",
-        "sortable": false
+        "sortable": true
       }
     },
     {
@@ -31,7 +31,7 @@ const grid = {
         "filterable": false,
         "width": "20.0%",
         "label": "Created Date",
-        "sortable": false
+        "sortable": true
       }
     },
     {
@@ -91,6 +91,7 @@ const Files = (props) => {
             }}/>
           </div>
           <DataGrid config={grid}
+                    defaultOrderField={'createdDate'}
                     criteriaParams={criteriaParams}
                     dataUrl={`${appManager.getAPIHost()}/api/v1/document/fetchUserDocuments`}
                     actionHandler={(e) => {

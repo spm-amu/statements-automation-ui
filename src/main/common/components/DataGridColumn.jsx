@@ -56,18 +56,18 @@ const DataGridColumn = React.memo(React.forwardRef((props, ref) => {
               width: config.attributes.width
             }}
         >
-            <TableSortLabel
-                active={config.attributes['sortable'] === true}
-                direction={'desc'}
+          {
+            config.attributes['sortable'] === true ?
+              <TableSortLabel
+                active={false}
+                direction={props.sortDirection}
                 onClick={props.createSortHandler(config.id)}
-            >
+              >
                 {label + postfix}
-                {'id' === config.id ? (
-                    <span className={classes.visuallyHidden}>
-                        {'sorted descending'}
-                    </span>
-                ) : null}
-            </TableSortLabel>
+              </TableSortLabel>
+              :
+              label + postfix
+          }
         </Th>
     );
 }));

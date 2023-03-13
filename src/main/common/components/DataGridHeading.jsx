@@ -18,12 +18,14 @@ const DataGridHeading = React.memo(React.forwardRef((props, ref) => {
     const classes = useStyles();
     const {onSelectAllClick, numSelected, rowCount, onRequestSort} = props;
     const [columnHandles] = React.useState([]);
+    const [sortDirection, setSortDirection] = React.useState('desc');
+
     const createSortHandler = property => event => {
         onRequestSort(event, property);
+        setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
     };
 
     let columnCounter = 0;
-
     React.useEffect(() => {
         props.handle.api = api();
     });
@@ -65,6 +67,7 @@ const DataGridHeading = React.memo(React.forwardRef((props, ref) => {
                 column.attributes['hidden'] === true ? null :
                     <DataGridColumn key={columnCounter++} config={column} handle={createColumnHandle()}
                                     ref={React.createRef()}
+                                    sortDirection={sortDirection}
                                     createSortHandler={createSortHandler}/>
             ))}
         </Tr>

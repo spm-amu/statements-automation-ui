@@ -102,9 +102,9 @@ const TableCellContent = React.memo(React.forwardRef((props, ref) => {
       return (
         <div>
           {props.columnConfig.attributes.toolbar.items.map((item, index) => {
-            return <div key={index} style={{margin: "-16px 0 0 0"}}>
+            return <div key={index}>
               <IconButton
-                style={{color: '#01476C'}}
+                style={{color: '#01476C', width: '36px', height: '36px'}}
                 onClick={(e) => {
                   props.actionHandler({
                     id: item.id,

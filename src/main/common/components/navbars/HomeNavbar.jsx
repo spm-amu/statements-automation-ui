@@ -205,14 +205,6 @@ class HomeNavbar extends React.Component {
                         <div className={'small-screen-menu-items'}>
                           <NavLink tag="div">
                             <DropdownItem className="nav-item"
-                                          onClick={() => this.launchView('system/user-profile.json')}>
-                              {" "}
-                              Profile{" "}
-                            </DropdownItem>{" "}
-                          </NavLink>{" "}
-                          <DropdownItem divider tag="div"/>
-                          <NavLink tag="div">
-                            <DropdownItem className="nav-item"
                                           onClick={this.props.logoutCallBack}>
                               {" "}
                               Log out{" "}
@@ -222,14 +214,6 @@ class HomeNavbar extends React.Component {
                       </DropdownToggle>{" "}
                     </div>
                     <DropdownMenu className="dropdown-navbar" end tag="ul">
-                      <NavLink tag="li">
-                        <DropdownItem className="nav-item"
-                                      onClick={() => this.launchView('system/user-profile.json')}>
-                          {" "}
-                          Profile{" "}
-                        </DropdownItem>{" "}
-                      </NavLink>{" "}
-                      <DropdownItem divider tag="li"/>
                       <NavLink tag="li">
                         <DropdownItem className="nav-item"
                                       onClick={this.props.logoutCallBack}>
