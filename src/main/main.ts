@@ -537,6 +537,35 @@ app.on('open-url', function (event, url) {
   }
 });
 
+app.on('web-contents-created', (_createEvent, contents) => {
+  contents.on('will-attach-webview', attachEvent => {
+    console.log("Blocked by 'will-attach-webview'")
+    attachEvent.preventDefault();
+  });
+
+  contents.on('new-window', newEvent => {
+    console.log("Blocked by 'new-window'")
+    newEvent.preventDefault();
+  });
+
+  contents.on('will-navigate', newEvent => {
+    console.log("Blocked by 'will-navigate'")
+    newEvent.preventDefault()
+  });
+
+  contents.setWindowOpenHandler(({ url }) => {
+    if (url) {
+      setImmediate(() => {
+        shell.openExternal(url);
+      });
+      return { action: 'allow' }
+    } else {
+      console.log("Blocked by 'setWindowOpenHandler'")
+      return { action: 'deny' }
+    }
+  })
+});
+
 // Force single application instance
 const gotTheLock = app.requestSingleInstanceLock();
 

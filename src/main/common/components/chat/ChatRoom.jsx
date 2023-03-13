@@ -3,7 +3,7 @@ import {Avatar, IconButton} from '@material-ui/core';
 import SendIcon from '@material-ui/icons/Send';
 import CallIcon from '@material-ui/icons/Call';
 import Tooltip from '@material-ui/core/Tooltip';
-import {useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './ChatRooms.scss';
 import moment from 'moment';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -23,6 +23,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import ChatPoll from './ChatPoll';
+import Linkify from "linkify-react";
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import FormControl from '@material-ui/core/FormControl';
@@ -508,6 +509,18 @@ const ChatRoom = (props) => {
     return thumbnails;
   };
 
+  const renderLink = ({ attributes, content }) => {
+    const { href, ...props } = attributes;
+    return <Link
+      onClick={() => {
+        window.open(href);
+      }}
+      {...props}
+    >
+      {content}
+    </Link>;
+  };
+
   const renderMessages = (message, index) => {
     if (message.type === 'FILE') {
       if (message.participant.userId === currentUser.userId) {
@@ -548,7 +561,9 @@ const ChatRoom = (props) => {
           <div key={index} className="chatroom__message">
             <div className="mychat">
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
-              <p key={index}>{message.content}</p>
+              <Linkify key={index} options={{ render: renderLink }}>
+                <p key={index}>{message.content}</p>
+              </Linkify>
             </div>
           </div>
         );
@@ -562,7 +577,9 @@ const ChatRoom = (props) => {
             <div className="peer">
               <span>{message.participant.name}</span>
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
-              <p key={index}>{message.content}</p>
+              <Linkify key={index} options={{ render: renderLink }}>
+                <p key={index}>{message.content}</p>
+              </Linkify>
             </div>
           </div>
         </div>
