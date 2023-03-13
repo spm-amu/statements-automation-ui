@@ -115,6 +115,7 @@ export default class EventHandler {
         }
 
         elementById.setAttribute("disabled", true);
+        document.getElementById(id).setAttribute('draggable', false);
       }
     }
   }
@@ -129,6 +130,7 @@ export default class EventHandler {
       }
 
       elementById.removeAttribute("disabled");
+      document.getElementById(id).setAttribute('draggable', true);
     }
   }
 
