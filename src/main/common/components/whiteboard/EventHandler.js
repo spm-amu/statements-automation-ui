@@ -213,6 +213,10 @@ export default class EventHandler {
         }, false);
       }
 
+      if(metadata.clientX && metadata.clientY) {
+        this.moveItem(node, metadata);
+      }
+
       dropTarget.appendChild(node);
       node.appendChild(helperText);
       node.appendChild(inputItem);

@@ -248,13 +248,10 @@ const MeetingRoom = (props) => {
 
     let find = whiteboardItems.find((i) => i.id === e.metadata.id);
     if (find) {
-      console.log("\n\n\n\n\n\n\nWB FIND BEFORE : ", JSON.parse(JSON.stringify(find)));
       const properties = Object.getOwnPropertyNames(e.metadata);
       for (const property of properties) {
         find[property] = e.metadata[property];
       }
-
-      console.log("WB FIND AFTER : ", find);
     } else {
       whiteboardItems.push(e.metadata);
     }
