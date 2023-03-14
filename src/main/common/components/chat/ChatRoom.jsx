@@ -172,7 +172,11 @@ const ChatRoom = (props) => {
 
     if (selectedChat) {
       const newMessages = [].concat(selectedChat.messages);
-      const dateAddedToChat = selectedChat.participants.find(p => p.userId === currentUser.userId).dateAddedToChat;
+
+      // TODO. @Nsovo. This code is very unreliable. it breaks randomly. Please check if a user exists in the chat. If not call the back end to add them and then filter their messages from he current date
+      // NB : @Amu has change the code to first find a user and do a null check so that it does not break
+      let find = selectedChat.participants.find(p => p.userId === currentUser.userId);
+      const dateAddedToChat = find ? find.dateAddedToChat : new Date();
       const filteredMessages = newMessages
         .filter(txt => dateAddedToChat === null || new Date(dateAddedToChat) < new Date(txt.createdDate));
       setMessages(filteredMessages);
@@ -180,7 +184,6 @@ const ChatRoom = (props) => {
 
     setLoading(false);
   };
-
 
   const getChatRoomTitle = () => {
     if (selectedChat.type === 'CALENDAR_MEETING' || selectedChat.title) {

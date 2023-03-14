@@ -22,8 +22,7 @@ const Footer = (props) => {
     isHost,
     autoPermit,
     participantsRaisedHands,
-    someoneSharing,
-    meetingTitle
+    someoneSharing
   } = props;
 
   useEffect(() => {
@@ -36,10 +35,9 @@ const Footer = (props) => {
       <div className={'row'}>
         {
           displayState === 'MAXIMIZED' &&
-          <div  className={'time'}>
+          <div  className={'time footer-white-content'}>
             <h3
               style={{
-                position: 'absolute',
                 fontSize: 'auto',
                 marginBottom: '0'
               }}
@@ -75,15 +73,6 @@ const Footer = (props) => {
         {
           displayState === 'MAXIMIZED' &&
           <div className={'time'}>
-            <h3
-              style={{
-                position: 'absolute',
-                fontSize: 'auto',
-                marginBottom: '0'
-              }}
-            >
-              {meetingTitle}
-            </h3>
           </div>
         }
         {

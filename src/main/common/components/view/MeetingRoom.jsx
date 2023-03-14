@@ -537,6 +537,12 @@ const MeetingRoom = (props) => {
       if (!isDirectCall) {
         // TODO : Introduce a new step for this
         setStep(Steps.LOBBY);
+        setShowWhiteBoard(false);
+        setMeetingParticipantGridMode('DEFAULT');
+        if(screenShared) {
+          stopShareScreen();
+        }
+
         props.windowHandler.hide();
       } else {
         endCall();
@@ -1072,16 +1078,6 @@ const MeetingRoom = (props) => {
 
   return (
     <Fragment>
-      {screenShared && shareScreenSource.current && (
-        <div style={{position: 'absolute', width: '320px', margin: '8px 0 8px 30%'}}>
-          <Alert style={{marginBottom: '16px'}} severity="error">
-            {
-              (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
-              + ' is beign shared with other participants'
-            }
-          </Alert>
-        </div>
-      )}
       <div className={'row meeting-container'} style={{
         height: displayState === 'MAXIMIZED' ? '100%' : '90%',
         maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
@@ -1357,6 +1353,14 @@ const MeetingRoom = (props) => {
         zIndex: '1200',
         position: 'absolute'
       }}>
+        {screenShared && shareScreenSource.current && (
+          <Alert style={{marginBottom: '16px'}} severity="error">
+            {
+              (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
+              + ' is being shared with other participants'
+            }
+          </Alert>
+        )}
         <Alert
           variant={'info'}
           show={activityMessage !== null}

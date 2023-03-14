@@ -14,7 +14,8 @@
   display: flex;
   min-width: 128px;
 }
-.white-content h3 {
+
+.footer-white-content h3 {
   color: #FFFFFF !important;
   margin-left: 16px;
 }
