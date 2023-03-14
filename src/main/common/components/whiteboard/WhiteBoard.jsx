@@ -250,7 +250,6 @@ const WhiteBoard = (props) => {
     let workspaceContainer = document.getElementById("workspaceContainerWrapper");
     let node = workspaceContainer.cloneNode(true);
 
-    console.log("\n\n\n\n\n WB SAVE DATA : ");
     let inputs = node.getElementsByTagName('input');
     for (const input of inputs) {
       input.style.display = 'none';
@@ -267,8 +266,6 @@ const WhiteBoard = (props) => {
     }
 
     let htmlContent = btoa(node.innerHTML);
-    console.log(htmlContent);
-
     post(
       `${appManager.getAPIHost()}/api/v1/meeting/whiteboard/save`,
       (response) => {
