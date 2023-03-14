@@ -1354,7 +1354,7 @@ const MeetingRoom = (props) => {
         position: 'absolute'
       }}>
         {screenShared && shareScreenSource.current && (
-          <Alert style={{marginBottom: '16px'}} severity="error">
+          <Alert style={{marginBottom: '16px', marginTop: '-120px'}} severity="error">
             {
               (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
               + ' is being shared with other participants'

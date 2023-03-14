@@ -121,7 +121,7 @@ const Timer = (props) => {
         }
       </div>
       <div style={{width: '72px'}} className={'col'}>
-        <div className={'row no-margin no-padding'}>
+        {/*<div className={'row no-margin no-padding'}>
           <div className={'col no-margin no-padding'}>
             <div className={'row digit no-padding'}>
               {hours}
@@ -138,7 +138,7 @@ const Timer = (props) => {
               Minute{minutes !== 1 && <>s</>}
             </div>
           </div>
-        </div>
+        </div>*/}
       </div>
     </div>
   );

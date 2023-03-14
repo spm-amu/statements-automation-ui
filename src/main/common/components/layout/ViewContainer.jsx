@@ -141,6 +141,7 @@ const ViewContainer = (props) => {
             isHost={attributes.data.isHost}
             isDirectCall={attributes.data.isDirectCall}
             selectedMeeting={attributes.data.selectedMeeting}
+            title={attributes.data.selectedMeeting.title}
           />
         }
                 title={attributes.data.selectedMeeting.title}

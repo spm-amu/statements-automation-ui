@@ -181,6 +181,9 @@ const MeetingRoomToolbar = (props) => {
               </IconButton>
             </div>
             <div className={'col no-margin'}>
+              {props.title}
+            </div>
+            <div className={'col no-margin'}>
               {
                 started &&
                 <Timer onTimeLapse={
