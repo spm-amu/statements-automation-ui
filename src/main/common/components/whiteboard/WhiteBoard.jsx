@@ -247,7 +247,27 @@ const WhiteBoard = (props) => {
 
 
   const handleSave = () => {
-    let htmlContent = btoa(document.getElementById("workspaceContainerWrapper").innerHTML);
+    let workspaceContainer = document.getElementById("workspaceContainerWrapper");
+    let node = workspaceContainer.cloneNode(true);
+
+    console.log("\n\n\n\n\n WB SAVE DATA : ");
+    let inputs = node.getElementsByTagName('input');
+    for (const input of inputs) {
+      input.style.display = 'none';
+    }
+
+    let helperTextElements = node.getElementsByClassName('wb-helper-text');
+    for (const helperTextElement of helperTextElements) {
+      helperTextElement.style.display = 'none';
+    }
+
+    let valueTextElements = node.getElementsByClassName('wb-value-text');
+    for (const valueTextElement of valueTextElements) {
+      valueTextElement.style.display = 'inherit';
+    }
+
+    let htmlContent = btoa(node.innerHTML);
+    console.log(htmlContent);
 
     post(
       `${appManager.getAPIHost()}/api/v1/meeting/whiteboard/save`,

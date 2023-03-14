@@ -101,6 +101,7 @@ export default class EventHandler {
     let elementById = document.getElementById(metadata.id + "_INPUT_TEXT");
     if(elementById) {
       elementById.value = metadata.value;
+      document.getElementById(metadata.id + "_VALUE_TEXT").innerText = metadata.value;
     }
   }
 
@@ -135,11 +136,13 @@ export default class EventHandler {
   }
 
   handleInputValueChange = (event) => {
+    let parentId = event.target.id.replace("_INPUT_TEXT", "");
     let metadata = {
-      id: event.target.id.replace("_INPUT_TEXT", ""),
+      id: parentId,
       value: event.target.value
     };
 
+    document.getElementById(parentId + "_VALUE_TEXT").innerText = metadata.value;
     socketManager.emitEvent(MessageType.WHITEBOARD_EVENT, {
       userId: appManager.getUserDetails().userId,
       metadata: metadata,
@@ -152,17 +155,29 @@ export default class EventHandler {
   createNode = (metadata, selectionHandler, focusHandler, readOnly = false) => {
     let dropTarget = document.getElementsByClassName('dropTarget')[0];
 
-    if (dropTarget) {
+    if (dropTarget && metadata.type) {
       let node = document.createElement("div");
       let helperText = document.createElement("div");
       helperText.id = metadata.id + "_HELPER_TEXT";
+      helperText.classList.add('wb-helper-text');
       helperText.style.color = 'rgb(235, 63, 33)';
       let inputItem = document.createElement(metadata.type);
       inputItem.style.height = '100%';
       inputItem.style.width = '100%';
+      inputItem.style['z-index'] = '1';
+      inputItem.style.position = 'absolute';
       inputItem.value = metadata.value ? metadata.value : "TEXT";
       inputItem.id = metadata.id + "_INPUT_TEXT";
+      inputItem.class = 'wb-text-input-item';
       inputItem.setAttribute('draggable', false);
+
+      let valueText = document.createElement("span");
+      valueText.style.height = '100%';
+      valueText.style.width = '100%';
+      valueText.style.position = 'absolute';
+      valueText.style.display = 'none';
+      valueText.id = metadata.id + "_VALUE_TEXT";
+      valueText.classList.add('wb-value-text');
 
       const properties = Object.getOwnPropertyNames(metadata);
       for (const property of properties) {
@@ -220,6 +235,7 @@ export default class EventHandler {
       dropTarget.appendChild(node);
       node.appendChild(helperText);
       node.appendChild(inputItem);
+      node.appendChild(valueText);
 
       return node;
     }
