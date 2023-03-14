@@ -163,6 +163,9 @@ const MeetingRoom = (props) => {
           case MessageType.CHAT_MESSAGE:
             handleChatMessage(be.payload);
             break;
+          case MessageType.SYSTEM_ALERT:
+            onSystemAlert(be.payload);
+            break;
         }
       }
     }
@@ -231,6 +234,14 @@ const MeetingRoom = (props) => {
         recording: true,
         userId: appManager.getUserDetails().userId
       });
+    }
+  };
+
+  const onSystemAlert = (payload) => {
+    if(payload.type === 'MEETING_STARTED_ALERT') {
+      handleMessageArrived({
+        message: payload.message
+      })
     }
   };
 
@@ -747,7 +758,7 @@ const MeetingRoom = (props) => {
     socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
       MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
       MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD,
-      MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT);
+      MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT, MessageType.SYSTEM_ALERT);
 
     appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT);
     return () => {

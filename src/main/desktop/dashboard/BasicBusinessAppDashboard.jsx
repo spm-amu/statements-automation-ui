@@ -290,7 +290,9 @@ const BasicBusinessAppDashboard = (props) => {
 
     console.log(payload);
 
-    if (!(appManager.get('CURRENT_MEETING') && payload.type === 'MEETING_START_ALERT')) {
+    // Do not pop if there is a running meeting and either of these events are received
+    if (!(appManager.get('CURRENT_MEETING')
+      && (payload.type === 'MEETING_START_ALERT' || payload.type === 'MEETING_STARTED_ALERT'))) {
       electron.ipcRenderer.sendMessage('systemAlert', args);
     }
   };
