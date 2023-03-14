@@ -259,13 +259,29 @@ export default class EventHandler {
     let width = props.width;
     let height = props.height;
 
+    let workspaceContainer = document.getElementById('workspaceContainerWrapper');
+    console.log("\n\n\nWS RIGHT : " + workspaceContainer.getBoundingClientRect().right);
+    console.log("clientX + Width : " + (width + event.clientX));
+
+    let clientX = event.clientX;
+    let right = clientX + width;
+    let diff = right - workspaceContainer.getBoundingClientRect().right;
+
+    console.log("DIFF : " + diff);
+
+    if(diff >= 0) {
+      clientX = clientX - diff - width;
+    }
+
+    console.log("NEW RIGHT : " + (clientX + width));
+
     let nodeMetadata = {
       type: "input",
       id: props.id,
       className: "_draggable_",
       style: {
         lineHeight: event.target.style.lineHeight,
-        left: event.clientX + 'px',
+        left: clientX + 'px',
         top: event.clientY + 'px',
         position: "absolute",
         height: height + 'px',
@@ -314,7 +330,26 @@ export default class EventHandler {
 
   moveItem = (item, metaData) => {
     console.log("MOVE ITEM METADATA : ", metaData);
-    item.style.left = ((metaData.clientX - metaData.offsetLeft) - metaData.dragOffset.x) + 'px';
+
+    let workspaceContainer = document.getElementById('workspaceContainerWrapper');
+
+    let width = parseInt(item.style.width.replace('px', ''));
+    let left = ((metaData.clientX - metaData.offsetLeft) - metaData.dragOffset.x);
+
+    if(left < workspaceContainer.getBoundingClientRect().left) {
+      left = 20;
+    } else {
+      let right = left + width;
+      let diff = workspaceContainer.getBoundingClientRect().right - right;
+
+      console.log("DIFF : " + diff);
+
+      if (diff < width) {
+        left = left + diff - width;
+      }
+    }
+
+    item.style.left = left + 'px';
     item.style.top = ((metaData.clientY - metaData.offsetTop) - metaData.dragOffset.y) + 'px';
   };
 

@@ -245,7 +245,6 @@ const WhiteBoard = (props) => {
     });
   };
 
-
   const handleSave = () => {
     let workspaceContainer = document.getElementById("workspaceContainerWrapper");
     let node = workspaceContainer.cloneNode(true);
