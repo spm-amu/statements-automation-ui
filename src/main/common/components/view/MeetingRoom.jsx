@@ -322,7 +322,8 @@ const MeetingRoom = (props) => {
       const newParticipants = participants.filter((p) => p.userId !== userId);
 
       if (newParticipants.length === 1 && isDirectCall) {
-        onCallEnded();
+        setStep(Steps.SESSION_ENDED);
+        //onCallEnded();
         //props.closeHandler();
       } else {
         setParticipants(newParticipants);
@@ -330,6 +331,7 @@ const MeetingRoom = (props) => {
           //onCallEnded();
           //props.closeHandler();
           setAllUserParticipantsLeft(true);
+          setStep(Steps.SESSION_ENDED);
 
           get(
             `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,

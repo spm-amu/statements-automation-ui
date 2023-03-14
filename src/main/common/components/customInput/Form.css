@@ -5,6 +5,13 @@
   z-index: 100;
 }
 
+.file-label td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100px;
+}
+
 .close-button {
   border-radius: 50%;
   background-color: #a1a1a1;
