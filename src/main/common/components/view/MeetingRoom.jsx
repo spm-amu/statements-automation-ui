@@ -321,7 +321,6 @@ const MeetingRoom = (props) => {
       const userId = user.userId;
       const newParticipants = participants.filter((p) => p.userId !== userId);
 
-      alert(newParticipants.length + " : " + isDirectCall);
       if (newParticipants.length === 0 && isDirectCall) {
         setStep(Steps.SESSION_ENDED);
         //onCallEnded();
