@@ -152,17 +152,22 @@ class SocketManager {
   createPeer = (userToSignal, stream, audioMuted, videoMuted) => {
     let userDetails = appManager.getUserDetails();
 
-    const peer = new Peer({
+    let opts = {
       initiator: true,
       trickle: false,
       streams: [stream.obj, stream.shareScreenObj]
-    });
+    };
 
     if (!appManager.isOnline()) {
       opts.config = {
         iceServers: []
       }
     }
+
+    console.log("CREATING PEER WITH OPTS : ", opts);
+    console.log("IS NET-0? " + appManager.isOnline());
+
+    const peer = new Peer(opts);
 
     peer.on('signal', (signal) => {
       this.socket.emit(MessageType.SENDING_SIGNAL, {
@@ -217,6 +222,15 @@ class SocketManager {
         iceServers: []
       }
     }
+
+    if (!appManager.isOnline()) {
+      opts.config = {
+        iceServers: []
+      }
+    }
+
+    console.log("ADDING PEER WITH OPTS : ", opts);
+    console.log("IS NET-0? " + appManager.isOnline());
 
     const peer = new Peer(opts);
     peer.on('signal', (signal) => {
