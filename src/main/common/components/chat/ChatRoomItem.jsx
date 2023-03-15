@@ -23,7 +23,7 @@ const ChatRoomItem = (props) => {
 
   return (
     <div
-      className={`chatroom__item ${event.id === selectedChat.id ? 'active-tab' : ''}`}
+      className={`chatroom__item ${selectedChat && event.id === selectedChat.id ? 'active-tab' : ''}`}
       onClick={() => {
         goToRoom(event.id);
       }}
