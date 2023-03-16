@@ -3,6 +3,7 @@ import ChatRoomItem from './ChatRoomItem';
 import './ChatRooms.scss';
 import { IconButton } from '@material-ui/core';
 import Tooltip from '@material-ui/core/Tooltip';
+import socketManager from '../../service/SocketManager';
 
 const ChatRoomList = (props) => {
 
@@ -18,6 +19,8 @@ const ChatRoomList = (props) => {
 
   useEffect(() => {
     setChats([].concat(props.chatEvents));
+
+    console.log('socketManager.unreadMessages: ', socketManager.unreadMessages);
   }, [props.chatEvents]);
 
   useEffect(() => {

@@ -45,6 +45,7 @@ const Chats = (props) => {
         switch (eventType) {
           case SystemEventType.ACTIVE_CHAT_CHANGED:
             let chat = updateSelectedChat(be.payload);
+            console.log('%%%%%%%%: ', chat);
             if(chat) {
               onChatRoomMessage(be.payload.message, chat);
             } else {
@@ -63,7 +64,7 @@ const Chats = (props) => {
     let chat = chatEvents.find((c) => c.id === payload.roomId);
     if (chat) {
       chat.messages.push(payload.chatMessage);
-      setSelectedChat(chat);
+      // setSelectedChat(chat);
     }
 
     return chat;
@@ -73,8 +74,18 @@ const Chats = (props) => {
     if(!selectedChat) {
       updateSelectedChat(payload);
     } else {
-      if(selectedChat.id !== payload.id) {
-        console.log('\n\n\nRECEIVED UNRELATED CHAT');
+      if(selectedChat.id !== payload.roomId) {
+        console.log('\n\n\nRECEIVED UNRELATED CHAT: ', payload);
+
+        let unread = socketManager.unreadMessages.find(u => u.id === payload.roomId);
+        if (unread) {
+          unread.numberOfUnread = unread.numberOfUnread + 1;
+        } else {
+          socketManager.unreadMessages.push({
+            id: payload.roomId,
+            numberOfUnread: 1
+          })
+        }
       }
     }
   };
@@ -197,6 +208,13 @@ const Chats = (props) => {
 
   useEffect(() => {
     appManager.add('CURRENT_CHAT', selectedChat);
+
+    const unreadWithIdIndex =
+      socketManager.unreadMessages.findIndex((obj) => obj.id === selectedChat.id);
+
+    if (unreadWithIdIndex > -1) {
+      socketManager.unreadMessages.splice(unreadWithIdIndex, 1);
+    }
   }, [selectedChat]);
 
   React.useEffect(() => {
@@ -211,7 +229,7 @@ const Chats = (props) => {
     chat.updatedAt = moment().format();
     //chat.messages.push(message);
 
-    setSelectedChat(chat);
+    // setSelectedChat(chat);
     const sorted = chatEvents
       .slice()
       .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));

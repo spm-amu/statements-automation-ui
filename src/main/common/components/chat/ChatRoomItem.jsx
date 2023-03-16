@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar } from '@material-ui/core';
+import { Avatar, Badge } from '@material-ui/core';
 import moment from 'moment';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../Icon';
 import { Calendar } from 'react-feather';
 import Utils from '../../Utils';
 import appManager from "../../../common/service/AppManager";
+import socketManager from '../../service/SocketManager';
 
 const ChatRoomItem = (props) => {
   const { event, selectedChat } = props;
@@ -21,6 +22,15 @@ const ChatRoomItem = (props) => {
     props.selectionHandler(event);
   };
 
+  const getUnreadMessagesCount = () => {
+    let unread = socketManager.unreadMessages.find(u => u.id === event.id);
+    if (unread) {
+      return unread.numberOfUnread;
+    }
+
+    return 0;
+  }
+
   return (
     <div
       className={`chatroom__item ${selectedChat && event.id === selectedChat.id ? 'active-tab' : ''}`}
@@ -28,13 +38,15 @@ const ChatRoomItem = (props) => {
         goToRoom(event.id);
       }}
     >
-      <Avatar>
-        {event.type === 'CALENDAR_MEETING' || event.participants.length > 2 ? (
-          <Calendar />
-        ) : (
-          Utils.getInitials(event.participants.find(p => p.userId !== currentUser.userId).name)
-        )}
-      </Avatar>
+      <Badge color="error" badgeContent={ getUnreadMessagesCount() } max={9}>
+        <Avatar>
+          {event.type === 'CALENDAR_MEETING' || event.participants.length > 2 ? (
+            <Calendar />
+          ) : (
+            Utils.getInitials(event.participants.find(p => p.userId !== currentUser.userId).name)
+          )}
+        </Avatar>
+      </Badge>
       <div className="chatroom__info">
         <div className="chatRoom__title">
           <p style={{ fontSize: '16px' }}>

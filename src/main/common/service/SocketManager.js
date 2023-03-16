@@ -9,6 +9,7 @@ class SocketManager {
       this.subscriptions = [];
       this.userPeerMap = [];
       this.usersOnline = [];
+      this.unreadMessages = [];
       this.chatEvents = [];
       SocketManager.instance = this;
     }
