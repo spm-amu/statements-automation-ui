@@ -3,7 +3,7 @@ import {Avatar, IconButton} from '@material-ui/core';
 import SendIcon from '@material-ui/icons/Send';
 import CallIcon from '@material-ui/icons/Call';
 import Tooltip from '@material-ui/core/Tooltip';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './ChatRooms.scss';
 import moment from 'moment';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -529,15 +529,14 @@ const ChatRoom = (props) => {
   };
 
   const renderLink = ({ attributes, content }) => {
-    const { href, ...props } = attributes;
-    return <Link
+    const { href } = attributes;
+    return <a
       onClick={() => {
         window.open(href);
       }}
-      {...props}
     >
       {content}
-    </Link>;
+    </a>;
   };
 
   const renderMessages = (message, index) => {

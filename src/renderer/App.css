@@ -104,3 +104,21 @@ a:hover {
   font-family: 'Readex Pro', sans-serif;
   color: #FFFFFF;
 }
+
+a:not([href]):not([tabindex]), a:not([href]):not([tabindex]),
+a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
+  color: #0000ee !important;
+}
+
+a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
+  text-decoration: underline !important;
+}
+
+a {
+  color: #0000ee;
+}
+
+a:hover, a:focus {
+  text-decoration: underline;
+  cursor: pointer;
+}
