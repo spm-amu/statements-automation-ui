@@ -35,7 +35,7 @@ const SystemAlertWindow = (props) => {
 
   return (
     (systemAlert) &&
-    <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
+    <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)', padding: '16px'}}>
       <div className={'centered-flex-box w-100'}
            style={{height: '72px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
         {
