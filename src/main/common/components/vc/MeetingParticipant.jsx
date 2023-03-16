@@ -49,7 +49,7 @@ const MeetingParticipant = (props) => {
     }
 
     return name;
-  }
+  };
 
   return (
     <div className={'col-*-* meeting-participant-container'}

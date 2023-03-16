@@ -74,7 +74,6 @@ export default function CustomInput(props) {
           {labelText}
         </InputLabel>
       ) : null}
-
       <Input
         classes={{
           input: inputClasses,
@@ -83,6 +82,7 @@ export default function CustomInput(props) {
           underline: underlineClasses,
         }}
         onKeyUp={props.onKeyUp}
+        multiline={props.multiline}
         id={id}
         {...inputProps}
         inputProps={newInputProps}

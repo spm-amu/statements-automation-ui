@@ -195,6 +195,10 @@
     }
   }
 
+  .mychat a {
+    overflow-wrap: break-word;
+  }
+
   .mychat {
     position: relative;
     flex-direction: column;
@@ -206,6 +210,7 @@
     margin-top: 5px;
     margin-bottom: 5px;
     border-radius: 15px;
+    max-width: 100%;
   }
 
   .mychat > span {

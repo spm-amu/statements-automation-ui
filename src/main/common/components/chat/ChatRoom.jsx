@@ -780,6 +780,7 @@ const ChatRoom = (props) => {
                   style={{zIndex: !Utils.isNull(documents) ? 0 : 1}}
                   labelText={documents ? "" : "Type a new message"}
                   disabled={!Utils.isNull(documents)}
+                  multiline={true}
                   id="message"
                   formControlProps={{fullWidth: true}}
                   autoFocus

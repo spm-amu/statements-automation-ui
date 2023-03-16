@@ -157,6 +157,7 @@ const MeetingParticipantGrid = (props) => {
                         padding: '4px'
                       }}>
             <MeetingParticipant data={participant}
+                                participantsRaisedHands={participantsRaisedHands}
                                 refChangeHandler={
                                   participant.isCurrentUser ? (ref) => {
                                     props.userVideoChangeHandler(ref);
