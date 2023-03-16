@@ -47,17 +47,17 @@ const SystemAlertWindow = (props) => {
           systemAlert ?
             <div>
               <div className={'centered-flex-box w-100'}>
-                <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px'}}>
+                <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px', fontSize: '16px'}}>
                   <Icon id={'CALENDAR'} style={{color: '#FFFFFF'}} fontSize={'large'}/>
                 </div>
               </div>
               <div className={'centered-flex-box w-100'}
-                   style={{marginTop: '8px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
+                   style={{marginTop: '8px', fontSize: '16px', fontWeight: '500', color: '#FFFFFF'}}>
                 {systemAlert.params.meetingTitle}
               </div>
             </div>
             :
-            <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px'}}/>
+            <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px', fontSize: '16px'}}/>
         }
       </div>
       <div className={'centered-flex-box w-100'} style={{marginTop: '32px'}}>

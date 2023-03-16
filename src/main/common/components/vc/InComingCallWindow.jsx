@@ -97,7 +97,7 @@ const InComingCallWindow = (props) => {
               (callPayload || meetingRequest || state.systemAlert) &&
               <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
                 <div className={'centered-flex-box w-100'}
-                     style={{height: '72px', fontSize: '20px', fontWeight: '500', color: '#FFFFFF'}}>
+                     style={{height: '72px', fontSize: '16px', fontWeight: '500', color: '#FFFFFF'}}>
                   {
                     state.systemAlert ? state.systemAlert.message :
                       callPayload ? `${callPayload.callerUser.name} is trying to call you` : `${meetingRequest.callerName} wants you to join meeting`
@@ -107,7 +107,7 @@ const InComingCallWindow = (props) => {
                   {
                     state.systemAlert ?
                       <div>
-                        <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px'}}>
+                        <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px', fontSize: '16px'}}>
                           <Icon id={'CALENDAR'} style={{color: '#FFFFFF'}} fontSize={'large'}/>
                         </div>
                         <div className={'centered-flex-box w-100'}
@@ -116,7 +116,7 @@ const InComingCallWindow = (props) => {
                         </div>
                       </div>
                       :
-                      <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px'}}/>
+                      <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px', fontSize: '24px'}}/>
                   }
                 </div>
                 <div className={'centered-flex-box w-100'} style={{marginTop: '32px'}}>
