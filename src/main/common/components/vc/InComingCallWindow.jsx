@@ -207,7 +207,6 @@ const InComingCallWindow = (props) => {
               <div style={{marginRight: '4px'}}>
                 <IconButton
                   onClick={() => declineCall()}
-                  disabled={!state.rejectionReason || state.rejectionReason.length === 0}
                   style={{
                     backgroundColor: '#eb3f21',
                     color: 'white',
