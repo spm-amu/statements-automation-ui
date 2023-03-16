@@ -1300,7 +1300,7 @@ const Meeting = (props) => {
               <div>
                 <div className={'row no-margin'}>
                   {
-                    (!Utils.isStringEmpty(props.selectedEvent.id) || recurrenceRepetition === 'NONE') &&
+                    (recurrenceRepetition === 'NONE') &&
                     <Fragment>
                       <div className={'col-*-*'}>
                         <DatePicker
@@ -1341,7 +1341,7 @@ const Meeting = (props) => {
               <div>
                 <div className={'row no-margin'}>
                   {
-                    (!Utils.isStringEmpty(props.selectedEvent.id) || recurrenceRepetition === 'NONE') &&
+                    (recurrenceRepetition === 'NONE') &&
                     <Fragment>
                       <div className={'col-*-*'}>
                         <DatePicker

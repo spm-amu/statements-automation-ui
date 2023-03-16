@@ -31,9 +31,9 @@ let mainWindow: BrowserWindow | null = null;
 let inComingCallWindow: BrowserWindow | null = null;
 let alertWindow: BrowserWindow | null = null;
 let messageWindow: BrowserWindow | null = null;
-let meetingRoomWindow: BrowserWindow | null = null;
 let screenWidth: number;
 let screenHeight: number;
+let windowHeight: number;
 
 let deeplinkingUrl: string | undefined;
 
@@ -96,9 +96,9 @@ const createDialWindow = () => {
   inComingCallWindow = new BrowserWindow({
     title: "Armscor",
     width: 300,
-    height: 300,
+    height: windowHeight,
     maxWidth: 300,
-    maxHeight: 300,
+    maxHeight: windowHeight,
     resizable: false,
     minimizable: false,
     maximizable: false,
@@ -106,7 +106,7 @@ const createDialWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 320,
-    y: screenHeight - 300,
+    y: screenHeight - windowHeight,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -142,9 +142,9 @@ const createAlertWindow = () => {
   alertWindow = new BrowserWindow({
     title: "Armscor",
     width: 300,
-    height: 300,
+    height: windowHeight,
     maxWidth: 300,
-    maxHeight: 300,
+    maxHeight: windowHeight,
     resizable: false,
     minimizable: false,
     maximizable: false,
@@ -152,7 +152,7 @@ const createAlertWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 320,
-    y: screenHeight - 300,
+    y: screenHeight - windowHeight,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -183,59 +183,13 @@ const createAlertWindow = () => {
   alertWindow.loadURL(resolveWindowHtmlPath('index.html#/systemAlert'));
 };
 
-const createMeetingRoomWindow = () => {
-  // Create the browser window.
-  meetingRoomWindow = new BrowserWindow({
-    title: "Armscor",
-    width: 1100,
-    height: 600,
-    maxWidth: 550,
-    maxHeight: 300,
-    resizable: false,
-    minimizable: false,
-    maximizable: false,
-    closable: true,
-    fullscreenable: false,
-    parent: mainWindow,
-    roundedCorners: false,
-    x: screenWidth - 1200,
-    y: screenHeight - 700,
-    webPreferences: {
-      preload: app.isPackaged
-        ? path.join(__dirname, 'preload.js')
-        : path.join(__dirname, '../../.erb/dll/preload.js'),
-    },
-    frame: false,
-    autoHideMenuBar: true,
-    transparent: true,
-    skipTaskbar: true,
-    hasShadow: false,
-    show: false,
-  });
-  // preventRefresh(inComingCallWindow);
-
-  const dev = app.commandLine.hasSwitch("dev");
-  if (!dev) {
-    let level = "normal";
-    // Mac OS requires a different level for our drag/drop and overlay
-    // functionality to work as expected.
-    if (process.platform === "darwin") {
-      level = "floating";
-    }
-
-    meetingRoomWindow.setAlwaysOnTop(false, level);
-  }
-
-  meetingRoomWindow.loadURL(resolveWindowHtmlPath('index.html#/meetingRoom'));
-};
-
 const createMessageWindow = () => {
   messageWindow = new BrowserWindow({
     title: "Armscor",
     width: 300,
-    height: 300,
+    height: windowHeight,
     maxWidth: 300,
-    maxHeight: 300,
+    maxHeight: windowHeight,
     resizable: false,
     minimizable: false,
     maximizable: false,
@@ -243,7 +197,7 @@ const createMessageWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 320,
-    y: screenHeight - 300,
+    y: screenHeight - windowHeight,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -370,16 +324,6 @@ ipcMain.on("receivingMessage", async (_event, args) => {
   messageWindow.webContents.send('messageViewContent', args);
   messageWindow.show();
   messageWindow.focus();
-});
-
-ipcMain.on("meetingRoomWindow", async (_event, args) => {
-  if (!meetingRoomWindow) {
-    throw new Error('meetingRoomWindow is not defined');
-  }
-
-  meetingRoomWindow.webContents.send('updateMeetingWindowContent', args);
-  meetingRoomWindow.show();
-  meetingRoomWindow.focus();
 });
 
 ipcMain.on("joinMeetingEvent", async (_event, args) => {
@@ -601,11 +545,12 @@ app
     screenWidth = width;
     screenHeight = height;
 
+    windowHeight = parseInt(((15 * screenHeight) / 100).toString());
+
     createWindow();
     createDialWindow();
     createAlertWindow();
     createMessageWindow();
-    createMeetingRoomWindow();
 
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

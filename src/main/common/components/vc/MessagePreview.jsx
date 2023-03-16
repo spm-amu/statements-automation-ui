@@ -55,11 +55,11 @@ const MessagePreview = (props) => {
     electron.ipcRenderer.sendMessage('replyMessage', {
       chatId: messenger.roomId
     });
-  }
+  };
 
   const close = () => {
     electron.ipcRenderer.sendMessage('hideMessagePreview', {});
-  }
+  };
 
   return (
     messenger &&
