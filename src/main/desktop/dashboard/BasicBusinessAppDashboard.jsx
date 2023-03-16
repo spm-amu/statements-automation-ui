@@ -310,7 +310,7 @@ const BasicBusinessAppDashboard = (props) => {
 
   const receiveCall = (payload) => {
     if (appManager.get('CURRENT_MEETING')) {
-      socketManager.declineDirectCall(payload.callerUser.socketId, payload.roomId, "I am in another meeting");
+      socketManager.declineDirectCall(payload.callerUser.socketId, payload.roomId, "In another meeting");
     } else {
       electron.ipcRenderer.sendMessage('receivingCall', {
         payload: payload
