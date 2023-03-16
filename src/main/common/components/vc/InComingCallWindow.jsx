@@ -107,7 +107,7 @@ const InComingCallWindow = (props) => {
                   {
                     state.systemAlert ?
                       <div>
-                        <div className={'avatar'} data-label={initials}>
+                        <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px'}}>
                           <Icon id={'CALENDAR'} style={{color: '#FFFFFF'}} fontSize={'large'}/>
                         </div>
                         <div className={'centered-flex-box w-100'}
@@ -116,7 +116,7 @@ const InComingCallWindow = (props) => {
                         </div>
                       </div>
                       :
-                      <div className={'avatar'} data-label={initials}/>
+                      <div className={'avatar'} data-label={initials} style={{width: '54px', height: '54px'}}/>
                   }
                 </div>
                 <div className={'centered-flex-box w-100'} style={{marginTop: '32px'}}>

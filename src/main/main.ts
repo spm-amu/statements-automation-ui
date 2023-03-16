@@ -33,7 +33,8 @@ let alertWindow: BrowserWindow | null = null;
 let messageWindow: BrowserWindow | null = null;
 let screenWidth: number;
 let screenHeight: number;
-let windowHeight: number;
+let largeWindowHeight: number;
+let smallWindowHeight: number;
 
 let deeplinkingUrl: string | undefined;
 
@@ -96,9 +97,9 @@ const createDialWindow = () => {
   inComingCallWindow = new BrowserWindow({
     title: "Armscor",
     width: 300,
-    height: windowHeight,
+    height: largeWindowHeight,
     maxWidth: 300,
-    maxHeight: windowHeight,
+    maxHeight: largeWindowHeight,
     resizable: false,
     minimizable: false,
     maximizable: false,
@@ -106,7 +107,7 @@ const createDialWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 320,
-    y: screenHeight - windowHeight - 20,
+    y: screenHeight - largeWindowHeight - 20,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -142,9 +143,9 @@ const createAlertWindow = () => {
   alertWindow = new BrowserWindow({
     title: "Armscor",
     width: 300,
-    height: windowHeight,
+    height: largeWindowHeight,
     maxWidth: 300,
-    maxHeight: windowHeight,
+    maxHeight: largeWindowHeight,
     resizable: false,
     minimizable: false,
     maximizable: false,
@@ -152,7 +153,7 @@ const createAlertWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 320,
-    y: screenHeight - windowHeight - 20,
+    y: screenHeight - largeWindowHeight - 20,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -187,9 +188,9 @@ const createMessageWindow = () => {
   messageWindow = new BrowserWindow({
     title: "Armscor",
     width: 300,
-    height: windowHeight,
+    height: smallWindowHeight,
     maxWidth: 300,
-    maxHeight: windowHeight,
+    maxHeight: smallWindowHeight,
     resizable: false,
     minimizable: false,
     maximizable: false,
@@ -197,7 +198,7 @@ const createMessageWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 320,
-    y: screenHeight - windowHeight - 20,
+    y: screenHeight - smallWindowHeight - 20,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -483,17 +484,17 @@ app.on('open-url', function (event, url) {
 
 app.on('web-contents-created', (_createEvent, contents) => {
   contents.on('will-attach-webview', attachEvent => {
-    console.log("Blocked by 'will-attach-webview'")
+    console.log("Blocked by 'will-attach-webview'");
     attachEvent.preventDefault();
   });
 
   contents.on('new-window', newEvent => {
-    console.log("Blocked by 'new-window'")
+    console.log("Blocked by 'new-window'");
     newEvent.preventDefault();
   });
 
   contents.on('will-navigate', newEvent => {
-    console.log("Blocked by 'will-navigate'")
+    console.log("Blocked by 'will-navigate'");
     newEvent.preventDefault()
   });
 
@@ -504,7 +505,7 @@ app.on('web-contents-created', (_createEvent, contents) => {
       });
       return { action: 'allow' }
     } else {
-      console.log("Blocked by 'setWindowOpenHandler'")
+      console.log("Blocked by 'setWindowOpenHandler'");
       return { action: 'deny' }
     }
   })
@@ -545,7 +546,8 @@ app
     screenWidth = width;
     screenHeight = height;
 
-    windowHeight = parseInt(((15 * screenHeight) / 100).toString());
+    largeWindowHeight = parseInt(((20 * screenHeight) / 100).toString());
+    smallWindowHeight = parseInt(((15 * screenHeight) / 100).toString());
 
     createWindow();
     createDialWindow();
