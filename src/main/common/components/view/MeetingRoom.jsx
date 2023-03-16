@@ -857,7 +857,8 @@ const MeetingRoom = (props) => {
             navigator.mediaDevices
               .getUserMedia(videoConstraints)
               .then((stream) => {
-                //stream.addTrack(currentUserStream.getAudioTracks()[0]);
+                stream.addTrack(currentUserStream.getAudioTracks()[0]);
+
                 const options = {mimeType: "video/webm; codecs=vp9"};
                 const recorder = new MediaRecorder(stream, options);
                 recorder.ondataavailable = handleDataAvailable;
