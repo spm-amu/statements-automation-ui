@@ -106,7 +106,7 @@ const createDialWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 320,
-    y: screenHeight - windowHeight,
+    y: screenHeight - windowHeight - 20,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -152,7 +152,7 @@ const createAlertWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 320,
-    y: screenHeight - windowHeight,
+    y: screenHeight - windowHeight - 20,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
@@ -197,7 +197,7 @@ const createMessageWindow = () => {
     parent: mainWindow,
     roundedCorners: false,
     x: screenWidth - 320,
-    y: screenHeight - windowHeight,
+    y: screenHeight - windowHeight - 20,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
