@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import Timer from "./Timer";
 import {get, post} from "../../service/RestService";
 import socketManager from "../../service/SocketManager";
-import { MessageType, SystemEventType } from '../../types';
+import {MessageType, SystemEventType} from '../../types';
 import appManager from "../../service/AppManager";
 import Icon from "../Icon";
 import {IconButton} from "@material-ui/core";
@@ -12,7 +12,7 @@ import LottieIcon from '../LottieIcon';
 
 const MeetingRoomToolbar = (props) => {
 
-  const { isDirectCall, selectedMeeting } = props;
+  const {isDirectCall, selectedMeeting} = props;
   const [endMeetingPromiseContext, setEndMeetingPromiseContext] = useState(null);
   const [started, setStarted] = useState(false);
   const [isHost, setIsHost] = useState(false);
@@ -40,14 +40,20 @@ const MeetingRoomToolbar = (props) => {
   };
 
   const onUpdateHost = (args) => {
-    console.log("\n\n\n\n\n\n\nCHANGE HOST DATA : ", args);
     let userDetails = appManager.getUserDetails();
     const iamHost = userDetails.userId === args.payload.host;
     setIsHost(iamHost);
     setStarted(args.payload.state.meetingStarted);
 
     if (iamHost) {
-      appManager.fireEvent(SystemEventType.API_SUCCESS, {message: 'You have been assigned as host of this meeting', timeout: 5000});
+      appManager.fireEvent(SystemEventType.API_SUCCESS, {
+        message: 'You have been assigned as host of this meeting',
+        timeout: 5000
+      });
+    }
+
+    if(args.payload.state.meetingStarted){
+      props.startMeetingHandler();
     }
   };
 
@@ -162,49 +168,51 @@ const MeetingRoomToolbar = (props) => {
       <div className={'row'} style={{margin: '0 0 0 0', display: 'flex', alignItems: 'center'}}>
         {
           isHost && !isDirectCall &&
-          <>
-            <div style={{margin: '0 8px 0 0'}}>
-              <IconButton
-                variant={'contained'}
-                disabled={started}
-                size="large"
-                color={'primary'}
-                onClick={(e) => startMeeting(e)}
-              >
-                <Icon id={'PLAY'}/>
-              </IconButton>
-              <IconButton
-                variant={'contained'}
-                disabled={!started}
-                size="large"
-                color={'primary'}
-                onClick={(e) => handleEndMeetingButton()}
-              >
-                <Icon id={'STOP'}/>
-              </IconButton>
-            </div>
-            <div className={'col no-margin'}>
-              {props.title}
-            </div>
-            <div className={'col no-margin'}>
-              {
-                started &&
-                <Timer onTimeLapse={
-                  (extend) => {
-                    if (!extend) {
-                      endMeeting();
-                    }
+          <div style={{margin: '0 8px 0 0'}}>
+            <IconButton
+              variant={'contained'}
+              disabled={started}
+              size="large"
+              color={'primary'}
+              onClick={(e) => startMeeting(e)}
+            >
+              <Icon id={'PLAY'}/>
+            </IconButton>
+            <IconButton
+              variant={'contained'}
+              disabled={!started}
+              size="large"
+              color={'primary'}
+              onClick={(e) => handleEndMeetingButton()}
+            >
+              <Icon id={'STOP'}/>
+            </IconButton>
+          </div>
+        }
+        {
+          <div className={'col no-margin'}>
+            {props.title}
+          </div>
+        }
+        {
+          <div className={'col no-margin'}>
+            {
+              started && isHost && !isDirectCall &&
+              <Timer onTimeLapse={
+                (extend) => {
+                  if (!extend) {
+                    endMeeting();
                   }
-                } time={remainingTime}/>
-              }
-            </div>
-          </>
+                }
+              } time={remainingTime}/>
+            }
+          </div>
         }
         {
           isRecording &&
           <>
             <LottieIcon id={'recording'}/>
-            <span style={{ fontSize: '16px' }}>
+            <span style={{fontSize: '16px'}}>
               {
                 isHost ? 'You are recording...' : 'Meeting is being recorded...'
               }
