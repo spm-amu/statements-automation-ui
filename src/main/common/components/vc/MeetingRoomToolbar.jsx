@@ -40,10 +40,11 @@ const MeetingRoomToolbar = (props) => {
   };
 
   const onUpdateHost = (args) => {
+    console.log("\n\n\n\n\n\n\nCHANGE HOST DATA : ", args);
     let userDetails = appManager.getUserDetails();
     const iamHost = userDetails.userId === args.payload.host;
     setIsHost(iamHost);
-    setStarted(args.payload.meetingStarted);
+    setStarted(args.payload.state.meetingStarted);
 
     if (iamHost) {
       appManager.fireEvent(SystemEventType.API_SUCCESS, {message: 'You have been assigned as host of this meeting', timeout: 5000});

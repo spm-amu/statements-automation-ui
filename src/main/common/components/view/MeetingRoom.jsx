@@ -439,7 +439,9 @@ const MeetingRoom = (props) => {
         socketManager.emitEvent(MessageType.CHANGE_HOST, {
           roomID: selectedMeeting.id,
           host: participant.userId,
-          meetingStarted: props.meetingStarted
+          state: {
+            meetingStarted: props.meetingStarted
+          }
         }).catch((error) => {
         });
 
