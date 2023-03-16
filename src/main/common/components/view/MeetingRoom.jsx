@@ -221,21 +221,24 @@ const MeetingRoom = (props) => {
   };
 
   const recordMeeting = () => {
-    if (mediaRecorder != null) {
-      mediaRecorder.start();
-      socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
-        roomID: selectedMeeting.id,
-        isRecording: true
-      }).catch((error) => {
-      });
+    createMediaRecorder().then((recorder) => {
+      if (recorder != null) {
+        recorder.start();
+        socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
+          roomID: selectedMeeting.id,
+          isRecording: true
+        }).catch((error) => {
+        });
 
-      setIsRecording(true);
+        setIsRecording(true);
+        setMediaRecorder(recorder);
 
-      emitSystemEvent("MEETING_RECORDING", {
-        recording: true,
-        userId: appManager.getUserDetails().userId
-      });
-    }
+        emitSystemEvent("MEETING_RECORDING", {
+          recording: true,
+          userId: appManager.getUserDetails().userId
+        });
+      }
+    });
   };
 
   const onSystemAlert = (payload) => {
@@ -400,7 +403,7 @@ const MeetingRoom = (props) => {
     //currentUserStream.shareScreenObj.addTrack(stream.getVideoTracks()[0]);
     shareScreenRef.current.srcObject = stream;
 
-    createMediaRecorder(stream);
+    //createMediaRecorder(stream);
     //setMeetingParticipantGridMode('STRIP');
 
     setSomeoneSharing(false);
@@ -814,21 +817,63 @@ const MeetingRoom = (props) => {
   };
 
   const setupStream = () => {
-    currentUserStream.init(!videoMuted, true, (stream) => {
+    currentUserStream.init(!videoMuted, true, (stream, shareStream) => {
       setStreamsInitiated(true);
-      createMediaRecorder(stream);
+      //createMediaRecorder(shareStream);
     }, (e) => {
       console.log(e);
     });
   };
 
-  const createMediaRecorder = (stream) => {
-    const options = {mimeType: "video/webm; codecs=vp9"};
-    const recorder = new MediaRecorder(stream, options);
-    recorder.ondataavailable = handleDataAvailable;
-    recorder.onstop = handleStop;
+  const createMediaRecorder = () => {
+    return new Promise((resolve, reject) => {
+      electron.ipcRenderer.getSources()
+        .then(sources => {
+          let appScreenSource = sources.find((source) => source.name === "Armscor Connect");
+          if(appScreenSource) {
+            const videoConstraints = {
+              cursor: true,
+              audio: {
+                mandatory: {
+                  chromeMediaSource: 'desktop',
+                },
+              },
+              video: {
+                mandatory: {
+                  chromeMediaSource: 'desktop',
+                  chromeMediaSourceId: appScreenSource.id,
+                  minWidth: 1280,
+                  maxWidth: 1280,
+                  minHeight: 720,
+                  maxHeight: 720
+                }
+              }
+            };
 
-    setMediaRecorder(recorder);
+            if (osName === 'Mac OS') {
+              videoConstraints.audio = false;
+            }
+
+            navigator.mediaDevices
+              .getUserMedia(videoConstraints)
+              .then((stream) => {
+                //stream.addTrack(currentUserStream.getAudioTracks()[0]);
+                const options = {mimeType: "video/webm; codecs=vp9"};
+                const recorder = new MediaRecorder(stream, options);
+                recorder.ondataavailable = handleDataAvailable;
+                recorder.onstop = handleStop;
+
+                resolve(recorder);
+              })
+              .catch(e => {
+                console.log(e);
+                reject(new Error(e.message));
+              });
+          } else {
+            reject(new Error("Cannot initialize recorder. Application screen source not found"));
+          }
+        });
+    });
   };
 
   useEffect(() => {

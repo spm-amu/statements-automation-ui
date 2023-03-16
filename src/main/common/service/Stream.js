@@ -36,7 +36,7 @@ export class Stream {
             stream.getVideoTracks()[0].enabled = false;
             console.log("STREAM STARTED");
             if (successHandler) {
-              successHandler(this.obj);
+              successHandler(this.obj, this.shareScreenObj);
             }
           });
       }).catch((e) => {
