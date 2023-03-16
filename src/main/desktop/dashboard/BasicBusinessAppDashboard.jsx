@@ -542,17 +542,6 @@ const BasicBusinessAppDashboard = (props) => {
   }
 
   React.useEffect(() => {
-    electron.ipcRenderer.sendMessage('hideMessagePreview', {});
-    electron.ipcRenderer.sendMessage('receivingMessage', {
-      payload: {
-        chatMessage: {
-          participant: 'Amukelani Shandlale',
-          content: 'Test'
-        }
-      }
-    });
-    //electron.ipcRenderer.sendMessage('hideMessagePreview', {});
-
     if (MODE === 'PROD') {
       get("http://DEVHOVC03/vc/api/v1/system/ping", (e) => {
         loadHost("http://DEVHOVC03/vc", "http://DEVHOVC03", false);
