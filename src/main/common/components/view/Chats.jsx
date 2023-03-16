@@ -80,6 +80,8 @@ const Chats = (props) => {
   };
 
   const createChatHandler = (title, chatParticipants) => {
+    console.log('CREATE CHAT HANDLER  chatParticipants ', chatParticipants);
+
     if (chatParticipants.length > 0) {
       let newChat = {
         participants: chatParticipants,
@@ -97,9 +99,14 @@ const Chats = (props) => {
         userId: userDetails.userId
       });
 
+      console.log('CREATE CHAT HANDLER ', newChat);
+
       post(
         `${appManager.getAPIHost()}/api/v1/chat/create`,
         (response) => {
+
+          console.log('CREATED CHAT: : ', response);
+
           setSelectedChat(newChat);
           setMode('LIST');
           loadChats();
@@ -131,12 +138,17 @@ const Chats = (props) => {
     if (existingChat) {
       setSelectedChat(existingChat);
     } else {
-      get(`${appManager.getAPIHost()}/api/v1/auth/userInfo/${meetingRoomNav.privateChatUserId}`, (response) => {
-        const addParticipants = [];
-        addParticipants.push(response);
-        createChatHandler(addParticipants);
-      }, (e) => {
-      })
+      post(
+        `${appManager.getAPIHost()}/api/v1/auth/userInfo/multiple`,
+        (response) => {
+          createChatHandler('', response.users);
+        },
+        (e) => {},
+        {
+          userIds: [ meetingRoomNav.privateChatUserId ]
+        },
+        null, false
+      );
     }
   };
 
