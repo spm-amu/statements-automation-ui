@@ -142,6 +142,11 @@ const ViewContainer = (props) => {
             isDirectCall={attributes.data.isDirectCall}
             selectedMeeting={attributes.data.selectedMeeting}
             title={attributes.data.selectedMeeting.title}
+            startMeetingHandler={() => {
+              attributes.data.meetingStarted = true;
+              setRefresher(!refresher);
+            }
+            }
           />
         }
                 title={attributes.data.selectedMeeting.title}
@@ -187,6 +192,7 @@ const ViewContainer = (props) => {
             }}
             displayState={attributes.windowDisplayState}
             selectedMeeting={attributes.data.selectedMeeting}
+            meetingStarted={attributes.data.meetingStarted}
             callerUser={attributes.data.callerUser}
             videoMuted={attributes.data.videoMuted}
             audioMuted={attributes.data.audioMuted}

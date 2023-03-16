@@ -97,3 +97,19 @@ button:focus {
 .fc-sidebarToggle-button{
   display: none !important;
 }
+
+.fc-event-main-frame {
+  color: #945c33 !important;
+}
+
+.fc .fc-col-header-cell-cushion {
+  color: #945c33 !important;
+}
+
+.fc-direction-ltr .fc-list-day-text {
+  color: #945c33 !important;
+}
+
+.fc .fc-list-event-dot {
+  border: 5px solid #945c33 !important;
+}

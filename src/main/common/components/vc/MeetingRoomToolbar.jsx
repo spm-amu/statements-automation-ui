@@ -43,9 +43,10 @@ const MeetingRoomToolbar = (props) => {
     let userDetails = appManager.getUserDetails();
     const iamHost = userDetails.userId === args.payload.host;
     setIsHost(iamHost);
+    setStarted(args.payload.meetingStarted);
 
     if (iamHost) {
-      appManager.fireEvent(SystemEventType.API_SUCCESS, {message: 'You have been assigned as host of this meeting.'});
+      appManager.fireEvent(SystemEventType.API_SUCCESS, {message: 'You have been assigned as host of this meeting', timeout: 5000});
     }
   };
 
@@ -127,6 +128,7 @@ const MeetingRoomToolbar = (props) => {
       `${appManager.getAPIHost()}/api/v1/meeting/start`,
       (response) => {
         setRemainingTime(response.remainingTime);
+        props.startMeetingHandler();
       },
       (e) => {
       },

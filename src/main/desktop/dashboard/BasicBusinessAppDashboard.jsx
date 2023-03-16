@@ -218,7 +218,7 @@ const BasicBusinessAppDashboard = (props) => {
       const messageTimeout = setTimeout(() => {
         setSuccessMessage(null);
         clearTimeout(messageTimeout);
-      }, 2000)
+      }, event.timeout ? event.timeout : 2000)
     }
   };
 

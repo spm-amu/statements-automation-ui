@@ -102,6 +102,7 @@ const MeetingRoom = (props) => {
   const [activityMessage, setActivityMessage] = useState(null);
   const [chatMessage, setChatMessage] = useState(null);
   const [chatSender, setChatSender] = useState(null);
+  const [meetingStarted, setMeetingStarted] = useState(null);
   const [hasUnreadChats, setHasUnreadChats] = useState(null);
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
   const recordedChunks = [];
@@ -437,7 +438,8 @@ const MeetingRoom = (props) => {
       (response) => {
         socketManager.emitEvent(MessageType.CHANGE_HOST, {
           roomID: selectedMeeting.id,
-          host: participant.userId
+          host: participant.userId,
+          meetingStarted: props.meetingStarted
         }).catch((error) => {
         });
 
@@ -497,6 +499,10 @@ const MeetingRoom = (props) => {
       setDisplayState(props.displayState);
     }
   }, [props.displayState]);
+
+  useEffect(() => {
+    setMeetingStarted(props.meetingStarted);
+  }, [props.meetingStarted]);
 
   useEffect(() => {
     if (screenShared) {
