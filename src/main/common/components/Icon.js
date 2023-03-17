@@ -18,7 +18,7 @@ import CameraOff from '@material-ui/icons/VideocamOff';
 import Microphone from '@material-ui/icons/Mic';
 import MicrophoneOff from '@material-ui/icons/MicOff';
 import Minimize from '@material-ui/icons/Minimize';
-import Maximize from '@material-ui/icons/Maximize';
+import Maximize from '@material-ui/icons/Launch';
 import Work from '@material-ui/icons/Work';
 import PanTool from '@material-ui/icons/PanTool';
 import List from '@material-ui/icons/List';

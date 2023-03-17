@@ -1158,9 +1158,7 @@ const MeetingRoom = (props) => {
         }}>
           <div style={{height: '100%', maxHeight: '100%', backgroundColor: '#000000'}}>
             <div className={displayState === 'MAXIMIZED' ? 'workspace-max' : 'workspace-min'}>
-              {
-                displayState === 'MAXIMIZED' ?
-                  <div className={'row no-margin no-padding'} style={{width: '100%', height: '100%'}}>
+                  <div className={'row no-margin no-padding'} style={{width: '100%', height: '100%', display: displayState === 'MAXIMIZED' ? 'inherit' : 'none'}}>
                     {
                       showWhiteBoard && meetingParticipantGridMode === 'STRIP' &&
                       <div className={'row no-margin no-padding'}
@@ -1284,9 +1282,9 @@ const MeetingRoom = (props) => {
                       </div>
                     </div>
                   </div>
-                  :
-                  <MeetingRoomSummary participants={participants} participantsRaisedHands={participantsRaisedHands}/>
-              }
+              <div style={{display: displayState === 'MINIMIZED' ? 'inherit' : 'none'}}>
+                <MeetingRoomSummary participants={participants} participantsRaisedHands={participantsRaisedHands}/>
+              </div>
             </div>
           </div>
         </div>
