@@ -410,10 +410,14 @@ const MeetingRoom = (props) => {
   };
 
   const handleDataAvailable = (e) => {
+  alert("DATA ARRIVED");
+  console.log("\n\n\n\n\nDATA");
+  console.log(e.data);
     recordedChunks.push(e.data);
   };
 
   const handleStop = async (e) => {
+  alert("STOPPING");
     const blob = new Blob(recordedChunks, {
       type: "video/webm",
     });
@@ -421,6 +425,7 @@ const MeetingRoom = (props) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onload = function (evt) {
+    alert("ONLOAD");
       const result = evt.target.result;
       const data = {
         meetingId: selectedMeeting.id,
@@ -430,6 +435,7 @@ const MeetingRoom = (props) => {
         recordedData: result
       };
 
+console.log(data);
       socketManager.emitEvent(MessageType.SAVE_RECORDING, data).catch((error) => {
       });
     }
@@ -830,25 +836,15 @@ const MeetingRoom = (props) => {
       electron.ipcRenderer.getMainWindowId()
         .then(id => {
           if(id) {
-            alert(id);
             const videoConstraints = {
-              cursor: true,
-              audio: {
-                mandatory: {
-                  chromeMediaSource: 'desktop',
-                },
-              },
-              video: {
-                mandatory: {
-                  chromeMediaSource: 'desktop',
-                  chromeMediaSourceId: id,
-                  minWidth: 1280,
-                  maxWidth: 1280,
-                  minHeight: 720,
-                  maxHeight: 720
-                }
-              }
-            };
+                                         audio: false,
+                                         video: {
+                                           mandatory: {
+                                             chromeMediaSource: 'desktop',
+                                             chromeMediaSourceId: id
+                                           }
+                                         }
+                                       };
 
             if (osName === 'Mac OS') {
               videoConstraints.audio = false;

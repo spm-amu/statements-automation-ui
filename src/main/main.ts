@@ -322,6 +322,7 @@ ipcMain.handle('main-window-id', () => {
     return mainWindow.getMediaSourceId();
   }
 
+
   return null;
 });
 
