@@ -108,6 +108,7 @@ const MeetingRoom = (props) => {
   const recordedChunks = [];
   const shareScreenSource = useRef();
   const shareScreenRef = useRef();
+  const recordRef = useRef();
   const tmpVideoTrack = useRef();
 
   const handler = () => {
@@ -227,6 +228,8 @@ const MeetingRoom = (props) => {
         roomID: selectedMeeting.id,
         isRecording: true
       }).catch((error) => {
+        console.log("\n\n\nRECORD START ERROR");
+        console.log(error);
       });
 
       setIsRecording(true);
@@ -407,9 +410,11 @@ const MeetingRoom = (props) => {
   };
 
   const handleDataAvailable = (e) => {
-    console.log("\n\n\n\n\nDATA ARRIVED");
-    console.log(e.data);
-    recordedChunks.push(e.data);
+    if (e.data.size > 0) {
+      recordedChunks.push(e.data);
+    } else {
+      console.log("no data to push");
+    }
   };
 
   const handleStop = async (e) => {
@@ -831,7 +836,7 @@ const MeetingRoom = (props) => {
   const createMediaRecorder = () => {
     return new Promise((resolve, reject) => {
       electron.ipcRenderer.getMainWindowId()
-        .then(id => {
+        .then((id) => {
           if (id) {
             const videoConstraints = {
               audio: false,
@@ -843,17 +848,15 @@ const MeetingRoom = (props) => {
               }
             };
 
-            if (osName === 'Mac OS') {
-              videoConstraints.audio = false;
-            }
-
             navigator.mediaDevices
               .getUserMedia(videoConstraints)
               .then((stream) => {
                 stream.addTrack(currentUserStream.getAudioTracks()[0]);
+                recordRef.current.srcObject = stream;
 
                 const options = {mimeType: "video/webm; codecs=vp9"};
                 const recorder = new MediaRecorder(stream, options);
+
                 recorder.ondataavailable = handleDataAvailable;
                 recorder.onstop = handleStop;
 
@@ -881,7 +884,6 @@ const MeetingRoom = (props) => {
     //setupStream();
     appManager.add('CURRENT_MEETING', selectedMeeting);
   }, []);
-
 
   useEffect(() => {
     if (userVideo && userVideo.current && !userVideo.current.srcObject) {
@@ -1138,6 +1140,13 @@ const MeetingRoom = (props) => {
 
   return (
     <Fragment>
+    <div style={{display: 'none'}}>
+      <video
+        hidden={false}
+        playsInline autoPlay ref={recordRef}
+        style={{width: '200px', height: '200px'}}
+      />
+    </div>
       <div className={'row meeting-container'} style={{
         height: displayState === 'MAXIMIZED' ? '100%' : '90%',
         maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
