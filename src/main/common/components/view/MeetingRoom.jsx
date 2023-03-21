@@ -180,13 +180,13 @@ const MeetingRoom = (props) => {
       on: (eventType, be) => {
         switch (eventType) {
           case SystemEventType.SOCKET_CONNECT:
-            if(preErrorStep) {
+            if (preErrorStep) {
               setStep(preErrorStep);
             }
 
             //if (preErrorStep === Steps.LOBBY) {
-              //console.log("RE-JOINING FROM LOBBY AFTER CONNECT");
-              //initMeetingSession();
+            //console.log("RE-JOINING FROM LOBBY AFTER CONNECT");
+            //initMeetingSession();
             //} else
             if (preErrorStep === Steps.SESSION) {
               socketManager.clearUserToPeerMap();
@@ -196,7 +196,7 @@ const MeetingRoom = (props) => {
             }
             break;
           case SystemEventType.SOCKET_DISCONNECT:
-            if(step !== Steps.SYSTEM_ERROR && step !== Steps.CONNECTION_ERROR) {
+            if (step !== Steps.SYSTEM_ERROR && step !== Steps.CONNECTION_ERROR) {
               setPreErrorStep(step);
             }
 
@@ -221,28 +221,25 @@ const MeetingRoom = (props) => {
   };
 
   const recordMeeting = () => {
-    createMediaRecorder().then((recorder) => {
-      if (recorder != null) {
-        recorder.start();
-        socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
-          roomID: selectedMeeting.id,
-          isRecording: true
-        }).catch((error) => {
-        });
+    if (mediaRecorder != null) {
+      mediaRecorder.start();
+      socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
+        roomID: selectedMeeting.id,
+        isRecording: true
+      }).catch((error) => {
+      });
 
-        setIsRecording(true);
-        setMediaRecorder(recorder);
+      setIsRecording(true);
 
-        emitSystemEvent("MEETING_RECORDING", {
-          recording: true,
-          userId: appManager.getUserDetails().userId
-        });
-      }
-    });
+      emitSystemEvent("MEETING_RECORDING", {
+        recording: true,
+        userId: appManager.getUserDetails().userId
+      });
+    }
   };
 
   const onSystemAlert = (payload) => {
-    if(payload.type === 'MEETING_STARTED_ALERT') {
+    if (payload.type === 'MEETING_STARTED_ALERT') {
       handleMessageArrived({
         message: payload.message
       })
@@ -410,14 +407,13 @@ const MeetingRoom = (props) => {
   };
 
   const handleDataAvailable = (e) => {
-  alert("DATA ARRIVED");
-  console.log("\n\n\n\n\nDATA");
-  console.log(e.data);
+    console.log("\n\n\n\n\nDATA ARRIVED");
+    console.log(e.data);
     recordedChunks.push(e.data);
   };
 
   const handleStop = async (e) => {
-  alert("STOPPING");
+    console.log("\n\n\n\n\nRECORDING STOPPING");
     const blob = new Blob(recordedChunks, {
       type: "video/webm",
     });
@@ -425,7 +421,6 @@ const MeetingRoom = (props) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onload = function (evt) {
-    alert("ONLOAD");
       const result = evt.target.result;
       const data = {
         meetingId: selectedMeeting.id,
@@ -435,7 +430,7 @@ const MeetingRoom = (props) => {
         recordedData: result
       };
 
-console.log(data);
+      console.log(data);
       socketManager.emitEvent(MessageType.SAVE_RECORDING, data).catch((error) => {
       });
     }
@@ -569,7 +564,7 @@ console.log(data);
         setStep(Steps.LOBBY);
         setShowWhiteBoard(false);
         setMeetingParticipantGridMode('DEFAULT');
-        if(screenShared) {
+        if (screenShared) {
           stopShareScreen();
         }
 
@@ -719,7 +714,7 @@ console.log(data);
 
         console.log("JOIN FROMISE FULFILLED");
         createParticipants(result.data.usersInRoom);
-        if(result.data.whiteboard) {
+        if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);
         }
       } else {
@@ -825,7 +820,9 @@ console.log(data);
   const setupStream = () => {
     currentUserStream.init(!videoMuted, true, (stream, shareStream) => {
       setStreamsInitiated(true);
-      //createMediaRecorder(shareStream);
+      createMediaRecorder().then((recorder) => {
+        setMediaRecorder(recorder);
+      })
     }, (e) => {
       console.log(e);
     });
@@ -835,16 +832,16 @@ console.log(data);
     return new Promise((resolve, reject) => {
       electron.ipcRenderer.getMainWindowId()
         .then(id => {
-          if(id) {
+          if (id) {
             const videoConstraints = {
-                                         audio: false,
-                                         video: {
-                                           mandatory: {
-                                             chromeMediaSource: 'desktop',
-                                             chromeMediaSourceId: id
-                                           }
-                                         }
-                                       };
+              audio: false,
+              video: {
+                mandatory: {
+                  chromeMediaSource: 'desktop',
+                  chromeMediaSourceId: id
+                }
+              }
+            };
 
             if (osName === 'Mac OS') {
               videoConstraints.audio = false;
@@ -1154,130 +1151,131 @@ console.log(data);
         }}>
           <div style={{height: '100%', maxHeight: '100%', backgroundColor: '#000000'}}>
             <div className={displayState === 'MAXIMIZED' ? 'workspace-max' : 'workspace-min'}>
-                  <div className={'row no-margin no-padding'} style={{width: '100%', height: '100%', display: displayState === 'MAXIMIZED' ? 'inherit' : 'none'}}>
-                    {
-                      showWhiteBoard && meetingParticipantGridMode === 'STRIP' &&
-                      <div className={'row no-margin no-padding'}
-                           style={{width: '100%', height: 'calc(100% - 200px)', margin: '16px 0'}}>
-                        <div className={'col no-margin no-padding'} style={{width: '100%'}}>
-                          <WhiteBoard isHost={isHost} id={selectedMeeting.id} items={whiteboardItems} eventHandler={
-                            {
-                              onAddItem: (item) => {
-                                whiteboardItems.push(item);
-                              },
-                              onDeleteItem: (item) => {
-                                let filtered = whiteboardItems.filter((i) => i.id !== item.id);
-                                whiteboardItems.splice(0, whiteboardItems.length);
+              <div className={'row no-margin no-padding'}
+                   style={{width: '100%', height: '100%', display: displayState === 'MAXIMIZED' ? 'inherit' : 'none'}}>
+                {
+                  showWhiteBoard && meetingParticipantGridMode === 'STRIP' &&
+                  <div className={'row no-margin no-padding'}
+                       style={{width: '100%', height: 'calc(100% - 200px)', margin: '16px 0'}}>
+                    <div className={'col no-margin no-padding'} style={{width: '100%'}}>
+                      <WhiteBoard isHost={isHost} id={selectedMeeting.id} items={whiteboardItems} eventHandler={
+                        {
+                          onAddItem: (item) => {
+                            whiteboardItems.push(item);
+                          },
+                          onDeleteItem: (item) => {
+                            let filtered = whiteboardItems.filter((i) => i.id !== item.id);
+                            whiteboardItems.splice(0, whiteboardItems.length);
 
-                                for (const filteredElement of filtered) {
-                                  whiteboardItems.push(filteredElement);
-                                }
-                              },
-                              onUpdateItem: (item) => {
-                                let filtered = whiteboardItems.filter((i) => i.id === item.id);
-                                if (filtered.length > 0) {
-                                  const properties = Object.getOwnPropertyNames(item);
-                                  for (const property of properties) {
-                                    filtered[0][property] = item[property];
-                                  }
-                                }
-                              },
-                              onSystemEvent: (eventType, data) => {
-                                emitSystemEvent(eventType, data);
+                            for (const filteredElement of filtered) {
+                              whiteboardItems.push(filteredElement);
+                            }
+                          },
+                          onUpdateItem: (item) => {
+                            let filtered = whiteboardItems.filter((i) => i.id === item.id);
+                            if (filtered.length > 0) {
+                              const properties = Object.getOwnPropertyNames(item);
+                              for (const property of properties) {
+                                filtered[0][property] = item[property];
                               }
                             }
-                          }/>
-                        </div>
-                      </div>
-                    }
-                    <div style={{
-                      width: someoneSharing ? '100%' : '0',
-                      height: someoneSharing ? 'calc(100% - 200px)' : 0
-                    }}>
-                      <video
-                        hidden={false}
-                        muted playsinline autoPlay ref={shareScreenRef}
-                        style={{width: '100%', height: '100%'}}
-                      />
+                          },
+                          onSystemEvent: (eventType, data) => {
+                            emitSystemEvent(eventType, data);
+                          }
+                        }
+                      }/>
                     </div>
-                    <div className={'row'} style={{
-                      width: '100%',
-                      height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : "160px",
-                      marginLeft: '0',
-                      marginRight: '0'
-                    }}>
-                      <div className={'col'} style={{width: '100%', paddingLeft: '0', paddingRight: '0'}}>
-                        {
-                          step === Steps.SESSION_ENDED ?
+                  </div>
+                }
+                <div style={{
+                  width: someoneSharing ? '100%' : '0',
+                  height: someoneSharing ? 'calc(100% - 200px)' : 0
+                }}>
+                  <video
+                    hidden={false}
+                    muted playsinline autoPlay ref={shareScreenRef}
+                    style={{width: '100%', height: '100%'}}
+                  />
+                </div>
+                <div className={'row'} style={{
+                  width: '100%',
+                  height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : "160px",
+                  marginLeft: '0',
+                  marginRight: '0'
+                }}>
+                  <div className={'col'} style={{width: '100%', paddingLeft: '0', paddingRight: '0'}}>
+                    {
+                      step === Steps.SESSION_ENDED ?
+                        <div style={{
+                          backgroundColor: 'rgb(40, 40, 43)',
+                          color: 'white',
+                          fontSize: '24px',
+                          width: '100%',
+                          height: '100%'
+                        }} className={'centered-flex-box'}>
+                          {'The ' + (isDirectCall ? 'call' : 'meeting') + ' has been ended' + (isDirectCall ? '' : ' by the host')}
+                        </div>
+                        :
+                        step === Steps.SYSTEM_ERROR ?
+                          <div style={{
+                            backgroundColor: 'rgb(40, 40, 43)',
+                            color: 'rgb(235, 63, 33)',
+                            fontSize: '24px',
+                            width: '100%',
+                            height: '100%'
+                          }} className={'centered-flex-box'}>
+                            {SYSTEM_ERROR_MESSAGE}
+                          </div>
+                          :
+                          step === Steps.CONNECTION_ERROR ?
                             <div style={{
                               backgroundColor: 'rgb(40, 40, 43)',
-                              color: 'white',
+                              color: 'rgb(235, 63, 33)',
                               fontSize: '24px',
                               width: '100%',
                               height: '100%'
                             }} className={'centered-flex-box'}>
-                              {'The ' + (isDirectCall ? 'call' : 'meeting') + ' has been ended' + (isDirectCall ? '' : ' by the host')}
+                              <div>
+                                <LottieIcon id={'waiting'}/>
+                                {CONNECTION_ERROR_MESSAGE}
+                              </div>
                             </div>
                             :
-                            step === Steps.SYSTEM_ERROR ?
-                              <div style={{
-                                backgroundColor: 'rgb(40, 40, 43)',
-                                color: 'rgb(235, 63, 33)',
-                                fontSize: '24px',
-                                width: '100%',
-                                height: '100%'
-                              }} className={'centered-flex-box'}>
-                                {SYSTEM_ERROR_MESSAGE}
-                              </div>
-                              :
-                              step === Steps.CONNECTION_ERROR ?
-                                <div style={{
-                                  backgroundColor: 'rgb(40, 40, 43)',
-                                  color: 'rgb(235, 63, 33)',
-                                  fontSize: '24px',
-                                  width: '100%',
-                                  height: '100%'
-                                }} className={'centered-flex-box'}>
-                                  <div>
-                                    <LottieIcon id={'waiting'}/>
-                                    {CONNECTION_ERROR_MESSAGE}
-                                  </div>
-                                </div>
-                                :
-                                <>
-                                  <MeetingParticipantGrid participants={participants}
-                                                          waitingList={lobbyWaitingList}
-                                                          mode={meetingParticipantGridMode}
-                                                          audioMuted={audioMuted}
-                                                          videoMuted={videoMuted}
-                                                          meetingTitle={selectedMeeting.title}
-                                                          userToCall={userToCall}
-                                                          userStream={currentUserStream.obj}
-                                                          step={step}
-                                                          isHost={isHost}
-                                                          participantsRaisedHands={participantsRaisedHands}
-                                                          allUserParticipantsLeft={allUserParticipantsLeft}
-                                                          userVideoChangeHandler={(ref) => setUserVideo(ref)}
-                                                          onHostAudioMute={(participant) => {
-                                                            changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
-                                                          }}
-                                                          onHostVideoMute={(participant) => {
-                                                            changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
-                                                          }}
-                                                          acceptUserHandler={
-                                                            (item) => {
-                                                              acceptUser(item);
-                                                            }}
-                                                          rejectUserHandler={
-                                                            (item) => {
-                                                              rejectUser(item);
-                                                            }}
-                                  />
-                                </>
-                        }
-                      </div>
-                    </div>
+                            <>
+                              <MeetingParticipantGrid participants={participants}
+                                                      waitingList={lobbyWaitingList}
+                                                      mode={meetingParticipantGridMode}
+                                                      audioMuted={audioMuted}
+                                                      videoMuted={videoMuted}
+                                                      meetingTitle={selectedMeeting.title}
+                                                      userToCall={userToCall}
+                                                      userStream={currentUserStream.obj}
+                                                      step={step}
+                                                      isHost={isHost}
+                                                      participantsRaisedHands={participantsRaisedHands}
+                                                      allUserParticipantsLeft={allUserParticipantsLeft}
+                                                      userVideoChangeHandler={(ref) => setUserVideo(ref)}
+                                                      onHostAudioMute={(participant) => {
+                                                        changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
+                                                      }}
+                                                      onHostVideoMute={(participant) => {
+                                                        changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
+                                                      }}
+                                                      acceptUserHandler={
+                                                        (item) => {
+                                                          acceptUser(item);
+                                                        }}
+                                                      rejectUserHandler={
+                                                        (item) => {
+                                                          rejectUser(item);
+                                                        }}
+                              />
+                            </>
+                    }
                   </div>
+                </div>
+              </div>
               <div style={{display: displayState === 'MINIMIZED' ? 'inherit' : 'none'}}>
                 <MeetingRoomSummary participants={participants} participantsRaisedHands={participantsRaisedHands}/>
               </div>
