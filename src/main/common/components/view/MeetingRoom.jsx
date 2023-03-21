@@ -102,6 +102,7 @@ const MeetingRoom = (props) => {
   const [activityMessage, setActivityMessage] = useState(null);
   const [chatMessage, setChatMessage] = useState(null);
   const [chatSender, setChatSender] = useState(null);
+  const [currentRecordingId, setCurrentRecordingId] = useState(null);
   const [meetingStarted, setMeetingStarted] = useState(null);
   const [hasUnreadChats, setHasUnreadChats] = useState(null);
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
@@ -221,22 +222,22 @@ const MeetingRoom = (props) => {
     setIsHost(userDetails.userId === args.payload.host);
   };
 
-  const recordMeeting = () => {
+  const recordMeeting = async () => {
     if (mediaRecorder != null) {
-      mediaRecorder.start();
+      mediaRecorder.start(30000);
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
         roomID: selectedMeeting.id,
         isRecording: true
+      }).then((id) => {
+        setCurrentRecordingId(id);
+        setIsRecording(true);
+        emitSystemEvent("MEETING_RECORDING", {
+          recording: true,
+          userId: appManager.getUserDetails().userId
+        });
       }).catch((error) => {
-        console.log("\n\n\nRECORD START ERROR");
+        console.log("RECORD START ERROR");
         console.log(error);
-      });
-
-      setIsRecording(true);
-
-      emitSystemEvent("MEETING_RECORDING", {
-        recording: true,
-        userId: appManager.getUserDetails().userId
       });
     }
   };
@@ -411,34 +412,43 @@ const MeetingRoom = (props) => {
 
   const handleDataAvailable = (e) => {
     if (e.data.size > 0) {
+      console.log("ADDED CHUNK : " + recordedChunks.length);
+      const blob = new Blob([e.data], {
+        type: "video/webm",
+      });
+
+      const reader = new FileReader();
+      reader.readAsText(blob);
+      reader.onload = function (evt) {
+        const result = evt.target.result;
+        const data = {
+          meetingId: selectedMeeting.id,
+          name: selectedMeeting.title,
+          type: blob.type,
+          size: blob.size,
+          recordedData: result,
+          chunkIndex: recordedChunks.length
+        };
+
+        console.log("======== SAVING RECORDING =========");
+        console.log(data);
+        socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
+          .then(id => setCurrentRecordingId(id))
+          .catch((error) => {
+        });
+      };
+
       recordedChunks.push(e.data);
+
+      //console.log(e.data);
     } else {
       console.log("no data to push");
     }
   };
 
   const handleStop = async (e) => {
-    console.log("\n\n\n\n\nRECORDING STOPPING");
-    const blob = new Blob(recordedChunks, {
-      type: "video/webm",
-    });
+    // TODO : Call an end-recording Message
 
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onload = function (evt) {
-      const result = evt.target.result;
-      const data = {
-        meetingId: selectedMeeting.id,
-        name: selectedMeeting.title,
-        type: blob.type,
-        size: blob.size,
-        recordedData: result
-      };
-
-      console.log(data);
-      socketManager.emitEvent(MessageType.SAVE_RECORDING, data).catch((error) => {
-      });
-    }
   };
 
   const changeHost = (participant) => {
@@ -843,7 +853,11 @@ const MeetingRoom = (props) => {
               video: {
                 mandatory: {
                   chromeMediaSource: 'desktop',
-                  chromeMediaSourceId: id
+                  chromeMediaSourceId: id,
+                  minWidth: 1280,
+                  maxWidth: 1280,
+                  minHeight: 720,
+                  maxHeight: 720
                 }
               }
             };
@@ -854,7 +868,10 @@ const MeetingRoom = (props) => {
                 stream.addTrack(currentUserStream.getAudioTracks()[0]);
                 recordRef.current.srcObject = stream;
 
-                const options = {mimeType: "video/webm; codecs=vp9"};
+                const options = {
+                  mimeType: "video/webm; codecs=vp9"
+                };
+
                 const recorder = new MediaRecorder(stream, options);
 
                 recorder.ondataavailable = handleDataAvailable;
@@ -1140,13 +1157,13 @@ const MeetingRoom = (props) => {
 
   return (
     <Fragment>
-    <div style={{display: 'none'}}>
-      <video
-        hidden={false}
-        playsInline autoPlay ref={recordRef}
-        style={{width: '200px', height: '200px'}}
-      />
-    </div>
+      <div style={{display: 'none'}}>
+        <video
+          hidden={false} muted
+          playsInline autoPlay ref={recordRef}
+          style={{width: '200px', height: '200px'}}
+        />
+      </div>
       <div className={'row meeting-container'} style={{
         height: displayState === 'MAXIMIZED' ? '100%' : '90%',
         maxHeight: displayState === 'MAXIMIZED' ? '100%' : '90%',
