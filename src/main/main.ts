@@ -9,13 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import {app, BrowserWindow, desktopCapturer, webContents, ipcMain, screen, shell, systemPreferences} from 'electron';
+import desktopCapturer, {app, BrowserWindow, ipcMain, screen, shell, systemPreferences} from 'electron';
 import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import {resolveHtmlPath, resolveWindowHtmlPath} from './util';
 import Store from "electron-store";
-import desktopCapturer from "electron";
 
 const store = new Store();
 
@@ -318,21 +317,12 @@ ipcMain.on("systemAlert", async (_event, args) => {
   alertWindow.focus();
 });
 
-ipcMain.on("mediaSources", async (_event, args) => {
-  log.info("\n\n\n\nSOURCES TEST");
-  //log.info(desktopCapturer.getMediaSourceIdForWebContents());
-  log.info(mainWindow.webContents.getMediaSourceId(mainWindow.webContents));
+ipcMain.handle('main-window-id', () => {
+  if (mainWindow) {
+    return mainWindow.getMediaSourceId();
+  }
 
-
-  /*desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
-    for (const source of sources) {
-      log.info(source.name);
-    }
-  })*/
-});
-
-ipcMain.handle("main-window-id", async (_event, args) => {
-  return
+  return null;
 });
 
 ipcMain.on("receivingMessage", async (_event, args) => {
@@ -516,15 +506,15 @@ app.on('web-contents-created', (_createEvent, contents) => {
     newEvent.preventDefault()
   });
 
-  contents.setWindowOpenHandler(({ url }) => {
+  contents.setWindowOpenHandler(({url}) => {
     if (url) {
       setImmediate(() => {
         shell.openExternal(url);
       });
-      return { action: 'allow' }
+      return {action: 'allow'}
     } else {
       console.log("Blocked by 'setWindowOpenHandler'");
-      return { action: 'deny' }
+      return {action: 'deny'}
     }
   })
 });

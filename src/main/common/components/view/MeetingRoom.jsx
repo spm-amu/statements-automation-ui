@@ -827,10 +827,10 @@ const MeetingRoom = (props) => {
 
   const createMediaRecorder = () => {
     return new Promise((resolve, reject) => {
-      electron.ipcRenderer.getSources()
-        .then(sources => {
-          let appScreenSource = sources.find((source) => source.name === "Armscor Connect");
-          if(appScreenSource) {
+      electron.ipcRenderer.getMainWindowId()
+        .then(id => {
+          if(id) {
+            alert(id);
             const videoConstraints = {
               cursor: true,
               audio: {
@@ -841,7 +841,7 @@ const MeetingRoom = (props) => {
               video: {
                 mandatory: {
                   chromeMediaSource: 'desktop',
-                  chromeMediaSourceId: appScreenSource.id,
+                  chromeMediaSourceId: id,
                   minWidth: 1280,
                   maxWidth: 1280,
                   minHeight: 720,

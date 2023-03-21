@@ -678,11 +678,6 @@ const BasicBusinessAppDashboard = (props) => {
     document.documentElement.classList.remove("nav-open");
   };
 
-const {electron} = window;
-  const test = (e) => {
-    electron.ipcRenderer.sendMessage('mediaSources', {});
-  }
-
   return (
     loading ?
       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
@@ -720,9 +715,6 @@ const {electron} = window;
               />{" "}
               <div className="main-panel" data={activeColor}>
                 <div className="content">
-                  <Button onClick={test} color="primary">
-                              Test
-                            </Button>
                   <div style={{height: '48px'}}>
                     <HomeNavbar
                       {...props}
