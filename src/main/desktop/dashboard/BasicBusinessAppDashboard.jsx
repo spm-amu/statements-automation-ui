@@ -678,6 +678,17 @@ const BasicBusinessAppDashboard = (props) => {
     document.documentElement.classList.remove("nav-open");
   };
 
+const {electron} = window;
+  const test = (e) => {
+    electron.ipcRenderer.getSources()
+      .then(sources => {
+        console.log("\n\n\n\nSOURCE");
+        for (const source of sources) {
+          console.log(source.name);
+        }
+      });
+  };
+
   return (
     loading ?
       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
@@ -715,6 +726,9 @@ const BasicBusinessAppDashboard = (props) => {
               />{" "}
               <div className="main-panel" data={activeColor}>
                 <div className="content">
+                  <Button onClick={test} color="primary">
+                              Test
+                            </Button>
                   <div style={{height: '48px'}}>
                     <HomeNavbar
                       {...props}
