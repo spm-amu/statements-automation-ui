@@ -12,6 +12,7 @@ import "./BasicBusinessAppDashboard.css"
 import {get, post} from '../../common/service/RestService';
 import socketManager from "../../common/service/SocketManager";
 import appManager from "../../common/service/AppManager";
+import Button from "@material-ui/core/Button";
 import tokenManager, {
   ACCESS_TOKEN_PROPERTY,
   LAST_LOGIN,
@@ -27,7 +28,7 @@ const {electron} = window;
 
 let ps;
 
-const MODE = "DEBUG";
+const MODE = "PROD";
 const newMessageAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/message.mp3');
 
 const BasicBusinessAppDashboard = (props) => {
@@ -677,6 +678,11 @@ const BasicBusinessAppDashboard = (props) => {
     document.documentElement.classList.remove("nav-open");
   };
 
+const {electron} = window;
+  const test = (e) => {
+    electron.ipcRenderer.sendMessage('mediaSources', {});
+  }
+
   return (
     loading ?
       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
@@ -714,6 +720,9 @@ const BasicBusinessAppDashboard = (props) => {
               />{" "}
               <div className="main-panel" data={activeColor}>
                 <div className="content">
+                  <Button onClick={test} color="primary">
+                              Test
+                            </Button>
                   <div style={{height: '48px'}}>
                     <HomeNavbar
                       {...props}
