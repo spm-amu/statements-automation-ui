@@ -106,7 +106,9 @@ const MeetingRoom = (props) => {
   const [meetingStarted, setMeetingStarted] = useState(null);
   const [hasUnreadChats, setHasUnreadChats] = useState(null);
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
-  const recordedChunks = [];
+  const recordingSequence = useRef(0);
+  const recordingSize = useRef(0);
+  const recordingType = useRef('');
   const shareScreenSource = useRef();
   const shareScreenRef = useRef();
   const recordRef = useRef();
@@ -412,13 +414,13 @@ const MeetingRoom = (props) => {
 
   const handleDataAvailable = (e) => {
     if (e.data.size > 0) {
-      console.log("ADDED CHUNK : " + recordedChunks.length);
+      console.log("ADDED CHUNK : " + recordingSequence.current);
       const blob = new Blob([e.data], {
         type: "video/webm",
       });
 
       const reader = new FileReader();
-      reader.readAsText(blob);
+      reader.readAsDataURL(blob);
       reader.onload = function (evt) {
         const result = evt.target.result;
         const data = {
@@ -426,29 +428,46 @@ const MeetingRoom = (props) => {
           name: selectedMeeting.title,
           type: blob.type,
           size: blob.size,
-          recordedData: result,
-          chunkIndex: recordedChunks.length
+          recordedData: result.replace('data:video/webm;base64,', ''),
+          sequenceNumber: recordingSequence.current,
+          sessionId: currentRecordingId
         };
 
-        console.log("======== SAVING RECORDING =========");
+        recordingType.current = blob.type;
+        recordingSize.current += blob.size;
+
+        console.log("======== SAVING RECORDING CHUNK =========");
         console.log(data);
         socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
-          .then(id => setCurrentRecordingId(id))
           .catch((error) => {
-        });
+          });
       };
 
-      recordedChunks.push(e.data);
-
-      //console.log(e.data);
+      recordingSequence.current++;
     } else {
       console.log("no data to push");
     }
   };
 
   const handleStop = async (e) => {
-    // TODO : Call an end-recording Message
+    const data = {
+      meetingId: selectedMeeting.id,
+      name: selectedMeeting.title,
+      type: recordingType.current,
+      size: recordingSize.current,
+      sequenceNumber: recordingSequence.current,
+      sessionId: currentRecordingId
+    };
 
+    socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
+      .catch((error) => {
+      });
+
+    setCurrentRecordingId(null);
+    setIsRecording(false);
+    recordingSequence.current = 0;
+    rrecordingSize.current = 0;
+    rrecordingType.current = '';
   };
 
   const changeHost = (participant) => {

@@ -28,7 +28,7 @@ const {electron} = window;
 
 let ps;
 
-const MODE = "PROD";
+const MODE = "DEBUG";
 const newMessageAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/message.mp3');
 
 const BasicBusinessAppDashboard = (props) => {
@@ -554,7 +554,7 @@ const BasicBusinessAppDashboard = (props) => {
         }, "", true, false);
       }, "", true, false);
     } else {
-      loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
+      loadHost("http://localhost:8080/vc", "http://localhost:8000");
     }
   }, []);
 
@@ -678,17 +678,6 @@ const BasicBusinessAppDashboard = (props) => {
     document.documentElement.classList.remove("nav-open");
   };
 
-const {electron} = window;
-  const test = (e) => {
-    electron.ipcRenderer.getSources()
-      .then(sources => {
-        console.log("\n\n\n\nSOURCE");
-        for (const source of sources) {
-          console.log(source.name);
-        }
-      });
-  };
-
   return (
     loading ?
       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
@@ -726,9 +715,6 @@ const {electron} = window;
               />{" "}
               <div className="main-panel" data={activeColor}>
                 <div className="content">
-                  <Button onClick={test} color="primary">
-                              Test
-                            </Button>
                   <div style={{height: '48px'}}>
                     <HomeNavbar
                       {...props}
