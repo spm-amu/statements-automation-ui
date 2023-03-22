@@ -466,8 +466,8 @@ const MeetingRoom = (props) => {
     setCurrentRecordingId(null);
     setIsRecording(false);
     recordingSequence.current = 0;
-    rrecordingSize.current = 0;
-    rrecordingType.current = '';
+    recordingSize.current = 0;
+    recordingType.current = '';
   };
 
   const changeHost = (participant) => {
