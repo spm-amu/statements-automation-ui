@@ -102,7 +102,6 @@ const MeetingRoom = (props) => {
   const [activityMessage, setActivityMessage] = useState(null);
   const [chatMessage, setChatMessage] = useState(null);
   const [chatSender, setChatSender] = useState(null);
-  const [currentRecordingId, setCurrentRecordingId] = useState(null);
   const [meetingStarted, setMeetingStarted] = useState(null);
   const [hasUnreadChats, setHasUnreadChats] = useState(null);
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
@@ -110,6 +109,7 @@ const MeetingRoom = (props) => {
   const recordingSize = useRef(0);
   const recordingType = useRef('');
   const shareScreenSource = useRef();
+  const currentRecordingId = useRef(null);
   const shareScreenRef = useRef();
   const recordRef = useRef();
   const tmpVideoTrack = useRef();
@@ -224,14 +224,15 @@ const MeetingRoom = (props) => {
     setIsHost(userDetails.userId === args.payload.host);
   };
 
-  const recordMeeting = async () => {
+  const recordMeeting = () => {
     if (mediaRecorder != null) {
-      mediaRecorder.start(30000);
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
         roomID: selectedMeeting.id,
         isRecording: true
-      }).then((id) => {
-        setCurrentRecordingId(id);
+      }).then((data) => {
+        currentRecordingId.current = data.id;
+        mediaRecorder.start(60000);
+
         setIsRecording(true);
         emitSystemEvent("MEETING_RECORDING", {
           recording: true,
@@ -385,7 +386,6 @@ const MeetingRoom = (props) => {
           handleMessageArrived({
             message: "Your video has been turned off by the meeting host"
           })
-
         }
       }
     }
@@ -412,29 +412,30 @@ const MeetingRoom = (props) => {
     setSomeoneSharing(false);
   };
 
-  const handleDataAvailable = (e) => {
+  const handleRecordingDataAvailable = (e) => {
     if (e.data.size > 0) {
       console.log("ADDED CHUNK : " + recordingSequence.current);
       const blob = new Blob([e.data], {
         type: "video/webm",
       });
 
+      const data = {
+        meetingId: selectedMeeting.id,
+        name: selectedMeeting.title,
+        type: blob.type,
+        size: blob.size,
+        sequenceNumber: recordingSequence.current,
+        sessionId: currentRecordingId.current
+      };
+
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onload = function (evt) {
         const result = evt.target.result;
-        const data = {
-          meetingId: selectedMeeting.id,
-          name: selectedMeeting.title,
-          type: blob.type,
-          size: blob.size,
-          recordedData: result.replace('data:video/webm;base64,', ''),
-          sequenceNumber: recordingSequence.current,
-          sessionId: currentRecordingId
-        };
-
         recordingType.current = blob.type;
         recordingSize.current += blob.size;
+
+        data.recordedData = result.replace('data:video/webm;base64,', '');
 
         console.log("======== SAVING RECORDING CHUNK =========");
         console.log(data);
@@ -449,21 +450,21 @@ const MeetingRoom = (props) => {
     }
   };
 
-  const handleStop = async (e) => {
+  const handleStopRecording = (e) => {
     const data = {
       meetingId: selectedMeeting.id,
       name: selectedMeeting.title,
       type: recordingType.current,
       size: recordingSize.current,
       sequenceNumber: recordingSequence.current,
-      sessionId: currentRecordingId
+      sessionId: currentRecordingId.current
     };
 
-    socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
+    socketManager.emitEvent(MessageType.STOP_RECORDING, data)
       .catch((error) => {
       });
 
-    setCurrentRecordingId(null);
+    currentRecordingId.current = null;
     setIsRecording(false);
     recordingSequence.current = 0;
     recordingSize.current = 0;
@@ -612,7 +613,7 @@ const MeetingRoom = (props) => {
 
   function addUserToParticipants(item, peerId = null) {
     // Typically, a user shoud not exist. We are ensuring that there are never duplicates
-    console.log("\n\n\n\n\n\nSEARCHING USER : " + item.user.userId);
+    console.log("SEARCHING USER : " + item.user.userId);
     console.log(participants);
     let user = participants.find((u) => u.userId === item.user.userId);
 
@@ -721,7 +722,7 @@ const MeetingRoom = (props) => {
   };
 
   const join = () => {
-    console.log("\n\n\n\n\n\nJOINING");
+    console.log("JOINING");
     let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.JOIN_MEETING, {
       room: selectedMeeting.id,
@@ -893,8 +894,8 @@ const MeetingRoom = (props) => {
 
                 const recorder = new MediaRecorder(stream, options);
 
-                recorder.ondataavailable = handleDataAvailable;
-                recorder.onstop = handleStop;
+                recorder.ondataavailable = handleRecordingDataAvailable;
+                recorder.onstop = handleStopRecording;
 
                 resolve(recorder);
               })

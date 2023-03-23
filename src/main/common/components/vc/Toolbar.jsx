@@ -151,7 +151,7 @@ const Toolbar = (props) => {
           :
           <div className={'row centered-flex-box'}>
             {
-              //isHost && step === 'SESSION' &&
+              isHost && step === 'SESSION' &&
               <Tooltip title="Record">
                 <IconButton
                   onClick={() => {
