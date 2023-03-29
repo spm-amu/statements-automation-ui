@@ -962,7 +962,7 @@ const Meeting = (props) => {
             <div>
               <TextField
                 disabled={readOnly}
-                label="Title"
+                label="Subject"
                 id="title"
                 hasError={errors.title}
                 value={value.title}
@@ -1433,7 +1433,7 @@ const Meeting = (props) => {
             <div style={{marginTop: '12px'}}>
               <AutoComplete
                 id="locations"
-                label={'Locations'}
+                label={'Location'}
                 disabled={readOnly}
                 value={value.locations}
                 multiple={true}

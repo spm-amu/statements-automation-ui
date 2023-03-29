@@ -113,3 +113,29 @@ button:focus {
 .fc .fc-list-event-dot {
   border: 5px solid #945c33 !important;
 }
+
+.fc-scrollgrid-section-body table {
+  background-image: url('/assets/calendar_background.png');
+  background-repeat: no-repeat;
+  background-size: 50% auto;
+  background-attachment: fixed;
+  background-position: center;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: rgba(234,223,213, .5) !important;
+}
+
+.app-calendar .fc-day-past .fc-daygrid-day-number {
+  color: #000000
+}
+
+.fc .fc-day-other .fc-daygrid-day-top, .fc .fc-day-other .fc-daygrid-day-botton {
+  opacity: .5
+}
+/*
+
+.fc-day-past {
+  color: #6e6b7b
+}
+*/

@@ -35,7 +35,7 @@ const ChatForm = (props) => {
         <div>
           <div style={{ marginTop: '8px' }}>
             <TextField
-              label="Title"
+              label="Subject"
               id="title"
               value={title}
               valueChangeHandler={(e) => setTitle(e.target.value)}

@@ -38,7 +38,7 @@
 .menu-item-active {
   /*border-left: 3px solid #985F31;*/
   margin-left: 0;
-  background-color: #EADFD5;
+  background-color: rgba(234,223,213, .5)!important;
 }
 
 .menu-item a span,
