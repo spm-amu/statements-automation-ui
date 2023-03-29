@@ -219,7 +219,7 @@ const SignIn = (props) => {
             ) : null }
 
             <CardTitle tag="h2" className="mb-1" style={{ color: '#00476a' }}>
-              Welcome to Armscor.
+              Welcome to Armscor Connect
             </CardTitle>
             <CardText style={{ color: '#00476a' }}>
               {

@@ -17,7 +17,7 @@
 
 .menu-item .menu-item-icon,
 .menu-item .menu-item-label {
-  opacity: .4;
+  /*opacity: .4;*/
 }
 
 .menu-item-active tr td,
@@ -29,9 +29,16 @@
   opacity: 1;
 }
 
+.menu-item,
 .menu-item-active {
-  border-left: 3px solid #985F31;
+  padding: 4px 0;
+  border-radius: 2px;
+}
+
+.menu-item-active {
+  /*border-left: 3px solid #985F31;*/
   margin-left: 0;
+  background-color: #EADFD5;
 }
 
 .menu-item a span,
