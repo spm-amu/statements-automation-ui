@@ -59,17 +59,25 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
 
   return (
     <div className="person-card">
-      <div className="row no-margin" style={{borderBottom: '1px solid #e1e1e1', paddingBottom: '8px'}}>
-        <div className={props.avatarSize === 'S' ? 'avatar-small' : null} style={{width: '54px'}}>
-          <img
-            src={props.data.avatar ? props.data.avatar : require('../../desktop/dashboard/images/noimage-person.png')}
-            alt={""} style={{borderRadius: '50%'}}/>
-        </div>
-        <div className={"user-details"}>
-          {
-            props.data.name
-          }
-        </div>
+      <div className="row no-margin" style={{borderBottom: '1px solid #e1e1e1', paddingBottom: '8px', minHeight: '92px'}}>
+        <table>
+          <tr>
+            <td>
+              <div className={props.avatarSize === 'S' ? 'avatar-small' : null} style={{width: '54px'}}>
+                <img
+                  src={props.data.avatar ? props.data.avatar : require('../../desktop/dashboard/images/noimage-person.png')}
+                  alt={""} style={{borderRadius: '50%'}}/>
+              </div>
+            </td>
+            <td>
+              <div className={"user-details"}>
+                {
+                  props.data.name
+                }
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
       <div className={"bottom-strip row no-margin"}>
         <div className={'indicator col'}>

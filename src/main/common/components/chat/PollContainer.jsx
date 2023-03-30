@@ -151,7 +151,7 @@ const PollContainer = (props) => {
             <Avatar
               className="poll-creator-avatar"
               style={{backgroundColor: Utils.getAvatarColor(props.pollCreator.name)}}>
-              {props.pollCreator.name.toUpperCase()}
+              {Utils.getInitials(props.pollCreator.name)}
             </Avatar>
             <span className="poll-creator-name">
                     {props.pollCreator.name}
