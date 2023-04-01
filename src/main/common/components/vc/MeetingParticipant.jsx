@@ -12,32 +12,15 @@ const MeetingParticipant = (props) => {
   const videoRef = useRef();
   const showVideo = true;
 
-  useEffect(() => {
+  useEffect( () => {
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
-      props.data.stream.addEventListener("ended", (e) => {
-        console.log("================ " + props.data.userId + " STREAM ENDED =================");
+      props.data.stream.getAudioTracks[0].addEventListener("muted", (event) => {
+        console.log(props.data.userId + " : muted");
       });
-
-      props.data.stream.getAudioTracks()[0].addEventListener("mute", (e) => {
-        console.log("================ " + props.data.userId + " STREAM MUTED =================");
+      props.data.stream.getAudioTracks[0].addEventListener("unmuted", (event) => {
+        console.log(props.data.userId + " : unmuted");
       });
-
-      props.data.stream.addEventListener("unmute", (e) => {
-        console.log("================ " + props.data.userId + " STREAM UNMUTED =================");
-      });
-
-      props.data.stream.addEventListener("overconstrained", (e) => {
-        console.log("================ " + props.data.userId + " STREAM OVER CONSTRAINED =================");
-      });
-
-      /*props.data.peer.on('data', data => {
-        console.log("================ " + props.data.userId + " DATA =================");
-      });
-
-      props.data.peer.on('track', data => {
-        console.log("================ " + props.data.userId + " TRACK =================");
-      })*/
     } else {
       videoRef.current.srcObject = props.userStream;
     }
@@ -98,12 +81,14 @@ const MeetingParticipant = (props) => {
               {
                 props.audioMuted || props.data.peer === null ?
                   <video
+                    id={props.data.userId}
                     hidden={props.videoMuted}
                     muted playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
                   />
                   :
                   <video
+                    id={props.data.userId}
                     hidden={props.videoMuted}
                     playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
@@ -128,7 +113,7 @@ const MeetingParticipant = (props) => {
                             color: 'white'
                           }}
                         >
-                          <Icon id={'MIC'} />
+                          <Icon id={'MIC'}/>
                         </IconButton>
                         :
                         <>
@@ -141,19 +126,19 @@ const MeetingParticipant = (props) => {
                     }
                     {
                       props.isHost && !props.videoMuted &&
-                        <IconButton
-                          onClick={(e) => {
-                            props.onHostVideoMute(props.data)
-                          }}
-                          style={{
-                            marginRight: '4px',
-                            width: '16px',
-                            height: '16px',
-                            color: 'white'
-                          }}
-                        >
-                          <Icon id={'CAMERA'} />
-                        </IconButton>
+                      <IconButton
+                        onClick={(e) => {
+                          props.onHostVideoMute(props.data)
+                        }}
+                        style={{
+                          marginRight: '4px',
+                          width: '16px',
+                          height: '16px',
+                          color: 'white'
+                        }}
+                      >
+                        <Icon id={'CAMERA'}/>
+                      </IconButton>
                     }
                   </span>
                 }
