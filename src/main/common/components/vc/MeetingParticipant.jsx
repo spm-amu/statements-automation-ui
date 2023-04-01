@@ -15,6 +15,21 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
+      props.data.stream.addEventListener("ended", (e) => {
+        console.log("================ " + props.data.userId + " STREAM ENDED =================");
+      });
+
+      props.data.stream.addEventListener("mute", (e) => {
+        console.log("================ " + props.data.userId + " STREAM MUTED =================");
+      });
+
+      props.data.stream.addEventListener("unmute", (e) => {
+        console.log("================ " + props.data.userId + " STREAM UNMUTED =================");
+      });
+
+      props.data.stream.addEventListener("overconstrained", (e) => {
+        console.log("================ " + props.data.userId + " STREAM Over Constrained =================");
+      });
     } else {
       videoRef.current.srcObject = props.userStream;
     }
