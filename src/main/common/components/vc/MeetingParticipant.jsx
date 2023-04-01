@@ -28,7 +28,7 @@ const MeetingParticipant = (props) => {
       });
 
       props.data.stream.addEventListener("overconstrained", (e) => {
-        console.log("================ " + props.data.userId + " STREAM Over Constrained =================");
+        console.log("================ " + props.data.userId + " STREAM OVER CONSTRAINED =================");
       });
     } else {
       videoRef.current.srcObject = props.userStream;
