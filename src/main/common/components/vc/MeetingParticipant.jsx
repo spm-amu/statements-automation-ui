@@ -15,10 +15,10 @@ const MeetingParticipant = (props) => {
   useEffect( () => {
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
-      props.data.stream.getAudioTracks[0].addEventListener("muted", (event) => {
+      props.data.stream.getAudioTracks()[0].addEventListener("muted", (event) => {
         console.log(props.data.userId + " : muted");
       });
-      props.data.stream.getAudioTracks[0].addEventListener("unmuted", (event) => {
+      props.data.stream.getAudioTracks()[0].addEventListener("unmuted", (event) => {
         console.log(props.data.userId + " : unmuted");
       });
     } else {
