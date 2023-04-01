@@ -296,6 +296,15 @@ class SocketManager {
     };
 
     this.userPeerMap.push(item);
+
+
+    peer.on('track', (track, stream) => {
+      console.log("\n\n\n\n\nhgjfhfgghhgffgh");
+      track.addEventListener('mute', () => {
+        console.log("================ " + props.data.userId + " TRACK =================");
+      })
+    })
+
     let promise = new Promise((resolve, reject) => {
       peer.on('stream', (stream) => {
         if (!item.mainStream) {

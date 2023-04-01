@@ -19,7 +19,7 @@ const MeetingParticipant = (props) => {
         console.log("================ " + props.data.userId + " STREAM ENDED =================");
       });
 
-      props.data.stream.addEventListener("mute", (e) => {
+      props.data.stream.getAudioTracks()[0].addEventListener("mute", (e) => {
         console.log("================ " + props.data.userId + " STREAM MUTED =================");
       });
 
@@ -30,6 +30,14 @@ const MeetingParticipant = (props) => {
       props.data.stream.addEventListener("overconstrained", (e) => {
         console.log("================ " + props.data.userId + " STREAM OVER CONSTRAINED =================");
       });
+
+      /*props.data.peer.on('data', data => {
+        console.log("================ " + props.data.userId + " DATA =================");
+      });
+
+      props.data.peer.on('track', data => {
+        console.log("================ " + props.data.userId + " TRACK =================");
+      })*/
     } else {
       videoRef.current.srcObject = props.userStream;
     }
