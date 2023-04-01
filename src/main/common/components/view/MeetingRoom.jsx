@@ -1116,8 +1116,8 @@ const MeetingRoom = (props) => {
     if (currentUserStream.obj && currentUserStream.getAudioTracks() && currentUserStream.getAudioTracks().length > 0) {
       let audioTrack = currentUserStream.getAudioTracks()[0];
       if (audioTrack && userVideo && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
-        audioTrack.muted = !audioMuted;
-        //audioTrack.enabled = !audioMuted;
+        //audioTrack.muted = !audioMuted;
+        audioTrack.enabled = !audioMuted;
         emitAVSettingsChange();
       }
     }

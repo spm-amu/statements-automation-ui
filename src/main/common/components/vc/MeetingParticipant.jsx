@@ -15,12 +15,17 @@ const MeetingParticipant = (props) => {
   useEffect( () => {
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
-      props.data.stream.getAudioTracks()[0].addEventListener("muted", (event) => {
+      /*props.data.stream.getAudioTracks()[0].addEventListener("mute", (event) => {
         console.log(props.data.userId + " : muted");
       });
-      props.data.stream.getAudioTracks()[0].addEventListener("unmuted", (event) => {
+
+      props.data.stream.getAudioTracks()[0].onmute = (event) => {
+        console.log(props.data.userId + " : muted 123");
+      };
+
+      props.data.stream.getAudioTracks()[0].addEventListener("unmute", (event) => {
         console.log(props.data.userId + " : unmuted");
-      });
+      });*/
     } else {
       videoRef.current.srcObject = props.userStream;
     }
