@@ -203,7 +203,7 @@ const MeetingSettingsComponent = (props) => {
                 <FormGroup>
                   <FormControlLabel style={{paddingTop: '10px'}} control={
                     <Switch
-                      checked={!autoPermit}
+                      checked={autoPermit}
                       value={autoPermit}
                       color="primary"
                       onChange={(e, value) => {

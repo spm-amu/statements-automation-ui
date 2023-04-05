@@ -945,7 +945,7 @@ const MeetingRoom = (props) => {
       },
       {
         meetingId: selectedMeeting.id,
-        askToJoin: autoPermit
+        askToJoin: !autoPermit
       }, null, false
     );
   };
