@@ -543,7 +543,7 @@ const BasicBusinessAppDashboard = (props) => {
   }
 
   React.useEffect(() => {
-    if (MODE === 'PROD') {
+    /*if (MODE === 'PROD') {
       get("http://ARMHOVC01/vc/api/v1/system/ping", (e) => {
         loadHost("http://ARMHOVC01/vc", "http://ARMHOVC01", false);
       }, (e) => {
@@ -555,7 +555,9 @@ const BasicBusinessAppDashboard = (props) => {
       }, "", true, false);
     } else {
       loadHost("http://localhost:8080/vc", "http://localhost:8000");
-    }
+    }*/
+
+    loadHost("http://ARMHOVC01/vc", "http://ARMHOVC01", false);
   }, []);
 
   React.useEffect(() => {
