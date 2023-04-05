@@ -820,9 +820,9 @@ const MeetingRoom = (props) => {
   }, []);
 
   function initMeetingSession() {
-    if (isHost || isDirectCall || isRequestToJoin) {
+    if (isHost || isDirectCall || isRequestToJoin || autoPermit) {
       console.log("CALLING JOIN FROM INIT initMeetingSession()");
-      join();
+      join();``
     } else {
       askForPermission();
     }
@@ -1300,6 +1300,7 @@ const MeetingRoom = (props) => {
                                                       userStream={currentUserStream.obj}
                                                       step={step}
                                                       isHost={isHost}
+                                                      autoPermit={autoPermit}
                                                       participantsRaisedHands={participantsRaisedHands}
                                                       allUserParticipantsLeft={allUserParticipantsLeft}
                                                       userVideoChangeHandler={(ref) => setUserVideo(ref)}
