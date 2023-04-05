@@ -544,8 +544,8 @@ const BasicBusinessAppDashboard = (props) => {
 
   React.useEffect(() => {
     if (MODE === 'PROD') {
-      get("http://DEVHOVC03/vc/api/v1/system/ping", (e) => {
-        loadHost("http://DEVHOVC03/vc", "http://DEVHOVC03", false);
+      get("http://ARMHOVC01/vc/api/v1/system/ping", (e) => {
+        loadHost("http://ARMHOVC01/vc", "http://ARMHOVC01", false);
       }, (e) => {
         get("https://svn.agilemotion.co.za/vc/api/v1/system/ping", (e) => {
           loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
