@@ -913,7 +913,7 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     setIsHost(props.isHost);
 
-    if (!isDirectCall) {
+    if (!isDirectCall && isHost) {
       persistMeetingSettings();
     }
 
