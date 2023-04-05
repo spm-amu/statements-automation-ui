@@ -43,7 +43,7 @@ const WebLinkLanding = (props) => {
   }
 
   const loadHostAPIs = () => {
-    if (MODE === 'PROD') {
+    /*if (MODE === 'PROD') {
       get("http://DEVHOVC03/vc/api/v1/system/ping", (e) => {
         loadHost("http://DEVHOVC03/vc", "http://DEVHOVC03", false);
       }, (e) => {
@@ -54,10 +54,10 @@ const WebLinkLanding = (props) => {
       }, "", true, false);
     } else {
       loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
-    }
+    }*/
 
-    console.log('___ appManager.getAPIHost(): ', appManager.getAPIHost());
-  }
+    loadHost("http://ARMHOVC01/vc", "http://ARMHOVC01", false);
+  };
 
   const openApp = () => {
     window.location.href = `armscor-connect://meetingId=${meetingId}&accessToken=${urlToken}`;
