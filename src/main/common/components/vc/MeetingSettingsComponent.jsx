@@ -42,7 +42,7 @@ const MeetingSettingsComponent = (props) => {
     let videoStream = new Stream();
     videoStream.init(true, false,(stream, shareStream) => {
       userVideo.current.srcObject = stream;
-      setVideoOptionDisabled(true);
+      setVideoOptionDisabled(false);
       //setVideoMuted(false);
     }, (e) => {
       console.log(e);
