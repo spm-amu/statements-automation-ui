@@ -6,7 +6,7 @@ export class Stream {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: audio,
-        video: {
+        video: retry ? false : {
           width: 240,
           height: 240,
         }
@@ -17,14 +17,14 @@ export class Stream {
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
             audio: true,
-            video: {
+            video: retry ? false : {
               width: 240,
               height: 240,
             }
           });
 
         this.obj = stream;
-        if (!video) {
+        if (!video && stream.getVideoTracks().length > 0) {
           stream.getVideoTracks()[0].enabled = false;
           //stream.getVideoTracks()[0].stop();
         }
@@ -33,15 +33,17 @@ export class Stream {
           .then((stream) => {
             this.shareScreenObj = stream;
             stream.getAudioTracks()[0].enabled = false;
-            stream.getVideoTracks()[0].enabled = false;
+            if (stream.getVideoTracks().length > 0) {
+              stream.getVideoTracks()[0].enabled = false;
+            }
+
             console.log("STREAM STARTED");
             if (successHandler) {
               successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length > 0);
             }
           });
       }).catch((e) => {
-        if(!retry) {
-          // Retry with no video enabled
+        if(e.message === 'Could not start video source' && !retry) {
           this.init(false, audio, successHandler, errorhandler, true);
         } else {
           console.log("STREAM FAILED");
