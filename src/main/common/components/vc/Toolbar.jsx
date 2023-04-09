@@ -7,6 +7,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import {ListItemIcon, Menu, MenuItem} from '@material-ui/core';
 import { GroupAdd, Note, PersonAdd } from '@material-ui/icons';
 import LottieIcon from '../LottieIcon';
+import Footer from "./Footer";
 
 const Toolbar = (props) => {
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
@@ -28,7 +29,8 @@ const Toolbar = (props) => {
     eventHandler,
     handRaised,
     isHost,
-    someoneSharing
+    someoneSharing,
+    videoDisabled
   } = props;
 
   useEffect(() => {
@@ -170,7 +172,7 @@ const Toolbar = (props) => {
               </Tooltip>
             }
             {
-              step === 'SESSION' &&
+              step === 'SESSION' && !videoDisabled &&
               <Tooltip title="Video">
                 <IconButton
                   onClick={() => {

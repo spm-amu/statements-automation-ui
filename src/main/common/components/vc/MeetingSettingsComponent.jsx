@@ -15,7 +15,7 @@ import {Alert} from "@material-ui/lab";
 const MeetingSettingsComponent = (props) => {
   const userVideo = useRef();
   const [stream, setStream] = useState();
-  const [videoOptionDisabled, setVideoOptionDisabled] = useState(true);
+  const [videoOptionDisabled, setVideoOptionDisabled] = useState(null);
   const [videoMuted, setVideoMuted] = useState(true);
   const [audioMuted, setAudioMuted] = useState(true);
   const [autoPermit, setAutoPermit] = useState(true);
@@ -40,9 +40,9 @@ const MeetingSettingsComponent = (props) => {
 
   const setupStream = () => {
     let videoStream = new Stream();
-    videoStream.init(true, false, (stream, shareStream) => {
+    videoStream.init(true, false,(stream, shareStream) => {
       userVideo.current.srcObject = stream;
-      setVideoOptionDisabled(false);
+      setVideoOptionDisabled(true);
       //setVideoMuted(false);
     }, (e) => {
       console.log(e);
@@ -120,10 +120,9 @@ const MeetingSettingsComponent = (props) => {
             <td colSpan={4}>
               {
                 videoOptionDisabled &&
-                <span>
-                  Intiating connection...
-                </span>
-
+                <Alert severity="warning">
+                  We cannot initiate your video camera. Please check your video settings and try again. You may join the meeting without video
+                </Alert>
               }
             </td>
           </tr>
@@ -176,7 +175,7 @@ const MeetingSettingsComponent = (props) => {
                 onChange={(e, value) => {
                   muteVideo();
                 }}
-                disabled={videoOptionDisabled}
+                disabled={videoOptionDisabled || videoOptionDisabled === null}
                 value={videoMuted}
                 checked={!videoMuted}
                 color="primary"
@@ -218,7 +217,7 @@ const MeetingSettingsComponent = (props) => {
             <td style={{paddingTop: '8px', textAlign: 'right'}}>
               <Button
                 variant={'contained'}
-                disabled={videoOptionDisabled}
+                disabled={videoOptionDisabled === null}
                 size="large"
                 color={'primary'}
                 onClick={(e) => {

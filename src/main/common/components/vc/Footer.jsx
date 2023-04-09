@@ -60,6 +60,7 @@ const Footer = (props) => {
                    whiteBoardShown={whiteBoardShown}
                    userVideo={userVideo}
                    userStream={userStream}
+                   videoDisabled={videoDisabled}
                    videoMuted={videoMuted}
                    audioMuted={audioMuted}
                    displayState={displayState}

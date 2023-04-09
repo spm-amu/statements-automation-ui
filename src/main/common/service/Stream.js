@@ -2,7 +2,7 @@ export class Stream {
   constructor() {
   }
 
-  init = (video = true, audio = true, successHandler, errorhandler) => {
+  init = (video = true, audio = true, successHandler, errorhandler, retry = false) => {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: audio,
@@ -36,15 +36,20 @@ export class Stream {
             stream.getVideoTracks()[0].enabled = false;
             console.log("STREAM STARTED");
             if (successHandler) {
-              successHandler(this.obj, this.shareScreenObj);
+              successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length > 0);
             }
           });
       }).catch((e) => {
-      console.log("STREAM FAILED");
-      console.log(e);
-      if (errorhandler) {
-        errorhandler(e);
-      }
+        if(!retry) {
+          // Retry with no video enabled
+          init(false, audio, successHandler, errorhandler, true);
+        } else {
+          console.log("STREAM FAILED");
+          console.log(e);
+          if (errorhandler) {
+            errorhandler(e);
+          }
+        }
     });
   };
 

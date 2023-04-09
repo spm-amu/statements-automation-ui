@@ -91,6 +91,7 @@ const MeetingRoom = (props) => {
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [videoDisabled, setVideoDisabled] = useState(null);
   const [screenSources, setScreenSources] = useState();
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
@@ -853,12 +854,14 @@ const MeetingRoom = (props) => {
   };
 
   const setupStream = () => {
-    currentUserStream.init(!videoMuted, true, (stream, shareStream) => {
+    currentUserStream.init(!videoMuted, true, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
       createMediaRecorder().then((recorder) => {
         setMediaRecorder(recorder);
+        setVideoDisabled(videoDisabled);
       })
     }, (e) => {
+      setVideoDisabled(true);
       console.log(e);
     });
   };
@@ -1375,6 +1378,7 @@ const MeetingRoom = (props) => {
                   hasUnreadChats={hasUnreadChats}
                   hasUnseenWhiteboardEvent={hasUnseenWhiteboardEvent}
                   participants={participants}
+                  videoDisabled={videoDisabled}
                   videoMuted={videoMuted}
                   userStream={currentUserStream.obj}
                   handRaised={handRaised}
