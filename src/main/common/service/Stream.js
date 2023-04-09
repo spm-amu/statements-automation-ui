@@ -39,7 +39,7 @@ export class Stream {
 
             console.log("STREAM STARTED");
             if (successHandler) {
-              successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length > 0);
+              successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length === 0);
             }
           });
       }).catch((e) => {
