@@ -22,7 +22,8 @@ const Footer = (props) => {
     isHost,
     autoPermit,
     participantsRaisedHands,
-    someoneSharing
+    someoneSharing,
+    videoDisabled
   } = props;
 
   useEffect(() => {
