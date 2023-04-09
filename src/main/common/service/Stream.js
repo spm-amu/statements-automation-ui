@@ -42,7 +42,7 @@ export class Stream {
       }).catch((e) => {
         if(!retry) {
           // Retry with no video enabled
-          init(false, audio, successHandler, errorhandler, true);
+          this.init(false, audio, successHandler, errorhandler, true);
         } else {
           console.log("STREAM FAILED");
           console.log(e);
