@@ -5,8 +5,7 @@ import {get, post} from "../../service/RestService";
 import socketManager from "../../service/SocketManager";
 import {MessageType, SystemEventType} from '../../types';
 import appManager from "../../service/AppManager";
-import Icon from "../Icon";
-import {IconButton} from "@material-ui/core";
+import Button from '@material-ui/core/Button';
 import AlertDialog from "../AlertDialog";
 import LottieIcon from '../LottieIcon';
 
@@ -18,7 +17,6 @@ const MeetingRoomToolbar = (props) => {
   const [isHost, setIsHost] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [remainingTime, setRemainingTime] = useState();
-
   const [socketEventHandler] = useState({});
 
   const handler = () => {
@@ -75,6 +73,9 @@ const MeetingRoomToolbar = (props) => {
     });
 
     setIsHost(props.isHost);
+    if(props.isHost) {
+      startMeeting();
+    }
   }, []);
 
   useEffect(() => {
@@ -125,7 +126,7 @@ const MeetingRoomToolbar = (props) => {
     }
   }, [remainingTime]);
 
-  const startMeeting = (e) => {
+  const startMeeting = () => {
     const data = {
       meetingId: selectedMeeting.id,
       end: selectedMeeting.endDate
@@ -169,24 +170,15 @@ const MeetingRoomToolbar = (props) => {
         {
           isHost && !isDirectCall &&
           <div style={{margin: '0 8px 0 0'}}>
-            <IconButton
-              variant={'contained'}
-              disabled={started}
-              size="large"
-              color={'primary'}
-              onClick={(e) => startMeeting(e)}
-            >
-              <Icon id={'PLAY'}/>
-            </IconButton>
-            <IconButton
+            <Button
               variant={'contained'}
               disabled={!started}
               size="large"
               color={'primary'}
               onClick={(e) => handleEndMeetingButton()}
             >
-              <Icon id={'STOP'}/>
-            </IconButton>
+              END MEETING
+            </Button>
           </div>
         }
         {

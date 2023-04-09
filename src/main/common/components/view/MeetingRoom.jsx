@@ -711,6 +711,8 @@ const MeetingRoom = (props) => {
   const askForPermission = () => {
     let userDetails = appManager.getUserDetails();
     const userAlias = Utils.isNull(userDetails.userId) ? `${userDetails.name} (Guest)` : userDetails.userId;
+
+    // TODO : Implement re-try and timeout
     socketManager.emitEvent(MessageType.PERMISSION, {
       user: userAlias,
       room: selectedMeeting.id,

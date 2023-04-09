@@ -4,6 +4,7 @@ import "./Timer.css"
 import FormControl from "@material-ui/core/FormControl";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import Radio from "@material-ui/core/Radio";
+import Button from '@material-ui/core/Button';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const MINUTE = 60000;
@@ -62,60 +63,45 @@ const Timer = (props) => {
     <div
       className={'timer-container row'}
     >
-      <div style={
+      <div className={'col-*-*'}>
         {
-          width: 'calc(100% - 160px)'
-        }
-      } className={'col-*-*'}>
-        {
-          hours === 0 && minutes <= 5 && minutes !== 0 &&
+          hours === 0 && minutes <= 5 && minutes !== 0 && !extend &&
           <div style={{
             border: '1px solid rgb(235, 63, 33)',
             width: '100%',
-            borderRadius: '4px',
-            paddingTop: '8px'
+            borderRadius: '4px'
           }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'rgb(235, 63, 33)',
-              marginLeft: '32px',
-              marginRight: '32px',
+              padding: '8px',
+              margin: '0',
               fontSize: '12px'
             }} className={'row'}>
-              <div className={'row'}>
-                There {minutes === 1 ? <>is</> : <>are</>} {minutes} minute{minutes !== 1 && <>s</>} remaining. Do you want to automatically extend the meeting?
-              </div>
-            </div>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'rgb(235, 63, 33)'
-            }} className={'row'}>
-              <FormControl>
-                <RadioGroup
-                  aria-labelledby="demo-radio-buttons-group-label"
-                  row
-                  defaultValue={'NO'}
-                  name="radio-buttons-group"
-                  onChange={(e, val) => {
-                    setExtend(val === 'YES');
+              <div className={'row'} style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0'
+              }}>
+                <div style={{margin: '4px'}}>
+                  The meeting will end in {minutes} minute{minutes !== 1 && <>s</>}
+                </div>
+                <div style={{margin: '0'}} className={'col'}>
+                <Button
+                  variant={'contained'}
+                  size="large"
+                  color={'green'}
+                  onClick={(e) => {
+                    setExtend(true);
                   }}
                 >
-                  <FormControlLabel
-                    value="YES"
-                    control={<Radio/>}
-                    label="Yes"
-                  />
-                  <FormControlLabel
-                    value="NO"
-                    control={<Radio/>}
-                    label="No"
-                  />
-                </RadioGroup>
-              </FormControl>
+                  EXTEND
+                </Button>
+              </div>
+              </div>
             </div>
           </div>
         }
