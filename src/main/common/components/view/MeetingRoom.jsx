@@ -700,7 +700,7 @@ const MeetingRoom = (props) => {
       socketId: data.socketId
     };
 
-    if (isHost && autoPermit === false) {
+    if (isHost && autoPermit === true) {
       acceptUser(item);
     } else {
       lobbyWaitingList.push(item);
