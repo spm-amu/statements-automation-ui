@@ -703,8 +703,12 @@ const MeetingRoom = (props) => {
     if (isHost && autoPermit === true) {
       acceptUser(item);
     } else {
-      lobbyWaitingList.push(item);
-      setLobbyWaitingList([].concat(lobbyWaitingList));
+      let find = lobbyWaitingList.find((u) => u.user === item.user);
+
+      if(!find) {
+        lobbyWaitingList.push(item);
+        setLobbyWaitingList([].concat(lobbyWaitingList));
+      }
     }
   };
 
