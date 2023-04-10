@@ -33,6 +33,7 @@ export enum SystemEventType {
 }
 
 export enum MessageType {
+  GET_LOBBY = "GET_LOBBY",
   JOIN_MEETING = "JOIN_MEETING",
   CALL_USER = "CALL_USER",
   CALL_MULTIPLE_USER = "CALL_MULTIPLE_USER",

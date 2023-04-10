@@ -223,9 +223,9 @@ const MeetingSettingsComponent = (props) => {
                 onClick={(e) => {
                   close();
 
-                  // if (isHost && selectedMeeting.askToJoin !== autoPermit) {
-                  //   persistMeetingSettings();
-                  // }
+                  if (isHost && selectedMeeting.askToJoin !== !autoPermit) {
+                     persistMeetingSettings();
+                  }
 
                   navigate("/view/meetingRoom", {
                     state: {

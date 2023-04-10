@@ -700,6 +700,7 @@ const MeetingRoom = (props) => {
       socketId: data.socketId
     };
 
+    alert(autoPermit);
     if (isHost && autoPermit === true) {
       acceptUser(item);
     } else {
@@ -754,6 +755,19 @@ const MeetingRoom = (props) => {
         createParticipants(result.data.usersInRoom);
         if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);
+        }
+
+        if(isHost) {
+          socketManager.emitEvent(MessageType.GET_LOBBY, {
+            roomId: selectedMeeting.id
+          }).then((result) => {
+            console.log("\n\n\nGET_LOBBY Result : ", result);
+            if (result.status === 'SUCCESS' && result.lobby && result.lobby.people) {
+              for (const person of result.lobby.people) {
+                addUserToLobby(person);
+              }
+            }
+          })
         }
       } else {
         setPreErrorStep(step);
@@ -825,7 +839,7 @@ const MeetingRoom = (props) => {
   function initMeetingSession() {
     if (isHost || isDirectCall || isRequestToJoin || autoPermit) {
       console.log("CALLING JOIN FROM INIT initMeetingSession()");
-      join();``
+      join();
     } else {
       askForPermission();
     }
