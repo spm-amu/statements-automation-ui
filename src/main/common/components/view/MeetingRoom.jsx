@@ -700,7 +700,6 @@ const MeetingRoom = (props) => {
       socketId: data.socketId
     };
 
-    alert(autoPermit);
     if (isHost && autoPermit === true) {
       acceptUser(item);
     } else {
@@ -932,8 +931,8 @@ const MeetingRoom = (props) => {
   useEffect(() => {
     setIsHost(props.isHost);
 
-    if (!isDirectCall && isHost) {
-      persistMeetingSettings();
+    if (!isDirectCall && props.isHost) {
+      persistMeetingSettings(props.autoPermit);
     }
 
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
@@ -955,7 +954,7 @@ const MeetingRoom = (props) => {
     }
   }, [streamsInitiated]);
 
-  const persistMeetingSettings = () => {
+  const persistMeetingSettings = (autoPermit) => {
     post(
       `${appManager.getAPIHost()}/api/v1/meeting/settings`,
       (response) => {
@@ -964,7 +963,7 @@ const MeetingRoom = (props) => {
       },
       {
         meetingId: selectedMeeting.id,
-        askToJoin: !autoPermit
+        askToJoin: autoPermit
       }, null, false
     );
   };
@@ -1460,7 +1459,7 @@ const MeetingRoom = (props) => {
                         lowerHand();
                       },
                       toggleAutoPermit: () => {
-                        persistMeetingSettings()
+                        persistMeetingSettings(autoPermit)
                       },
                       closeWindow: () => {
                         endCall();

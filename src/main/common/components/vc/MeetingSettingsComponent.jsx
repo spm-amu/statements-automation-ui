@@ -9,7 +9,7 @@ import appManager from "../../../common/service/AppManager";
 import {Stream} from "../../service/Stream";
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import {get} from '../../service/RestService';
+import {get, post} from '../../service/RestService';
 import {Alert} from "@material-ui/lab";
 
 const MeetingSettingsComponent = (props) => {
@@ -40,7 +40,7 @@ const MeetingSettingsComponent = (props) => {
 
   const setupStream = () => {
     let videoStream = new Stream();
-    videoStream.init(true, false,(stream, shareStream) => {
+    videoStream.init(true, false, (stream, shareStream) => {
       userVideo.current.srcObject = stream;
       setVideoOptionDisabled(false);
       //setVideoMuted(false);
@@ -59,7 +59,11 @@ const MeetingSettingsComponent = (props) => {
 
     get(`${appManager.getAPIHost()}/api/v1/meeting/settings/${selectedMeeting.id}`,
       (response) => {
-        setAutoPermit(response.askToJoin);
+        if (Utils.isNull(response.askToJoin)) {
+          setAutoPermit(false);
+        } else {
+          setAutoPermit(response.askToJoin);
+        }
       }, (e) => {
       });
 
@@ -89,6 +93,19 @@ const MeetingSettingsComponent = (props) => {
   const close = () => {
     closeStreams();
     navigate("/view/calendar");
+  };
+
+  const navigateToMeetingRoom = () => {
+    navigate("/view/meetingRoom", {
+      state: {
+        displayMode: 'window',
+        selectedMeeting: selectedMeeting,
+        videoMuted: videoMuted,
+        audioMuted: audioMuted,
+        isHost,
+        autoPermit: autoPermit
+      }
+    })
   };
 
   return (
@@ -121,7 +138,8 @@ const MeetingSettingsComponent = (props) => {
               {
                 videoOptionDisabled &&
                 <Alert severity="warning">
-                  We cannot initiate your video camera. Please check your video settings and try again. You may join the meeting without video
+                  We cannot initiate your video camera. Please check your video settings and try again. You may join the
+                  meeting without video
                 </Alert>
               }
             </td>
@@ -222,21 +240,7 @@ const MeetingSettingsComponent = (props) => {
                 color={'primary'}
                 onClick={(e) => {
                   close();
-
-                  if (isHost && selectedMeeting.askToJoin !== !autoPermit) {
-                     persistMeetingSettings();
-                  }
-
-                  navigate("/view/meetingRoom", {
-                    state: {
-                      displayMode: 'window',
-                      selectedMeeting: selectedMeeting,
-                      videoMuted: videoMuted,
-                      audioMuted: audioMuted,
-                      isHost,
-                      autoPermit: autoPermit
-                    }
-                  })
+                  navigateToMeetingRoom();
                 }}
               >
                 JOIN
