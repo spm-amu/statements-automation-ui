@@ -73,7 +73,7 @@ const MeetingRoomToolbar = (props) => {
     });
 
     setIsHost(props.isHost);
-    if(props.isHost) {
+    if(props.isHost || isDirectCall) {
       startMeeting();
     }
   }, []);
