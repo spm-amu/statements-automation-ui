@@ -13,7 +13,10 @@ export const SYSTEM_ERROR_MESSAGE =
   'A system error has occured. Please try again later or contact your system administrator';
 
 export const CONNECTION_ERROR_MESSAGE =
-  'There seems to be a problem with your connection. We are trying to re-connect you';
+  'There seems to be a problem with your connection. Please check your network connection';
+
+export const STREAM_ERROR_MESSAGE =
+  'The system cannot initiate audio and video streams. Please check your microphone and camera settings';
 
 export default class Utils {
   constructor() {

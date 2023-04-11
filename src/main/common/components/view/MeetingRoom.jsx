@@ -9,7 +9,7 @@ import Draggable from "react-draggable";
 import Footer from "../vc/Footer";
 import socketManager from "../../service/SocketManager";
 import {MessageType, SystemEventType} from "../../types";
-import Utils, {CONNECTION_ERROR_MESSAGE, SYSTEM_ERROR_MESSAGE} from "../../Utils";
+import Utils, {CONNECTION_ERROR_MESSAGE, STREAM_ERROR_MESSAGE, SYSTEM_ERROR_MESSAGE} from "../../Utils";
 import MeetingParticipantGrid from '../vc/CenteredMeetingParticipantGrid';
 import ClosablePanel from "../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
@@ -60,7 +60,8 @@ const Steps = {
   SESSION: 'SESSION',
   SESSION_ENDED: 'SESSION_ENDED',
   SYSTEM_ERROR: 'SYSTEM_ERROR',
-  CONNECTION_ERROR: 'CONNECTION_ERROR'
+  CONNECTION_ERROR: 'CONNECTION_ERROR',
+  STREAM_ERROR: 'STREAM_ERROR'
 };
 
 const hangUpAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/hangupsound.mp3');
@@ -705,7 +706,7 @@ const MeetingRoom = (props) => {
     } else {
       let find = lobbyWaitingList.find((u) => u.user === item.user);
 
-      if(!find) {
+      if (!find) {
         lobbyWaitingList.push(item);
         setLobbyWaitingList([].concat(lobbyWaitingList));
       }
@@ -760,7 +761,7 @@ const MeetingRoom = (props) => {
           setWhiteboardItems(result.data.whiteboard.items);
         }
 
-        if(isHost) {
+        if (isHost) {
           socketManager.emitEvent(MessageType.GET_LOBBY, {
             roomId: selectedMeeting.id
           }).then((result) => {
@@ -882,6 +883,9 @@ const MeetingRoom = (props) => {
     }, (e) => {
       setVideoDisabled(true);
       console.log(e);
+
+      setPreErrorStep(step);
+      setStep(Steps.STREAM_ERROR);
     });
   };
 
@@ -1311,37 +1315,51 @@ const MeetingRoom = (props) => {
                               </div>
                             </div>
                             :
-                            <>
-                              <MeetingParticipantGrid participants={participants}
-                                                      waitingList={lobbyWaitingList}
-                                                      mode={meetingParticipantGridMode}
-                                                      audioMuted={audioMuted}
-                                                      videoMuted={videoMuted}
-                                                      meetingTitle={selectedMeeting.title}
-                                                      userToCall={userToCall}
-                                                      userStream={currentUserStream.obj}
-                                                      step={step}
-                                                      isHost={isHost}
-                                                      autoPermit={autoPermit}
-                                                      participantsRaisedHands={participantsRaisedHands}
-                                                      allUserParticipantsLeft={allUserParticipantsLeft}
-                                                      userVideoChangeHandler={(ref) => setUserVideo(ref)}
-                                                      onHostAudioMute={(participant) => {
-                                                        changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
-                                                      }}
-                                                      onHostVideoMute={(participant) => {
-                                                        changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
-                                                      }}
-                                                      acceptUserHandler={
-                                                        (item) => {
-                                                          acceptUser(item);
+                            step === Steps.STREAM_ERROR ?
+                              <div style={{
+                                backgroundColor: 'rgb(40, 40, 43)',
+                                color: 'rgb(235, 63, 33)',
+                                fontSize: '24px',
+                                width: '100%',
+                                height: '100%'
+                              }} className={'centered-flex-box'}>
+                                <div>
+                                  <LottieIcon id={'waiting'}/>
+                                  {STREAM_ERROR_MESSAGE}
+                                </div>
+                              </div>
+                              :
+                              <>
+                                <MeetingParticipantGrid participants={participants}
+                                                        waitingList={lobbyWaitingList}
+                                                        mode={meetingParticipantGridMode}
+                                                        audioMuted={audioMuted}
+                                                        videoMuted={videoMuted}
+                                                        meetingTitle={selectedMeeting.title}
+                                                        userToCall={userToCall}
+                                                        userStream={currentUserStream.obj}
+                                                        step={step}
+                                                        isHost={isHost}
+                                                        autoPermit={autoPermit}
+                                                        participantsRaisedHands={participantsRaisedHands}
+                                                        allUserParticipantsLeft={allUserParticipantsLeft}
+                                                        userVideoChangeHandler={(ref) => setUserVideo(ref)}
+                                                        onHostAudioMute={(participant) => {
+                                                          changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
                                                         }}
-                                                      rejectUserHandler={
-                                                        (item) => {
-                                                          rejectUser(item);
+                                                        onHostVideoMute={(participant) => {
+                                                          changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
                                                         }}
-                              />
-                            </>
+                                                        acceptUserHandler={
+                                                          (item) => {
+                                                            acceptUser(item);
+                                                          }}
+                                                        rejectUserHandler={
+                                                          (item) => {
+                                                            rejectUser(item);
+                                                          }}
+                                />
+                              </>
                     }
                   </div>
                 </div>
