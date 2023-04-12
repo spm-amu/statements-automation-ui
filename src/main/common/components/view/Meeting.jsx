@@ -452,6 +452,7 @@ const Meeting = (props) => {
           name: userDetails.name,
           phoneNumber: userDetails.phoneNumber,
           type: 'HOST',
+          objectClass: 'user'
         };
       }
 
