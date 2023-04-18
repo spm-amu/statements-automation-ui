@@ -41,7 +41,7 @@ const ChatRoomList = (props) => {
               addChat();
             }}>
               <img
-                src="https://img.icons8.com/fluent-systems-regular/48/000000/edit-chat-history.png"
+                src={require('/assets/edit-chat-history.png')}
                 alt="new chat"
               />
             </IconButton>
