@@ -15,23 +15,44 @@ const SystemAlertWindow = (props) => {
   const soundInterval = useRef();
   const [systemAlert, setSystemAlert] = useState(null);
 
+  function stopRingingSound() {
+    waitingAudio.pause();
+    clearInterval(soundInterval.current);
+    soundInterval.current = null;
+  }
+
   useEffect(() => {
     electron.ipcRenderer.on('systemAlertWindowContent', args => {
-      console.log("\n\n\n\nPAYLOAD : ", args.payload);
+      console.log("\n\n\n\nSYSTEM ALERT PAYLOAD : ", args.payload);
       setSystemAlert(args.payload);
       soundInterval.current = null;
-      permitAudio.play();
+      if(args.payload && args.payload.params && args.payload.params.soundType === 'RING') {
+        soundInterval.current = setInterval(() => {
+          if(soundInterval.current) {
+            waitingAudio.play();
+          }
+        }, 100);
+      } else {
+        permitAudio.play();
+      }
     });
+
+    return () => {
+      stopRingingSound();
+    }
   }, []);
 
   const joinMeeting = () => {
     electron.ipcRenderer.sendMessage('joinMeetingEvent', {
       payload: systemAlert
     });
+
+    stopRingingSound();
   };
 
   const closeWindow = () => {
     electron.ipcRenderer.sendMessage('closeWindowEvent');
+    stopRingingSound();
   };
 
   return (

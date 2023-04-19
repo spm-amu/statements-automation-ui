@@ -25,11 +25,19 @@ const InComingCallWindow = (props) => {
     rejectionReason: ''
   });
 
+  function stopRingingSound() {
+    waitingAudio.pause();
+    clearInterval(soundInterval.current);
+    soundInterval.current = null;
+  }
+
   useEffect(() => {
     electron.ipcRenderer.on('incomingCallWindowContent', args => {
       resetValues();
       soundInterval.current = setInterval(() => {
-        waitingAudio.play();
+        if(soundInterval.current) {
+          waitingAudio.play();
+        }
       }, 100);
 
       if (args.payload.meetingJoinRequest) {
@@ -42,9 +50,12 @@ const InComingCallWindow = (props) => {
     });
 
     electron.ipcRenderer.on('cancelCall', args => {
-      waitingAudio.pause();
-      clearInterval(soundInterval.current);
+      stopRingingSound();
     });
+
+    return () => {
+      stopRingingSound();
+    }
   }, []);
 
   useEffect(() => {
@@ -60,8 +71,7 @@ const InComingCallWindow = (props) => {
   }, [meetingRequest]);
 
   const answerCall = () => {
-    waitingAudio.pause();
-    clearInterval(soundInterval.current);
+    stopRingingSound();
 
     electron.ipcRenderer.sendMessage('answerCall', {
       payload: callPayload ? callPayload : meetingRequest
@@ -71,8 +81,7 @@ const InComingCallWindow = (props) => {
   };
 
   const declineCall = () => {
-    waitingAudio.pause();
-    clearInterval(soundInterval.current);
+    stopRingingSound();
     electron.ipcRenderer.sendMessage('declineCall', {
       payload: {
         callerId: callPayload ? callPayload.callerUser.socketId : null,
