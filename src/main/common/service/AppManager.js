@@ -17,6 +17,11 @@ class AppManager {
     return this.store.apiHost;
   };
 
+  getSoundFileHost = () => {
+    //return 'https://armscor-audio-files.s3.amazonaws.com';
+    return 'http://ARMHOVC01/sounds';
+  };
+
   setSignalingServerHost = (signalingServerHost) => {
     this.store.signalingServerHost = signalingServerHost;
   };

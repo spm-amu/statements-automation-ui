@@ -3,11 +3,12 @@ import React, {useEffect, useRef, useState} from "react";
 import './InComingCallWindow.css';
 import Icon from "../Icon";
 import Button from '../RegularButton';
+import appManager from "../../service/AppManager";
 
 const {electron} = window;
 
-const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
-const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
+const waitingAudio = new Audio(appManager.getSoundFileHost() + '/waiting.mp3');
+const permitAudio = new Audio(appManager.getSoundFileHost() + '/permission.mp3');
 
 const SystemAlertWindow = (props) => {
   const [initials, setInitials] = useState('');

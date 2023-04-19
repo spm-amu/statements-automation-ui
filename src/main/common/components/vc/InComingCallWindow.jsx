@@ -7,11 +7,12 @@ import Utils from '../../Utils';
 import Button from '../RegularButton';
 import {Form} from "reactstrap";
 import TextField from "../customInput/TextField";
+import appManager from "../../service/AppManager";
 
 const {electron} = window;
 
-const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
-const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
+const waitingAudio = new Audio(appManager.getSoundFileHost() + '/waiting.mp3');
+const permitAudio = new Audio(appManager.getSoundFileHost() + '/permission.mp3');
 
 const InComingCallWindow = (props) => {
   const [callPayload, setCallPayload] = useState(null);

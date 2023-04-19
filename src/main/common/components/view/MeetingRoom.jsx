@@ -64,11 +64,11 @@ const Steps = {
   STREAM_ERROR: 'STREAM_ERROR'
 };
 
-const hangUpAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/hangupsound.mp3');
-const joinInAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/joinsound.mp3');
-const permitAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/permission.mp3');
-//const errorAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/error.mp3');
-//const waitingAudio = new Audio('https://armscor-audio-files.s3.amazonaws.com/waiting.mp3');
+const hangUpAudio = new Audio(appManager.getSoundFileHost() + '/hangupsound.mp3');
+const joinInAudio = new Audio(appManager.getSoundFileHost() + '/joinsound.mp3');
+const permitAudio = new Audio(appManager.getSoundFileHost() + '/permission.mp3');
+//const errorAudio = new Audio(appManager.getSoundFileHost() + '/error.mp3');
+//const waitingAudio = new Audio(appManager.getSoundFileHost() + '/waiting.mp3');
 
 const MeetingRoom = (props) => {
   const [sideBarOpen, setSideBarOpen] = useState(false);
