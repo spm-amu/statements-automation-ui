@@ -130,8 +130,8 @@ const AutoCompleteComponent = React.memo(React.forwardRef((props, ref) => {
       value={props.value ? props.value : []}
       multiple={!Utils.isNull(props.multiple) ? props.multiple : false}
       getOptionLabel={(option) => props.labelClickHandler ?
-        <span className={'option-label'} onClick={(e) => props.labelClickHandler(option.id)}>{option.label}</span>
-        : option ? option.label : ''
+        <span className={'option-label'} onClick={(e) => props.labelClickHandler(option.id)}>{option.label ? option.label : option.userId}</span>
+        : option ? option.label ? option.label : option.userId : ''
       }
       open={open}
       onOpen={handleOpen}
