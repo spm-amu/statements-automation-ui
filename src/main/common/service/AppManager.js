@@ -18,8 +18,8 @@ class AppManager {
   };
 
   getSoundFileHost = () => {
-    return 'https://armscor-audio-files.s3.amazonaws.com';
-    //return 'http://ARMHOVC01/sounds';
+    //return 'https://armscor-audio-files.s3.amazonaws.com';
+    return 'http://ARMHOVC01/sounds';
   };
 
   setSignalingServerHost = (signalingServerHost) => {
