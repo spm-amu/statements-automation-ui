@@ -516,7 +516,10 @@ const MeetingRoom = (props) => {
     //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
     //currentUserStream.shareScreenObj.addTrack(tmpVideoTrack.current);
 
-    shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
+    if (shareScreenRef.current) {
+      shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
+    }
+
     setMeetingParticipantGridMode('DEFAULT');
   };
 
@@ -527,7 +530,9 @@ const MeetingRoom = (props) => {
     if (screenSources && selectedSource) {
       setScreenShared(true);
       setSomeoneSharing(true);
-      setMeetingParticipantGridMode('STRIP');
+      if(shareScreenSource.current.name.toLowerCase() !== 'entire screen' && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') {
+        setMeetingParticipantGridMode('STRIP');
+      }
     }
   };
 
@@ -1265,16 +1270,21 @@ const MeetingRoom = (props) => {
                     </div>
                   </div>
                 }
-                <div style={{
-                  width: someoneSharing ? '100%' : '0',
-                  height: someoneSharing ? 'calc(100% - 200px)' : 0
-                }}>
-                  <video
-                    hidden={false}
-                    muted playsinline autoPlay ref={shareScreenRef}
-                    style={{width: '100%', height: '100%'}}
-                  />
-                </div>
+                {
+                  shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
+                  && shareScreenSource.current.name.toLowerCase() !== 'armscor connect' &&
+                  <div style={{
+                    padding: '16px',
+                    width: someoneSharing ? '100%' : '0',
+                    height: someoneSharing ? 'calc(100% - 200px)' : 0
+                  }}>
+                    <video
+                      hidden={false}
+                      muted playsinline autoPlay ref={shareScreenRef}
+                      style={{width: '100%', height: '100%'}}
+                    />
+                  </div>
+                }
                 <div className={'row'} style={{
                   width: '100%',
                   height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : "160px",
@@ -1505,7 +1515,8 @@ const MeetingRoom = (props) => {
         zIndex: '1200',
         position: 'absolute'
       }}>
-        {screenShared && shareScreenSource.current && (
+        {screenShared && shareScreenSource.current
+        && (shareScreenSource.current.name.toLowerCase() === 'entire screen' || shareScreenSource.current.name.toLowerCase() === 'armscor connect') && (
           <Alert style={{marginBottom: '16px', marginTop: '-120px'}} severity="error">
             {
               (shareScreenSource.current.name.toLowerCase() === 'entire screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
