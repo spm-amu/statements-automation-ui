@@ -215,7 +215,7 @@ const Toolbar = (props) => {
             }
             {" "}
             {
-              step === 'SESSION' && displayState === 'MAXIMIZED' && !whiteBoardShown && !someoneSharing &&
+              step === 'SESSION' && displayState === 'MAXIMIZED' && !whiteBoardShown && (!someoneSharing || screenShared) &&
               <Tooltip title="Share">
                 <IconButton
                   onClick={() => {

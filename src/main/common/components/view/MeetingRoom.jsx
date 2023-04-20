@@ -411,7 +411,7 @@ const MeetingRoom = (props) => {
     //createMediaRecorder(stream);
     //setMeetingParticipantGridMode('STRIP');
 
-    setSomeoneSharing(false);
+    //setSomeoneSharing(false);
   };
 
   const handleRecordingDataAvailable = (e) => {
@@ -502,6 +502,8 @@ const MeetingRoom = (props) => {
   const stopShareScreen = () => {
     shareScreenSource.current = null;
     setScreenShared(false);
+    setMeetingParticipantGridMode('DEFAULT');
+    setSomeoneSharing(false);
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
@@ -524,6 +526,8 @@ const MeetingRoom = (props) => {
 
     if (screenSources && selectedSource) {
       setScreenShared(true);
+      setSomeoneSharing(true);
+      setMeetingParticipantGridMode('STRIP');
     }
   };
 
@@ -1504,7 +1508,7 @@ const MeetingRoom = (props) => {
         {screenShared && shareScreenSource.current && (
           <Alert style={{marginBottom: '16px', marginTop: '-120px'}} severity="error">
             {
-              (shareScreenSource.current.name === 'Entire Screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
+              (shareScreenSource.current.name.toLowerCase() === 'entire screen' ? 'Your entire screen' : 'The ' + shareScreenSource.current.name + ' window')
               + ' is being shared with other participants'
             }
           </Alert>

@@ -6,7 +6,6 @@ import LobbyWaitingList from "./LobbyWaitingList";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
-import LottieIcon from "../LottieIcon";
 import Lobby from "./Lobby";
 
 const MAX_COLS = 3;
