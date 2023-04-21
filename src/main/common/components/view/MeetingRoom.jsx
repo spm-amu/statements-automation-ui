@@ -1271,12 +1271,12 @@ const MeetingRoom = (props) => {
                   </div>
                 }
                 {
-                  shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
-                  && shareScreenSource.current.name.toLowerCase() !== 'armscor connect' &&
                   <div style={{
                     padding: '16px',
-                    width: someoneSharing ? '100%' : '0',
-                    height: someoneSharing ? 'calc(100% - 200px)' : 0
+                    width: (shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
+                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '100%' : '0',
+                    height: (shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
+                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? 'calc(100% - 200px)' : 0
                   }}>
                     <video
                       hidden={false}
