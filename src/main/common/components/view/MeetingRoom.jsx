@@ -503,7 +503,6 @@ const MeetingRoom = (props) => {
     shareScreenSource.current = null;
     setScreenShared(false);
     setMeetingParticipantGridMode('DEFAULT');
-    setSomeoneSharing(false);
 
     socketManager.userPeerMap.forEach((peerObj) => {
       peerObj.peer.replaceTrack(
@@ -529,7 +528,6 @@ const MeetingRoom = (props) => {
 
     if (screenSources && selectedSource) {
       setScreenShared(true);
-      setSomeoneSharing(true);
       if(shareScreenSource.current.name.toLowerCase() !== 'entire screen' && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') {
         setMeetingParticipantGridMode('STRIP');
       }
@@ -1273,10 +1271,10 @@ const MeetingRoom = (props) => {
                 {
                   <div style={{
                     padding: '16px',
-                    width: (shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
+                    width: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
                       && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '100%' : '0',
-                    height: (shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
-                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? 'calc(100% - 200px)' : 0
+                    height: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
+                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? 'calc(100% - 200px)' : '0'
                   }}>
                     <video
                       hidden={false}
