@@ -592,7 +592,8 @@ const MeetingRoom = (props) => {
     if (!Utils.isNull(screenShared)) {
       emitSystemEvent("SHARE_SCREEN", {
         shared: screenShared,
-        userId: appManager.getUserDetails().userId
+        userId: appManager.getUserDetails().userId,
+        roomId: selectedMeeting.id
       });
     }
   }, [screenShared]);
@@ -767,6 +768,8 @@ const MeetingRoom = (props) => {
         if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);
         }
+
+        alert(result.data.userSharingScreen);
 
         if (isHost) {
           socketManager.emitEvent(MessageType.GET_LOBBY, {
@@ -1174,7 +1177,8 @@ const MeetingRoom = (props) => {
 
       emitSystemEvent("SHARE_SCREEN", {
         shared: false,
-        userId: appManager.getUserDetails().userId
+        userId: appManager.getUserDetails().userId,
+        roomId: selectedMeeting.id
       });
     }
 

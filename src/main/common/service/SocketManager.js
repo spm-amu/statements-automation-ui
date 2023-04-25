@@ -299,8 +299,10 @@ class SocketManager {
     let promise = new Promise((resolve, reject) => {
       peer.on('stream', (stream) => {
         if (!item.mainStream) {
+          console.log("\n\n\n\nMAIN STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
           item.mainStream = stream;
         } else {
+          console.log("\n\n\n\nSHARE STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
           item.shareStream = stream;
         }
 
