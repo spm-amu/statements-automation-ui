@@ -86,7 +86,7 @@ const MeetingRoom = (props) => {
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
-  const [screenShared, setScreenShared] = useState(false);
+  const [screenShared, setScreenShared] = useState(null);
   const [someoneSharing, setSomeoneSharing] = useState(false);
   const [autoPermit, setAutoPermit] = useState(false);
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
@@ -528,7 +528,7 @@ const MeetingRoom = (props) => {
 
     if (screenSources && selectedSource) {
       setScreenShared(true);
-      if(shareScreenSource.current.name.toLowerCase() !== 'entire screen' && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') {
+      if (shareScreenSource.current.name.toLowerCase() !== 'entire screen' && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') {
         setMeetingParticipantGridMode('STRIP');
       }
     }
@@ -682,7 +682,7 @@ const MeetingRoom = (props) => {
       });
   };
 
-  const createParticipants = (users, socket) => {
+  const createParticipants = (users, userSharingScreen) => {
     console.log("ALL_USERS received and creating participants : ", users);
     socketManager.clearUserToPeerMap();
     let newParticipants = [];
@@ -697,6 +697,16 @@ const MeetingRoom = (props) => {
               setStep(Steps.SESSION);
               props.windowHandler.show();
             }
+          }
+
+          if (item.user.userId === userSharingScreen) {
+            onSystemEvent({
+              systemEventType: "SHARE_SCREEN",
+              data: {
+                userId: userSharingScreen,
+                shared: true
+              }
+            })
           }
         })
     });
@@ -764,12 +774,11 @@ const MeetingRoom = (props) => {
         }
 
         console.log("JOIN FROMISE FULFILLED");
-        createParticipants(result.data.usersInRoom);
+        console.log(result);
+        createParticipants(result.data.usersInRoom, result.data.userSharingScreen);
         if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);
         }
-
-        alert(result.data.userSharingScreen);
 
         if (isHost) {
           socketManager.emitEvent(MessageType.GET_LOBBY, {
