@@ -43,7 +43,7 @@ export class Stream {
             }
           });
       }).catch((e) => {
-        if(e.message === 'Could not start video source' && !retry) {
+        if(!retry) {
           this.init(false, audio, successHandler, errorhandler, true);
         } else {
           console.log("STREAM FAILED");
