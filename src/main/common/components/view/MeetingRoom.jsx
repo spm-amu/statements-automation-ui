@@ -1080,6 +1080,7 @@ const MeetingRoom = (props) => {
       setMeetingParticipantGridMode("DEFAULT");
       setStep(Steps.SESSION_ENDED);
       setScreenShared(false);
+      appManager.remove('CURRENT_MEETING');
     }
   };
 
