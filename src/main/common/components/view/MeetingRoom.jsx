@@ -676,7 +676,7 @@ const MeetingRoom = (props) => {
         if(screenShared) {
           item.peer.replaceTrack(
             currentUserStream.shareScreenObj.getVideoTracks()[0],
-            shareScreenRef.current.srcObject,
+            shareScreenRef.current.srcObject.getVideoTracks()[0],
             currentUserStream.shareScreenObj
           );
 
@@ -814,6 +814,8 @@ const MeetingRoom = (props) => {
     } else {
       participantIds = participantIds.concat(toParticipantIds);
     }
+
+    console.log("\n\n\\n\nSYSTEM EVENT PARTICIPANTS : ", participantIds);
 
     socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
       systemEventType: eventType,
