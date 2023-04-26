@@ -333,16 +333,16 @@ const MeetingRoom = (props) => {
       const newParticipants = participants.filter((p) => p.userId !== userId);
 
       if (newParticipants.length === 0 && isDirectCall) {
-        //setStep(Steps.SESSION_ENDED);
-        onCallEnded();
-        props.closeHandler();
+        setStep(Steps.SESSION_ENDED);
+        //onCallEnded();
+        //props.closeHandler();
       } else {
         setParticipants(newParticipants);
         if (newParticipants.length === 0) {
-          onCallEnded();
-          props.closeHandler();
-          //setAllUserParticipantsLeft(true);
-          //setStep(Steps.SESSION_ENDED);
+          //onCallEnded();
+          //props.closeHandler();
+          setAllUserParticipantsLeft(true);
+          setStep(Steps.SESSION_ENDED);
 
           get(
             `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,
@@ -1074,12 +1074,10 @@ const MeetingRoom = (props) => {
       props.onEndCall();
       props.closeHandler();
     } else {
-      /*setSomeoneSharing(false);
+      setSomeoneSharing(false);
       setMeetingParticipantGridMode("DEFAULT");
       setStep(Steps.SESSION_ENDED);
-      setScreenShared(false);*/
-      onCallEnded();
-      props.closeHandler();
+      setScreenShared(false);
     }
   };
 
