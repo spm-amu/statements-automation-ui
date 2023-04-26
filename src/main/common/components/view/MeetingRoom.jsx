@@ -528,7 +528,7 @@ const MeetingRoom = (props) => {
 
     if (screenSources && selectedSource) {
       setScreenShared(true);
-      if (shareScreenSource.current.name.toLowerCase() !== 'entire screen' && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') {
+      if(shareScreenSource.current.name.toLowerCase() !== 'entire screen' && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') {
         setMeetingParticipantGridMode('STRIP');
       }
     }
@@ -592,8 +592,7 @@ const MeetingRoom = (props) => {
     if (!Utils.isNull(screenShared)) {
       emitSystemEvent("SHARE_SCREEN", {
         shared: screenShared,
-        userId: appManager.getUserDetails().userId,
-        roomId: selectedMeeting.id
+        userId: appManager.getUserDetails().userId
       });
     }
   }, [screenShared]);
@@ -674,6 +673,19 @@ const MeetingRoom = (props) => {
           props.windowHandler.show();
         }
 
+        if(screenShared) {
+          item.peer.replaceTrack(
+            currentUserStream.shareScreenObj.getVideoTracks()[0],
+            shareScreenRef.current.srcObject,
+            currentUserStream.shareScreenObj
+          );
+
+          emitSystemEvent("SHARE_SCREEN", {
+            shared: screenShared,
+            userId: appManager.getUserDetails().userId
+          }, [payload.userId]);
+        }
+
         handleMessageArrived({
           message: item.user.name + " has joined"
         });
@@ -682,7 +694,7 @@ const MeetingRoom = (props) => {
       });
   };
 
-  const createParticipants = (users, userSharingScreen) => {
+  const createParticipants = (users, socket) => {
     console.log("ALL_USERS received and creating participants : ", users);
     socketManager.clearUserToPeerMap();
     let newParticipants = [];
@@ -697,16 +709,6 @@ const MeetingRoom = (props) => {
               setStep(Steps.SESSION);
               props.windowHandler.show();
             }
-          }
-
-          if (item.user.userId === userSharingScreen) {
-            onSystemEvent({
-              systemEventType: "SHARE_SCREEN",
-              data: {
-                userId: userSharingScreen,
-                shared: true
-              }
-            })
           }
         })
     });
@@ -774,8 +776,7 @@ const MeetingRoom = (props) => {
         }
 
         console.log("JOIN FROMISE FULFILLED");
-        console.log(result);
-        createParticipants(result.data.usersInRoom, result.data.userSharingScreen);
+        createParticipants(result.data.usersInRoom);
         if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);
         }
@@ -802,12 +803,16 @@ const MeetingRoom = (props) => {
     });
   };
 
-  const emitSystemEvent = (eventType, data) => {
+  const emitSystemEvent = (eventType, data, toParticipantIds = null) => {
     let participantIds = [];
-    for (const participant of participants) {
-      if (participant.userId !== appManager.getUserDetails().userId) {
-        participantIds.push(participant.userId);
+    if(!toParticipantIds) {
+      for (const participant of participants) {
+        if (participant.userId !== appManager.getUserDetails().userId) {
+          participantIds.push(participant.userId);
+        }
       }
+    } else {
+      participantIds = participantIds.concat(toParticipantIds);
     }
 
     socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
@@ -1186,8 +1191,7 @@ const MeetingRoom = (props) => {
 
       emitSystemEvent("SHARE_SCREEN", {
         shared: false,
-        userId: appManager.getUserDetails().userId,
-        roomId: selectedMeeting.id
+        userId: appManager.getUserDetails().userId
       });
     }
 
