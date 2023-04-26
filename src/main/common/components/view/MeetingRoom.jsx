@@ -334,6 +334,7 @@ const MeetingRoom = (props) => {
 
       if (newParticipants.length === 0 && isDirectCall) {
         setStep(Steps.SESSION_ENDED);
+        appManager.remove('CURRENT_MEETING');
         //onCallEnded();
         //props.closeHandler();
       } else {
@@ -343,6 +344,7 @@ const MeetingRoom = (props) => {
           //props.closeHandler();
           setAllUserParticipantsLeft(true);
           setStep(Steps.SESSION_ENDED);
+          appManager.remove('CURRENT_MEETING');
 
           get(
             `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,
