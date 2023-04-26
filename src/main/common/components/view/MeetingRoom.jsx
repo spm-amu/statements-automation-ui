@@ -106,7 +106,6 @@ const MeetingRoom = (props) => {
   const [chatSender, setChatSender] = useState(null);
   const [meetingStarted, setMeetingStarted] = useState(null);
   const [hasUnreadChats, setHasUnreadChats] = useState(null);
-  const [onloadScreenShareData, setOnloadScreenShareData] = useState(null);
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
   const recordingSequence = useRef(0);
   const recordingSize = useRef(0);
@@ -116,6 +115,7 @@ const MeetingRoom = (props) => {
   const shareScreenRef = useRef();
   const recordRef = useRef();
   const tmpVideoTrack = useRef();
+  const onloadScreenShareData = useRef(null);
 
   const handler = () => {
     return {
@@ -360,7 +360,6 @@ const MeetingRoom = (props) => {
 
   const onSystemEvent = (payload) => {
     if (payload.systemEventType === "SHARE_SCREEN") {
-      alert("SHARE FIREEEEE");
       let participant = participants.find((p) => p.userId === payload.data.userId);
       console.log("\n\n\n\n\n\nSHARE PARTICIPANT : ", participant);
       if (participant) {
@@ -378,7 +377,7 @@ const MeetingRoom = (props) => {
           setMeetingParticipantGridMode('DEFAULT');
         }
       } else if(payload.data.userJoining){
-        setOnloadScreenShareData(payload.data);
+        onloadScreenShareData.current = payload.data;
       }
     } else if (payload.systemEventType === "HOST_CHANGED_AV_SETTINGS") {
       if (payload.data.userId === appManager.getUserDetails().userId) {
@@ -510,11 +509,15 @@ const MeetingRoom = (props) => {
     setMeetingParticipantGridMode('DEFAULT');
 
     socketManager.userPeerMap.forEach((peerObj) => {
-      peerObj.peer.replaceTrack(
-        currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
-        tmpVideoTrack.current, // current video track - screen track
-        currentUserStream.shareScreenObj
-      );
+      try {
+        peerObj.peer.replaceTrack(
+          currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+          tmpVideoTrack.current, // current video track - screen track
+          currentUserStream.shareScreenObj
+        );
+      } catch(e) {
+
+      }
     });
 
     //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
@@ -661,15 +664,18 @@ const MeetingRoom = (props) => {
         user.peerID = peerId;
       }
 
-      if(onloadScreenShareData && setOnloadScreenShareData.userId === item.user.userId) {
-        shareScreenRef.current.srcObject = item.shareStream;
-        setSomeoneSharing(true);
-        setMeetingParticipantGridMode('STRIP');
-      }
-
       participants.push(user);
       setParticipants([].concat(participants));
       //setParticipants((participants) => [...participants, user]);
+    }
+
+    console.log("\n\n\n\n CHECK SCREEN SHARE ONLOAD");
+    if(onloadScreenShareData.current && onloadScreenShareData.current.userId === item.user.userId) {
+      shareScreenRef.current.srcObject = item.shareStream;
+      setSomeoneSharing(true);
+      setMeetingParticipantGridMode('STRIP');
+
+      onloadScreenShareData.current = null;
     }
   }
 
@@ -875,8 +881,6 @@ const MeetingRoom = (props) => {
       appManager.removeSubscriptions(systemEventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
       appManager.remove('CURRENT_MEETING');
-
-      setOnloadScreenShareData(null);
     };
   }, []);
 
