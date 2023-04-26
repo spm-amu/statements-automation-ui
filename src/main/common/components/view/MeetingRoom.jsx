@@ -106,6 +106,7 @@ const MeetingRoom = (props) => {
   const [chatSender, setChatSender] = useState(null);
   const [meetingStarted, setMeetingStarted] = useState(null);
   const [hasUnreadChats, setHasUnreadChats] = useState(null);
+  const [onloadScreenShareData, setOnloadScreenShareData] = useState(null);
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
   const recordingSequence = useRef(0);
   const recordingSize = useRef(0);
@@ -359,7 +360,9 @@ const MeetingRoom = (props) => {
 
   const onSystemEvent = (payload) => {
     if (payload.systemEventType === "SHARE_SCREEN") {
+      alert("SHARE FIREEEEE");
       let participant = participants.find((p) => p.userId === payload.data.userId);
+      console.log("\n\n\n\n\n\nSHARE PARTICIPANT : ", participant);
       if (participant) {
         if (payload.data.shared) {
           handleMessageArrived({
@@ -374,6 +377,8 @@ const MeetingRoom = (props) => {
           setSomeoneSharing(false);
           setMeetingParticipantGridMode('DEFAULT');
         }
+      } else if(payload.data.userJoining){
+        setOnloadScreenShareData(payload.data);
       }
     } else if (payload.systemEventType === "HOST_CHANGED_AV_SETTINGS") {
       if (payload.data.userId === appManager.getUserDetails().userId) {
@@ -656,6 +661,12 @@ const MeetingRoom = (props) => {
         user.peerID = peerId;
       }
 
+      if(onloadScreenShareData && setOnloadScreenShareData.userId === item.user.userId) {
+        shareScreenRef.current.srcObject = item.shareStream;
+        setSomeoneSharing(true);
+        setMeetingParticipantGridMode('STRIP');
+      }
+
       participants.push(user);
       setParticipants([].concat(participants));
       //setParticipants((participants) => [...participants, user]);
@@ -682,7 +693,8 @@ const MeetingRoom = (props) => {
 
           emitSystemEvent("SHARE_SCREEN", {
             shared: screenShared,
-            userId: appManager.getUserDetails().userId
+            userId: appManager.getUserDetails().userId,
+            userJoining: true
           }, [payload.userId]);
         }
 
@@ -863,6 +875,8 @@ const MeetingRoom = (props) => {
       appManager.removeSubscriptions(systemEventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
       appManager.remove('CURRENT_MEETING');
+
+      setOnloadScreenShareData(null);
     };
   }, []);
 
