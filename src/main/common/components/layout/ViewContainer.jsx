@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import Calendar from '../view/Calendar';
@@ -17,21 +17,21 @@ import WhiteboardView from "../view/WhiteboardView";
 import MeetingRoomToolbar from "../vc/MeetingRoomToolbar";
 import RecordingView from '../view/RecordingView';
 import ChatPollsHistoryView from '../view/ChatPollsHistoryView';
+import MeetingRoomSessionEndedView from "../view/MeetingRoomSessionEndedView";
 
 const ViewContainer = (props) => {
   const params = useParams();
   const location = useLocation();
-  const [attributes] = useState({
+  const attributes = useRef({
     currentWindow: null,
     currentView: null,
     data: null,
     currentDisplayMode: 'inline',
-    windowClosing: false,
     windowDisplayState: 'MAXIMIZED',
     windowToolbarDisplayState: 'HIDDEN',
   });
 
-  const [windowOpen, setWindowOpen] = useState(null);
+  const windowOpen = useRef(null);
   const [refresher, setRefresher] = useState(false);
 
   const navigate = useNavigate();
@@ -39,17 +39,9 @@ const ViewContainer = (props) => {
   React.useEffect(() => {
     return () => {
       appManager.remove('CURRENT_MEETING');
-      attributes.data = null;
+      attributes.current.data = null;
     };
   }, []);
-
-  React.useEffect(() => {
-    if (windowOpen !== null && windowOpen === false) {
-      attributes.currentDisplayMode = 'inline';
-      attributes.windowClosing = true;
-      attributes.windowToolbarDisplayState = 'HIDDEN';
-    }
-  }, [windowOpen]);
 
   const renderView = () => {
     let viewId = params.id;
@@ -65,69 +57,67 @@ const ViewContainer = (props) => {
       displayMode = 'inline';
     }
 
-    if (!attributes.windowClosing) {
-      if (displayMode !== attributes.currentDisplayMode) {
-        if (displayMode === 'window') {
-          setWindowOpen(true);
-        }
-
-        attributes.currentDisplayMode = displayMode;
+    console.log("\n\n\n\n\n\nNAVIGATING TO : ", viewId);
+    console.log("CLOSING : " + attributes.current.windowClosing + " : " + displayMode);
+    if (displayMode !== attributes.current.currentDisplayMode) {
+      if (displayMode === 'window') {
+        windowOpen.current = true;
       }
 
-      attributes.windowClosing = false;
-      if (displayMode === 'inline' && viewId !== attributes.currentView) {
-        attributes.currentView = viewId;
-        if (windowOpen) {
-          attributes.windowDisplayState = 'MINIMIZED';
-        }
-      }
+      attributes.current.currentDisplayMode = displayMode;
+    }
 
-      if (displayMode === 'window' && viewId !== attributes.currentWindow) {
-        attributes.currentWindow = viewId;
+    attributes.current.windowClosing = false;
+    if (displayMode === 'inline' && viewId !== attributes.current.currentView) {
+      attributes.current.currentView = viewId;
+      if (windowOpen.current) {
+        attributes.current.windowDisplayState = 'MINIMIZED';
       }
+    }
 
-      if (data !== attributes.data && viewId === 'meetingRoom') {
-        attributes.data = data;
-      }
+    if (displayMode === 'window' && viewId !== attributes.current.currentWindow) {
+      attributes.current.currentWindow = viewId;
+    }
 
-      console.log("\n\n\n\n\n\nNAV : ", attributes);
-      switch (attributes.currentView) {
-        case 'calendar':
-          element = <Calendar/>;
-          break;
-        case 'chats':
-          element = <Chats selected={location.state}/>;
-          break;
-        case 'meetingHistory':
-          element = <MeetingHistory/>;
-          break;
-        case 'files':
-          element = <Files/>;
-          break;
-        case 'meeting':
-          element = <Meeting selectedEvent={location.state}/>;
-          break;
-        case 'joinMeetingSettings':
-          element = <JoinMeetingSettings selectedMeeting={location.state}/>;
-          break;
-        case 'whiteboard':
-          element = <WhiteboardView id={location.state}/>;
-          break;
-        case 'recordings':
-          element = <RecordingView meetingId={location.state}/>;
-          break;
-        case 'pollsHistory':
-          element = <ChatPollsHistoryView meetingId={location.state}/>;
-          break;
-        case 'people':
-          element = <People dialEnabled={true} chatEnabled={false}/>;
-          break;
-        case 'activity':
-          element = <Activity/>;
-          break;
-      }
-    } else {
-      attributes.windowClosing = false;
+    if (data !== attributes.current.data && (viewId === 'meetingRoom' || viewId === 'meetingRoomSessionEnded')) {
+      attributes.current.data = data;
+    }
+
+    console.log("ATTRIBUTES : ", attributes.current);
+    switch (attributes.current.currentView) {
+      case 'calendar':
+        element = <Calendar/>;
+        break;
+      case 'chats':
+        element = <Chats selected={location.state}/>;
+        break;
+      case 'meetingHistory':
+        element = <MeetingHistory/>;
+        break;
+      case 'files':
+        element = <Files/>;
+        break;
+      case 'meeting':
+        element = <Meeting selectedEvent={location.state}/>;
+        break;
+      case 'joinMeetingSettings':
+        element = <JoinMeetingSettings selectedMeeting={location.state}/>;
+        break;
+      case 'whiteboard':
+        element = <WhiteboardView id={location.state}/>;
+        break;
+      case 'recordings':
+        element = <RecordingView meetingId={location.state}/>;
+        break;
+      case 'pollsHistory':
+        element = <ChatPollsHistoryView meetingId={location.state}/>;
+        break;
+      case 'people':
+        element = <People dialEnabled={true} chatEnabled={false}/>;
+        break;
+      case 'activity':
+        element = <Activity/>;
+        break;
     }
 
     return <>
@@ -135,74 +125,101 @@ const ViewContainer = (props) => {
         element
       }
       {
-        attributes.currentWindow === 'meetingRoom' && attributes.data && windowOpen &&
-        <Window minimizable={true} open={windowOpen} toolbar={
-          <MeetingRoomToolbar
-            isHost={attributes.data.isHost}
-            isDirectCall={attributes.data.isDirectCall}
-            selectedMeeting={attributes.data.selectedMeeting}
-            title={attributes.data.selectedMeeting.title}
-            startMeetingHandler={() => {
-              attributes.data.meetingStarted = true;
-              setRefresher(!refresher);
-            }
-            }
-          />
-        }
-                title={attributes.data.selectedMeeting.title}
-                containerClassName={'meeting-window-container'}
-                toolbarDisplayState={attributes.windowToolbarDisplayState}
-                displayState={attributes.windowDisplayState} onDisplayModeChange={
-          (mode) => {
-            attributes.windowDisplayState = mode;
-            let meetingContainer = document.getElementsByClassName('meeting-window-container')[0];
-            meetingContainer.style.overflowY = mode === 'MINIMIZED' ? 'hidden' : 'auto';
-            if (attributes.currentView === 'joinMeetingSettings') {
-              navigate('/view/calendar');
-            }
+        attributes.current.currentWindow === 'meetingRoomSessionEnded' && attributes.current.data && windowOpen.current ?
+          <Window minimizable={false} open={windowOpen.current}>
+            <MeetingRoomSessionEndedView isDirectCall={attributes.current.data.isDirectCall} closeHandler={() => {
+              attributes.current.windowDisplayState = 'MAXIMIZED';
+              attributes.current.currentWindow = null;
+              attributes.current.data = null;
 
-            setRefresher(!refresher);
-          }
-        }>
-          <MeetingRoom
-            windowHandler={
-              {
-                show: () => {
-                  attributes.windowToolbarDisplayState = 'VISIBLE';
-                  setRefresher(!refresher);
-                },
-                hide: () => {
-                  attributes.windowToolbarDisplayState = 'HIDDEN';
-                  setRefresher(!refresher);
-                }
+              windowOpen.current = false;
+
+              if (attributes.current.currentView === 'joinMeetingSettings') {
+                navigate('/view/calendar');
+              } else {
+                navigate('/view/' + attributes.current.currentView);
               }
-            }
-            closeHandler={() => {
-              if (attributes.currentView === 'joinMeetingSettings') {
+            }}/>
+          </Window>
+          :
+          attributes.current.currentWindow === 'meetingRoom' && attributes.current.data && windowOpen.current &&
+          <Window minimizable={true} open={windowOpen.current} toolbar={
+            <MeetingRoomToolbar
+              isHost={attributes.current.data.isHost}
+              isDirectCall={attributes.current.data.isDirectCall}
+              selectedMeeting={attributes.current.data.selectedMeeting}
+              title={attributes.current.data.selectedMeeting.title}
+              startMeetingHandler={() => {
+                attributes.current.data.meetingStarted = true;
+                setRefresher(!refresher);
+              }
+              }
+            />
+          }
+                  title={attributes.current.data.selectedMeeting.title}
+                  containerClassName={'meeting-window-container'}
+                  toolbarDisplayState={attributes.current.windowToolbarDisplayState}
+                  displayState={attributes.current.windowDisplayState} onDisplayModeChange={
+            (mode) => {
+              attributes.current.windowDisplayState = mode;
+              let meetingContainer = document.getElementsByClassName('meeting-window-container')[0];
+              meetingContainer.style.overflowY = mode === 'MINIMIZED' ? 'hidden' : 'auto';
+              if (attributes.current.currentView === 'joinMeetingSettings') {
                 navigate('/view/calendar');
               }
-            }}
-            onEndCall={() => {
-              appManager.remove('CURRENT_MEETING');
 
-              attributes.windowDisplayState = 'MAXIMIZED';
-              attributes.currentWindow = null;
-              attributes.data = null;
-              setWindowOpen(false);
-            }}
-            displayState={attributes.windowDisplayState}
-            selectedMeeting={attributes.data.selectedMeeting}
-            meetingStarted={attributes.data.meetingStarted}
-            callerUser={attributes.data.callerUser}
-            videoMuted={attributes.data.videoMuted}
-            audioMuted={attributes.data.audioMuted}
-            isHost={attributes.data.isHost}
-            autoPermit={attributes.data.autoPermit}
-            isDirectCall={attributes.data.isDirectCall}
-            isRequestToJoin={attributes.data.isRequestToJoin}
-            userToCall={attributes.data.userToCall}
-          />
-        </Window>
+              setRefresher(!refresher);
+            }
+          }>
+            <MeetingRoom
+              windowHandler={
+                {
+                  show: () => {
+                    attributes.current.windowToolbarDisplayState = 'VISIBLE';
+                    setRefresher(!refresher);
+                  },
+                  hide: () => {
+                    attributes.current.windowToolbarDisplayState = 'HIDDEN';
+                    setRefresher(!refresher);
+                  }
+                }
+              }
+              closeHandler={() => {
+              }}
+              onEndCall={(isDirectCall, showMessage) => {
+                appManager.remove('CURRENT_MEETING');
+
+                console.log("\n\n\n\nSHOW MESSAGE : " + showMessage);
+                if (showMessage) {
+                  console.log("NAVIGATING TO meetingRoomSessionEnded");
+                  navigate("/view/meetingRoomSessionEnded", {
+                    state: {
+                      displayMode: 'window',
+                      isDirectCall: isDirectCall
+                    }
+                  })
+                } else {
+                  attributes.current.windowDisplayState = 'MAXIMIZED';
+                  attributes.current.currentWindow = null;
+                  attributes.current.data = null;
+
+                  windowOpen.current = false;
+                  navigate('/view/' + attributes.current.currentView);
+                }
+              }}
+              displayState={attributes.current.windowDisplayState}
+              selectedMeeting={attributes.current.data.selectedMeeting}
+              meetingStarted={attributes.current.data.meetingStarted}
+              callerUser={attributes.current.data.callerUser}
+              videoMuted={attributes.current.data.videoMuted}
+              audioMuted={attributes.current.data.audioMuted}
+              isHost={attributes.current.data.isHost}
+              autoPermit={attributes.current.data.autoPermit}
+              isDirectCall={attributes.current.data.isDirectCall}
+              isRequestToJoin={attributes.current.data.isRequestToJoin}
+              userToCall={attributes.current.data.userToCall}
+            />
+          </Window>
       }
     </>
   };

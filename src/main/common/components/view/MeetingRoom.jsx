@@ -333,16 +333,16 @@ const MeetingRoom = (props) => {
       const newParticipants = participants.filter((p) => p.userId !== userId);
 
       if (newParticipants.length === 0 && isDirectCall) {
-        setStep(Steps.SESSION_ENDED);
-        //onCallEnded();
-        //props.closeHandler();
+        //setStep(Steps.SESSION_ENDED);
+        onCallEnded();
+        props.closeHandler();
       } else {
         setParticipants(newParticipants);
         if (newParticipants.length === 0) {
           //onCallEnded();
           //props.closeHandler();
           setAllUserParticipantsLeft(true);
-          setStep(Steps.SESSION_ENDED);
+          //setStep(Steps.SESSION_ENDED);
 
           get(
             `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,
@@ -361,7 +361,6 @@ const MeetingRoom = (props) => {
   const onSystemEvent = (payload) => {
     if (payload.systemEventType === "SHARE_SCREEN") {
       let participant = participants.find((p) => p.userId === payload.data.userId);
-      console.log("\n\n\n\n\n\nSHARE PARTICIPANT : ", participant);
       if (participant) {
         if (payload.data.shared) {
           handleMessageArrived({
@@ -376,7 +375,7 @@ const MeetingRoom = (props) => {
           setSomeoneSharing(false);
           setMeetingParticipantGridMode('DEFAULT');
         }
-      } else if(payload.data.userJoining){
+      } else if (payload.data.userJoining) {
         onloadScreenShareData.current = payload.data;
       }
     } else if (payload.systemEventType === "HOST_CHANGED_AV_SETTINGS") {
@@ -515,7 +514,7 @@ const MeetingRoom = (props) => {
           tmpVideoTrack.current, // current video track - screen track
           currentUserStream.shareScreenObj
         );
-      } catch(e) {
+      } catch (e) {
 
       }
     });
@@ -536,7 +535,7 @@ const MeetingRoom = (props) => {
 
     if (screenSources && selectedSource) {
       setScreenShared(true);
-      if(shareScreenSource.current.name.toLowerCase() !== 'entire screen' && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') {
+      if (shareScreenSource.current.name.toLowerCase() !== 'entire screen' && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') {
         setMeetingParticipantGridMode('STRIP');
       }
     }
@@ -670,7 +669,7 @@ const MeetingRoom = (props) => {
     }
 
     console.log("\n\n\n\n CHECK SCREEN SHARE ONLOAD");
-    if(onloadScreenShareData.current && onloadScreenShareData.current.userId === item.user.userId) {
+    if (onloadScreenShareData.current && onloadScreenShareData.current.userId === item.user.userId) {
       shareScreenRef.current.srcObject = item.shareStream;
       setSomeoneSharing(true);
       setMeetingParticipantGridMode('STRIP');
@@ -690,7 +689,7 @@ const MeetingRoom = (props) => {
           props.windowHandler.show();
         }
 
-        if(screenShared) {
+        if (screenShared) {
           item.peer.replaceTrack(
             currentUserStream.shareScreenObj.getVideoTracks()[0],
             shareScreenRef.current.srcObject.getVideoTracks()[0],
@@ -823,7 +822,7 @@ const MeetingRoom = (props) => {
 
   const emitSystemEvent = (eventType, data, toParticipantIds = null) => {
     let participantIds = [];
-    if(!toParticipantIds) {
+    if (!toParticipantIds) {
       for (const participant of participants) {
         if (participant.userId !== appManager.getUserDetails().userId) {
           participantIds.push(participant.userId);
@@ -876,7 +875,7 @@ const MeetingRoom = (props) => {
 
     appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT);
     return () => {
-      endCall();
+      //endCall(false);
       socketManager.removeSubscriptions(eventHandler);
       appManager.removeSubscriptions(systemEventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
@@ -1048,13 +1047,14 @@ const MeetingRoom = (props) => {
     setParticipantsRaisedHands(participantsRaisedHands.filter((p) => p.userId !== payload.userId));
   };
 
-  const endCall = () => {
+  const endCall = (showMessage = true) => {
     if (currentUserStream.obj) {
       socketManager.endCall(isDirectCall, callerUser, selectedMeeting.id);
     }
 
     closeStreams();
-    props.onEndCall();
+    console.log('456');
+    props.onEndCall(isDirectCall, showMessage);
   };
 
   const closeStreams = () => {
@@ -1062,7 +1062,7 @@ const MeetingRoom = (props) => {
     currentUserStream.close();
   };
 
-  const onCallEnded = () => {
+  const onCallEnded = (showMessage = true) => {
     closeStreams();
 
     socketManager.removeSubscriptions(eventHandler);
@@ -1070,15 +1070,16 @@ const MeetingRoom = (props) => {
     socketManager.clearUserToPeerMap();
     socketManager.disconnectSocket();
     socketManager.init();
-    if ((isHost && !isDirectCall) || (step !== Steps.SESSION)) {
-      props.onEndCall();
-      props.closeHandler();
-    } else {
+    //if ((isHost && !isDirectCall) || (step !== Steps.SESSION)) {
+    console.log('123');
+    props.onEndCall(isDirectCall, showMessage);
+    props.closeHandler();
+    /*} else {
       setSomeoneSharing(false);
       setMeetingParticipantGridMode("DEFAULT");
       setStep(Steps.SESSION_ENDED);
       setScreenShared(false);
-    }
+    }*/
   };
 
   const removeFromLobbyWaiting = (item) => {
@@ -1226,9 +1227,9 @@ const MeetingRoom = (props) => {
         meetingId: selectedMeeting.id
       }).catch((error) => {
       });
-      onCallEnded();
+      onCallEnded(false);
     } else {
-      endCall();
+      endCall(false);
       props.closeHandler();
     }
   };
@@ -1328,18 +1329,18 @@ const MeetingRoom = (props) => {
                 }}>
                   <div className={'col'} style={{width: '100%', paddingLeft: '0', paddingRight: '0'}}>
                     {
-                      step === Steps.SESSION_ENDED ?
+                      step === Steps.SYSTEM_ERROR ?
                         <div style={{
                           backgroundColor: 'rgb(40, 40, 43)',
-                          color: 'white',
+                          color: 'rgb(235, 63, 33)',
                           fontSize: '24px',
                           width: '100%',
                           height: '100%'
                         }} className={'centered-flex-box'}>
-                          {'The ' + (isDirectCall ? 'call' : 'meeting') + ' has been ended' + (isDirectCall ? '' : ' by the host')}
+                          {SYSTEM_ERROR_MESSAGE}
                         </div>
                         :
-                        step === Steps.SYSTEM_ERROR ?
+                        step === Steps.CONNECTION_ERROR ?
                           <div style={{
                             backgroundColor: 'rgb(40, 40, 43)',
                             color: 'rgb(235, 63, 33)',
@@ -1347,10 +1348,13 @@ const MeetingRoom = (props) => {
                             width: '100%',
                             height: '100%'
                           }} className={'centered-flex-box'}>
-                            {SYSTEM_ERROR_MESSAGE}
+                            <div>
+                              <LottieIcon id={'waiting'}/>
+                              {CONNECTION_ERROR_MESSAGE}
+                            </div>
                           </div>
                           :
-                          step === Steps.CONNECTION_ERROR ?
+                          step === Steps.STREAM_ERROR ?
                             <div style={{
                               backgroundColor: 'rgb(40, 40, 43)',
                               color: 'rgb(235, 63, 33)',
@@ -1360,55 +1364,41 @@ const MeetingRoom = (props) => {
                             }} className={'centered-flex-box'}>
                               <div>
                                 <LottieIcon id={'waiting'}/>
-                                {CONNECTION_ERROR_MESSAGE}
+                                {STREAM_ERROR_MESSAGE}
                               </div>
                             </div>
                             :
-                            step === Steps.STREAM_ERROR ?
-                              <div style={{
-                                backgroundColor: 'rgb(40, 40, 43)',
-                                color: 'rgb(235, 63, 33)',
-                                fontSize: '24px',
-                                width: '100%',
-                                height: '100%'
-                              }} className={'centered-flex-box'}>
-                                <div>
-                                  <LottieIcon id={'waiting'}/>
-                                  {STREAM_ERROR_MESSAGE}
-                                </div>
-                              </div>
-                              :
-                              <>
-                                <MeetingParticipantGrid participants={participants}
-                                                        waitingList={lobbyWaitingList}
-                                                        mode={meetingParticipantGridMode}
-                                                        audioMuted={audioMuted}
-                                                        videoMuted={videoMuted}
-                                                        meetingTitle={selectedMeeting.title}
-                                                        userToCall={userToCall}
-                                                        userStream={currentUserStream.obj}
-                                                        step={step}
-                                                        isHost={isHost}
-                                                        autoPermit={autoPermit}
-                                                        participantsRaisedHands={participantsRaisedHands}
-                                                        allUserParticipantsLeft={allUserParticipantsLeft}
-                                                        userVideoChangeHandler={(ref) => setUserVideo(ref)}
-                                                        onHostAudioMute={(participant) => {
-                                                          changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
+                            <>
+                              <MeetingParticipantGrid participants={participants}
+                                                      waitingList={lobbyWaitingList}
+                                                      mode={meetingParticipantGridMode}
+                                                      audioMuted={audioMuted}
+                                                      videoMuted={videoMuted}
+                                                      meetingTitle={selectedMeeting.title}
+                                                      userToCall={userToCall}
+                                                      userStream={currentUserStream.obj}
+                                                      step={step}
+                                                      isHost={isHost}
+                                                      autoPermit={autoPermit}
+                                                      participantsRaisedHands={participantsRaisedHands}
+                                                      allUserParticipantsLeft={allUserParticipantsLeft}
+                                                      userVideoChangeHandler={(ref) => setUserVideo(ref)}
+                                                      onHostAudioMute={(participant) => {
+                                                        changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
+                                                      }}
+                                                      onHostVideoMute={(participant) => {
+                                                        changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
+                                                      }}
+                                                      acceptUserHandler={
+                                                        (item) => {
+                                                          acceptUser(item);
                                                         }}
-                                                        onHostVideoMute={(participant) => {
-                                                          changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
+                                                      rejectUserHandler={
+                                                        (item) => {
+                                                          rejectUser(item);
                                                         }}
-                                                        acceptUserHandler={
-                                                          (item) => {
-                                                            acceptUser(item);
-                                                          }}
-                                                        rejectUserHandler={
-                                                          (item) => {
-                                                            rejectUser(item);
-                                                          }}
-                                />
-                              </>
+                              />
+                            </>
                     }
                   </div>
                 </div>
