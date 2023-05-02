@@ -204,7 +204,11 @@ const ViewContainer = (props) => {
                   attributes.current.data = null;
 
                   windowOpen.current = false;
-                  navigate('/view/' + attributes.current.currentView);
+                  if (attributes.current.currentView === 'joinMeetingSettings') {
+                    navigate('/view/calendar');
+                  } else {
+                    navigate('/view/' + attributes.current.currentView);
+                  }
                 }
               }}
               displayState={attributes.current.windowDisplayState}
