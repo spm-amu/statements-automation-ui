@@ -2,7 +2,7 @@ export class Stream {
   constructor() {
   }
 
-  init = (video = true, audio = true, successHandler, errorhandler, retry = false) => {
+  init = (video = true, audio = true, successHandler, errorhandler, retry = false, socketManager) => {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: audio,
@@ -37,14 +37,50 @@ export class Stream {
               stream.getVideoTracks()[0].enabled = false;
             }
 
-            console.log("STREAM STARTED");
+            if(this.obj.getAudioTracks().length > 0) {
+              console.log("STREAM STARTED");
+              console.log(this.obj.getAudioTracks()[0].enabled);
+              console.log(this.obj.getAudioTracks()[0].muted);
+            }
             if (successHandler) {
+              navigator.mediaDevices.ondevicechange = () => {
+                console.log("MEDIA CHANGED");
+                console.log("UPDATING TRACKS");
+
+                let newUserMedia = navigator.mediaDevices
+                          .getUserMedia({
+                            audio: true,
+                            video: false
+                          });
+
+                newUserMedia
+                        .then((stream) => {
+                let newAudioTrack = stream.getAudioTracks()[0];
+                          if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
+                            if (socketManager) {
+                            console.log("REPLACING PEER TRACKS TRACKS");
+                              socketManager.userPeerMap.forEach((peerObj) => {
+                                peerObj.peer.replaceTrack(
+                                  this.getAudioTracks()[0],
+                                  newAudioTrack,
+                                  this.obj
+                                );
+                              });
+                            }
+
+                            this.obj.removeTrack(this.getAudioTracks()[0]);
+                          }
+
+                          this.obj.addTrack(newAudioTrack);
+                }
+                );
+              };
               successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length === 0);
             }
           });
       }).catch((e) => {
         if(!retry) {
-          this.init(false, audio, successHandler, errorhandler, true);
+          this.init(false, audio, successHandler, errorhandler, true, socketManager);
         } else {
           console.log("STREAM FAILED");
           console.log(e);

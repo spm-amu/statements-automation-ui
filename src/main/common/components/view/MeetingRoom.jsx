@@ -929,7 +929,7 @@ const MeetingRoom = (props) => {
 
       setPreErrorStep(step);
       setStep(Steps.STREAM_ERROR);
-    });
+    }, false, socketManager);
   };
 
   const createMediaRecorder = () => {
