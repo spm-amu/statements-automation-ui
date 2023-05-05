@@ -5,6 +5,7 @@ import IconButton from "@material-ui/core/IconButton";
 import socketManager from "../../common/service/SocketManager";
 import {MessageType} from "../types";
 import appManager from "../service/AppManager";
+import Utils from '../Utils';
 
 const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
 
@@ -31,12 +32,16 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
             }
 
             break;
+          case MessageType.SYSTEM_EVENT:
+            onSystemEvent(be.payload);
+            break;
         }
       }
     }
   };
 
   const [online, setOnline] = useState(false);
+  const [calling, setCalling] = useState(false);
 
   useEffect(() => {
     socketEventHandler.api = handler();
@@ -48,14 +53,25 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
 
   useEffect(() => {
     socketManager.removeSubscriptions(socketEventHandler);
-    socketManager.addSubscriptions(socketEventHandler, MessageType.USER_ONLINE, MessageType.USERS_ONLINE, MessageType.USER_OFFLINE)
+    socketManager.addSubscriptions(socketEventHandler, MessageType.USER_ONLINE, MessageType.USERS_ONLINE, MessageType.USER_OFFLINE, MessageType.CALL_ENDED, MessageType.SYSTEM_EVENT)
   }, []);
 
   useEffect(() => {
     return () => {
+      setCalling(false);
       socketManager.removeSubscriptions(socketEventHandler);
     };
   }, []);
+
+  const onSystemEvent = (payload) => {
+    if (payload.systemEventType === MessageType.REQUEST_TO_JOIN_MEETING_ANSWERED) {
+      setCalling(false);
+
+      if (!Utils.isNull(props.onClosePeopleDialogHandler)) {
+        props.onClosePeopleDialogHandler();
+      }
+    }
+  }
 
   return (
     <div className="person-card">
@@ -90,17 +106,40 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
         {
           (!appManager.get('CURRENT_MEETING') || props.inCall) && props.dialEnabled &&
           <div style={{marginRight: '4px'}} className={'buttons'}>
-            <IconButton
-              onClick={(e) => {
-                props.onAudioCallHandler(props.data)
-              }}
-              disabled={!online}
-              style={{
-                marginRight: '4px'
-              }}
-            >
-              <Icon id={'CALL_END'}/>
-            </IconButton>
+            {
+              calling && props.inCall ?
+                <>
+                  <div className={'centered-flex-box blink-me'} style={{ marginRight: '4px', color: 'green' }}>
+                    Calling...
+                  </div>
+                  <IconButton
+                    onClick={(e) => {
+                      setCalling(false);
+                      props.onAudioCallCancelHandler(props.data)
+                    }}
+                    style={{
+                      marginRight: '4px',
+                      color: '#eb3f21',
+                    }}
+                  >
+                    <Icon id={'CALL_END'}/>
+                  </IconButton>
+                </>
+                :
+                <IconButton
+                  onClick={(e) => {
+                    setCalling(true);
+                    props.onAudioCallHandler(props.data)
+                  }}
+                  disabled={!online}
+                  style={{
+                    marginRight: '4px',
+                    color: online ? 'green' : '',
+                  }}
+                >
+                  <Icon id={'CALL_END'}/>
+                </IconButton>
+            }
           </div>
         }
         {

@@ -108,6 +108,12 @@ const People = (props) => {
                         marginBottom: '8px'
                       }}>
             <PersonCard onAudioCallHandler={(data) => onAudioCallHandler(data)}
+                        onAudioCallCancelHandler={(data) => {
+                          if (!Utils.isNull(props.onAudioCallCancelHandler)) {
+                            props.onAudioCallCancelHandler(data);
+                          }
+                        }}
+                        onClosePeopleDialogHandler={() => props.onClosePeopleDialogHandler()}
                         data={user}
                         avatarSize={!Utils.isNull(props.avatarSize) ? props.avatarSize : true}
                         showOnlineIndicator={!Utils.isNull(props.showOnlineIndicator) ? props.showOnlineIndicator : true}

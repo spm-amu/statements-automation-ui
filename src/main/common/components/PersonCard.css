@@ -46,6 +46,14 @@
   width: 32px;
 }
 
+.blink-me {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}
+
 @media screen and (max-width: 991px) {
   .person-card {
     padding: 0;

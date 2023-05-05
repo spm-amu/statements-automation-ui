@@ -2,6 +2,7 @@
 import React, { } from "react";
 import Lottie from 'react-lottie';
 import waitingData from '../assets/lotties/waiting';
+import callLoading from '../assets/lotties/call-loading.json';
 import recordingData from '../assets/lotties/recording';
 import loadingData from '../assets/lotties/loading';
 import callingData from '../assets/lotties/calling2';
@@ -23,6 +24,25 @@ const LottieIcon = (props) => {
           }}
           height={80}
           width={80}
+        />
+      </div>
+    );
+  }
+
+	if (props.id === 'call-loading') {
+    return (
+      <div>
+        <Lottie
+          options={{
+            loop: true,
+            autoplay: true,
+            animationData: callLoading,
+            rendererSettings: {
+              preserveAspectRatio: "xMidYMid slice"
+            }
+          }}
+          height={40}
+          width={40}
         />
       </div>
     );

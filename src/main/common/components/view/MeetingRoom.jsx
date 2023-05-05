@@ -1200,6 +1200,17 @@ const MeetingRoom = (props) => {
     });
   }
 
+  const cancelRequestCall = (requestedUser) => {
+    socketManager.emitEvent(MessageType.CANCEL_CALL, {
+      userId: requestedUser.userId,
+      userDescription: requestedUser.name,
+      callerId: appManager.getUserDetails().userId,
+      callerDescription: appManager.getUserDetails().name,
+      meetingId: selectedMeeting.id
+    }).catch((error) => {
+    });
+  }
+
   const handleEndCall = () => {
     if (screenShared) {
       socketManager.userPeerMap.forEach((peerObj) => {
@@ -1218,7 +1229,6 @@ const MeetingRoom = (props) => {
 
 
     if (userToCall && isDirectCall && participants.length <= 1) {
-      console.log("USER TO CALL : ", userToCall);
       socketManager.emitEvent(MessageType.CANCEL_CALL, {
         userId: userToCall.userId,
         userDescription: userToCall.name,
@@ -1427,6 +1437,7 @@ const MeetingRoom = (props) => {
                 participantsRaisedHands={participantsRaisedHands}
                 participants={participants}
                 onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
+                onAudioCallCancelHandler={(requestedUser) => cancelRequestCall(requestedUser)}
                 onChangeMeetingHostHandler={(newHost) => {
                   changeHost(newHost);
                 }}

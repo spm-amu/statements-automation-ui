@@ -96,7 +96,10 @@ const MeetingRoomSideBarContent = (props) => {
           <div style={{height: '100%'}} className={'request-to-join-dialog-content'}>
             <People meetingId={meetingId} dialEnabled={true} chatEnabled={false}
                     inCall={true} exclusions={peopleExclusions}
-                    onAudioCallHandler={(e) => props.onAudioCallHandler(e)}/>
+                    onClosePeopleDialogHandler={() => setPeopleDialogOpen(false)}
+                    onAudioCallHandler={(e) => props.onAudioCallHandler(e)}
+                    onAudioCallCancelHandler={(e) => props.onAudioCallCancelHandler(e)}
+            />
           </div>
         </DialogContent>
         <DialogActions>

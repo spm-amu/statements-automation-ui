@@ -444,6 +444,17 @@ const BasicBusinessAppDashboard = (props) => {
         post(
           `${appManager.getAPIHost()}/api/v1/meeting/answerCall`,
           (response) => {
+            if ( args.payload.meetingJoinRequest ) {
+              socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
+                systemEventType: MessageType.REQUEST_TO_JOIN_MEETING_ANSWERED,
+                recipients: [
+                  args.payload.callerUser.userId
+                ],
+                data: {}
+              }).catch((error) => {
+              });
+            }
+
             navigate("/view/meetingRoom", {
               state: {
                 displayMode: 'window',
@@ -506,9 +517,18 @@ const BasicBusinessAppDashboard = (props) => {
       });
 
       electron.ipcRenderer.on('declineCall', args => {
-        console.log(args.payload);
+        console.log('&&&&&&&&', args.payload);
         if (args.payload.callerId) {
           socketManager.declineDirectCall(args.payload.callerId, args.payload.callPayload.roomId, args.payload.reason);
+        } else {
+          socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
+            systemEventType: MessageType.REQUEST_TO_JOIN_MEETING_ANSWERED,
+            recipients: [
+              args.payload.callPayload.callerUser.userId
+            ],
+            data: {}
+          }).catch((error) => {
+          });
         }
       });
 
