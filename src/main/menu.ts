@@ -52,6 +52,7 @@ export default class MenuBuilder {
     });
   }
 
+
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: 'Armscor Connect',
