@@ -83,7 +83,9 @@ export default class MenuBuilder {
   }
 
   buildDefaultTemplate() {
+    // @ts-ignore
     const templateDefault = [];
+    // @ts-ignore
     return templateDefault;
   }
 }
