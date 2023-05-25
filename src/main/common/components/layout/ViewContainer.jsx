@@ -8,6 +8,7 @@ import MeetingHistory from '../view/MeetingHistory';
 import Meeting from '../view/Meeting';
 import JoinMeetingSettings from '../view/JoinMeetingSettings';
 import People from "../view/People";
+import Math from "../view/Math";
 import MeetingRoom from "../view/MeetingRoom";
 import Window from "../Window";
 import appManager from "../../../common/service/AppManager";
@@ -115,8 +116,8 @@ const ViewContainer = (props) => {
       case 'people':
         element = <People dialEnabled={true} chatEnabled={false}/>;
         break;
-      case 'activity':
-        element = <Activity/>;
+      case 'math':
+        element = <Math/>;
         break;
     }
 

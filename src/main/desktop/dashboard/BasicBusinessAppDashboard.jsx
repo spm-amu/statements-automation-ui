@@ -160,6 +160,15 @@ const BasicBusinessAppDashboard = (props) => {
     newRoute.isParent = true;
     newRoutes.push(newRoute);
 
+    /*newRoute = {};
+    newRoute.name = "Math";
+    newRoute.path = "math";
+    newRoute.icon = "ADD";
+    newRoute.layout = "/admin";
+    newRoute.level = 0;
+    newRoute.isParent = true;
+    newRoutes.push(newRoute);*/
+
     let utilsRoutes = [];
     newRoute = {};
     newRoute.name = "Help";
@@ -577,7 +586,7 @@ const BasicBusinessAppDashboard = (props) => {
       loadHost("http://localhost:8080/vc", "http:"http://ARMHOVC01/vc", "http://ARMHOVC01", false//localhost:8000");
     }*/
 
-    loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za", true);
+    loadHost("http://localhost:8080/vc", "http://localhost:8080", true);
   }, []);
 
   React.useEffect(() => {

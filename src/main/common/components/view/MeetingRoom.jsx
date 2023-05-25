@@ -445,7 +445,11 @@ const MeetingRoom = (props) => {
         console.log("======== SAVING RECORDING CHUNK =========");
         console.log(data);
         socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
+          .then((data) => {
+            console.log("===== SAVE RECORDING SUCCESS ======")
+          })
           .catch((error) => {
+            console.log("===== SAVE RECORDING ERROR ======")
           });
       };
 

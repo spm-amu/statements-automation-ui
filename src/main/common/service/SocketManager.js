@@ -166,7 +166,7 @@ class SocketManager {
     }
 
     console.log("CREATING PEER WITH OPTS : ", opts);
-    console.log("IS NET-0? " + appManager.isOnline());
+    console.log("IS NET-0? " + !appManager.isOnline());
 
     const peer = new Peer(opts);
 
@@ -180,9 +180,6 @@ class SocketManager {
         audioMuted: audioMuted,
         videoMuted: videoMuted
       });
-    });
-
-    peer.on('close', () => {
     });
 
     return peer;
@@ -224,14 +221,8 @@ class SocketManager {
       }
     }
 
-    if (!appManager.isOnline()) {
-      opts.config = {
-        iceServers: []
-      }
-    }
-
     console.log("ADDING PEER WITH OPTS : ", opts);
-    console.log("IS NET-0? " + appManager.isOnline());
+    console.log("IS NET-0? " + !appManager.isOnline());
 
     const peer = new Peer(opts);
     peer.on('signal', (signal) => {
@@ -295,14 +286,26 @@ class SocketManager {
       user: payload
     };
 
+
+    peer.on('close', () => {
+      onsole.log("\n\n\nPEER CLOSED : ");
+    });
+
+    peer.on("error", (err) => {
+      console.log("\n\n\nPEER ERROR : ");
+      console.log(err);
+    });
+
     this.userPeerMap.push(item);
     let promise = new Promise((resolve, reject) => {
       peer.on('stream', (stream) => {
         if (!item.mainStream) {
           console.log("\n\n\n\nMAIN STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
+          console.log(peer);
           item.mainStream = stream;
         } else {
           console.log("\n\n\n\nSHARE STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
+          console.log(peer);
           item.shareStream = stream;
         }
 
