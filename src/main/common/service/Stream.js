@@ -2,7 +2,7 @@ export class Stream {
   constructor() {
   }
 
-  init = (video = true, audio = true, successHandler, errorhandler, retry = false, socketManager) => {
+  init = async (video = true, audio = true, successHandler, errorhandler, retry = false, socketManager) => {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: audio,
@@ -37,39 +37,30 @@ export class Stream {
               stream.getVideoTracks()[0].enabled = false;
             }
 
-            if (successHandler) {
-              navigator.mediaDevices.ondevicechange = () => {
-                console.log("MEDIA CHANGED");
-                console.log("UPDATING TRACKS");
+            navigator.mediaDevices.ondevicechange = () => {
+              console.log("MEDIA CHANGED");
+              console.log("UPDATING TRACKS");
 
-                let newUserMedia = navigator.mediaDevices
-                  .getUserMedia({
-                    audio: true,
-                    video: false
-                  });
+              let newUserMedia = navigator.mediaDevices
+                .getUserMedia({
+                  audio: true,
+                  video: false
+                });
 
-                newUserMedia
-                  .then((stream) => {
-                      let newAudioTrack = stream.getAudioTracks()[0];
-                      if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
-                        if (socketManager) {
-                          console.log("REPLACING PEER TRACKS TRACKS");
-                          socketManager.userPeerMap.forEach((peerObj) => {
-                            peerObj.peer.replaceTrack(
-                              this.getAudioTracks()[0],
-                              newAudioTrack,
-                              this.obj
-                            );
-                          });
-                        }
-
-                        this.obj.removeTrack(this.getAudioTracks()[0]);
-                      }
-
-                      this.obj.addTrack(newAudioTrack);
+              newUserMedia
+                .then((stream) => {
+                    let newAudioTrack = stream.getAudioTracks()[0];
+                    if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
+                      this.replacePeerAudioTracks(socketManager, newAudioTrack);
+                      this.obj.removeTrack(this.getAudioTracks()[0]);
                     }
-                  );
-              };
+
+                    this.obj.addTrack(newAudioTrack);
+                  }
+                );
+            };
+
+            if (successHandler) {
               successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length === 0);
             }
           });
@@ -85,6 +76,19 @@ export class Stream {
       }
     });
   };
+
+  async replacePeerAudioTracks(socketManager, newAudioTrack) {
+    if (socketManager) {
+      console.log("REPLACING PEER TRACKS");
+      socketManager.userPeerMap.forEach((peerObj) => {
+        peerObj.peer.replaceTrack(
+          this.getAudioTracks()[0],
+          newAudioTrack,
+          this.obj
+        );
+      });
+    }
+  }
 
   close = () => {
     if (this.obj) {
@@ -136,15 +140,7 @@ export class Stream {
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
           if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
-            if (socketManager) {
-              socketManager.userPeerMap.forEach((peerObj) => {
-                peerObj.peer.replaceTrack(
-                  this.getVideoTracks()[0],
-                  this.videoTrack,
-                  this.obj
-                );
-              });
-            }
+            this.replacePeerVideoTracks(socketManager);
 
             this.obj.removeTrack(this.getVideoTracks()[0]);
           }
@@ -156,6 +152,22 @@ export class Stream {
       if (videoTrack) {
         videoTrack.stop();
       }
+    }
+  };
+
+  async replacePeerVideoTracks(socketManager) {
+    console.log("REPLACING TRACKS");
+    console.log(socketManager.userPeerMap.length);
+    console.log(socketManager.userPeerMap);
+
+    if (socketManager) {
+      socketManager.userPeerMap.forEach((peerObj) => {
+        peerObj.peer.replaceTrack(
+          this.getVideoTracks()[0],
+          this.videoTrack,
+          this.obj
+        );
+      });
     }
   }
 }

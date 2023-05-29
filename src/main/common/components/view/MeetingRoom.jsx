@@ -396,7 +396,7 @@ const MeetingRoom = (props) => {
     }
   };
 
-  const handleScreenShareStream = (stream) => {
+  const handleScreenShareStream = async (stream) => {
     tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
@@ -1213,9 +1213,9 @@ const MeetingRoom = (props) => {
       meetingId: selectedMeeting.id
     }).catch((error) => {
     });
-  }
+  };
 
-  const handleEndCall = () => {
+  const handleEndCall = async () => {
     if (screenShared) {
       socketManager.userPeerMap.forEach((peerObj) => {
         peerObj.peer.replaceTrack(

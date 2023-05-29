@@ -182,6 +182,10 @@ class SocketManager {
       });
     });
 
+    peer.on('error', (err) => {
+      console.log("PEER ERROR - " + err);
+    });
+
     return peer;
   };
 
@@ -203,6 +207,10 @@ class SocketManager {
         audioMuted: !stream.getTracks()[1].enabled,
         videoMuted: !stream.getTracks()[0].enabled
       });
+    });
+
+    peer.on('error', (err) => {
+      console.log("PEER ERROR - " + err);
     });
 
     return peer;
@@ -234,7 +242,8 @@ class SocketManager {
       });
     });
 
-    peer.on('close', () => {
+    peer.on('error', (err) => {
+      console.log("PEER ERROR - " + err);
     });
 
     return peer;
