@@ -460,7 +460,21 @@ const MeetingRoom = (props) => {
         console.log(data);
         socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
           .then((data) => {
-            console.log("===== SAVE RECORDING SUCCESS ======")
+            console.log("===== SAVE RECORDING SUCCESS ======");
+            if(!currentRecordingId.current) {
+              const data = {
+                meetingId: selectedMeeting.id,
+                name: selectedMeeting.title,
+                type: recordingType.current,
+                size: recordingSize.current,
+                sequenceNumber: recordingSequence.current,
+                sessionId: currentRecordingId.current
+              };
+
+              socketManager.emitEvent(MessageType.STOP_RECORDING, data)
+                .catch((error) => {
+                });
+            }
           })
           .catch((error) => {
             console.log("===== SAVE RECORDING ERROR ======")
@@ -474,19 +488,6 @@ const MeetingRoom = (props) => {
   };
 
   const handleStopRecording = (e) => {
-    const data = {
-      meetingId: selectedMeeting.id,
-      name: selectedMeeting.title,
-      type: recordingType.current,
-      size: recordingSize.current,
-      sequenceNumber: recordingSequence.current,
-      sessionId: currentRecordingId.current
-    };
-
-    socketManager.emitEvent(MessageType.STOP_RECORDING, data)
-      .catch((error) => {
-      });
-
     currentRecordingId.current = null;
     setIsRecording(false);
     recordingSequence.current = 0;
@@ -1259,7 +1260,6 @@ const MeetingRoom = (props) => {
         userId: appManager.getUserDetails().userId
       });
     }
-
 
     if (userToCall && isDirectCall && participants.length <= 1) {
       socketManager.emitEvent(MessageType.CANCEL_CALL, {
