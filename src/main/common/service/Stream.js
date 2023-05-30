@@ -146,7 +146,9 @@ export class Stream {
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
           if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
-            this.replacePeerVideoTracks(socketManager);
+            if(socketManager) {
+              this.replacePeerVideoTracks(socketManager);
+            }
 
             this.obj.removeTrack(this.getVideoTracks()[0]);
           }
