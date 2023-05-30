@@ -688,7 +688,7 @@ const MeetingRoom = (props) => {
       //setParticipants((participants) => [...participants, user]);
     }
 
-    console.log("\n\n\n\n CHECK SCREEN SHARE ONLOAD");
+    console.log("CHECK SCREEN SHARE ONLOAD");
     if (onloadScreenShareData.current && onloadScreenShareData.current.userId === item.user.userId) {
       shareScreenRef.current.srcObject = item.shareStream;
       setSomeoneSharing(true);
@@ -1066,7 +1066,7 @@ const MeetingRoom = (props) => {
       participant.videoMuted = payload.videoMuted;
     }
 
-    setParticipants([].concat(participants));
+    //setParticipants([].concat(participants));
   };
 
   const onLowerHand = (payload) => {
