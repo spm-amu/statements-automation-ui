@@ -1307,7 +1307,7 @@ const MeetingRoom = (props) => {
         <div className={'col'} style={{
           paddingLeft: '0',
           paddingRight: '0',
-          maxHeight: '100%',
+          maxHeight: '95%',
           height: displayState === 'MAXIMIZED' ? null : '100%'
         }}>
           <div style={{height: '100%', maxHeight: '100%', backgroundColor: '#000000'}}>
