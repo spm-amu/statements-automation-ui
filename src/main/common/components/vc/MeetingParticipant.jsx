@@ -5,27 +5,27 @@ import Utils from '../../Utils';
 import Icon from '../Icon';
 import {PanTool} from '@material-ui/icons';
 import IconButton from "@material-ui/core/IconButton";
-import {MessageType} from "../../types";
-import socketManager from "../../service/SocketManager";
+import {MessageType, SystemEventType} from "../../types";
+import appManager from "../../../common/service/AppManager";
 
 const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
-  const [eventHandler] = useState({});
+  const [systemEventHandler] = useState({});
 
   const videoRef = useRef();
   const showVideo = true;
 
-  const handler = () => {
+  const systemEventHandlerApi = () => {
     return {
       get id() {
         return 'meeting-participant-' + props.data.userId;
       },
       on: (eventType, be) => {
         switch (eventType) {
-          case MessageType.AUDIO_VISUAL_SETTINGS_CHANGED:
-            onAVSettingsChange(be.payload);
+          case SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED:
+            onAVSettingsChange(be);
             break;
         }
       }
@@ -33,7 +33,7 @@ const MeetingParticipant = (props) => {
   };
 
   useEffect(() => {
-    eventHandler.api = handler();
+    systemEventHandler.api = systemEventHandlerApi();
   });
 
   const onAVSettingsChange = (payload) => {
@@ -63,10 +63,10 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
-    socketManager.removeSubscriptions(eventHandler);
-    socketManager.addSubscriptions(eventHandler, MessageType.AUDIO_VISUAL_SETTINGS_CHANGED)
+    appManager.removeSubscriptions(systemEventHandler);
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     return () => {
-      socketManager.removeSubscriptions(eventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
     };
   }, []);
 
