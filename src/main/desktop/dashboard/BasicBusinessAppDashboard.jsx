@@ -26,6 +26,12 @@ import {isChrome, isEdge, isIE, isSafari} from 'react-device-detect';
 
 const {electron} = window;
 
+import * as process from 'process';
+
+window.global = window;
+window.process = process;
+window.Buffer = [];
+
 let ps;
 
 const MODE = "PROD";
@@ -77,7 +83,6 @@ const BasicBusinessAppDashboard = (props) => {
 
     window.addEventListener("scroll", showNavbarButton);
   });
-
 
   React.useEffect(() => {
     if (props.width !== null && typeof props.width !== 'undefined') {

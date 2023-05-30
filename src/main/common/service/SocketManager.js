@@ -21,7 +21,7 @@ class SocketManager {
     return new Promise((resolve, reject) => {
       if (this.socket) {
         let response = this.socket.emit(eventType, data, (data) => {
-          if(data.status === 'SUCCESS') {
+          if (data.status === 'SUCCESS') {
             resolve(data);
           } else {
             reject(new Error(data.status));
@@ -263,7 +263,7 @@ class SocketManager {
   };
 
   removeFromUserToPeerMap = (id) => {
-    //this.destroyPeer(id);
+    this.destroyPeer(id);
     let filtered = this.userPeerMap.filter((item) => item.user.socketId !== id);
     this.userPeerMap.splice(0, this.userPeerMap.length);
 
@@ -297,12 +297,22 @@ class SocketManager {
 
 
     peer.on('close', () => {
-      onsole.log("\n\n\nPEER CLOSED : ");
+      appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
+        payload: payload
+      });
     });
 
     peer.on("error", (err) => {
-      console.log("\n\n\nPEER ERROR : ");
+      console.log("PEER ERROR : ");
       console.log(err);
+      console.log(JSON.stringify(err));
+      if(err.code === 'ERR_CONNECTION_FAILURE') {
+        appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
+          payload: payload
+        });
+
+        console.log("PEER_DISCONNECT FIRED");
+      }
     });
 
     this.userPeerMap.push(item);

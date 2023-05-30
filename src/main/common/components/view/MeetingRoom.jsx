@@ -209,6 +209,10 @@ const MeetingRoom = (props) => {
 
             setStep(Steps.CONNECTION_ERROR);
             break;
+          case SystemEventType.PEER_DISCONNECT:
+            be.payload.meetingId = selectedMeeting.id;
+            removeUser(be.payload);
+            break;
         }
       }
     }
@@ -330,29 +334,33 @@ const MeetingRoom = (props) => {
       socketManager.removeFromUserToPeerMap(user.socketId);
 
       const userId = user.userId;
-      const newParticipants = participants.filter((p) => p.userId !== userId);
 
-      if (newParticipants.length === 0 && isDirectCall) {
-        //setStep(Steps.SESSION_ENDED);
-        onCallEnded();
-        props.closeHandler();
-      } else {
-        setParticipants(newParticipants);
-        if (newParticipants.length === 0) {
-          //onCallEnded();
-          //props.closeHandler();
-          setAllUserParticipantsLeft(true);
+      const find = participants.filter((p) => p.userId === userId);
+      if(find) {
+        const newParticipants = participants.filter((p) => p.userId !== userId);
+
+        if (newParticipants.length === 0 && isDirectCall) {
           //setStep(Steps.SESSION_ENDED);
+          onCallEnded();
+          props.closeHandler();
+        } else {
+          setParticipants(newParticipants);
+          if (newParticipants.length === 0) {
+            //onCallEnded();
+            //props.closeHandler();
+            setAllUserParticipantsLeft(true);
+            //setStep(Steps.SESSION_ENDED);
 
-          get(
-            `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,
-            (response) => {
-            },
-            (e) => {
-            },
-            '',
-            true
-          );
+            get(
+              `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,
+              (response) => {
+              },
+              (e) => {
+              },
+              '',
+              true
+            );
+          }
         }
       }
     }
@@ -877,7 +885,7 @@ const MeetingRoom = (props) => {
       MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD,
       MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT, MessageType.SYSTEM_ALERT);
 
-    appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT);
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT, SystemEventType.PEER_DISCONNECT);
     return () => {
       //endCall(false);
       socketManager.removeSubscriptions(eventHandler);
