@@ -81,11 +81,17 @@ export class Stream {
     if (socketManager) {
       console.log("REPLACING PEER TRACKS");
       socketManager.userPeerMap.forEach((peerObj) => {
-        peerObj.peer.replaceTrack(
-          this.getAudioTracks()[0],
-          newAudioTrack,
-          this.obj
-        );
+        if(peerObj.peer.connected) {
+          try{
+            peerObj.peer.replaceTrack(
+              this.getAudioTracks()[0],
+              newAudioTrack,
+              this.obj
+            );
+          } catch (e) {
+            console.log(e);
+          }
+        }
       });
     }
   }
@@ -162,11 +168,17 @@ export class Stream {
 
     if (socketManager) {
       socketManager.userPeerMap.forEach((peerObj) => {
-        peerObj.peer.replaceTrack(
-          this.getVideoTracks()[0],
-          this.videoTrack,
-          this.obj
-        );
+        if(peerObj.peer.connected) {
+          try{
+            peerObj.peer.replaceTrack(
+              this.getVideoTracks()[0],
+              this.videoTrack,
+              this.obj
+            );
+          } catch (e) {
+            console.log(e);
+          }
+        }
       });
     }
   }
