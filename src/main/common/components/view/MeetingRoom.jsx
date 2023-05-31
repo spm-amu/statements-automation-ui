@@ -346,7 +346,7 @@ const MeetingRoom = (props) => {
       console.log(find);
 
       if (find) {
-        socketManager.removeFromUserToPeerMap(user.socketId);
+        socketManager.removeFromUserToPeerMap(userId);
         const newParticipants = participants.filter((p) => p.userId !== userId);
 
         if (newParticipants.length === 0 && isDirectCall) {
@@ -1097,7 +1097,6 @@ const MeetingRoom = (props) => {
     }
 
     closeStreams();
-    console.log('456');
     props.onEndCall(isDirectCall, showMessage);
   };
 
@@ -1115,7 +1114,6 @@ const MeetingRoom = (props) => {
     socketManager.disconnectSocket();
     socketManager.init();
     //if ((isHost && !isDirectCall) || (step !== Steps.SESSION)) {
-    console.log('123');
     props.onEndCall(isDirectCall, showMessage);
     props.closeHandler();
     /*} else {

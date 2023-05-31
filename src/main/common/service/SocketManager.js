@@ -260,12 +260,16 @@ class SocketManager {
 
   // TODO : Change this method to take userId
   removeFromUserToPeerMap = (id) => {
-    this.destroyPeer(id);
-    let filtered = this.userPeerMap.filter((item) => item.user.socketId !== id);
-    this.userPeerMap.splice(0, this.userPeerMap.length);
+    let find = this.userPeerMap.find((item) => item.user.userId === id);
 
-    for (const filteredElement of filtered) {
-      this.userPeerMap.push(filteredElement);
+    if(find) {
+      this.destroyPeer(find.socketId);
+      let filtered = this.userPeerMap.filter((item) => item.user.userId !== id);
+      this.userPeerMap.splice(0, this.userPeerMap.length);
+
+      for (const filteredElement of filtered) {
+        this.userPeerMap.push(filteredElement);
+      }
     }
   };
 
@@ -293,8 +297,11 @@ class SocketManager {
     };
 
     peer.on('close', () => {
-      console.log("\n\nPEER CLOSE : ");
+      console.log("\n\n\nPEER CLOSE : ");
       console.log(payload);
+      appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
+        payload: payload
+      });
     });
 
     peer.on("error", (err) => {
