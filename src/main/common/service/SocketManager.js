@@ -292,7 +292,6 @@ class SocketManager {
       user: payload
     };
 
-
     peer.on('close', () => {
       console.log("\n\nPEER CLOSE : ");
       console.log(payload);
