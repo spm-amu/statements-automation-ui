@@ -263,7 +263,7 @@ class SocketManager {
     let find = this.userPeerMap.find((item) => item.user.userId === id);
 
     if(find) {
-      this.destroyPeer(find.socketId);
+      //this.destroyPeer(find.socketId);
       let filtered = this.userPeerMap.filter((item) => item.user.userId !== id);
       this.userPeerMap.splice(0, this.userPeerMap.length);
 
