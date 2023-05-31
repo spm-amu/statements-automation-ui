@@ -215,6 +215,7 @@ const MeetingRoom = (props) => {
             be.payload.meetingId = selectedMeeting.id;
             if(be.payload.userId === someoneSharing) {
               setSomeoneSharing(null);
+              setMeetingParticipantGridMode('DEFAULT');
             }
 
             console.log("\n\nPEER_DISCONNECT calling remove user");
