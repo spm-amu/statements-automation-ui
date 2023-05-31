@@ -91,7 +91,6 @@ const MeetingRoom = (props) => {
   const [autoPermit, setAutoPermit] = useState(false);
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
   const [videoDisabled, setVideoDisabled] = useState(null);
   const [screenSources, setScreenSources] = useState();
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
@@ -115,6 +114,7 @@ const MeetingRoom = (props) => {
   const shareScreenRef = useRef();
   const recordRef = useRef();
   const isRecordingRef = useRef(false);
+  const mediaRecorder = useRef(null);
   const tmpVideoTrack = useRef();
   const onloadScreenShareData = useRef(null);
 
@@ -233,13 +233,13 @@ const MeetingRoom = (props) => {
   };
 
   const recordMeeting = () => {
-    if (mediaRecorder != null) {
+    if (mediaRecorder.current != null) {
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
         roomID: selectedMeeting.id,
         isRecording: true
       }).then((data) => {
         currentRecordingId.current = data.id;
-        mediaRecorder.start(60000);
+        mediaRecorder.current.start(60000);
 
         setIsRecording(true);
         isRecordingRef.current = true;
@@ -290,8 +290,8 @@ const MeetingRoom = (props) => {
   };
 
   const stopRecordingMeeting = () => {
-    if (mediaRecorder != null) {
-      mediaRecorder.stop();
+    if (mediaRecorder.current != null) {
+      mediaRecorder.current.stop();
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
         roomID: selectedMeeting.id,
         isRecording: false
@@ -909,15 +909,15 @@ const MeetingRoom = (props) => {
 
     appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT, SystemEventType.PEER_DISCONNECT);
     return () => {
+      if(isRecordingRef.current) {
+        stopRecordingMeeting();
+      }
+
       //endCall(false);
       socketManager.removeSubscriptions(eventHandler);
       appManager.removeSubscriptions(systemEventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
       appManager.remove('CURRENT_MEETING');
-
-      if(isRecording) {
-        stopRecordingMeeting();
-      }
     };
   }, []);
 
@@ -958,7 +958,7 @@ const MeetingRoom = (props) => {
     currentUserStream.init(!videoMuted, true, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
       createMediaRecorder().then((recorder) => {
-        setMediaRecorder(recorder);
+        mediaRecorder.current = recorder;
         setVideoDisabled(videoDisabled);
       })
     }, (e) => {
