@@ -465,7 +465,7 @@ const MeetingRoom = (props) => {
           .then((data) => {
             console.log("===== SAVE RECORDING SUCCESS ======");
             if(!isRecordingRef.current) {
-              console.log("======= STOPPING RECORDING =======")
+              console.log("======= STOPPING RECORDING =======");
               const data = {
                 meetingId: selectedMeeting.id,
                 name: selectedMeeting.title,
@@ -914,6 +914,10 @@ const MeetingRoom = (props) => {
       appManager.removeSubscriptions(systemEventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
       appManager.remove('CURRENT_MEETING');
+
+      if(isRecording) {
+        stopRecordingMeeting();
+      }
     };
   }, []);
 
