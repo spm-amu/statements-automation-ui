@@ -114,6 +114,7 @@ const MeetingRoom = (props) => {
   const currentRecordingId = useRef(null);
   const shareScreenRef = useRef();
   const recordRef = useRef();
+  const isRecordingRef = useRef(false);
   const tmpVideoTrack = useRef();
   const onloadScreenShareData = useRef(null);
 
@@ -241,6 +242,7 @@ const MeetingRoom = (props) => {
         mediaRecorder.start(60000);
 
         setIsRecording(true);
+        isRecordingRef.current = true;
         emitSystemEvent("MEETING_RECORDING", {
           recording: true,
           userId: appManager.getUserDetails().userId
@@ -297,6 +299,7 @@ const MeetingRoom = (props) => {
       });
 
       setIsRecording(false);
+      isRecordingRef.current = false;
 
       emitSystemEvent("MEETING_RECORDING", {
         recording: false,
@@ -461,7 +464,8 @@ const MeetingRoom = (props) => {
         socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
           .then((data) => {
             console.log("===== SAVE RECORDING SUCCESS ======");
-            if(!currentRecordingId.current) {
+            if(!isRecordingRef.current) {
+              console.log("======= STOPPING RECORDING =======")
               const data = {
                 meetingId: selectedMeeting.id,
                 name: selectedMeeting.title,
@@ -474,6 +478,13 @@ const MeetingRoom = (props) => {
               socketManager.emitEvent(MessageType.STOP_RECORDING, data)
                 .catch((error) => {
                 });
+
+              currentRecordingId.current = null;
+              setIsRecording(false);
+              recordingSequence.current = 0;
+              recordingSize.current = 0;
+              recordingType.current = '';
+
             }
           })
           .catch((error) => {
@@ -488,11 +499,7 @@ const MeetingRoom = (props) => {
   };
 
   const handleStopRecording = (e) => {
-    currentRecordingId.current = null;
-    setIsRecording(false);
-    recordingSequence.current = 0;
-    recordingSize.current = 0;
-    recordingType.current = '';
+    isRecordingRef.current = false;
   };
 
   const changeHost = (participant) => {
