@@ -339,7 +339,7 @@ const MeetingRoom = (props) => {
       const userId = user.userId;
 
       const find = participants.filter((p) => p.userId === userId);
-      if(find) {
+      if (find) {
         const newParticipants = participants.filter((p) => p.userId !== userId);
 
         if (newParticipants.length === 0 && isDirectCall) {
@@ -411,8 +411,8 @@ const MeetingRoom = (props) => {
     tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
-      if(peerObj.peer.connected) {
-        try{
+      if (peerObj.peer.connected) {
+        try {
           peerObj.peer.replaceTrack(
             currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
             stream.getVideoTracks()[0], // current video track - screen track
@@ -464,7 +464,7 @@ const MeetingRoom = (props) => {
         socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
           .then((data) => {
             console.log("===== SAVE RECORDING SUCCESS ======");
-            if(!isRecordingRef.current) {
+            if (!isRecordingRef.current) {
               console.log("======= STOPPING RECORDING =======");
               const data = {
                 meetingId: selectedMeeting.id,
@@ -534,8 +534,8 @@ const MeetingRoom = (props) => {
     setMeetingParticipantGridMode('DEFAULT');
 
     socketManager.userPeerMap.forEach((peerObj) => {
-      if(peerObj.peer.connected) {
-        try{
+      if (peerObj.peer.connected) {
+        try {
           peerObj.peer.replaceTrack(
             currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
             tmpVideoTrack.current, // current video track - screen track
@@ -718,22 +718,20 @@ const MeetingRoom = (props) => {
         }
 
         if (screenShared) {
-          if(item.peer.connected) {
-            try {
-              item.peer.replaceTrack(
-                currentUserStream.shareScreenObj.getVideoTracks()[0],
-                shareScreenRef.current.srcObject.getVideoTracks()[0],
-                currentUserStream.shareScreenObj
-              );
+          try {
+            item.peer.replaceTrack(
+              currentUserStream.shareScreenObj.getVideoTracks()[0],
+              shareScreenRef.current.srcObject.getVideoTracks()[0],
+              currentUserStream.shareScreenObj
+            );
 
-              emitSystemEvent("SHARE_SCREEN", {
-                shared: screenShared,
-                userId: appManager.getUserDetails().userId,
-                userJoining: true
-              }, [payload.userId]);
-            } catch (e) {
-              console.log(e);
-            }
+            emitSystemEvent("SHARE_SCREEN", {
+              shared: screenShared,
+              userId: appManager.getUserDetails().userId,
+              userJoining: true
+            }, [payload.userId]);
+          } catch (e) {
+            console.log(e);
           }
         }
 
@@ -909,7 +907,7 @@ const MeetingRoom = (props) => {
 
     appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT, SystemEventType.PEER_DISCONNECT);
     return () => {
-      if(isRecordingRef.current) {
+      if (isRecordingRef.current) {
         stopRecordingMeeting();
       }
 
@@ -1253,8 +1251,8 @@ const MeetingRoom = (props) => {
   const handleEndCall = async () => {
     if (screenShared) {
       socketManager.userPeerMap.forEach((peerObj) => {
-        if(peerObj.peer.connected) {
-          try{
+        if (peerObj.peer.connected) {
+          try {
             peerObj.peer.replaceTrack(
               currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
               tmpVideoTrack.current, // current video track - screen track
