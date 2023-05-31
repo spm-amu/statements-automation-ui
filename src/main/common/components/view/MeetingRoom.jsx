@@ -1078,8 +1078,8 @@ const MeetingRoom = (props) => {
       participant.videoMuted = payload.videoMuted;
     }
 
-    //setParticipants([].concat(participants));
-    appManager.fireEvent(SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED, payload);
+    setParticipants([].concat(participants));
+    //appManager.fireEvent(SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED, payload);
   };
 
   const onLowerHand = (payload) => {

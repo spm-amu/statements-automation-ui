@@ -591,7 +591,7 @@ const BasicBusinessAppDashboard = (props) => {
       loadHost("http://localhost:8080/vc", "http:"http://ARMHOVC01/vc", "http://ARMHOVC01", false//localhost:8000");
     }*/
 
-    loadHost("http://ARMHOVC01/vc", "http://ARMHOVC01", false);
+    loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za", false);
   }, []);
 
   React.useEffect(() => {
