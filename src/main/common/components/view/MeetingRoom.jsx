@@ -217,6 +217,7 @@ const MeetingRoom = (props) => {
               setSomeoneSharing(null);
               setMeetingParticipantGridMode('DEFAULT');
               setScreenShared(false);
+              shareScreenSource.current = null;
             }
 
             console.log("\n\nPEER_DISCONNECT calling remove user");
