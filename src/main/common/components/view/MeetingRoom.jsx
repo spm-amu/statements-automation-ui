@@ -142,6 +142,7 @@ const MeetingRoom = (props) => {
             socketManager.signal(be.payload);
             break;
           case MessageType.USER_LEFT:
+            console.log("\n\nUSER_LEFT calling remove user");
             removeUser(be.payload);
             break;
           case MessageType.CALL_ENDED:
@@ -212,6 +213,7 @@ const MeetingRoom = (props) => {
             break;
           case SystemEventType.PEER_DISCONNECT:
             be.payload.meetingId = selectedMeeting.id;
+            console.log("\n\nPEER_DISCONNECT calling remove user");
             removeUser(be.payload);
             break;
         }

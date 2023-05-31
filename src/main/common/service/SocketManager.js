@@ -242,10 +242,6 @@ class SocketManager {
       });
     });
 
-    peer.on('error', (err) => {
-      console.log("PEER ERROR - " + err);
-    });
-
     return peer;
   };
 
@@ -298,13 +294,12 @@ class SocketManager {
 
 
     peer.on('close', () => {
-      appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
-        payload: payload
-      });
+      console.log("\n\nPEER CLOSE : ");
+      console.log(payload);
     });
 
     peer.on("error", (err) => {
-      console.log("PEER ERROR : ");
+      console.log("\n\n\nPEER ERROR : ");
       console.log(err);
       console.log(JSON.stringify(err));
       if(err.code === 'ERR_CONNECTION_FAILURE') {
