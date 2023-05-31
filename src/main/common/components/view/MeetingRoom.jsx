@@ -87,7 +87,7 @@ const MeetingRoom = (props) => {
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [handRaised, setHandRaised] = useState(false);
   const [screenShared, setScreenShared] = useState(null);
-  const [someoneSharing, setSomeoneSharing] = useState(false);
+  const [someoneSharing, setSomeoneSharing] = useState(null);
   const [autoPermit, setAutoPermit] = useState(false);
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -213,6 +213,10 @@ const MeetingRoom = (props) => {
             break;
           case SystemEventType.PEER_DISCONNECT:
             be.payload.meetingId = selectedMeeting.id;
+            if(be.payload.userId === someoneSharing) {
+              setSomeoneSharing(null);
+            }
+
             console.log("\n\nPEER_DISCONNECT calling remove user");
             removeUser(be.payload);
             break;
@@ -386,11 +390,11 @@ const MeetingRoom = (props) => {
           });
 
           shareScreenRef.current.srcObject = participant.shareStream;
-          setSomeoneSharing(true);
+          setSomeoneSharing(payload.data.userId);
           setMeetingParticipantGridMode('STRIP');
         } else {
           shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
-          setSomeoneSharing(false);
+          setSomeoneSharing(null);
           setMeetingParticipantGridMode('DEFAULT');
         }
       } else if (payload.data.userJoining) {
@@ -706,7 +710,7 @@ const MeetingRoom = (props) => {
     console.log("CHECK SCREEN SHARE ONLOAD");
     if (onloadScreenShareData.current && onloadScreenShareData.current.userId === item.user.userId) {
       shareScreenRef.current.srcObject = item.shareStream;
-      setSomeoneSharing(true);
+      setSomeoneSharing(onloadScreenShareData.current.userId);
       setMeetingParticipantGridMode('STRIP');
 
       onloadScreenShareData.current = null;
@@ -1519,7 +1523,7 @@ const MeetingRoom = (props) => {
                   isRecording={isRecording}
                   displayState={displayState}
                   screenShared={screenShared}
-                  someoneSharing={someoneSharing}
+                  someoneSharing={someoneSharing !== null}
                   whiteBoardShown={showWhiteBoard}
                   isHost={isHost}
                   step={step}
