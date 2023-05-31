@@ -360,7 +360,7 @@ const MeetingRoom = (props) => {
           props.closeHandler();
         } else {
           setParticipants(newParticipants);
-          if (newParticipants.length === 0) {
+          if (newParticipants.length === 0 && step !== Steps.CONNECTION_ERROR) {
             //onCallEnded();
             //props.closeHandler();
             setAllUserParticipantsLeft(true);
