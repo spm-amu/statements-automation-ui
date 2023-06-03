@@ -71,7 +71,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
         props.onClosePeopleDialogHandler();
       }
     }
-  }
+  };
 
   return (
     <div className="person-card">

@@ -580,7 +580,11 @@ const ChatRoom = (props) => {
             <div className="mychat">
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
               <Linkify key={index} options={{ render: renderLink }}>
-                <p key={index}>{message.content}</p>
+                <div key={index} style={{marginBottom: '4px'}}>
+                  {message.content.split('\n').map((token, index) => {
+                    return <>{token}<br/></>
+                  })}
+                </div>
               </Linkify>
             </div>
           </div>
@@ -596,7 +600,11 @@ const ChatRoom = (props) => {
               <span>{message.participant.name}</span>
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
               <Linkify key={index} options={{ render: renderLink }}>
-                <p key={index}>{message.content}</p>
+                <div key={index} style={{marginBottom: '4px'}}>
+                  {message.content.split('\n').map((token, index) => {
+                    return <>{token}<br/></>
+                  })}
+                </div>
               </Linkify>
             </div>
           </div>
