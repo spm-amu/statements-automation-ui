@@ -25,7 +25,7 @@ const MeetingParticipant = (props) => {
       on: (eventType, be) => {
         switch (eventType) {
           case SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED:
-            onAVSettingsChange(be.payload);
+            onAVSettingsChange(be);
             break;
         }
       }
