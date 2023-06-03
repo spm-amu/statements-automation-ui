@@ -1095,7 +1095,7 @@ const MeetingRoom = (props) => {
     }
 
     //setParticipants([].concat(participants));
-    //appManager.fireEvent(SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED, payload);
+    appManager.fireEvent(SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED, payload);
   };
 
   const onLowerHand = (payload) => {
