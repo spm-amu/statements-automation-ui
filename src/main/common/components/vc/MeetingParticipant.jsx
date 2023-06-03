@@ -1,16 +1,47 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './MeetingParticipant.css'
 import Utils from '../../Utils';
 import Icon from '../Icon';
 import {PanTool} from '@material-ui/icons';
 import IconButton from "@material-ui/core/IconButton";
+import {MessageType, SystemEventType} from "../../types";
+import appManager from "../../../common/service/AppManager";
 
 const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
+  const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
+  const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
+  const [systemEventHandler] = useState({});
 
   const videoRef = useRef();
   const showVideo = true;
+
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'meeting-participant-' + props.data.userId;
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED:
+            onAVSettingsChange(be.payload);
+            break;
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    systemEventHandler.api = systemEventHandlerApi();
+  });
+
+  const onAVSettingsChange = (payload) => {
+    if (props.data.userId === payload.userId) {
+      setAudioMuted(payload.audioMuted);
+      setVideoMuted(payload.videoMuted);
+    }
+  };
 
   useEffect( () => {
     if (props.data.peer) {
@@ -30,6 +61,14 @@ const MeetingParticipant = (props) => {
       videoRef.current.srcObject = props.userStream;
     }
   }, [props.data]);
+
+  useEffect(() => {
+    appManager.removeSubscriptions(systemEventHandler);
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
+    return () => {
+      appManager.removeSubscriptions(systemEventHandler);
+    };
+  }, []);
 
   useEffect(() => {
     if (props.participantsRaisedHands) {
@@ -70,7 +109,7 @@ const MeetingParticipant = (props) => {
           showVideo ?
             <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
               {
-                props.videoMuted &&
+                videoMuted &&
                 <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
                   <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
                        style={
@@ -84,17 +123,17 @@ const MeetingParticipant = (props) => {
                 </div>
               }
               {
-                props.audioMuted || props.data.peer === null ?
+                audioMuted || props.data.peer === null ?
                   <video
                     id={props.data.userId}
-                    hidden={props.videoMuted}
+                    hidden={videoMuted}
                     muted playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
                   />
                   :
                   <video
                     id={props.data.userId}
-                    hidden={props.videoMuted}
+                    hidden={videoMuted}
                     playsInline autoPlay ref={videoRef}
                     style={{width: '100%', height: '100%'}}
                   />
@@ -106,7 +145,7 @@ const MeetingParticipant = (props) => {
                   props.showName &&
                   <span style={{marginLeft: '4px'}}>
                     {
-                      props.isHost && !props.audioMuted ?
+                      props.isHost && !audioMuted ?
                         <IconButton
                           onClick={(e) => {
                             props.onHostAudioMute(props.data)
@@ -122,7 +161,7 @@ const MeetingParticipant = (props) => {
                         </IconButton>
                         :
                         <>
-                          {props.audioMuted ? (
+                          {audioMuted ? (
                             <Icon id={'MIC_OFF'}/>
                           ) : (
                             <Icon id={'MIC'}/>
@@ -130,7 +169,7 @@ const MeetingParticipant = (props) => {
                         </>
                     }
                     {
-                      props.isHost && !props.videoMuted &&
+                      props.isHost && !videoMuted &&
                       <IconButton
                         onClick={(e) => {
                           props.onHostVideoMute(props.data)
