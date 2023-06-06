@@ -1198,7 +1198,7 @@ const MeetingRoom = (props) => {
   }, [videoMuted]);
 
   const handleMessageArrived = (event) => {
-    if (event.message && event.message.length > 0) {
+    if (step === Steps.SESSION && event.message && event.message.length > 0) {
       setActivityMessage(event.message);
       const messageTimeout = setTimeout(() => {
         setActivityMessage(null);
