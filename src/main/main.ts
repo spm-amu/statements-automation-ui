@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import {app, BrowserWindow, desktopCapturer, ipcMain, screen, shell, systemPreferences} from 'electron';
+import {app, dialog, BrowserWindow, desktopCapturer, ipcMain, screen, shell, systemPreferences} from 'electron';
 import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -18,14 +18,29 @@ import Store from "electron-store";
 
 const store = new Store();
 
-class AppUpdater {
-  constructor() {
-    log.transports.file.resolvePath = () => path.join('/Users/nsovongobeni/Work/Armscore/ui', '/logsmain.log');
-    log.transports.file.level = 'debug';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
+// class AppUpdater {
+//   constructor() {
+//     log.transports.file.resolvePath = () => path.join('/Users/nsovongobeni/Work/Armscore/ui', '/logsmain.log');
+//     log.transports.file.level = 'debug';
+//     autoUpdater.logger = log;
+//     autoUpdater.checkForUpdatesAndNotify();
+//   }
+// }
+
+autoUpdater.on('update-downloaded', (info) => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Restart', 'Update'],
+    title: 'Application Update',
+    detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+  };
+
+  dialog.showMessageBox(dialogOpts, (response: number) => {
+    if (response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+});
 
 let mainWindow: BrowserWindow | null = null;
 let inComingCallWindow: BrowserWindow | null = null;
@@ -562,6 +577,10 @@ app
     createDialWindow();
     createAlertWindow();
     createMessageWindow();
+
+    if (process.platform !== "darwin") {
+      autoUpdater.checkForUpdates()
+    }
 
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
