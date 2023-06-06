@@ -74,7 +74,7 @@ const MeetingParticipant = (props) => {
   }, [props.videoMuted]);
 
   useEffect(() => {
-    setVideoMuted(props.audioMuted);
+    setAudioMuted(props.audioMuted);
   }, [props.audioMuted]);
 
   const onAVSettingsChange = (payload) => {
