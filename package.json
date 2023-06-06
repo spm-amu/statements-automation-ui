@@ -14,6 +14,7 @@
   "homepage": "",
   "license": "MIT",
   "main": "./src/main/main.ts",
+  "version": "4.0.0",
   "scripts": {
     "web:dev": "cross-env TARGET=web NODE_ENV=development webpack-dev-server --hot --open --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -263,7 +264,8 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "verifyUpdateCodeSignature": false
     },
     "linux": {
       "target": [
@@ -280,7 +282,8 @@
       "./assets/**"
     ],
     "publish": {
-      "provider": "github",
+      "provider": "generic",
+      "url": "https://gitlab.com",
       "owner": "",
       "repo": ""
     }
