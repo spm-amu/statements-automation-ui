@@ -18,16 +18,47 @@ import Store from "electron-store";
 
 const store = new Store();
 
-// class AppUpdater {
-//   constructor() {
-//     log.transports.file.resolvePath = () => path.join('/Users/nsovongobeni/Work/Armscore/ui', '/logsmain.log');
-//     log.transports.file.level = 'debug';
-//     autoUpdater.logger = log;
-//     autoUpdater.checkForUpdatesAndNotify();
-//   }
-// }
+autoUpdater.autoDownload = true;
 
-autoUpdater.on('update-downloaded', (info) => {
+autoUpdater.setFeedURL({
+  provider: "generic",
+  url: "http://localhost:5020/"
+});
+
+autoUpdater.on('checking-for-update', function () {
+  sendStatusToWindow('Checking for update...');
+});
+
+autoUpdater.on('update-available', function (info) {
+  sendStatusToWindow('Update available.');
+  console.log("info: ", info);
+});
+
+autoUpdater.on('update-not-available', function (info) {
+  sendStatusToWindow('Update not available.');
+  console.log("info: ", info);
+});
+
+autoUpdater.on('error', function (err) {
+  sendStatusToWindow('Error in auto-updater.');
+  console.log("error: ", err);
+});
+
+autoUpdater.on('download-progress', function (progressObj) {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + parseInt(progressObj.percent) + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  sendStatusToWindow(log_message);
+});
+
+autoUpdater.on('update-downloaded', function (info) {
+  sendStatusToWindow('Update downloaded; will install in 1 seconds');
+  console.log("info: ", info);
+});
+
+autoUpdater.on('update-downloaded', function (info) {
+  console.log("info: ", info);
+
   const dialogOpts = {
     type: 'info',
     buttons: ['Restart', 'Update'],
@@ -41,6 +72,21 @@ autoUpdater.on('update-downloaded', (info) => {
     }
   });
 });
+
+// autoUpdater.checkForUpdates();
+
+function sendStatusToWindow(message: string) {
+  console.log(message);
+}
+
+class AppUpdater {
+  constructor() {
+    log.transports.file.resolvePath = () => path.join('/Users/nsovongobeni/Work/Armscore/ui', '/logsmain.log');
+    log.transports.file.level = 'debug';
+    autoUpdater.logger = log;
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+}
 
 let mainWindow: BrowserWindow | null = null;
 let inComingCallWindow: BrowserWindow | null = null;
@@ -578,9 +624,9 @@ app
     createAlertWindow();
     createMessageWindow();
 
-    if (process.platform !== "darwin") {
-      autoUpdater.checkForUpdates()
-    }
+    console.log("READY******")
+
+    autoUpdater.checkForUpdates();
 
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
