@@ -20,13 +20,23 @@ const store = new Store();
 
 autoUpdater.autoDownload = true;
 
-autoUpdater.setFeedURL({
-  provider: "generic",
-  url: "http://localhost:5020/"
-});
+const server = 'http://localhost:8080'
+const url = `${server}/update/${process.platform}/${app.getVersion()}`
+
+autoUpdater.setFeedURL({url})
+
+setInterval(() => {
+  autoUpdater.checkForUpdates()
+}, 60000);
+
+// autoUpdater.setFeedURL({
+//   provider: "generic",
+//   url: "http://localhost:5020/"
+// });
 
 autoUpdater.on('checking-for-update', function () {
   sendStatusToWindow('Checking for update...');
+  sendStatusToWindow(app.getVersion());
 });
 
 autoUpdater.on('update-available', function (info) {

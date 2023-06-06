@@ -280,6 +280,8 @@
       "./assets/**"
     ],
     "publish": {
+      "provider": "generic",
+      "url": "https://localhost:8080",
       "owner": "",
       "repo": ""
     }
