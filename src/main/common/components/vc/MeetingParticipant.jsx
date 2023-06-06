@@ -7,15 +7,47 @@ import {PanTool} from '@material-ui/icons';
 import IconButton from "@material-ui/core/IconButton";
 import {MessageType, SystemEventType} from "../../types";
 import appManager from "../../../common/service/AppManager";
+import socketManager from "../../service/SocketManager";
 
 const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
+  const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
 
   const videoRef = useRef();
   const showVideo = true;
+
+  const handler = () => {
+    return {
+      get id() {
+        return 'meeting-participant-' + props.data.userId;
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case MessageType.RAISE_HAND:
+            onRaiseHand(be.payload);
+            break;
+          case MessageType.LOWER_HAND:
+            onLowerHand(be.payload);
+            break;
+        }
+      }
+    }
+  };
+
+  const onRaiseHand = (payload) => {
+    if(payload && payload.userId === props.data.userId) {
+      setHandRaised(true);
+    }
+  };
+
+  const onLowerHand = (payload) => {
+    if(payload && payload.userId === props.data.userId) {
+      setHandRaised(false);
+    }
+  };
 
   const systemEventHandlerApi = () => {
     return {
@@ -33,6 +65,7 @@ const MeetingParticipant = (props) => {
   };
 
   useEffect(() => {
+    eventHandler.api = handler();
     systemEventHandler.api = systemEventHandlerApi();
   });
 
@@ -65,21 +98,13 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
+    socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
+
     return () => {
       appManager.removeSubscriptions(systemEventHandler);
+      socketManager.removeSubscriptions(eventHandler);
     };
   }, []);
-
-  useEffect(() => {
-    if (props.participantsRaisedHands) {
-      let raisedHandParticipants = props.participantsRaisedHands.find((user => user.userId === props.data.userId));
-      if (raisedHandParticipants) {
-        setHandRaised(true);
-      } else {
-        setHandRaised(false);
-      }
-    }
-  }, [props.participantsRaisedHands]);
 
   useEffect(() => {
     if (props.refChangeHandler) {

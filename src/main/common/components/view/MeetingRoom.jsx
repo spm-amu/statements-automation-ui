@@ -1448,7 +1448,6 @@ const MeetingRoom = (props) => {
                                                       step={step}
                                                       isHost={isHost}
                                                       autoPermit={autoPermit}
-                                                      participantsRaisedHands={participantsRaisedHands}
                                                       allUserParticipantsLeft={allUserParticipantsLeft}
                                                       userVideoChangeHandler={(ref) => setUserVideo(ref)}
                                                       onHostAudioMute={(participant) => {
