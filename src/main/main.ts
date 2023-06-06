@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import {app, BrowserWindow, desktopCapturer, ipcMain, screen, shell, systemPreferences} from 'electron';
+import {app, dialog, BrowserWindow, desktopCapturer, ipcMain, screen, shell, systemPreferences} from 'electron';
 import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -17,6 +17,77 @@ import {resolveHtmlPath, resolveWindowHtmlPath} from './util';
 import Store from "electron-store";
 
 const store = new Store();
+
+autoUpdater.autoDownload = true;
+
+const server = 'http://localhost:8080'
+const url = `${server}/update/${process.platform}/${app.getVersion()}`
+
+autoUpdater.setFeedURL({url})
+
+setInterval(() => {
+  autoUpdater.checkForUpdates()
+}, 60000);
+
+// autoUpdater.setFeedURL({
+//   provider: "generic",
+//   url: "http://localhost:5020/"
+// });
+
+autoUpdater.on('checking-for-update', function () {
+  sendStatusToWindow('Checking for update...');
+  sendStatusToWindow(app.getVersion());
+});
+
+autoUpdater.on('update-available', function (info) {
+  sendStatusToWindow('Update available.');
+  console.log("info: ", info);
+});
+
+autoUpdater.on('update-not-available', function (info) {
+  sendStatusToWindow('Update not available.');
+  console.log("info: ", info);
+});
+
+autoUpdater.on('error', function (err) {
+  sendStatusToWindow('Error in auto-updater.');
+  console.log("error: ", err);
+});
+
+autoUpdater.on('download-progress', function (progressObj) {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + parseInt(progressObj.percent) + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  sendStatusToWindow(log_message);
+});
+
+autoUpdater.on('update-downloaded', function (info) {
+  sendStatusToWindow('Update downloaded; will install in 1 seconds');
+  console.log("info: ", info);
+});
+
+autoUpdater.on('update-downloaded', function (info) {
+  console.log("info: ", info);
+
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Restart', 'Update'],
+    title: 'Application Update',
+    detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+  };
+
+  dialog.showMessageBox(dialogOpts, (response: number) => {
+    if (response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+});
+
+// autoUpdater.checkForUpdates();
+
+function sendStatusToWindow(message: string) {
+  console.log(message);
+}
 
 class AppUpdater {
   constructor() {
@@ -562,6 +633,10 @@ app
     createDialWindow();
     createAlertWindow();
     createMessageWindow();
+
+    console.log("READY******")
+
+    autoUpdater.checkForUpdates();
 
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
