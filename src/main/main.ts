@@ -23,7 +23,7 @@ autoUpdater.autoDownload = true;
 const server = 'http://localhost:8080'
 const url = `${server}/update/${process.platform}/${app.getVersion()}`
 
-autoUpdater.setFeedURL({url})
+//autoUpdater.setFeedURL({url})
 
 setInterval(() => {
   autoUpdater.checkForUpdates()

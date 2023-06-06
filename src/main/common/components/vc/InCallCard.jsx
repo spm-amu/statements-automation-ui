@@ -1,24 +1,63 @@
 import React, {useEffect, useState} from 'react';
 import './InCallCard.css';
-import { IconButton, ListItemIcon, Menu, MenuItem } from '@material-ui/core';
+import {IconButton, ListItemIcon, Menu, MenuItem} from '@material-ui/core';
 import Icon from '../Icon';
-import Button from '@material-ui/core/Button';
-import SendIcon from '@material-ui/icons/Send';
-import { Autorenew, Note, PersonAdd, Settings } from '@material-ui/icons';
+import {PersonAdd} from '@material-ui/icons';
 import Tooltip from '@material-ui/core/Tooltip';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import appManager from "../../service/AppManager";
 import Utils from '../../Utils';
+import {MessageType} from "../../types";
+import socketManager from "../../service/SocketManager";
 
 const InCall = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMoreActions = Boolean(anchorEl);
-  const {participant, raisedHands} = props;
-
+  const {participant} = props;
+  const [handRaised, setHandRaised] = React.useState(false);
+  const [eventHandler] = useState({});
   const navigate = useNavigate();
 
+  const handler = () => {
+    return {
+      get id() {
+        return 'in-call-card-' + participant.userId;
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case MessageType.RAISE_HAND:
+            onRaiseHand(be.payload);
+            break;
+          case MessageType.LOWER_HAND:
+            onLowerHand(be.payload);
+            break;
+        }
+      }
+    }
+  };
+
+  const onRaiseHand = (payload) => {
+    if(participant && payload && payload.userId === participant.userId) {
+      setHandRaised(true);
+    }
+  };
+
+  const onLowerHand = (payload) => {
+    if(participant && payload && payload.userId === participant.userId) {
+      setHandRaised(false);
+    }
+  };
+
   useEffect(() => {
-    console.log('IN CALL CARD participant: ', participant);
+    eventHandler.api = handler();
+  });
+
+  useEffect(() => {
+    socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
+
+    return () => {
+      socketManager.removeSubscriptions(eventHandler);
+    };
   }, []);
 
   const privateChatHandler = () => {
@@ -47,7 +86,7 @@ const InCall = (props) => {
     }
 
     return name;
-  }
+  };
 
   return (
     <div
@@ -89,7 +128,7 @@ const InCall = (props) => {
                 </IconButton>
               }
               {
-                appManager.getUserDetails().userId !== participant.userId && raisedHands &&
+                appManager.getUserDetails().userId !== participant.userId && handRaised &&
                 <IconButton
                   onClick={() => {
                   }}
@@ -100,7 +139,6 @@ const InCall = (props) => {
                   <Icon id={'PANTOOL'} fontSize={'small'}/>
                 </IconButton>
               }
-
               {
                 props.isHost && appManager.getUserDetails().userId !== participant.userId &&
                 <Tooltip title="More Actions">

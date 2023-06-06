@@ -77,7 +77,6 @@ const MeetingRoom = (props) => {
   const [displayState, setDisplayState] = useState(props.displayState);
   const [participants, setParticipants] = useState([]);
   const [meetingChat, setMeetingChat] = useState(null);
-  const [participantsRaisedHands, setParticipantsRaisedHands] = useState([]);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
   const [preErrorStep, setPreErrorStep] = useState('');
@@ -147,12 +146,6 @@ const MeetingRoom = (props) => {
             break;
           case MessageType.CALL_ENDED:
             onCallEnded();
-            break;
-          case MessageType.RAISE_HAND:
-            onRaiseHand(be.payload);
-            break;
-          case MessageType.LOWER_HAND:
-            onLowerHand(be.payload);
             break;
           case MessageType.AUDIO_VISUAL_SETTINGS_CHANGED:
             onAVSettingsChange(be.payload);
@@ -919,7 +912,7 @@ const MeetingRoom = (props) => {
     appManager.removeSubscriptions(systemEventHandler);
 
     socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
-      MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED, MessageType.RAISE_HAND, MessageType.LOWER_HAND,
+      MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED,
       MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD,
       MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT, MessageType.SYSTEM_ALERT);
 
@@ -1082,11 +1075,6 @@ const MeetingRoom = (props) => {
     }
   };
 
-  const onRaiseHand = (payload) => {
-    const raisedHandParticipant = participants.find(p => p.userId === payload.userId);
-    setParticipantsRaisedHands(oldParticipants => [...oldParticipants, raisedHandParticipant]);
-  };
-
   const onAVSettingsChange = (payload) => {
     let participant = participants.find((p) => p.userId === payload.userId);
     if (participant) {
@@ -1096,10 +1084,6 @@ const MeetingRoom = (props) => {
 
     //setParticipants([].concat(participants));
     appManager.fireEvent(SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED, payload);
-  };
-
-  const onLowerHand = (payload) => {
-    setParticipantsRaisedHands(participantsRaisedHands.filter((p) => p.userId !== payload.userId));
   };
 
   const endCall = (showMessage = true) => {
@@ -1471,7 +1455,7 @@ const MeetingRoom = (props) => {
                 </div>
               </div>
               <div style={{display: displayState === 'MINIMIZED' ? 'inherit' : 'none'}}>
-                <MeetingRoomSummary participants={participants} participantsRaisedHands={participantsRaisedHands}/>
+                <MeetingRoomSummary participants={participants}/>
               </div>
             </div>
           </div>
@@ -1491,7 +1475,6 @@ const MeetingRoom = (props) => {
                 isHost={isHost}
                 tab={sideBarTab}
                 meetingId={selectedMeeting.id}
-                participantsRaisedHands={participantsRaisedHands}
                 participants={participants}
                 onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
                 onAudioCallCancelHandler={(requestedUser) => cancelRequestCall(requestedUser)}
@@ -1534,7 +1517,6 @@ const MeetingRoom = (props) => {
                   isHost={isHost}
                   step={step}
                   autoPermit={autoPermit}
-                  participantsRaisedHands={participantsRaisedHands}
                   meetingTitle={selectedMeeting.title}
                   toolbarEventHandler={
                     {

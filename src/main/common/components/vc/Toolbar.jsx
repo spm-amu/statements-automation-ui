@@ -5,11 +5,13 @@ import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from '@material-ui/core/Tooltip';
 import {ListItemIcon, Menu, MenuItem} from '@material-ui/core';
-import { GroupAdd, Note, PersonAdd } from '@material-ui/icons';
+import {Note, PersonAdd} from '@material-ui/icons';
 import LottieIcon from '../LottieIcon';
-import Footer from "./Footer";
+import {MessageType} from "../../types";
+import socketManager from "../../service/SocketManager";
 
 const Toolbar = (props) => {
+  const [numberOfHandsRaised, setNumberOfHandsRaised] = useState(0);
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [isRecording, setIsRecording] = useState(false);
@@ -19,9 +21,26 @@ const Toolbar = (props) => {
   const [screenShared, setScreenShared] = useState(false);
   const [step, setStep] = useState();
 
+  const handler = () => {
+    return {
+      get id() {
+        return 'meeting-toolbar';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case MessageType.RAISE_HAND:
+            onRaiseHand(be.payload);
+            break;
+          case MessageType.LOWER_HAND:
+            onLowerHand(be.payload);
+            break;
+        }
+      }
+    }
+  };
+
   const {
     participants,
-    participantsRaisedHands,
     hasUnreadChats,
     hasUnseenWhiteboardEvent,
     whiteBoardShown,
@@ -36,6 +55,14 @@ const Toolbar = (props) => {
   useEffect(() => {
     setScreenShared(props.screenShared);
   }, [props.screenShared]);
+
+  const onRaiseHand = (payload) => {
+    setNumberOfHandsRaised(numberOfHandsRaised + 1);
+  };
+
+  const onLowerHand = (payload) => {
+    setNumberOfHandsRaised(numberOfHandsRaised - 1);
+  };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -82,6 +109,17 @@ const Toolbar = (props) => {
   useEffect(() => {
     eventHandler.onMuteAudio(audioMuted);
   }, [audioMuted]);
+
+  useEffect(() => {
+    eventHandler.api = handler();
+  });
+
+  useEffect(() => {
+    socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
+    return () => {
+      socketManager.removeSubscriptions(eventHandler);
+    };
+  }, []);
 
   const muteAudio = () => {
     setAudioMuted((prevStatus) => !prevStatus);
@@ -297,8 +335,8 @@ const Toolbar = (props) => {
               step === 'SESSION' &&
               <div>
                 {
-                  participantsRaisedHands.length > 0 &&
-                  <div className={'people-count-bubble'}>{participantsRaisedHands.length}</div>
+                  numberOfHandsRaised > 0 &&
+                  <div className={'people-count-bubble'}>{numberOfHandsRaised}</div>
                 }
                 <Tooltip title="Raise hand">
                   <IconButton

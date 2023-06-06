@@ -46,7 +46,6 @@ const MeetingRoomSideBarContent = (props) => {
     isHost,
     meetingId,
     participants,
-    participantsRaisedHands,
     meetingChat
   } = props;
 
@@ -130,7 +129,6 @@ const MeetingRoomSideBarContent = (props) => {
               onChangeMeetingHostHandler={(e) => props.onChangeMeetingHostHandler(e)}
               isHost={isHost}
               participants={participants}
-              participantsRaisedHands={participantsRaisedHands}
             /> :
             <ChatRoom chatTab={true} selectedChat={meetingChat} meetingId={meetingId}/>
         }

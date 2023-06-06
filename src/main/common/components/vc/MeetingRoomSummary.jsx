@@ -1,24 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState} from "react";
+import React from "react";
 import InCallCard from "./InCallCard";
 
 const MeetingRoomSummary = (props) => {
-
-  const [label, setLabel] = useState('');
-
-  const {participants, participantsRaisedHands} = props;
-
-  const {
-    waitingList
-  } = props;
+  const {participants} = props;
 
   return (
-    participants && participantsRaisedHands &&
+    participants &&
     <div style={{height: '100%', maxHeight: '100%', width: '100%', overflow: 'auto'}}>
       <div>
         {participants.map((participant, index) => {
-          return <InCallCard key={index} participant={participant} maxWidth={'700px'} borderBottom={'none'}
-                             raisedHands={participantsRaisedHands.filter((p) => p.userId === participant.userId).length > 0}/>
+          return <InCallCard key={index} participant={participant} maxWidth={'700px'} borderBottom={'none'}/>
         })}
       </div>
     </div>

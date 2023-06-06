@@ -8,12 +8,7 @@ import InCallCard from '../vc/InCallCard';
 const InCall = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const { participantsRaisedHands, participants } = props;
-
-  useEffect(() => {
-    console.log('IN CALL participantsRaisedHands: ', participantsRaisedHands);
-    console.log('IN CALL participants: ', participants);
-  }, [participantsRaisedHands]);
+  const {participants} = props;
 
   return (
     <div className={'w-100 h-100 people-container'}>
@@ -27,7 +22,6 @@ const InCall = (props) => {
               onChangeMeetingHostHandler={(e) => props.onChangeMeetingHostHandler(e)}
               isHost={props.isHost}
               participant={participant}
-              raisedHands={participantsRaisedHands.filter((p) => p.userId === participant.userId).length > 0}
             />
           })}
         </div>

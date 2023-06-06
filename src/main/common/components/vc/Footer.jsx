@@ -21,7 +21,6 @@ const Footer = (props) => {
     step,
     isHost,
     autoPermit,
-    participantsRaisedHands,
     someoneSharing,
     videoDisabled
   } = props;
@@ -56,7 +55,6 @@ const Footer = (props) => {
                    hasUnreadChats={hasUnreadChats}
                    hasUnseenWhiteboardEvent={hasUnseenWhiteboardEvent}
                    participants={participants}
-                   participantsRaisedHands={participantsRaisedHands}
                    handRaised={handRaised}
                    whiteBoardShown={whiteBoardShown}
                    userVideo={userVideo}
