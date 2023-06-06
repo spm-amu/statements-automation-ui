@@ -69,6 +69,14 @@ const MeetingParticipant = (props) => {
     systemEventHandler.api = systemEventHandlerApi();
   });
 
+  useEffect(() => {
+    setVideoMuted(props.videoMuted);
+  }, [props.videoMuted]);
+
+  useEffect(() => {
+    setVideoMuted(props.audioMuted);
+  }, [props.audioMuted]);
+
   const onAVSettingsChange = (payload) => {
     if (props.data.userId === payload.userId) {
       setAudioMuted(payload.audioMuted);
