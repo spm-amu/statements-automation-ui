@@ -206,12 +206,12 @@ const MeetingRoom = (props) => {
             break;
           case SystemEventType.PEER_DISCONNECT:
             be.payload.meetingId = selectedMeeting.id;
-            if(be.payload.userId === someoneSharing) {
+            if (be.payload.userId === someoneSharing) {
               setSomeoneSharing(null);
               setMeetingParticipantGridMode('DEFAULT');
             }
 
-            if(screenShared) {
+            if (screenShared) {
               setScreenShared(false);
               shareScreenSource.current = null;
               setMeetingParticipantGridMode('DEFAULT');
@@ -418,21 +418,25 @@ const MeetingRoom = (props) => {
     }
   };
 
+  async function replaceShareScreenStream(peerObj, stream) {
+    if (peerObj.peer.connected) {
+      try {
+        peerObj.peer.replaceTrack(
+          currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+          stream.getVideoTracks()[0], // current video track - screen track
+          currentUserStream.shareScreenObj
+        );
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
+
   const handleScreenShareStream = async (stream) => {
     tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
-      if (peerObj.peer.connected) {
-        try {
-          peerObj.peer.replaceTrack(
-            currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
-            stream.getVideoTracks()[0], // current video track - screen track
-            currentUserStream.shareScreenObj
-          );
-        } catch (e) {
-          console.log(e);
-        }
-      }
+      replaceShareScreenStream(peerObj, stream);
     });
 
     //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);

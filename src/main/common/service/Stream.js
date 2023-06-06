@@ -81,18 +81,22 @@ export class Stream {
     if (socketManager) {
       console.log("REPLACING PEER TRACKS");
       socketManager.userPeerMap.forEach((peerObj) => {
-        if(peerObj.peer.connected) {
-          try{
-            peerObj.peer.replaceTrack(
-              this.getAudioTracks()[0],
-              newAudioTrack,
-              this.obj
-            );
-          } catch (e) {
-            console.log(e);
-          }
-        }
+        this.replacePeerAudioTrack(peerObj, newAudioTrack);
       });
+    }
+  }
+
+  async replacePeerAudioTrack(peerObj, newAudioTrack) {
+    if (peerObj.peer.connected) {
+      try {
+        peerObj.peer.replaceTrack(
+          this.getAudioTracks()[0],
+          newAudioTrack,
+          this.obj
+        );
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
@@ -170,18 +174,22 @@ export class Stream {
 
     if (socketManager) {
       socketManager.userPeerMap.forEach((peerObj) => {
-        if(peerObj.peer.connected) {
-          try{
-            peerObj.peer.replaceTrack(
-              this.getVideoTracks()[0],
-              this.videoTrack,
-              this.obj
-            );
-          } catch (e) {
-            console.log(e);
-          }
-        }
+        this.replacePeerVideoTrack(peerObj);
       });
+    }
+  }
+
+  async replacePeerVideoTrack(peerObj) {
+    if (peerObj.peer.connected) {
+      try {
+        peerObj.peer.replaceTrack(
+          this.getVideoTracks()[0],
+          this.videoTrack,
+          this.obj
+        );
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 }
