@@ -980,6 +980,7 @@ const MeetingRoom = (props) => {
     currentUserStream.init(!videoMuted, !audioMuted, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
       soundMonitor.start(stream, async (data) => {
+        console.log(data);
         if(data.level > 0) {
           transmitAudioLevel(data);
         }
