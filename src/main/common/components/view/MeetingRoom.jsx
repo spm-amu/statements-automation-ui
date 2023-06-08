@@ -970,8 +970,8 @@ const MeetingRoom = (props) => {
 
   const transmitAudioLevel = async (data) => {
     for (const participant of participants) {
-      if(participant.peer) {
-        participant.peer.send({userId: appManager.getUserDetails().userId, data});
+      if(participant.peer && participant.peer.connected) {
+        participant.peer.send(JSON.stringify({userId: appManager.getUserDetails().userId, data}));
       }
     }
   };

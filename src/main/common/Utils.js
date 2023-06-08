@@ -293,7 +293,7 @@ export default class Utils {
         if (index < 4 && user.userId !== currentUserId) {
           name = name + user.name + ', ';
         }
-      })
+      });
 
       name = name.slice(0, charMax);
 
@@ -307,6 +307,16 @@ export default class Utils {
     }
 
     return name;
+  };
+
+  static blobToString = async (blob) => {
+    const reader = new FileReader();
+
+    reader.onload = function() {
+      console.log(reader.result);
+    };
+
+    reader.readAsText(blob);
   };
 
   static getComponentAttribute(field, attribute, defaultValue) {

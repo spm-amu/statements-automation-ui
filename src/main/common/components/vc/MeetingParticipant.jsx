@@ -5,6 +5,7 @@ import Utils from '../../Utils';
 import {MessageType, SystemEventType} from "../../types";
 import appManager from "../../../common/service/AppManager";
 import socketManager from "../../../common/service/SocketManager";
+import {Buffer} from "buffer/";
 
 const MeetingParticipant = (props) => {
   const [active, setActive] = React.useState(props.active);
@@ -88,8 +89,9 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
-      props.data.peer.on('data', (data) => {
-        console.log(JSON.stringify(data));
+      props.data.peer.on('data', data => {
+        let dataJSON = JSON.parse("" + data);
+        console.log(data);
       });
     } else {
       videoRef.current.srcObject = props.userStream;
@@ -104,6 +106,10 @@ const MeetingParticipant = (props) => {
     return () => {
       appManager.removeSubscriptions(systemEventHandler);
       socketManager.removeSubscriptions(eventHandler);
+
+      if (props.data.peer) {
+        props.data.peer.removeAllListeners('data')
+      }
     };
   }, []);
 
