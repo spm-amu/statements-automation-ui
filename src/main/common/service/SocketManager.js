@@ -238,24 +238,17 @@ class SocketManager {
   };
 
   destroyPeer = (id) => {
-    let filtered = this.userPeerMap.filter((item) => item.user.id === id);
-
-    if (filtered.length > 0) {
-      for (const filteredElement of filtered) {
-        let peerObj = filteredElement.peer;
-        if (peerObj && peerObj.connected) {
-          peerObj.destroy();
-        }
-      }
+    let find = this.userPeerMap.find((item) => item.user.id === id);
+    if (find) {
+      find.peer.destroy();
     }
   };
 
   // TODO : Change this method to take userId
   removeFromUserToPeerMap = (id) => {
     let find = this.userPeerMap.find((item) => item.user.userId === id);
-
     if(find) {
-      //this.destroyPeer(find.socketId);
+      //this.destroyPeer(id);
       let filtered = this.userPeerMap.filter((item) => item.user.userId !== id);
       this.userPeerMap.splice(0, this.userPeerMap.length);
 

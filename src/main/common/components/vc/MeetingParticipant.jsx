@@ -89,9 +89,10 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
+      console.log("\n\n\n\n\n\n\n\nADDING PEER DATA EVENT FOR : " + props.data.userId);
       props.data.peer.on('data', data => {
         let dataJSON = JSON.parse("" + data);
-        console.log(data);
+        console.log(dataJSON);
       });
     } else {
       videoRef.current.srcObject = props.userStream;
@@ -108,7 +109,7 @@ const MeetingParticipant = (props) => {
       socketManager.removeSubscriptions(eventHandler);
 
       if (props.data.peer) {
-        props.data.peer.removeAllListeners('data')
+        //props.data.peer.removeAllListeners('data')
       }
     };
   }, []);
