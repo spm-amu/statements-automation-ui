@@ -8,9 +8,9 @@ import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
 import Lobby from "./Lobby";
 
-const MAX_COLS = 3;
-const MAX_ROWS = 2;
-const MAX_TILES = 6;
+const MAX_COLS = 1;
+const MAX_ROWS = 1;
+const MAX_TILES = 1;
 
 const MeetingParticipantGrid = (props) => {
   const [participants, setParticipants] = React.useState([]);
@@ -43,16 +43,24 @@ const MeetingParticipantGrid = (props) => {
           audioMuted
         };
 
+        currentUserParticipant.active = true;
         newParticipants.push(currentUserParticipant);
       }
 
+      let i = 1;
       for (const participant of props.participants) {
         if (!participant.isCurrentUser) {
           newParticipants.push(participant);
+        } else {
+          participant.active = true;
+        }
+
+        if(i++ < MAX_TILES) {
+          participant.active = true;
         }
       }
 
-      console.log("\n\n\nPARTS : ", props.participants);
+      console.log("\n\n\nPARTS : ", newParticipants);
 
       setParticipants(newParticipants);
       let gridData = createGrid(newParticipants);
@@ -120,8 +128,9 @@ const MeetingParticipantGrid = (props) => {
                                   showName={!participant.isCurrentUser}
                                   userStream={userStream}
                                   videoMuted={participant.videoMuted}
-                                  isHost={isHost}
-                                  audioMuted={participant.audioMuted}/>
+                                  audioMuted={participant.audioMuted}
+                                  active={participant.active}
+                                  isHost={isHost}/>
             </Grid>
           })}
         </React.Fragment>
@@ -166,7 +175,8 @@ const MeetingParticipantGrid = (props) => {
                                 isHost={isHost}
                                 showName={!participant.isCurrentUser}
                                 videoMuted={participant.videoMuted}
-                                audioMuted={participant.audioMuted} sizing={'sm'}/>
+                                audioMuted={participant.audioMuted} sizing={'sm'}
+                                active={participant.active}/>
           </div>
         })}
       </div>;

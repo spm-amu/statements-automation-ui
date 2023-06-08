@@ -20,8 +20,8 @@ const store = new Store();
 
 autoUpdater.autoDownload = true;
 
-const server = 'http://localhost:8080'
-const url = `${server}/update/${process.platform}/${app.getVersion()}`
+const server = 'http://localhost:8080';
+const url = `${server}/update/${process.platform}/${app.getVersion()}`;
 
 //autoUpdater.setFeedURL({url})
 

@@ -23,6 +23,7 @@ import WhiteBoard from "../whiteboard/WhiteBoard";
 import Alert from "react-bootstrap/Alert";
 import Icon from "../Icon";
 import LottieIcon from "../LottieIcon";
+import soundMonitor from "../../service/SoundMonitor";
 
 const {electron} = window;
 
@@ -967,9 +968,19 @@ const MeetingRoom = (props) => {
     }, '', false)
   };
 
+  const transmitAudioLevel = async (data) => {
+    for (const participant of participants) {
+      participant.peer.send({userId: appManager.getUserDetails().userId, data});
+    }
+  };
+
   const setupStream = () => {
-    currentUserStream.init(!videoMuted, true, (stream, shareStream, videoDisabled) => {
+    currentUserStream.init(!videoMuted, !audioMuted, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
+      soundMonitor.start(stream, async (data) => {
+        transmitAudioLevel(data);
+      });
+
       createMediaRecorder().then((recorder) => {
         mediaRecorder.current = recorder;
         setVideoDisabled(videoDisabled);
@@ -1102,6 +1113,7 @@ const MeetingRoom = (props) => {
   const closeStreams = () => {
     hangUpAudio.play();
     currentUserStream.close();
+    soundMonitor.stop();
   };
 
   const onCallEnded = (showMessage = true) => {

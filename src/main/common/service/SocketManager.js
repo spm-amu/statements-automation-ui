@@ -182,10 +182,6 @@ class SocketManager {
       });
     });
 
-    peer.on('error', (err) => {
-      console.log("PEER ERROR - " + err);
-    });
-
     return peer;
   };
 
@@ -207,10 +203,6 @@ class SocketManager {
         audioMuted: !stream.getTracks()[1].enabled,
         videoMuted: !stream.getTracks()[0].enabled
       });
-    });
-
-    peer.on('error', (err) => {
-      console.log("PEER ERROR - " + err);
     });
 
     return peer;
@@ -297,7 +289,7 @@ class SocketManager {
     };
 
     peer.on('close', () => {
-      console.log("\n\n\nPEER CLOSE : ");
+      console.log("PEER CLOSE : ");
       console.log(payload);
       appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
         payload: payload
@@ -305,7 +297,7 @@ class SocketManager {
     });
 
     peer.on("error", (err) => {
-      console.log("\n\n\nPEER ERROR : ");
+      console.log("PEER ERROR : ");
       console.log(err);
       console.log(JSON.stringify(err));
       if(err.code === 'ERR_CONNECTION_FAILURE') {

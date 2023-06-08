@@ -5,21 +5,22 @@ export class Stream {
   init = async (video = true, audio = true, successHandler, errorhandler, retry = false, socketManager) => {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
-        audio: audio,
+        audio: true,
         video: retry ? false : {
-          width: 240,
-          height: 240,
+          width: { min: 160, ideal: 320, max: 640 },
+          height: { min: 120, ideal: 240, max: 480 },
         }
       });
 
     userMedia
       .then((stream) => {
+        stream.getAudioTracks()[0].enabled = audio;
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
             audio: true,
             video: retry ? false : {
-              width: 240,
-              height: 240,
+              width: { min: 160, ideal: 320, max: 640 },
+              height: { min: 120, ideal: 240, max: 480 },
             }
           });
 
@@ -142,8 +143,8 @@ export class Stream {
           {
             audio: true,
             video: {
-              width: 240,
-              height: 240,
+              width: { min: 160, ideal: 320, max: 640 },
+              height: { min: 120, ideal: 240, max: 480 },
             }
           });
       userMedia
