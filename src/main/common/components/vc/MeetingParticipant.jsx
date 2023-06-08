@@ -132,7 +132,10 @@ const MeetingParticipant = (props) => {
     <>
       {
         !active ?
-          <audio autoPlay muted ref={videoRef}/>
+          audioMuted || props.data.peer === null ?
+            <audio autoPlay muted ref={videoRef}/>
+            :
+            <audio autoPlay ref={videoRef}/>
           :
           <div className={'col-*-* meeting-participant-container'}
                style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null}}>
