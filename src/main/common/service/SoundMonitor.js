@@ -26,8 +26,8 @@ class SoundMonitor {
       const currentLevel = this.getLevel();
 
       callback({
-        currentVolume,
-        currentLevel
+        volume: currentVolume,
+        level: currentLevel
       })
     }, 1000);
   };
