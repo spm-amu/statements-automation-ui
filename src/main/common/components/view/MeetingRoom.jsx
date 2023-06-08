@@ -970,7 +970,9 @@ const MeetingRoom = (props) => {
 
   const transmitAudioLevel = async (data) => {
     for (const participant of participants) {
-      participant.peer.send({userId: appManager.getUserDetails().userId, data});
+      if(participant.peer) {
+        participant.peer.send({userId: appManager.getUserDetails().userId, data});
+      }
     }
   };
 
@@ -978,7 +980,9 @@ const MeetingRoom = (props) => {
     currentUserStream.init(!videoMuted, !audioMuted, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
       soundMonitor.start(stream, async (data) => {
-        transmitAudioLevel(data);
+        if(data.level > 0) {
+          transmitAudioLevel(data);
+        }
       });
 
       createMediaRecorder().then((recorder) => {
