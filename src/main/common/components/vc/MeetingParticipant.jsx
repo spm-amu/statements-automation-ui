@@ -145,7 +145,6 @@ const MeetingParticipant = (props) => {
 
   return (
     <>
-      <div style={{fontWeight: '20px', color: 'white'}}>{soundLevel}</div>
       {
         !active ?
           audioMuted || props.data.peer === null ?
@@ -163,19 +162,16 @@ const MeetingParticipant = (props) => {
                       videoMuted &&
                       <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
                         {
-                          soundLevel > 0 ?
-                            <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
-                                 style={
-                                   {
-                                     width: props.sizing === 'sm' ? '52px' : null,
-                                     height: props.sizing === 'sm' ? '52px' : null,
-                                     fontSize: props.sizing === 'sm' ? '14px' : null,
-                                     marginBottom: props.sizing === 'sm' ? '16px' : null,
-                                     border: '3px solid red'
-                                   }
-                                 }/>
-                            :
-                            null
+                          <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
+                               style={
+                                 {
+                                   width: props.sizing === 'sm' ? '52px' : null,
+                                   height: props.sizing === 'sm' ? '52px' : null,
+                                   fontSize: props.sizing === 'sm' ? '14px' : null,
+                                   marginBottom: props.sizing === 'sm' ? '16px' : null,
+                                   border: soundLevel > 0 ? '3px solid green' : 'none'
+                                 }
+                               }/>
                         }
                       </div>
                     }
