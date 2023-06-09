@@ -5,12 +5,16 @@ import Utils from '../../Utils';
 import {MessageType, SystemEventType} from "../../types";
 import appManager from "../../../common/service/AppManager";
 import socketManager from "../../../common/service/SocketManager";
+import {Buffer} from "buffer/";
+import Icon from "../Icon";
+import IconButton from "@material-ui/core/IconButton";
 
 const MeetingParticipant = (props) => {
   const [active, setActive] = React.useState(props.active);
   const [handRaised, setHandRaised] = React.useState(false);
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
+  const [soundLevel, setSoundLevel] = React.useState(0);
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
@@ -71,7 +75,13 @@ const MeetingParticipant = (props) => {
   }, [props.videoMuted]);
 
   useEffect(() => {
+  }, [soundLevel]);
+
+  useEffect(() => {
     setAudioMuted(props.audioMuted);
+    if(props.audioMuted) {
+      setSoundLevel(0);
+    }
   }, [props.audioMuted]);
 
   useEffect(() => {
@@ -88,8 +98,10 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
-      props.data.peer.on('data', (data) => {
-        console.log(JSON.stringify(data));
+      props.data.peer.on('data', data => {
+        let dataJSON = JSON.parse("" + data);
+        console.log(dataJSON.data.level);
+        setSoundLevel(dataJSON.data.level);
       });
     } else {
       videoRef.current.srcObject = props.userStream;
@@ -104,6 +116,10 @@ const MeetingParticipant = (props) => {
     return () => {
       appManager.removeSubscriptions(systemEventHandler);
       socketManager.removeSubscriptions(eventHandler);
+
+      if (props.data.peer) {
+        props.data.peer.removeAllListeners('data')
+      }
     };
   }, []);
 
@@ -135,7 +151,7 @@ const MeetingParticipant = (props) => {
           audioMuted || props.data.peer === null ?
             <audio autoPlay muted ref={videoRef}/>
             :
-            <audio autoPlay muted ref={videoRef}/>
+            <audio autoPlay ref={videoRef}/>
           :
           <div className={'col-*-* meeting-participant-container'}
                style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null}}>
@@ -146,15 +162,18 @@ const MeetingParticipant = (props) => {
                     {
                       videoMuted &&
                       <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
-                        <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
-                             style={
-                               {
-                                 width: props.sizing === 'sm' ? '52px' : null,
-                                 height: props.sizing === 'sm' ? '52px' : null,
-                                 fontSize: props.sizing === 'sm' ? '14px' : null,
-                                 marginBottom: props.sizing === 'sm' ? '16px' : null
-                               }
-                             }/>
+                        {
+                          <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
+                               style={
+                                 {
+                                   width: props.sizing === 'sm' ? '52px' : null,
+                                   height: props.sizing === 'sm' ? '52px' : null,
+                                   fontSize: props.sizing === 'sm' ? '14px' : null,
+                                   marginBottom: props.sizing === 'sm' ? '16px' : null,
+                                   border: soundLevel > 0 && !audioMuted ? '3px solid green' : 'none'
+                                 }
+                               }/>
+                        }
                       </div>
                     }
                     {
@@ -239,6 +258,12 @@ const MeetingParticipant = (props) => {
                           alignItems: 'center',
                           justifyContent: 'center'
                         }}>
+                        {
+                          audioMuted || props.data.peer === null ?
+                            <audio autoPlay muted ref={videoRef}/>
+                            :
+                            <audio autoPlay ref={videoRef}/>
+                        }
                         <img src={props.data.avatar}
                              style={{
                                width: props.sizing === 'sm' ? '40px' : '80px',
