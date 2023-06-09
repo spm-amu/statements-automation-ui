@@ -6,6 +6,7 @@ import {MessageType, SystemEventType} from "../../types";
 import appManager from "../../../common/service/AppManager";
 import socketManager from "../../../common/service/SocketManager";
 import {Buffer} from "buffer/";
+import Icon from "../Icon";
 
 const MeetingParticipant = (props) => {
   const [active, setActive] = React.useState(props.active);
@@ -98,8 +99,7 @@ const MeetingParticipant = (props) => {
       videoRef.current.srcObject = props.data.stream;
       props.data.peer.on('data', data => {
         let dataJSON = JSON.parse("" + data);
-        //console.log(dataJSON.data.level);
-        setSoundLevel(parseFloat(dataJSON.data.level));
+        setSoundLevel(dataJSON.data.level);
       });
     } else {
       videoRef.current.srcObject = props.userStream;
@@ -144,6 +144,7 @@ const MeetingParticipant = (props) => {
 
   return (
     <>
+      <div style={{fontWeight: '20px', color: 'white'}}>{soundLevel}</div>
       {
         !active ?
           audioMuted || props.data.peer === null ?
@@ -161,7 +162,7 @@ const MeetingParticipant = (props) => {
                       videoMuted &&
                       <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
                         {
-                          console.log(soundLevel) > 0 ?
+                          soundLevel > 0 ?
                             <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
                                  style={
                                    {

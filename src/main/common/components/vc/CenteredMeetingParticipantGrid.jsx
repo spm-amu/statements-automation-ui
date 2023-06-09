@@ -8,9 +8,9 @@ import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
 import Lobby from "./Lobby";
 
-const MAX_COLS = 1;
-const MAX_ROWS = 1;
-const MAX_TILES = 1;
+const MAX_COLS = 3;
+const MAX_ROWS = 2;
+const MAX_TILES = 2;
 
 const MeetingParticipantGrid = (props) => {
   const [participants, setParticipants] = React.useState([]);
