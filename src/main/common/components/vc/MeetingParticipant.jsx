@@ -18,7 +18,6 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
-  const soundLevelIntervalRef = useRef();
   const showVideo = true;
 
   const handler = () => {
@@ -80,6 +79,9 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     setAudioMuted(props.audioMuted);
+    if(props.audioMuted) {
+      setSoundLevel(0);
+    }
   }, [props.audioMuted]);
 
   useEffect(() => {
@@ -94,7 +96,6 @@ const MeetingParticipant = (props) => {
   };
 
   useEffect(() => {
-    soundLevelIntervalRef.current = setInterval(() => setSoundLevel(0), 2000);
     if (props.data.peer) {
       videoRef.current.srcObject = props.data.stream;
       props.data.peer.on('data', data => {
@@ -119,8 +120,6 @@ const MeetingParticipant = (props) => {
       if (props.data.peer) {
         props.data.peer.removeAllListeners('data')
       }
-
-      clearInterval(soundLevelIntervalRef.current);
     };
   }, []);
 
