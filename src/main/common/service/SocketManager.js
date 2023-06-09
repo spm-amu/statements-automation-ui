@@ -247,8 +247,9 @@ class SocketManager {
   // TODO : Change this method to take userId
   removeFromUserToPeerMap = (id) => {
     let find = this.userPeerMap.find((item) => item.user.userId === id);
+    alert("REMOVING");
     if(find) {
-      //this.destroyPeer(id);
+      this.destroyPeer(id);
       let filtered = this.userPeerMap.filter((item) => item.user.userId !== id);
       this.userPeerMap.splice(0, this.userPeerMap.length);
 
@@ -260,7 +261,7 @@ class SocketManager {
 
   clearUserToPeerMap = () => {
     for (const userPeerMapElement of this.userPeerMap) {
-      //this.destroyPeer(userPeerMapElement.user.id);
+      this.destroyPeer(userPeerMapElement.user.userId);
     }
 
     this.userPeerMap.splice(0, this.userPeerMap.length);
