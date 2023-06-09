@@ -969,6 +969,8 @@ const MeetingRoom = (props) => {
   };
 
   const transmitAudioLevel = async (data) => {
+    console.log("TRANSMITTING AUDIO LEVEL TO PARTS : ");
+    console.log(handler().participants);
     for (const participant of handler().participants) {
       if(participant.peer && participant.peer.connected) {
         console.log("TRANSMITTING AUDIO LEVEL TO : " + participant.userId);
