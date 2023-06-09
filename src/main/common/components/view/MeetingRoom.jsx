@@ -344,8 +344,8 @@ const MeetingRoom = (props) => {
     console.log(user);
 
     if (selectedMeeting.id === user.meetingId) {
-      socketManager.removeFromUserToPeerMap(userId);
       const userId = user.userId;
+      socketManager.removeFromUserToPeerMap(userId);
       const find = participants.find((p) => p.userId === userId);
 
       console.log("REMOVING USER - CHECKING USER : ");
