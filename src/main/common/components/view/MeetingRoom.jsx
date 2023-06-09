@@ -345,13 +345,13 @@ const MeetingRoom = (props) => {
 
     if (selectedMeeting.id === user.meetingId) {
       const userId = user.userId;
-      socketManager.removeFromUserToPeerMap(userId);
       const find = participants.find((p) => p.userId === userId);
 
       console.log("REMOVING USER - CHECKING USER : ");
       console.log(find);
 
       if (find) {
+        socketManager.removeFromUserToPeerMap(userId);
         const newParticipants = participants.filter((p) => p.userId !== userId);
 
         if (newParticipants.length === 0 && isDirectCall) {
