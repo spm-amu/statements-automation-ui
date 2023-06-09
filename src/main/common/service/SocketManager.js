@@ -285,9 +285,9 @@ class SocketManager {
     peer.on('close', () => {
       console.log("PEER CLOSE : ");
       console.log(payload);
-      appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
+      /*appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
         payload: payload
-      });
+      });*/
     });
 
     peer.on("error", (err) => {
