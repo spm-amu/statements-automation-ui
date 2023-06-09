@@ -98,6 +98,7 @@ const MeetingRoom = (props) => {
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [whiteboardItems, setWhiteboardItems] = useState([]);
   const [eventHandler] = useState({});
+  const [audioLevelTransmissionHandler] = useState({});
   const [systemEventHandler] = useState({});
   const [userVideo, setUserVideo] = useState(null);
   const [activityMessage, setActivityMessage] = useState(null);
@@ -224,6 +225,10 @@ const MeetingRoom = (props) => {
         }
       }
     }
+  };
+
+  const audioLevelTransmissionHandlerApi = () => {
+
   };
 
   const {
@@ -606,6 +611,10 @@ const MeetingRoom = (props) => {
   }, [props.meetingStarted]);
 
   useEffect(() => {
+    soundMonitor.setParticipants(participants);
+  }, [participants]);
+
+  useEffect(() => {
     if (screenShared) {
       const videoConstraints = {
         cursor: true,
@@ -968,14 +977,16 @@ const MeetingRoom = (props) => {
     }, '', false)
   };
 
-  const transmitAudioLevel = async (data) => {
-    console.log("TRANSMITTING AUDIO LEVEL TO PARTS : ");
-    console.log(handler().participants);
-    for (const participant of handler().participants) {
-      if(participant.peer && participant.peer.connected) {
-        console.log("TRANSMITTING AUDIO LEVEL TO : " + participant.userId);
-        console.log((participant.peer ? participant.peer.connected : "NULL PEER"));
-        participant.peer.send(JSON.stringify({userId: appManager.getUserDetails().userId, data}));
+  const transmitAudioLevel = async (data, participants) => {
+    if(participants) {
+      console.log("TRANSMITTING AUDIO LEVEL TO PARTS : ");
+      console.log(participants);
+      for (const participant of participants) {
+        if (participant.peer && participant.peer.connected) {
+          console.log("TRANSMITTING AUDIO LEVEL TO : " + participant.userId);
+          console.log((participant.peer ? participant.peer.connected : "NULL PEER"));
+          participant.peer.send(JSON.stringify({userId: appManager.getUserDetails().userId, data}));
+        }
       }
     }
   };
@@ -983,9 +994,9 @@ const MeetingRoom = (props) => {
   const setupStream = () => {
     currentUserStream.init(!videoMuted, !audioMuted, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
-      soundMonitor.start(stream, async (data) => {
+      soundMonitor.start(stream, async (data, participants) => {
         if(data.level > 0) {
-          transmitAudioLevel(data);
+          transmitAudioLevel(data, participants);
         }
       });
 

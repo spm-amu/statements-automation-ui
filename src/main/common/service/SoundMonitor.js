@@ -28,7 +28,7 @@ class SoundMonitor {
       callback({
         volume: currentVolume,
         level: currentLevel
-      })
+      }, this.participants)
     }, 1000);
   };
 
@@ -42,6 +42,10 @@ class SoundMonitor {
   stop = () => {
     this.sourceNode.disconnect();
     clearInterval(this.interval);
+  };
+
+  setParticipants = (participants) => {
+    this.participants = participants;
   }
 }
 
