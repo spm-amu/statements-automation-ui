@@ -154,7 +154,6 @@ const MeetingParticipantGrid = (props) => {
           overflowY: 'hidden',
           margin: mode === 'STRIP' ? "0" : "12px 8px",
           backgroundColor: 'rgb(40, 40, 43)',
-          display: overflowGrid.filter((p) => p.active).length > 0 ? 'flex' : 'none',
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">

@@ -115,6 +115,17 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
+    if(videoRef.current) {
+      if (props.data.peer) {
+        videoRef.current.srcObject = props.data.stream;
+      } else {
+        videoRef.current.srcObject = props.userStream;
+      }
+    }
+  }, [videoRef.current]);
+
+
+  useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
