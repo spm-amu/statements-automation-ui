@@ -30,14 +30,15 @@ video {
   height: unset;
 }
 
-.avatar-wrapper {
+.avatar-wrapper,
+.avatar-wrapper-sm {
   font-size: 36px;
   width: 3em;
   height: 3em;
   border-radius: 50%;
   display: inline-flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 @media  screen and (max-width:800px) {

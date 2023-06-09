@@ -167,21 +167,18 @@ const MeetingParticipant = (props) => {
                   <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
                     {
                       videoMuted &&
-                      <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
+                      <div className={'centered-flex-box'} style={{width: '100%', height: '100%', marginBottom: props.sizing === 'sm' ? '8px' : 0}}>
                         {
                           <div className={'avatar-wrapper'}
                                style={{
-                                 width: (3 + soundLevel / 10) + 'em',
-                                 height: (3 + soundLevel / 10) + 'em',
-                                 border: !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                                 width: ((props.sizing === 'sm' ? 1 : 3) + soundLevel / 10) + 'em',
+                                 height: ((props.sizing === 'sm' ? 1 : 3) + soundLevel / 10) + 'em',
+                                 border: !audioMuted && soundLevel > 3 ? (props.sizing === 'sm' ? 2 : 4) + 'px solid #00476a' : 'none'
                                }}>
                             <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
                                  style={
                                    {
-                                     width: props.sizing === 'sm' ? '52px' : null,
-                                     height: props.sizing === 'sm' ? '52px' : null,
-                                     fontSize: props.sizing === 'sm' ? '14px' : null,
-                                     marginBottom: props.sizing === 'sm' ? '16px' : null
+                                     fontSize: props.sizing === 'sm' ? '14px' : null
                                    }
                                  }/>
                           </div>
