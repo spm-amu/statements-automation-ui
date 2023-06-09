@@ -79,7 +79,7 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     setAudioMuted(props.audioMuted);
-    if(props.audioMuted) {
+    if (props.audioMuted) {
       setSoundLevel(0);
     }
   }, [props.audioMuted]);
@@ -181,14 +181,14 @@ const MeetingParticipant = (props) => {
                         <video
                           id={props.data.userId}
                           hidden={videoMuted}
-                          muted playsInline ref={videoRef}
+                          autoPlay muted playsInline ref={videoRef}
                           style={{width: '100%', height: '100%'}}
                         />
                         :
                         <video
                           id={props.data.userId}
                           hidden={videoMuted}
-                          playsInline ref={videoRef}
+                          autoPlay playsInline ref={videoRef}
                           style={{width: '100%', height: '100%'}}
                         />
                     }
