@@ -10,12 +10,13 @@ import Lobby from "./Lobby";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
-const MAX_TILES = 2;
+const MAX_TILES = 1;
 
 const MeetingParticipantGrid = (props) => {
   const [participants, setParticipants] = React.useState([]);
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
+  const [refresher, setRefresher] = React.useState(false);
   const {
     waitingList,
     mode,
@@ -44,6 +45,7 @@ const MeetingParticipantGrid = (props) => {
         };
 
         currentUserParticipant.active = true;
+        currentUserParticipant.inView = true;
         newParticipants.push(currentUserParticipant);
       }
 
@@ -53,10 +55,12 @@ const MeetingParticipantGrid = (props) => {
           newParticipants.push(participant);
         } else {
           participant.active = true;
+          participant.inView = true;
         }
 
         if(i++ < MAX_TILES) {
           participant.active = true;
+          participant.inView = true;
         }
       }
 
@@ -84,7 +88,7 @@ const MeetingParticipantGrid = (props) => {
 
     let currentRowIndex = 0;
     for (let i = 0; i < participants.length; i++) {
-      if (i < MAX_TILES && mode === 'DEFAULT') {
+      if (mode === 'DEFAULT' && participants[i].inView) {
         itemGrid.mainGrid[currentRowIndex].push(participants[i]);
         if (currentRowIndex++ === MAX_ROWS - 1 || participants.length === 2) {
           currentRowIndex = 0;
@@ -150,7 +154,7 @@ const MeetingParticipantGrid = (props) => {
           overflowY: 'hidden',
           margin: mode === 'STRIP' ? "0" : "12px 8px",
           backgroundColor: 'rgb(40, 40, 43)',
-          display: 'flex',
+          display: overflowGrid.filter((p) => p.active).length > 0 ? 'flex' : 'none',
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
@@ -169,6 +173,10 @@ const MeetingParticipantGrid = (props) => {
                                     props.userVideoChangeHandler(ref);
                                   } : null
                                 }
+                                soundMonitor={(userId, active) => {
+                                  participants.find((p) => p.userId === userId).active = active;
+                                  setRefresher(!refresher);
+                                }}
                                 onHostAudioMute={() => props.onHostAudioMute(participant)}
                                 onHostVideoMute={() => props.onHostVideoMute(participant)}
                                 userStream={userStream}

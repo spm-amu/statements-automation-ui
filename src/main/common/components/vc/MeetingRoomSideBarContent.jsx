@@ -75,7 +75,7 @@ const MeetingRoomSideBarContent = (props) => {
         <DialogTitle id="people-window-title">
           <div className={'closable-panel-header row'}>
             <div className={'title col'}>
-              Request to join
+              Dial in other participants
             </div>
             <div style={{width: '64px'}}>
               <IconButton
@@ -118,7 +118,7 @@ const MeetingRoomSideBarContent = (props) => {
             fullWidth={true}
             style={styles.loginBtn}
           >
-            Request to join
+            Dial in other participants
           </Button>
         </div>
       }

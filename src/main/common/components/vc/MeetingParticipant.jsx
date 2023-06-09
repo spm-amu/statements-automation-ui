@@ -75,6 +75,9 @@ const MeetingParticipant = (props) => {
   }, [props.videoMuted]);
 
   useEffect(() => {
+    if(props.soundMonitor) {
+      props.soundMonitor(props.data.userId, soundLevel > 3);
+    }
   }, [soundLevel]);
 
   useEffect(() => {
@@ -100,8 +103,11 @@ const MeetingParticipant = (props) => {
       videoRef.current.srcObject = props.data.stream;
       props.data.peer.on('data', data => {
         let dataJSON = JSON.parse("" + data);
-        console.log(dataJSON.data.level);
-        setSoundLevel(dataJSON.data.level);
+
+        if(dataJSON.userId === props.data.userId) {
+          console.log(dataJSON.data.level);
+          setSoundLevel(dataJSON.data.level);
+        }
       });
     } else {
       videoRef.current.srcObject = props.userStream;
@@ -163,16 +169,22 @@ const MeetingParticipant = (props) => {
                       videoMuted &&
                       <div className={'centered-flex-box'} style={{width: '100%', height: '100%'}}>
                         {
-                          <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
-                               style={
-                                 {
-                                   width: props.sizing === 'sm' ? '52px' : null,
-                                   height: props.sizing === 'sm' ? '52px' : null,
-                                   fontSize: props.sizing === 'sm' ? '14px' : null,
-                                   marginBottom: props.sizing === 'sm' ? '16px' : null,
-                                   border: soundLevel > 0 && !audioMuted ? '3px solid green' : 'none'
-                                 }
-                               }/>
+                          <div className={'avatar-wrapper'}
+                               style={{
+                                 width: (3 + soundLevel / 10) + 'em',
+                                 height: (3 + soundLevel / 10) + 'em',
+                                 border: !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                               }}>
+                            <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
+                                 style={
+                                   {
+                                     width: props.sizing === 'sm' ? '52px' : null,
+                                     height: props.sizing === 'sm' ? '52px' : null,
+                                     fontSize: props.sizing === 'sm' ? '14px' : null,
+                                     marginBottom: props.sizing === 'sm' ? '16px' : null
+                                   }
+                                 }/>
+                          </div>
                         }
                       </div>
                     }
@@ -182,14 +194,22 @@ const MeetingParticipant = (props) => {
                           id={props.data.userId}
                           hidden={videoMuted}
                           autoPlay muted playsInline ref={videoRef}
-                          style={{width: '100%', height: '100%'}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            border: !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                          }}
                         />
                         :
                         <video
                           id={props.data.userId}
                           hidden={videoMuted}
                           autoPlay playsInline ref={videoRef}
-                          style={{width: '100%', height: '100%'}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            border: !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                          }}
                         />
                     }
                     <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}>
