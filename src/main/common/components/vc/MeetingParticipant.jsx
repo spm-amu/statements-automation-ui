@@ -7,6 +7,7 @@ import appManager from "../../../common/service/AppManager";
 import socketManager from "../../../common/service/SocketManager";
 import {Buffer} from "buffer/";
 import Icon from "../Icon";
+import IconButton from "@material-ui/core/IconButton";
 
 const MeetingParticipant = (props) => {
   const [active, setActive] = React.useState(props.active);
