@@ -68,7 +68,6 @@ const MeetingParticipantGrid = (props) => {
 
       setParticipants(newParticipants);
       let gridData = createGrid(newParticipants);
-      console.log("\n\n\n\n\n\n\n\nMAIN GRID");
       console.log(gridData);
       setGrid(gridData.mainGrid);
       setOverflowGrid(gridData.overflowGrid);
@@ -116,7 +115,7 @@ const MeetingParticipantGrid = (props) => {
             return <Grid item xs={4} key={index} className={'meetingParticipantContainer'} style={
               {
                 borderRadius: '4px',
-                width: (100 / MAX_ROWS) + "%",
+                width: (90 / MAX_ROWS) + "vh",
                 height: "100%",
                 flexBasis: null,
                 maxWidth: null
@@ -211,7 +210,7 @@ const MeetingParticipantGrid = (props) => {
           }}>
             <Grid container spacing={2} style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', border: '4px solid green'}}>
               {grid.map((row, index) => {
-                return <div style={{width: "100%", height: (100 / MAX_ROWS) + "vh", border: '4px solid red'}}>
+                return <div style={{width: "100%", height: (90 / MAX_ROWS) + "vh", border: '4px solid red'}}>
                   {
                       <Fragment key={index}>
                         {
