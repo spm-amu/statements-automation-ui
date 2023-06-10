@@ -1395,7 +1395,6 @@ const MeetingRoom = (props) => {
                 }
                 {
                   <div style={{
-                    padding: '16px',
                     width: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
                       && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '100%' : '0',
                     height: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'

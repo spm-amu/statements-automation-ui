@@ -68,6 +68,8 @@ const MeetingParticipantGrid = (props) => {
 
       setParticipants(newParticipants);
       let gridData = createGrid(newParticipants);
+      console.log("\n\n\n\n\n\n\n\nMAIN GRID");
+      console.log(gridData);
       setGrid(gridData.mainGrid);
       setOverflowGrid(gridData.overflowGrid);
     }
@@ -79,7 +81,8 @@ const MeetingParticipantGrid = (props) => {
       overflowGrid: []
     };
 
-    let numRows = participants.length < MAX_ROWS ? participants.length : MAX_ROWS;
+    let rows = Math.ceil(participants.filter((p) => p.inView).length / MAX_COLS);
+    let numRows = rows < MAX_ROWS ? rows : MAX_ROWS;
     if (mode === 'DEFAULT') {
       for (let i = 0; i < numRows; i++) {
         itemGrid.mainGrid.push([]);
@@ -104,7 +107,7 @@ const MeetingParticipantGrid = (props) => {
   const renderRow = (row, index) => {
     return (
       <Grid
-        style={{height: null,}}
+        style={{height: '100%'}}
         direction="row"
         justifyContent="center"
         alignItems="center" container item spacing={2}>
@@ -113,9 +116,9 @@ const MeetingParticipantGrid = (props) => {
             return <Grid item xs={4} key={index} className={'meetingParticipantContainer'} style={
               {
                 borderRadius: '4px',
-                width: "33vh",
-                height: "33vh",
-                maxHeight: "33vh",
+                width: "33%",
+                height: "33%",
+                maxHeight: "33%",
                 flexBasis: null,
                 maxWidth: null
               }
@@ -149,11 +152,10 @@ const MeetingParticipantGrid = (props) => {
           overflowX: 'auto',
           maxWidth: '100%',
           width: '100%',
-          height: '96%',
+          height: '120px',
           borderRadius: '4px',
           overflowY: 'hidden',
           margin: mode === 'STRIP' ? "0" : "12px 8px",
-          backgroundColor: 'rgb(40, 40, 43)',
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
@@ -201,16 +203,15 @@ const MeetingParticipantGrid = (props) => {
           grid && grid.length > 0 &&
           <Box sx={{
             flexGrow: 1,
-            height: step === "LOBBY" ? null : '100%',
+            height: step === "LOBBY" ? null : 'calc(100% - 120px)',
             width: '100%',
             justifyContent: 'center',
             alignItems: 'center',
-            display: 'flex',
-            padding: '32px'
+            display: 'flex'
           }}>
-            <Grid container spacing={2} style={{width: '100%'}}>
+            <Grid container spacing={2} style={{width: '100%', height: '100%'}}>
               {grid.map((row, index) => {
-                return <>
+                return <div style={{width: '100%', height: (100 / grid.length) + '%'}}>
                   {
                       <Fragment key={index}>
                         {
@@ -218,7 +219,7 @@ const MeetingParticipantGrid = (props) => {
                         }
                       </Fragment>
                   }
-                </>
+                </div>
               })}
               {
                 renderOverflowGrid()
