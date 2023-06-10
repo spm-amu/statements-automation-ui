@@ -8,7 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
 import Lobby from "./Lobby";
 
-const MAX_COLS = 3;
+const MAX_COLS = 2;
 const MAX_ROWS = 2;
 
 const MeetingParticipantGrid = (props) => {
@@ -57,7 +57,7 @@ const MeetingParticipantGrid = (props) => {
           participant.inView = true;
         }
 
-        if(i++ < (MAX_ROWS * MAX_COLS)) {
+        if (i++ < (MAX_ROWS * MAX_COLS)) {
           participant.active = true;
           participant.inView = true;
         }
@@ -81,24 +81,32 @@ const MeetingParticipantGrid = (props) => {
 
     if (mode === 'DEFAULT') {
       let rows = Math.ceil(participants.filter((p) => p.inView).length / MAX_COLS);
-      if(participants.length <= MAX_COLS) {
-        for (const participant of participants) {
-          itemGrid.mainGrid.push(participants);
+      let numRows = rows < MAX_ROWS ? rows : MAX_ROWS;
+      if (mode === 'DEFAULT') {
+        for (let i = 0; i < numRows; i++) {
+          itemGrid.mainGrid.push([]);
         }
-      }  else {
-        // TODO : The complex stuff
+      }
+
+      let inViewParticipants = participants.filter((p) => p.inView);
+      if (rows === 1) {
+        for (const participant of inViewParticipants) {
+          itemGrid.mainGrid[0].push(participant);
+        }
+      } else {
+        let currentRowIndex = 0;
+        for (let i = 0; i < inViewParticipants.length; i++) {
+          itemGrid.mainGrid[currentRowIndex].push(participants[i]);
+          if (currentRowIndex++ === MAX_ROWS - 1) {
+            currentRowIndex = 0;
+          }
+        }
       }
     } else {
       for (const participant of participants) {
         itemGrid.overflowGrid.push(participants);
       }
     }
-
-
-
-
-
-
 
     /*if(if (mode === 'DEFAULT') {
       let inViewParticipants = participants.filter((p) => p.inView);
@@ -228,39 +236,46 @@ const MeetingParticipantGrid = (props) => {
            style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
         {
           step === "LOBBY" &&
-          <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState} meetingTitle={props.meetingTitle}/>
+          <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState}
+                 meetingTitle={props.meetingTitle}/>
         }
         {
           grid && grid.length > 0 &&
-            <>
-          <Box sx={{
-            flexGrow: 1,
-            height: step === "LOBBY" ? null : 'calc(100% - 120px)',
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            display: 'flex'
-          }}>
-            <Grid container spacing={2} style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', border: '4px solid green'}}>
-              {grid.map((row, index) => {
-                return <div style={{width: "100%", height: (90 / MAX_ROWS) + "vh", border: '4px solid red'}}>
-                  {
+          <>
+            <Box sx={{
+              flexGrow: 1,
+              height: step === "LOBBY" ? null : 'calc(100% - 120px)',
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              display: 'flex'
+            }}>
+              <Grid container spacing={2} style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                border: '4px solid green'
+              }}>
+                {grid.map((row, index) => {
+                  return <div style={{width: "100%", height: (90 / MAX_ROWS) + "vh", border: '4px solid red'}}>
+                    {
                       <Fragment key={index}>
                         {
                           renderRow(row, index)
                         }
                       </Fragment>
-                  }
-                </div>
-              })}
-            </Grid>
-          </Box>
+                    }
+                  </div>
+                })}
+              </Grid>
+            </Box>
 
-              <div style={{width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
-                {
-                  renderOverflowGrid()
-                }
-              </div>
+            <div style={{width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
+              {
+                renderOverflowGrid()
+              }
+            </div>
           </>
         }
         {
