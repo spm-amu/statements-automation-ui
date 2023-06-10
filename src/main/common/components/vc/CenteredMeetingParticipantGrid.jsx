@@ -222,8 +222,7 @@ const MeetingParticipantGrid = (props) => {
                 {grid.map((row, index) => {
                   return <div style={{
                     width: "100%",
-                    height: (VH / MAX_ROWS) + "vh",
-                    marginTop: index > 0 ? '-44px' : '0'
+                    height: (VH / MAX_ROWS) + "vh"
                   }}>
                     {
                       <Fragment key={index}>
