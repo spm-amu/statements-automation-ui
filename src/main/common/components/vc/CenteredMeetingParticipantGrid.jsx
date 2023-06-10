@@ -10,7 +10,7 @@ import Lobby from "./Lobby";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
-const MAX_TILES = 1;
+const MAX_TILES = 3;
 
 const MeetingParticipantGrid = (props) => {
   const [participants, setParticipants] = React.useState([]);
