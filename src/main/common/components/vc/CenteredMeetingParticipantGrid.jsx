@@ -116,7 +116,7 @@ const MeetingParticipantGrid = (props) => {
             return <Grid item xs={4} key={index} className={'meetingParticipantContainer'} style={
               {
                 borderRadius: '4px',
-                width: "33%",
+                width: (100 / MAX_ROWS) + "%",
                 height: "100%",
                 flexBasis: null,
                 maxWidth: null
@@ -200,6 +200,7 @@ const MeetingParticipantGrid = (props) => {
         }
         {
           grid && grid.length > 0 &&
+            <>
           <Box sx={{
             flexGrow: 1,
             height: step === "LOBBY" ? null : 'calc(100% - 120px)',
@@ -208,9 +209,9 @@ const MeetingParticipantGrid = (props) => {
             alignItems: 'center',
             display: 'flex'
           }}>
-            <Grid container spacing={2} style={{width: '100%', height: '100%'}}>
+            <Grid container spacing={2} style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', border: '4px solid green'}}>
               {grid.map((row, index) => {
-                return <div style={{width: '100%', height: (100 / grid.length) + '%'}}>
+                return <div style={{width: "100%", height: (100 / MAX_ROWS) + "%", border: '4px solid red'}}>
                   {
                       <Fragment key={index}>
                         {
@@ -220,11 +221,15 @@ const MeetingParticipantGrid = (props) => {
                   }
                 </div>
               })}
-              {
-                renderOverflowGrid()
-              }
             </Grid>
           </Box>
+
+              <div style={{width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
+                {
+                  renderOverflowGrid()
+                }
+              </div>
+          </>
         }
         {
           mode === 'STRIP' &&
