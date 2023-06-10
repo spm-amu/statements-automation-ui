@@ -8,8 +8,9 @@ import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
 import Lobby from "./Lobby";
 
-const MAX_COLS = 2;
+const MAX_COLS = 3;
 const MAX_ROWS = 2;
+const VH = 60;
 
 const MeetingParticipantGrid = (props) => {
   const [participants, setParticipants] = React.useState([]);
@@ -80,26 +81,21 @@ const MeetingParticipantGrid = (props) => {
     };
 
     if (mode === 'DEFAULT') {
-      let rows = Math.ceil(participants.filter((p) => p.inView).length / MAX_COLS);
-      let numRows = rows < MAX_ROWS ? rows : MAX_ROWS;
+      let inViewParticipants = participants.filter((p) => p.inView);
+      let numRows = inViewParticipants.length < MAX_ROWS ? inViewParticipants.length : MAX_ROWS;
+      let rows = inViewParticipants.length === 2 ? 1 : numRows;
+
       if (mode === 'DEFAULT') {
-        for (let i = 0; i < numRows; i++) {
+        for (let i = 0; i < rows; i++) {
           itemGrid.mainGrid.push([]);
         }
       }
 
-      let inViewParticipants = participants.filter((p) => p.inView);
-      if (rows === 1) {
-        for (const participant of inViewParticipants) {
-          itemGrid.mainGrid[0].push(participant);
-        }
-      } else {
-        let currentRowIndex = 0;
-        for (let i = 0; i < inViewParticipants.length; i++) {
-          itemGrid.mainGrid[currentRowIndex].push(participants[i]);
-          if (currentRowIndex++ === MAX_ROWS - 1) {
-            currentRowIndex = 0;
-          }
+      let currentRowIndex = 0;
+      for (let i = 0; i < inViewParticipants.length; i++) {
+        itemGrid.mainGrid[currentRowIndex].push(participants[i]);
+        if (currentRowIndex++ === rows - 1) {
+          currentRowIndex = 0;
         }
       }
     } else {
@@ -107,39 +103,6 @@ const MeetingParticipantGrid = (props) => {
         itemGrid.overflowGrid.push(participants);
       }
     }
-
-    /*if(if (mode === 'DEFAULT') {
-      let inViewParticipants = participants.filter((p) => p.inView);
-      let overflowViewParticipants = participants.filter((p) => !p.inView);
-
-      for (const inViewParticipant of inViewParticipants) {
-
-      }
-    } else {
-
-    }
-
-
-
-    let rows = Math.ceil(participants.filter((p) => p.inView).length / MAX_COLS);
-    let numRows = rows < MAX_ROWS ? rows : MAX_ROWS;
-    if (mode === 'DEFAULT') {
-      for (let i = 0; i < numRows; i++) {
-        itemGrid.mainGrid.push([]);
-      }
-    }
-
-    let currentRowIndex = 0;
-    for (let i = 0; i < participants.length; i++) {
-      if (mode === 'DEFAULT' && participants[i].inView) {
-        itemGrid.mainGrid[currentRowIndex].push(participants[i]);
-        if (currentRowIndex++ === MAX_ROWS - 1 || participants.length === 2) {
-          currentRowIndex = 0;
-        }
-      } else {
-        itemGrid.overflowGrid.push(participants[i]);
-      }
-    }*/
 
     return itemGrid;
   };
@@ -156,8 +119,8 @@ const MeetingParticipantGrid = (props) => {
             return <Grid item xs={4} key={index} className={'meetingParticipantContainer'} style={
               {
                 borderRadius: '4px',
-                width: (90 / MAX_ROWS) + "vh",
-                height: "100%",
+                width: (VH / MAX_ROWS) + "vh",
+                height: (VH / MAX_ROWS) + "vh",
                 flexBasis: null,
                 maxWidth: null
               }
@@ -254,11 +217,10 @@ const MeetingParticipantGrid = (props) => {
                 width: '100%',
                 height: '100%',
                 display: 'flex',
-                alignItems: 'center',
-                border: '4px solid green'
+                alignItems: 'center'
               }}>
                 {grid.map((row, index) => {
-                  return <div style={{width: "100%", height: (90 / MAX_ROWS) + "vh", border: '4px solid red'}}>
+                  return <div style={{width: "100%", height: (VH / MAX_ROWS) + "vh"}}>
                     {
                       <Fragment key={index}>
                         {
