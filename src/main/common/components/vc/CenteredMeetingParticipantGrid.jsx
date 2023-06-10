@@ -116,7 +116,7 @@ const MeetingParticipantGrid = (props) => {
         alignItems="center" container item spacing={2}>
         <React.Fragment>
           {row.map((participant, index) => {
-            return <Grid item xs={4} key={index} className={'meetingParticipantContainer'} style={
+            return <Grid spacing={0} item xs={4} key={index} className={'meetingParticipantContainer'} style={
               {
                 borderRadius: '4px',
                 width: (VH / MAX_ROWS) + "vh",
@@ -196,7 +196,7 @@ const MeetingParticipantGrid = (props) => {
   return (
     grid !== null ?
       <div className={'row grid'}
-           style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
+           style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%', margin: '16px 0'}}>
         {
           step === "LOBBY" &&
           <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState}
@@ -213,14 +213,18 @@ const MeetingParticipantGrid = (props) => {
               alignItems: 'center',
               display: 'flex'
             }}>
-              <Grid container spacing={2} style={{
+              <Grid container spacing={1} style={{
                 width: '100%',
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center'
               }}>
                 {grid.map((row, index) => {
-                  return <div style={{width: "100%", height: (VH / MAX_ROWS) + "vh"}}>
+                  return <div style={{
+                    width: "100%",
+                    height: (VH / MAX_ROWS) + "vh",
+                    marginTop: index > 0 ? '-44px' : '0'
+                  }}>
                     {
                       <Fragment key={index}>
                         {
