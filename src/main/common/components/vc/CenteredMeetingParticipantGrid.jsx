@@ -117,8 +117,7 @@ const MeetingParticipantGrid = (props) => {
               {
                 borderRadius: '4px',
                 width: "33%",
-                height: "33%",
-                maxHeight: "33%",
+                height: "100%",
                 flexBasis: null,
                 maxWidth: null
               }
