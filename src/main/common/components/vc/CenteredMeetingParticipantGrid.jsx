@@ -10,7 +10,6 @@ import Lobby from "./Lobby";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
-const MAX_TILES = 3;
 
 const MeetingParticipantGrid = (props) => {
   const [participants, setParticipants] = React.useState([]);
@@ -58,7 +57,7 @@ const MeetingParticipantGrid = (props) => {
           participant.inView = true;
         }
 
-        if(i++ < MAX_TILES) {
+        if(i++ < (MAX_ROWS * MAX_COLS)) {
           participant.active = true;
           participant.inView = true;
         }
@@ -80,6 +79,40 @@ const MeetingParticipantGrid = (props) => {
       overflowGrid: []
     };
 
+    if (mode === 'DEFAULT') {
+      let rows = Math.ceil(participants.filter((p) => p.inView).length / MAX_COLS);
+      if(participants.length <= MAX_COLS) {
+        for (const participant of participants) {
+          itemGrid.mainGrid.push(participants);
+        }
+      }  else {
+        // TODO : The complex stuff
+      }
+    } else {
+      for (const participant of participants) {
+        itemGrid.overflowGrid.push(participants);
+      }
+    }
+
+
+
+
+
+
+
+    /*if(if (mode === 'DEFAULT') {
+      let inViewParticipants = participants.filter((p) => p.inView);
+      let overflowViewParticipants = participants.filter((p) => !p.inView);
+
+      for (const inViewParticipant of inViewParticipants) {
+
+      }
+    } else {
+
+    }
+
+
+
     let rows = Math.ceil(participants.filter((p) => p.inView).length / MAX_COLS);
     let numRows = rows < MAX_ROWS ? rows : MAX_ROWS;
     if (mode === 'DEFAULT') {
@@ -98,7 +131,7 @@ const MeetingParticipantGrid = (props) => {
       } else {
         itemGrid.overflowGrid.push(participants[i]);
       }
-    }
+    }*/
 
     return itemGrid;
   };
