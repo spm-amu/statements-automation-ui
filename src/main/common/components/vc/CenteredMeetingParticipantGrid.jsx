@@ -82,6 +82,7 @@ const MeetingParticipantGrid = (props) => {
 
     if (mode === 'DEFAULT') {
       let inViewParticipants = participants.filter((p) => p.inView);
+      let overflowParticipants = participants.filter((p) => !p.inView).sort(function(a, b){return b.active - a.active});
       let numRows = inViewParticipants.length < MAX_ROWS ? inViewParticipants.length : MAX_ROWS;
       let rows = inViewParticipants.length === 2 ? 1 : numRows;
 
@@ -98,9 +99,13 @@ const MeetingParticipantGrid = (props) => {
           currentRowIndex = 0;
         }
       }
+
+      for (const participant of overflowParticipants) {
+        itemGrid.overflowGrid.push(participant);
+      }
     } else {
       for (const participant of participants) {
-        itemGrid.overflowGrid.push(participants);
+        itemGrid.overflowGrid.push(participant);
       }
     }
 
@@ -148,7 +153,8 @@ const MeetingParticipantGrid = (props) => {
   };
 
   function renderOverflowGrid() {
-    return overflowGrid && overflowGrid.length > 0 &&
+    let sortedOverflowGrid = overflowGrid.sort(function(a, b){return b.active - a.active});
+    return sortedOverflowGrid && sortedOverflowGrid.length > 0 &&
       <div
         style={{
           overflowX: 'auto',
@@ -161,7 +167,7 @@ const MeetingParticipantGrid = (props) => {
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
-        {overflowGrid.map((participant, index) => {
+        {sortedOverflowGrid.map((participant, index) => {
           return <div className={'col-*-*'} key={index}
                       style={{
                         borderRadius: '4px',
