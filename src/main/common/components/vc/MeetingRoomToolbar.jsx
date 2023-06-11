@@ -171,6 +171,7 @@ const MeetingRoomToolbar = (props) => {
           isHost && !isDirectCall &&
           <div style={{margin: '0 8px 0 0'}}>
             <Button
+              style={{color: '#FFFFFF'}}
               variant={'contained'}
               disabled={!started}
               size="large"

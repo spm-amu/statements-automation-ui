@@ -14,7 +14,6 @@ import People from "../view/People";
 import "./MeetingRoomSideBarContent.css"
 import InCall from '../view/InCall';
 import ChatRoom from '../chat/ChatRoom';
-import InCallCard from "./InCallCard";
 
 const StyledDialog = withStyles({
   root: {pointerEvents: "none"},
@@ -127,6 +126,8 @@ const MeetingRoomSideBarContent = (props) => {
           tab === 'People' ?
             <InCall
               onChangeMeetingHostHandler={(e) => props.onChangeMeetingHostHandler(e)}
+              onPinHandler={(participant, pinned) => props.onPinHandler(participant, pinned)}
+              onBringToViewHandler={(participant) => props.onBringToViewHandler(participant)}
               isHost={isHost}
               participants={participants}
             /> :

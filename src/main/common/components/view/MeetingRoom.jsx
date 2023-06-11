@@ -77,6 +77,7 @@ const MeetingRoom = (props) => {
   const [isHost, setIsHost] = useState(false);
   const [displayState, setDisplayState] = useState(props.displayState);
   const [participants, setParticipants] = useState([]);
+  const [pinnedParticipant, setPinnedParticipant] = useState(null);
   const [meetingChat, setMeetingChat] = useState(null);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const [step, setStep] = useState('LOBBY');
@@ -1395,6 +1396,8 @@ const MeetingRoom = (props) => {
                 }
                 {
                   <div style={{
+                    padding: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
+                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '32px 32px 0 32px' : null,
                     width: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
                       && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '100%' : '0',
                     height: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
@@ -1463,6 +1466,7 @@ const MeetingRoom = (props) => {
                                                       meetingTitle={selectedMeeting.title}
                                                       userToCall={userToCall}
                                                       userStream={currentUserStream.obj}
+                                                      pinnedParticipant={pinnedParticipant}
                                                       step={step}
                                                       isHost={isHost}
                                                       autoPermit={autoPermit}
@@ -1514,6 +1518,16 @@ const MeetingRoom = (props) => {
                 onAudioCallCancelHandler={(requestedUser) => cancelRequestCall(requestedUser)}
                 onChangeMeetingHostHandler={(newHost) => {
                   changeHost(newHost);
+                }}
+                onPinHandler={(participant, pinned) => {
+                  if(pinned) {
+                    setPinnedParticipant(participant);
+                  } else {
+                    setPinnedParticipant(null);
+                  }
+                }}
+                onBringToViewHandler={(participant) => {
+                  alert("Bring to view firee : " + participant.userId);
                 }}
               />
             </ClosablePanel>

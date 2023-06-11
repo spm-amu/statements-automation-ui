@@ -3,6 +3,8 @@ import './InCallCard.css';
 import {IconButton, ListItemIcon, Menu, MenuItem} from '@material-ui/core';
 import Icon from '../Icon';
 import {PersonAdd} from '@material-ui/icons';
+import {PersonPinCircle} from '@material-ui/icons';
+import {PinDrop} from '@material-ui/icons';
 import Tooltip from '@material-ui/core/Tooltip';
 import {useNavigate} from 'react-router-dom';
 import appManager from "../../service/AppManager";
@@ -15,6 +17,7 @@ const InCall = (props) => {
   const openMoreActions = Boolean(anchorEl);
   const {participant} = props;
   const [handRaised, setHandRaised] = React.useState(false);
+  const [pinned, setPinned] = React.useState(participant.pinned);
   const [eventHandler] = useState({});
   const navigate = useNavigate();
 
@@ -37,13 +40,13 @@ const InCall = (props) => {
   };
 
   const onRaiseHand = (payload) => {
-    if(participant && payload && payload.userId === participant.userId) {
+    if (participant && payload && payload.userId === participant.userId) {
       setHandRaised(true);
     }
   };
 
   const onLowerHand = (payload) => {
-    if(participant && payload && payload.userId === participant.userId) {
+    if (participant && payload && payload.userId === participant.userId) {
       setHandRaised(false);
     }
   };
@@ -78,6 +81,15 @@ const InCall = (props) => {
     setAnchorEl(null);
   };
 
+  const togglePinned = () => {
+    let newPinnedVal = !pinned;
+    setPinned(newPinnedVal);
+    participant.pinned = newPinnedVal;
+    if(props.onPinHandler) {
+      props.onPinHandler(participant, newPinnedVal);
+    }
+  };
+
   const computeParticipantName = () => {
     let name = participant.name;
 
@@ -91,8 +103,10 @@ const InCall = (props) => {
   return (
     <div
       className={'col person-card-wrapper'}
-      style={{marginLeft: '0', paddingLeft: '0', paddingRight: '0', maxWidth: props.maxWidth ? props.maxWidth : '400px',
-        borderBottom: props.borderBottom ? props.borderBottom : '1px solid #e1e1e1'}}
+      style={{
+        marginLeft: '0', paddingLeft: '0', paddingRight: '0', maxWidth: props.maxWidth ? props.maxWidth : '400px',
+        borderBottom: props.borderBottom ? props.borderBottom : '1px solid #e1e1e1'
+      }}
     >
       <div className="participant-card">
         <div className="row no-margin person-card">
@@ -107,7 +121,7 @@ const InCall = (props) => {
               style={{borderRadius: '50%'}}
             />
           </div>
-          <div className={'col user-details'}>{ computeParticipantName() }</div>
+          <div className={'col user-details'}>{computeParticipantName()}</div>
           <div style={{
             marginTop: '4px',
             marginLeft: '0',
@@ -145,7 +159,7 @@ const InCall = (props) => {
                   <IconButton
                     onClick={handleClick}
                     size="small"
-                    sx={{ ml: 2 }}
+                    sx={{ml: 2}}
                     aria-controls={openMoreActions ? 'account-menu' : undefined}
                     aria-haspopup="true"
                     aria-expanded={openMoreActions ? 'true' : undefined}
@@ -192,18 +206,39 @@ const InCall = (props) => {
                   },
                 },
               }}
-              transformOrigin={{ horizontal: 20, vertical: 44 }}
-              anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+              transformOrigin={{horizontal: 20, vertical: 44}}
+              anchorOrigin={{horizontal: 'right', vertical: 'top'}}
             >
-
               <MenuItem
                 disabled={Utils.isNull(participant.userId)}
                 onClick={() => props.onChangeMeetingHostHandler(participant)}
               >
                 <ListItemIcon>
-                  <PersonAdd fontSize="small" />
+                  <PersonAdd fontSize="small"/>
                 </ListItemIcon>
                 Change Meeting Host
+              </MenuItem>
+              <MenuItem
+                disabled={participant.inView || !props.onBringToViewHandler}
+                onClick={() => props.onBringToViewHandler(participant)}
+              >
+                <ListItemIcon>
+                  <Icon id={'MAXIMIZE'}/>
+                </ListItemIcon>
+                Bring to view
+              </MenuItem>
+              <MenuItem
+                disabled={!props.onPinHandler}
+                onClick={() => togglePinned()}
+              >
+                <ListItemIcon>
+                  {
+                    pinned ? <PinDrop fontSize="small"/> : <PersonPinCircle fontSize="small"/>
+                  }
+                </ListItemIcon>
+                {
+                  pinned ? 'Unpin' : "Pin"
+                }
               </MenuItem>
             </Menu>
           </div>

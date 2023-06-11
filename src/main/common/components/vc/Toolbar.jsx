@@ -314,7 +314,6 @@ const Toolbar = (props) => {
               step === 'SESSION' && displayState === 'MAXIMIZED' &&
               <div>
                 {
-                  participants.length > 1 &&
                   <div className={'people-count-bubble'}>{participants.length}</div>
                 }
                 <Tooltip title="People">

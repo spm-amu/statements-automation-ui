@@ -14,6 +14,7 @@ const VH = 60;
 
 const MeetingParticipantGrid = (props) => {
   const [participants, setParticipants] = React.useState([]);
+  const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
   const [refresher, setRefresher] = React.useState(false);
@@ -26,7 +27,7 @@ const MeetingParticipantGrid = (props) => {
     audioMuted,
     isHost,
     autoPermit,
-    meetingTitle
+    pinnedParticipant
   } = props;
 
   useEffect(() => {
@@ -44,9 +45,10 @@ const MeetingParticipantGrid = (props) => {
           audioMuted
         };
 
+        setCurrentUserParticipant(currentUserParticipant);
         currentUserParticipant.active = true;
-        currentUserParticipant.inView = true;
-        newParticipants.push(currentUserParticipant);
+        //currentUserParticipant.inView = true;
+        //newParticipants.push(currentUserParticipant);
       }
 
       let i = 1;
@@ -61,6 +63,7 @@ const MeetingParticipantGrid = (props) => {
         if (i++ < (MAX_ROWS * MAX_COLS)) {
           participant.active = true;
           participant.inView = true;
+          console.log(participant);
         }
       }
 
@@ -81,15 +84,15 @@ const MeetingParticipantGrid = (props) => {
     };
 
     if (mode === 'DEFAULT') {
-      let inViewParticipants = participants.filter((p) => p.inView);
-      let overflowParticipants = participants.filter((p) => !p.inView).sort(function(a, b){return b.active - a.active});
+      let inViewParticipants = pinnedParticipant ? [pinnedParticipant] : participants.filter((p) => p.inView);
+      let overflowParticipants = pinnedParticipant ? participants : participants.filter((p) => !p.inView).sort(function (a, b) {
+        return b.active - a.active
+      });
       let numRows = inViewParticipants.length < MAX_ROWS ? inViewParticipants.length : MAX_ROWS;
       let rows = inViewParticipants.length === 2 ? 1 : numRows;
 
-      if (mode === 'DEFAULT') {
-        for (let i = 0; i < rows; i++) {
-          itemGrid.mainGrid.push([]);
-        }
+      for (let i = 0; i < rows; i++) {
+        itemGrid.mainGrid.push([]);
       }
 
       let currentRowIndex = 0;
@@ -115,17 +118,18 @@ const MeetingParticipantGrid = (props) => {
   const renderRow = (row, index) => {
     return (
       <Grid
-        style={{height: '100%'}}
+        style={{height: '100%', width: pinnedParticipant ? '100%' : null}}
         direction="row"
         justifyContent="center"
         alignItems="center" container item spacing={2}>
         <React.Fragment>
           {row.map((participant, index) => {
-            return <Grid spacing={0} item xs={4} key={index} className={'meetingParticipantContainer'} style={
+            return <Grid spacing={0} item xs={pinnedParticipant ? 0 : 4} key={index}
+                         className={'meetingParticipantContainer'} style={
               {
                 borderRadius: '4px',
-                width: (VH / MAX_ROWS) + "vh",
-                height: (VH / MAX_ROWS) + "vh",
+                width: pinnedParticipant ? '100%' : (VH / MAX_ROWS) + "vh",
+                height: pinnedParticipant ? '100%' : (VH / MAX_ROWS) + "vh",
                 flexBasis: null,
                 maxWidth: null
               }
@@ -153,7 +157,9 @@ const MeetingParticipantGrid = (props) => {
   };
 
   function renderOverflowGrid() {
-    let sortedOverflowGrid = overflowGrid.sort(function(a, b){return b.active - a.active});
+    let sortedOverflowGrid = overflowGrid.sort(function (a, b) {
+      return b.active - a.active
+    });
     return sortedOverflowGrid && sortedOverflowGrid.length > 0 &&
       <div
         style={{
@@ -163,6 +169,7 @@ const MeetingParticipantGrid = (props) => {
           height: '120px',
           borderRadius: '4px',
           overflowY: 'hidden',
+          backgroundColor: 'rgb(40, 40, 43)',
           margin: mode === 'STRIP' ? "0" : "12px 8px",
           alignItems: 'center'
         }}
@@ -209,7 +216,7 @@ const MeetingParticipantGrid = (props) => {
                  meetingTitle={props.meetingTitle}/>
         }
         {
-          grid && grid.length > 0 &&
+          grid && mode === 'DEFAULT' && step !== "LOBBY" &&
           <>
             <Box sx={{
               flexGrow: 1,
@@ -228,7 +235,7 @@ const MeetingParticipantGrid = (props) => {
                 {grid.map((row, index) => {
                   return <div style={{
                     width: "100%",
-                    height: (VH / MAX_ROWS) + "vh"
+                    height: pinnedParticipant ? '100%' : (VH / MAX_ROWS) + "vh"
                   }}>
                     {
                       <Fragment key={index}>
@@ -241,20 +248,63 @@ const MeetingParticipantGrid = (props) => {
                 })}
               </Grid>
             </Box>
-
-            <div style={{width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
-              {
-                renderOverflowGrid()
-              }
+            <div className={'row'} style={{width: '100%', height: '120px'}}>
+              <div className={'col'}
+                   style={{width: 'calc(100% - 200px)', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
+                {
+                  renderOverflowGrid()
+                }
+              </div>
+              <div style={{width: '200px'}}>
+                {
+                  currentUserParticipant &&
+                  <MeetingParticipant data={currentUserParticipant}
+                                      refChangeHandler={
+                                        currentUserParticipant.isCurrentUser ? (ref) => {
+                                          props.userVideoChangeHandler(ref);
+                                        } : null
+                                      }
+                                      onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
+                                      onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
+                                      showName={!currentUserParticipant.isCurrentUser}
+                                      userStream={userStream}
+                                      videoMuted={currentUserParticipant.videoMuted}
+                                      audioMuted={currentUserParticipant.audioMuted}
+                                      active={currentUserParticipant.active}
+                                      isHost={isHost}/>
+                }
+              </div>
             </div>
           </>
         }
         {
-          mode === 'STRIP' &&
-          <div style={{width: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
-            {
-              renderOverflowGrid()
-            }
+          mode === 'STRIP' || step === "LOBBY" &&
+          <div className={'row'} style={{width: '100%', height: '120px'}}>
+            <div className={'col'}
+                 style={{width: 'calc(100% - 200px)', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
+              {
+                renderOverflowGrid()
+              }
+            </div>
+            <div style={{width: '200px'}}>
+              {
+                currentUserParticipant &&
+                <MeetingParticipant data={currentUserParticipant}
+                                    refChangeHandler={
+                                      currentUserParticipant.isCurrentUser ? (ref) => {
+                                        props.userVideoChangeHandler(ref);
+                                      } : null
+                                    }
+                                    onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
+                                    onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
+                                    showName={!currentUserParticipant.isCurrentUser}
+                                    userStream={userStream}
+                                    videoMuted={currentUserParticipant.videoMuted}
+                                    audioMuted={currentUserParticipant.audioMuted}
+                                    active={currentUserParticipant.active}
+                                    isHost={isHost}/>
+              }
+            </div>
           </div>
         }
         {

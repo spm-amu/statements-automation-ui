@@ -111,7 +111,14 @@ const Window = (props) => {
   };
 
   return (
-    <div style={{width: '100%', height: '100%', maxHeight: '100%', overflowX: 'hidden', overflowY: 'auto', display: 'none'}}>
+    <div style={{
+      width: '100%',
+      height: '100%',
+      maxHeight: '100%',
+      overflowX: 'hidden',
+      overflowY: 'auto',
+      display: 'none'
+    }}>
       <StyledDialog
         disableEnforceFocus
         open={open}
