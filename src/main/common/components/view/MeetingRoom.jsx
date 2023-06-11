@@ -1401,22 +1401,21 @@ const MeetingRoom = (props) => {
                     width: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
                       && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '100%' : '0',
                     height: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
-                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? 'calc(100% - 108px)' : '0'
+                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? 'calc(100% - 120px)' : '0'
                   }}>
                     <video
                       hidden={false}
                       muted playsinline autoPlay ref={shareScreenRef}
-                      style={{width: '100%', height: '100%'}}
+                      style={{width: '100%', height: '100%', borderRadius: '4px'}}
                     />
                   </div>
                 }
                 <div className={'row'} style={{
                   width: 'calc(100% - 32px)',
-                  height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : "156px",
+                  height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : null,
                   marginLeft: '0',
                   marginRight: '0',
-                  margin: '16px',
-                  border: '2px solid red'
+                  margin: '16px'
                 }}>
                   <div className={'col'} style={{width: '100%', paddingLeft: '0', paddingRight: '0'}}>
                     {
