@@ -204,7 +204,7 @@ const MeetingParticipant = (props) => {
                           autoPlay muted playsInline ref={videoRef}
                           style={{
                             width: '100%',
-                            maxHeight: '100%',
+                            height: props.videoHeight ? props.videoHeight: '100%',
                             border: !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
                           }}
                         />

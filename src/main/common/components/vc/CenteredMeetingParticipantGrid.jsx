@@ -168,7 +168,6 @@ const MeetingParticipantGrid = (props) => {
           height: mode === 'STRIP' ? '120px' : null,
           overflowY: 'hidden',
           backgroundColor: 'rgb(40, 40, 43)',
-          margin: "0 8px",
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
@@ -246,7 +245,7 @@ const MeetingParticipantGrid = (props) => {
                 })}
               </Grid>
             </Box>
-            <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
+            <div className={'row'} style={{width: '100%', height: '88px', marginLeft: '0', marginRight: '0'}}>
               <div className={'col'}
                    style={{width: 'calc(100% - 200px)', height: '120px', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: 0, paddingRight: 0}}>
                 {
