@@ -269,6 +269,7 @@ const MeetingParticipantGrid = (props) => {
                                       videoMuted={currentUserParticipant.videoMuted}
                                       audioMuted={currentUserParticipant.audioMuted}
                                       active={currentUserParticipant.active}
+                                      videoHeight={'120px'}
                                       sizing={'md'}
                                       isHost={isHost}/>
                 }
@@ -301,6 +302,7 @@ const MeetingParticipantGrid = (props) => {
                                     videoMuted={currentUserParticipant.videoMuted}
                                     audioMuted={currentUserParticipant.audioMuted}
                                     active={currentUserParticipant.active}
+                                    videoHeight={'120px'}
                                     sizing={'md'}
                                     isHost={isHost}/>
               }
