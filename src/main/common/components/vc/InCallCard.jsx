@@ -227,7 +227,7 @@ const InCall = (props) => {
                 </ListItemIcon>
                 Bring to view
               </MenuItem>
-              <MenuItem
+              {/*<MenuItem
                 disabled={!props.onPinHandler}
                 onClick={() => togglePinned()}
               >
@@ -239,7 +239,7 @@ const InCall = (props) => {
                 {
                   pinned ? 'Unpin' : "Pin"
                 }
-              </MenuItem>
+              </MenuItem>*/}
             </Menu>
           </div>
         </div>

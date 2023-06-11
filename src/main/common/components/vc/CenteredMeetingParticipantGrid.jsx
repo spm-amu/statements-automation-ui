@@ -8,8 +8,8 @@ import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
 import Lobby from "./Lobby";
 
-const MAX_COLS = 3;
-const MAX_ROWS = 2;
+const MAX_COLS = 1;
+const MAX_ROWS = 1;
 const VH = 60;
 
 const MeetingParticipantGrid = (props) => {
@@ -26,8 +26,7 @@ const MeetingParticipantGrid = (props) => {
     videoMuted,
     audioMuted,
     isHost,
-    autoPermit,
-    pinnedParticipant
+    autoPermit
   } = props;
 
   useEffect(() => {
@@ -51,22 +50,18 @@ const MeetingParticipantGrid = (props) => {
         //newParticipants.push(currentUserParticipant);
       }
 
-      let i = 1;
+      let i = 0;
       for (const participant of props.participants) {
         if (!participant.isCurrentUser) {
           newParticipants.push(participant);
         } else {
           participant.active = true;
-          if(!pinnedParticipant || pinnedParticipant.userId === participant.userId) {
-            participant.inView = true;
-          }
+          participant.inView = true;
         }
 
         if (i++ < (MAX_ROWS * MAX_COLS)) {
           participant.active = true;
-          if(!pinnedParticipant || pinnedParticipant.userId === participant.userId) {
-            participant.inView = true;
-          }
+          participant.inView = true;
         }
       }
 
@@ -87,8 +82,8 @@ const MeetingParticipantGrid = (props) => {
     };
 
     if (mode === 'DEFAULT') {
-      let inViewParticipants = pinnedParticipant ? [pinnedParticipant] : participants.filter((p) => p.inView);
-      let overflowParticipants = pinnedParticipant ? participants : participants.filter((p) => !p.inView).sort(function (a, b) {
+      let inViewParticipants =participants.filter((p) => p.inView);
+      let overflowParticipants = participants.filter((p) => !p.inView).sort(function (a, b) {
         return b.active - a.active
       });
       let numRows = inViewParticipants.length < MAX_ROWS ? inViewParticipants.length : MAX_ROWS;
@@ -127,12 +122,12 @@ const MeetingParticipantGrid = (props) => {
         alignItems="center" container item spacing={2}>
         <React.Fragment>
           {row.map((participant, index) => {
-            return <Grid spacing={0} item xs={pinnedParticipant ? 0 : 4} key={index}
+            return <Grid spacing={0} item xs={4} key={index}
                          className={'meetingParticipantContainer'} style={
               {
                 borderRadius: '4px',
-                width: pinnedParticipant ? '100%' : (VH / MAX_ROWS) + "vh",
-                height: pinnedParticipant ? '100%' : (VH / MAX_ROWS) + "vh",
+                width: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
+                height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
                 flexBasis: null,
                 maxWidth: null
               }
@@ -173,7 +168,7 @@ const MeetingParticipantGrid = (props) => {
           height: mode === 'STRIP' ? '120px' : null,
           overflowY: 'hidden',
           backgroundColor: 'rgb(40, 40, 43)',
-          margin: mode === 'STRIP' || pinnedParticipant ? "0" : "12px 8px",
+          margin: "0 8px",
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
@@ -182,7 +177,8 @@ const MeetingParticipantGrid = (props) => {
                       style={{
                         borderRadius: '4px',
                         minWidth: "200px",
-                        padding: '4px'
+                        padding: '4px',
+                        height: '120px'
                       }}>
             <MeetingParticipant data={participant}
                                 refChangeHandler={
@@ -201,6 +197,7 @@ const MeetingParticipantGrid = (props) => {
                                 showName={!participant.isCurrentUser}
                                 videoMuted={participant.videoMuted}
                                 audioMuted={participant.audioMuted} sizing={'sm'}
+                                inView={participant.inView}
                                 active={participant.active}/>
           </div>
         })}
@@ -236,7 +233,7 @@ const MeetingParticipantGrid = (props) => {
                 {grid.map((row, index) => {
                   return <div style={{
                     width: "100%",
-                    height: pinnedParticipant ? '100%' : (VH / MAX_ROWS) + "vh"
+                    height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh"
                   }}>
                     {
                       <Fragment key={index}>
@@ -249,9 +246,9 @@ const MeetingParticipantGrid = (props) => {
                 })}
               </Grid>
             </Box>
-            <div className={'row'} style={{width: '100%', marginLeft: '0', marginRight: '0'}}>
+            <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
               <div className={'col'}
-                   style={{width: 'calc(100% - 200px)', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: 0, paddingRight: 0}}>
+                   style={{width: 'calc(100% - 200px)', height: '120px', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: 0, paddingRight: 0}}>
                 {
                   renderOverflowGrid()
                 }
