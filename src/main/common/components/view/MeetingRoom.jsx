@@ -1352,7 +1352,7 @@ const MeetingRoom = (props) => {
         <div className={'col'} style={{
           paddingLeft: '0',
           paddingRight: '0',
-          maxHeight: '97%',
+          maxHeight: '100%',
           height: displayState === 'MAXIMIZED' ? null : '100%'
         }}>
           <div style={{height: '100%', maxHeight: '100%', backgroundColor: '#000000'}}>
@@ -1401,7 +1401,7 @@ const MeetingRoom = (props) => {
                     width: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
                       && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '100%' : '0',
                     height: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
-                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '100%' : '0'
+                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? 'calc(100% - 152px)' : '0'
                   }}>
                     <video
                       hidden={false}
@@ -1412,7 +1412,7 @@ const MeetingRoom = (props) => {
                 }
                 <div className={'row'} style={{
                   width: 'calc(100% - 32px)',
-                  height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : null,
+                  height: meetingParticipantGridMode === 'DEFAULT' ? 'calc(100% - 32px)' : null,
                   marginLeft: '0',
                   marginRight: '0',
                   margin: '16px'

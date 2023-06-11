@@ -169,8 +169,8 @@ const MeetingParticipantGrid = (props) => {
           overflowX: 'auto',
           maxWidth: '100%',
           width: '100%',
-          height: '120px',
           borderRadius: '4px',
+          height: mode === 'STRIP' ? '120px' : null,
           overflowY: 'hidden',
           backgroundColor: 'rgb(40, 40, 43)',
           margin: mode === 'STRIP' || pinnedParticipant ? "0" : "12px 8px",
@@ -181,8 +181,6 @@ const MeetingParticipantGrid = (props) => {
           return <div className={'col-*-*'} key={index}
                       style={{
                         borderRadius: '4px',
-                        height: "120px",
-                        maxHeight: "120px",
                         minWidth: "200px",
                         padding: '4px'
                       }}>
@@ -223,7 +221,7 @@ const MeetingParticipantGrid = (props) => {
           <>
             <Box sx={{
               flexGrow: 1,
-              height: step === "LOBBY" ? null : 'calc(100% - 120px)',
+              height: step === "LOBBY" ? null : 'calc(100% - 152px)',
               width: '100%',
               justifyContent: 'center',
               alignItems: 'center',
@@ -251,7 +249,7 @@ const MeetingParticipantGrid = (props) => {
                 })}
               </Grid>
             </Box>
-            <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
+            <div className={'row'} style={{width: '100%', marginLeft: '0', marginRight: '0'}}>
               <div className={'col'}
                    style={{width: 'calc(100% - 200px)', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: 0, paddingRight: 0}}>
                 {
@@ -285,7 +283,7 @@ const MeetingParticipantGrid = (props) => {
           (mode === 'STRIP' || step === "LOBBY") &&
           <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
             <div className={'col'}
-                 style={{width: 'calc(100% - 200px)', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: 0, paddingRight: 0}}>
+                 style={{width: 'calc(100% - 200px)', height: '120px', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: 0, paddingRight: 0}}>
               {
                 renderOverflowGrid()
               }
