@@ -1352,7 +1352,7 @@ const MeetingRoom = (props) => {
         <div className={'col'} style={{
           paddingLeft: '0',
           paddingRight: '0',
-          maxHeight: '95%',
+          maxHeight: '97%',
           height: displayState === 'MAXIMIZED' ? null : '100%'
         }}>
           <div style={{height: '100%', maxHeight: '100%', backgroundColor: '#000000'}}>
@@ -1362,7 +1362,7 @@ const MeetingRoom = (props) => {
                 {
                   showWhiteBoard && meetingParticipantGridMode === 'STRIP' &&
                   <div className={'row no-margin no-padding'}
-                       style={{width: '100%', height: 'calc(100% - 200px)', margin: '16px 0'}}>
+                       style={{width: '100%', height: 'calc(100% - 156px)', margin: '16px 0'}}>
                     <div className={'col no-margin no-padding'} style={{width: '100%'}}>
                       <WhiteBoard isHost={isHost} id={selectedMeeting.id} items={whiteboardItems} eventHandler={
                         {
@@ -1397,11 +1397,11 @@ const MeetingRoom = (props) => {
                 {
                   <div style={{
                     padding: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
-                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '32px 32px 0 32px' : null,
+                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '16px 16px 0 16px' : null,
                     width: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
                       && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? '100%' : '0',
                     height: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
-                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? 'calc(100% - 200px)' : '0'
+                      && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? 'calc(100% - 108px)' : '0'
                   }}>
                     <video
                       hidden={false}
@@ -1411,10 +1411,12 @@ const MeetingRoom = (props) => {
                   </div>
                 }
                 <div className={'row'} style={{
-                  width: '100%',
-                  height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : "160px",
+                  width: 'calc(100% - 32px)',
+                  height: meetingParticipantGridMode === 'DEFAULT' ? '100%' : "156px",
                   marginLeft: '0',
-                  marginRight: '0'
+                  marginRight: '0',
+                  margin: '16px',
+                  border: '2px solid red'
                 }}>
                   <div className={'col'} style={{width: '100%', paddingLeft: '0', paddingRight: '0'}}>
                     {

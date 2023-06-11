@@ -88,6 +88,7 @@ a:hover {
   z-index: 1051 !important;
 }
 
+.avatar-md,
 .avatar {
   font-size: 36px;
   width: 3em;
@@ -97,6 +98,11 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.avatar-md {
+  width: 2.6em;
+  height: 2.6em;
 }
 
 .avatar::after {

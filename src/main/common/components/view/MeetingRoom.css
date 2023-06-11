@@ -6,8 +6,8 @@
 
 .closable-panel-container {
   width: 25%;
-  height: 96%;
-  margin: 16px;
+  height: calc(100% - 32px);
+  margin: 16px 16px 16px 0;
 }
 
 .workspace-max {

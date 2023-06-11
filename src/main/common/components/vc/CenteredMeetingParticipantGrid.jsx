@@ -57,13 +57,16 @@ const MeetingParticipantGrid = (props) => {
           newParticipants.push(participant);
         } else {
           participant.active = true;
-          participant.inView = true;
+          if(!pinnedParticipant || pinnedParticipant.userId === participant.userId) {
+            participant.inView = true;
+          }
         }
 
         if (i++ < (MAX_ROWS * MAX_COLS)) {
           participant.active = true;
-          participant.inView = true;
-          console.log(participant);
+          if(!pinnedParticipant || pinnedParticipant.userId === participant.userId) {
+            participant.inView = true;
+          }
         }
       }
 
@@ -118,7 +121,7 @@ const MeetingParticipantGrid = (props) => {
   const renderRow = (row, index) => {
     return (
       <Grid
-        style={{height: '100%', width: pinnedParticipant ? '100%' : null}}
+        style={{height: '100%'}}
         direction="row"
         justifyContent="center"
         alignItems="center" container item spacing={2}>
@@ -170,7 +173,7 @@ const MeetingParticipantGrid = (props) => {
           borderRadius: '4px',
           overflowY: 'hidden',
           backgroundColor: 'rgb(40, 40, 43)',
-          margin: mode === 'STRIP' ? "0" : "12px 8px",
+          margin: mode === 'STRIP' || pinnedParticipant ? "0" : "12px 8px",
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
@@ -209,7 +212,7 @@ const MeetingParticipantGrid = (props) => {
   return (
     grid !== null ?
       <div className={'row grid'}
-           style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%', margin: '16px 0'}}>
+           style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
         {
           step === "LOBBY" &&
           <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState}
@@ -248,9 +251,9 @@ const MeetingParticipantGrid = (props) => {
                 })}
               </Grid>
             </Box>
-            <div className={'row'} style={{width: '100%', height: '120px'}}>
+            <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
               <div className={'col'}
-                   style={{width: 'calc(100% - 200px)', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
+                   style={{width: 'calc(100% - 200px)', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: 0, paddingRight: 0}}>
                 {
                   renderOverflowGrid()
                 }
@@ -271,6 +274,7 @@ const MeetingParticipantGrid = (props) => {
                                       videoMuted={currentUserParticipant.videoMuted}
                                       audioMuted={currentUserParticipant.audioMuted}
                                       active={currentUserParticipant.active}
+                                      sizing={'md'}
                                       isHost={isHost}/>
                 }
               </div>
@@ -278,10 +282,10 @@ const MeetingParticipantGrid = (props) => {
           </>
         }
         {
-          mode === 'STRIP' || step === "LOBBY" &&
-          <div className={'row'} style={{width: '100%', height: '120px'}}>
+          (mode === 'STRIP' || step === "LOBBY") &&
+          <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
             <div className={'col'}
-                 style={{width: 'calc(100% - 200px)', overflow: 'hidden', display: 'flex', alignItems: 'center'}}>
+                 style={{width: 'calc(100% - 200px)', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: 0, paddingRight: 0}}>
               {
                 renderOverflowGrid()
               }
@@ -302,6 +306,7 @@ const MeetingParticipantGrid = (props) => {
                                     videoMuted={currentUserParticipant.videoMuted}
                                     audioMuted={currentUserParticipant.audioMuted}
                                     active={currentUserParticipant.active}
+                                    sizing={'md'}
                                     isHost={isHost}/>
               }
             </div>

@@ -186,7 +186,7 @@ const MeetingParticipant = (props) => {
                                  height: ((props.sizing === 'sm' ? 1 : 3) + soundLevel / 10) + 'em',
                                  border: !audioMuted && soundLevel > 3 ? (props.sizing === 'sm' ? 2 : 4) + 'px solid #00476a' : 'none'
                                }}>
-                            <div className={'avatar'} data-label={Utils.getInitials(props.data.name)}
+                            <div className={props.sizing === 'md' ? 'avatar avatar-md' : 'avatar'} data-label={Utils.getInitials(props.data.name)}
                                  style={
                                    {
                                      fontSize: props.sizing === 'sm' ? '14px' : null
