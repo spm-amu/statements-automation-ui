@@ -65,16 +65,23 @@ const MeetingParticipantGrid = (props) => {
       console.log("\n\n\n\n\n\n\n\nparticipantsInView : " + participant.userId + " : " + participant.inView);
       console.log("\n\n\n\n\n\n\n\nPARTS STATE : ", participants);
 
-      let gridData = createGrid(participants);
-      console.log(gridData);
-      setGrid(gridData.mainGrid);
-      setOverflowGrid(gridData.overflowGrid);
+      setGrid(null);
+      setOverflowGrid(null);
     }
   };
 
   useEffect(() => {
     systemEventHandler.api = systemEventHandlerApi();
   });
+
+  useEffect(() => {
+    if(grid === null && overflowGrid === null) {
+      let gridData = createGrid(participants);
+      console.log(gridData);
+      setGrid(gridData.mainGrid);
+      setOverflowGrid(gridData.overflowGrid);
+    }
+  }, [grid, overflowGrid]);
 
   useEffect(() => {
     if (props.participants && props.mode) {
@@ -181,6 +188,7 @@ const MeetingParticipantGrid = (props) => {
     return (
       <Grid
         style={{height: '100%'}}
+        key={index}
         direction="row"
         justifyContent="center"
         alignItems="center" container item spacing={2}>
@@ -223,6 +231,7 @@ const MeetingParticipantGrid = (props) => {
     let sortedOverflowGrid = overflowGrid.sort(function (a, b) {
       return b.active - a.active
     });
+    console.log("\n\n\n\n\n\n\n\nRENDERING OFG : , ", overflowGrid);
     return sortedOverflowGrid && sortedOverflowGrid.length > 0 &&
       <div
         style={{
@@ -251,8 +260,8 @@ const MeetingParticipantGrid = (props) => {
                                   } : null
                                 }
                                 soundMonitor={(userId, active) => {
-                                  participants.find((p) => p.userId === userId).active = active;
-                                  setRefresher(!refresher);
+                                  //participants.find((p) => p.userId === userId).active = active;
+                                  //setRefresher(!refresher);
                                 }}
                                 onHostAudioMute={() => props.onHostAudioMute(participant)}
                                 onHostVideoMute={() => props.onHostVideoMute(participant)}

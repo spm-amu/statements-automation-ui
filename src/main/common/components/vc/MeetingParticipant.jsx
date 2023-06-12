@@ -10,7 +10,7 @@ import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
 
 const MeetingParticipant = (props) => {
-  const [active, setActive] = React.useState(props.active);
+  const [active, setActive] = React.useState(false);
   const [handRaised, setHandRaised] = React.useState(false);
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
@@ -109,7 +109,6 @@ const MeetingParticipant = (props) => {
       videoRef.current.srcObject = props.data.stream;
       props.data.peer.on('data', data => {
         let dataJSON = JSON.parse("" + data);
-
         if(dataJSON.userId === props.data.userId) {
           //console.log(dataJSON.data.level);
           setSoundLevel(dataJSON.data.level);
@@ -222,7 +221,7 @@ const MeetingParticipant = (props) => {
                           style={{
                             width: '100%',
                             height: props.videoHeight ? props.videoHeight: '100%',
-                            border: !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                            border: !audioMuted && soundLevel > 3 ? '4px solid red' : 'none'
                           }}
                         />
                     }

@@ -710,7 +710,9 @@ const MeetingRoom = (props) => {
         audioMuted: item.user.audioMuted,
         videoMuted: item.user.videoMuted,
         stream: item.mainStream,
-        shareStream: item.shareStream
+        shareStream: item.shareStream,
+        active: false,
+        inView: false
       };
 
       if (peerId) {
