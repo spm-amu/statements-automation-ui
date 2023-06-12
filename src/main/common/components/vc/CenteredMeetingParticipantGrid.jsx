@@ -321,7 +321,7 @@ const MeetingParticipantGrid = (props) => {
             </Box>
             <div className={'row'} style={{width: '100%', height: '88px', marginLeft: '0', marginRight: '0'}}>
               <div className={'col'}
-                   style={{width: 'calc(100% - 200px)', height: '120px', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: '8px', paddingRight: '8px'}}>
+                   style={{width: 'calc(100% - 200px)', height: '120px', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: '16px', paddingRight: '16px'}}>
                 {
                   renderOverflowGrid()
                 }
@@ -355,7 +355,7 @@ const MeetingParticipantGrid = (props) => {
           (mode === 'STRIP' || step === "LOBBY") &&
           <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
             <div className={'col'}
-                 style={{width: 'calc(100% - 200px)', height: '120px', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: '8px', paddingRight: '8px'}}>
+                 style={{width: 'calc(100% - 200px)', height: '120px', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: '16px', paddingRight: '16px'}}>
               {
                 renderOverflowGrid()
               }
