@@ -221,7 +221,7 @@ const MeetingParticipant = (props) => {
                           style={{
                             width: '100%',
                             height: props.videoHeight ? props.videoHeight: '100%',
-                            border: !audioMuted && soundLevel > 3 ? '4px solid red' : 'none'
+                            border: !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
                           }}
                         />
                     }
