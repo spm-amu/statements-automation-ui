@@ -97,8 +97,9 @@ const MeetingParticipant = (props) => {
       setAudioMuted(payload.audioMuted);
       setVideoMuted(payload.videoMuted);
 
-      if(!props.inView && payload.audioMuted) {
+      if(!props.inView && payload.audioMuted && !props.isCurrentUser) {
         setActive(false);
+        props.data.active = false;
       }
     }
   };

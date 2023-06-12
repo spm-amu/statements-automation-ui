@@ -210,6 +210,7 @@ const MeetingParticipantGrid = (props) => {
                                   videoMuted={participant.videoMuted}
                                   audioMuted={participant.audioMuted}
                                   active={participant.active}
+                                  inView={participant.inView}
                                   isHost={isHost}/>
             </Grid>
           })}
@@ -328,6 +329,7 @@ const MeetingParticipantGrid = (props) => {
                                       onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
                                       onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
                                       showName={!currentUserParticipant.isCurrentUser}
+                                      isCurrentUser={currentUserParticipant.isCurrentUser}
                                       userStream={userStream}
                                       videoMuted={currentUserParticipant.videoMuted}
                                       audioMuted={currentUserParticipant.audioMuted}
@@ -361,6 +363,7 @@ const MeetingParticipantGrid = (props) => {
                                     onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
                                     onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
                                     showName={!currentUserParticipant.isCurrentUser}
+                                    isCurrentUser={currentUserParticipant.isCurrentUser}
                                     userStream={userStream}
                                     videoMuted={currentUserParticipant.videoMuted}
                                     audioMuted={currentUserParticipant.audioMuted}
