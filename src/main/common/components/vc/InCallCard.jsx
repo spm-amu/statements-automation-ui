@@ -14,7 +14,7 @@ const InCall = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMoreActions = Boolean(anchorEl);
   const {participant} = props;
-  const [handRaised, setHandRaised] = React.useState(false);
+  const [handRaised, setHandRaised] = React.useState(participant.handRaised);
   const [inView, setInView] = React.useState(participant.inView);
   const [pinned, setPinned] = React.useState(participant.pinned);
   const [eventHandler] = useState({});
@@ -55,7 +55,7 @@ const InCall = (props) => {
   };
 
   const handleParticipantOffView = (payload) => {
-    if(payload.userId === participant.userId) {
+    if (payload.userId === participant.userId) {
       setInView(false);
     }
   };
@@ -109,7 +109,7 @@ const InCall = (props) => {
     let newPinnedVal = !pinned;
     setPinned(newPinnedVal);
     participant.pinned = newPinnedVal;
-    if(props.onPinHandler) {
+    if (props.onPinHandler) {
       props.onPinHandler(participant, newPinnedVal);
     }
   };
@@ -178,7 +178,7 @@ const InCall = (props) => {
                 </IconButton>
               }
               {
-                props.isHost && appManager.getUserDetails().userId !== participant.userId &&
+                appManager.getUserDetails().userId !== participant.userId &&
                 <Tooltip title="More Actions">
                   <IconButton
                     onClick={handleClick}
@@ -192,9 +192,7 @@ const InCall = (props) => {
                   </IconButton>
                 </Tooltip>
               }
-
             </div>
-
             <Menu
               anchorEl={anchorEl}
               id="account-menu"
@@ -233,15 +231,19 @@ const InCall = (props) => {
               transformOrigin={{horizontal: 20, vertical: 44}}
               anchorOrigin={{horizontal: 'right', vertical: 'top'}}
             >
-              <MenuItem
-                disabled={Utils.isNull(participant.userId)}
-                onClick={() => props.onChangeMeetingHostHandler(participant)}
-              >
-                <ListItemIcon>
-                  <PersonAdd fontSize="small"/>
-                </ListItemIcon>
-                Change Meeting Host
-              </MenuItem>
+              {
+                props.isHost &&
+                <MenuItem
+                  disabled={Utils.isNull(participant.userId)}
+                  onClick={() => props.onChangeMeetingHostHandler(participant)}
+                >
+                  <ListItemIcon>
+                    <PersonAdd fontSize="small"/>
+                  </ListItemIcon>
+                  Change Meeting Host
+                </MenuItem>
+
+              }
               <MenuItem
                 disabled={inView}
                 onClick={() => {

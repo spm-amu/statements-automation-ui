@@ -8,6 +8,7 @@ import socketManager from "../../../common/service/SocketManager";
 import {Buffer} from "buffer/";
 import Icon from "../Icon";
 import IconButton from "@material-ui/core/IconButton";
+import {PanTool} from "@material-ui/icons";
 
 const MeetingParticipant = (props) => {
   const [active, setActive] = React.useState(false);
@@ -41,12 +42,14 @@ const MeetingParticipant = (props) => {
   const onRaiseHand = (payload) => {
     if (payload && payload.userId === props.data.userId) {
       setHandRaised(true);
+      props.data.handRaised = true;
     }
   };
 
   const onLowerHand = (payload) => {
     if (payload && payload.userId === props.data.userId) {
       setHandRaised(false);
+      props.data.handRaised = false;
     }
   };
 
@@ -75,7 +78,7 @@ const MeetingParticipant = (props) => {
   }, [props.videoMuted]);
 
   useEffect(() => {
-    if(props.soundMonitor && !props.inView) {
+    if (props.soundMonitor && !props.inView) {
       props.soundMonitor(props.data.userId, soundLevel > 3);
       setActive(soundLevel > 3);
     }
@@ -97,7 +100,7 @@ const MeetingParticipant = (props) => {
       setAudioMuted(payload.audioMuted);
       setVideoMuted(payload.videoMuted);
 
-      if(!props.inView && payload.audioMuted && !props.isCurrentUser) {
+      if (!props.inView && payload.audioMuted && !props.isCurrentUser) {
         setActive(false);
         props.data.active = false;
       }
@@ -109,7 +112,7 @@ const MeetingParticipant = (props) => {
       videoRef.current.srcObject = props.data.stream;
       props.data.peer.on('data', data => {
         let dataJSON = JSON.parse("" + data);
-        if(dataJSON.userId === props.data.userId) {
+        if (dataJSON.userId === props.data.userId) {
           //console.log(dataJSON.data.level);
           setSoundLevel(dataJSON.data.level);
         }
@@ -120,7 +123,7 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
-    if(videoRef.current) {
+    if (videoRef.current) {
       if (props.data.peer) {
         videoRef.current.srcObject = props.data.stream;
       } else {
@@ -183,7 +186,8 @@ const MeetingParticipant = (props) => {
                   <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
                     {
                       videoMuted &&
-                      <div className={'centered-flex-box'} style={{width: '100%', height: '100%', marginBottom: props.sizing === 'sm' ? '8px' : 0}}>
+                      <div className={'centered-flex-box'}
+                           style={{width: '100%', height: '100%', marginBottom: props.sizing === 'sm' ? '8px' : 0}}>
                         {
                           <div className={'avatar-wrapper'}
                                style={{
@@ -191,7 +195,8 @@ const MeetingParticipant = (props) => {
                                  height: ((props.sizing === 'sm' ? 1 : 3) + soundLevel / 10) + 'em',
                                  border: !audioMuted && soundLevel > 3 ? (props.sizing === 'sm' ? 2 : 4) + 'px solid #00476a' : 'none'
                                }}>
-                            <div className={props.sizing === 'md' ? 'avatar avatar-md' : 'avatar'} data-label={Utils.getInitials(props.data.name)}
+                            <div className={props.sizing === 'md' ? 'avatar avatar-md' : 'avatar'}
+                                 data-label={Utils.getInitials(props.data.name)}
                                  style={
                                    {
                                      fontSize: props.sizing === 'sm' ? '14px' : null
@@ -209,8 +214,8 @@ const MeetingParticipant = (props) => {
                           autoPlay muted playsInline ref={videoRef}
                           style={{
                             width: '100%',
-                            height: props.videoHeight ? props.videoHeight: '100%',
-                            border: !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                            height: props.videoHeight ? props.videoHeight : '100%',
+                            border: props.inView && !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
                           }}
                         />
                         :
@@ -220,8 +225,8 @@ const MeetingParticipant = (props) => {
                           autoPlay playsInline ref={videoRef}
                           style={{
                             width: '100%',
-                            height: props.videoHeight ? props.videoHeight: '100%',
-                            border: !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                            height: props.videoHeight ? props.videoHeight : '100%',
+                            border: props.inView && !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
                           }}
                         />
                     }
@@ -230,30 +235,30 @@ const MeetingParticipant = (props) => {
                       {
                         props.showName &&
                         <span style={{marginLeft: '4px'}}>
-                    {
-                      props.isHost && !audioMuted ?
-                        <IconButton
-                          onClick={(e) => {
-                            props.onHostAudioMute(props.data)
-                          }}
-                          style={{
-                            marginRight: '4px',
-                            width: '16px',
-                            height: '16px',
-                            color: 'white'
-                          }}
-                        >
-                          <Icon id={'MIC'}/>
-                        </IconButton>
-                        :
-                        <>
-                          {audioMuted ? (
-                            <Icon id={'MIC_OFF'}/>
-                          ) : (
-                            <Icon id={'MIC'}/>
-                          )}
-                        </>
-                    }
+                          {
+                            props.isHost && !audioMuted ?
+                              <IconButton
+                                onClick={(e) => {
+                                  props.onHostAudioMute(props.data)
+                                }}
+                                style={{
+                                  marginRight: '4px',
+                                  width: '16px',
+                                  height: '16px',
+                                  color: 'white'
+                                }}
+                              >
+                                <Icon id={'MIC'}/>
+                              </IconButton>
+                              :
+                              <>
+                                {audioMuted ? (
+                                  <Icon id={'MIC_OFF'}/>
+                                ) : (
+                                  <Icon id={'MIC'}/>
+                                )}
+                              </>
+                          }
                           {
                             props.isHost && !videoMuted &&
                             <IconButton
@@ -270,7 +275,7 @@ const MeetingParticipant = (props) => {
                               <Icon id={'CAMERA'}/>
                             </IconButton>
                           }
-                  </span>
+                        </span>
                       }
                       {
                         props.showName &&
