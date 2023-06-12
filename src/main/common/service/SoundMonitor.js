@@ -28,7 +28,7 @@ class SoundMonitor {
       callback({
         volume: currentVolume,
         level: currentLevel
-      }, this.participants)
+      }, this.participants, this.audioMuted);
     }, 1000);
   };
 
@@ -46,6 +46,10 @@ class SoundMonitor {
 
   setParticipants = (participants) => {
     this.participants = participants;
+  };
+
+  setAudioMuted = (audioMuted) => {
+    this.audioMuted = audioMuted;
   }
 }
 

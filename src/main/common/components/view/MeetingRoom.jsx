@@ -980,12 +980,12 @@ const MeetingRoom = (props) => {
 
   const transmitAudioLevel = async (data, participants) => {
     if(participants) {
-      console.log("TRANSMITTING AUDIO LEVEL TO PARTS : ");
-      console.log(participants);
+      //console.log("TRANSMITTING AUDIO LEVEL TO PARTS : ");
+      //console.log(participants);
       for (const participant of participants) {
         if (participant.peer && participant.peer.connected) {
-          console.log("TRANSMITTING AUDIO LEVEL TO : " + participant.userId);
-          console.log((participant.peer ? participant.peer.connected : "NULL PEER"));
+          //console.log("TRANSMITTING AUDIO LEVEL TO : " + participant.userId);
+          //console.log((participant.peer ? participant.peer.connected : "NULL PEER"));
           participant.peer.send(JSON.stringify({userId: appManager.getUserDetails().userId, data}));
         }
       }
@@ -995,8 +995,8 @@ const MeetingRoom = (props) => {
   const setupStream = () => {
     currentUserStream.init(!videoMuted, !audioMuted, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
-      soundMonitor.start(stream, async (data, participants) => {
-        if(data.level > 0 && !audioMuted) {
+      soundMonitor.start(stream, async (data, participants, muted) => {
+        if(data.level > 0 && !muted) {
           transmitAudioLevel(data, participants);
         }
       });
@@ -1213,6 +1213,7 @@ const MeetingRoom = (props) => {
     if (audioMuted !== null) {
       toggleAudio();
       emitAVSettingsChange();
+      soundMonitor.setAudioMuted(audioMuted);
     }
   }, [audioMuted]);
 

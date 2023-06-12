@@ -105,7 +105,7 @@ const MeetingParticipant = (props) => {
         let dataJSON = JSON.parse("" + data);
 
         if(dataJSON.userId === props.data.userId) {
-          console.log(dataJSON.data.level);
+          //console.log(dataJSON.data.level);
           setSoundLevel(dataJSON.data.level);
         }
       });
