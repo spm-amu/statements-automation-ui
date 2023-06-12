@@ -10,7 +10,7 @@ import Footer from "../vc/Footer";
 import socketManager from "../../service/SocketManager";
 import {MessageType, SystemEventType} from "../../types";
 import Utils, {CONNECTION_ERROR_MESSAGE, STREAM_ERROR_MESSAGE, SYSTEM_ERROR_MESSAGE} from "../../Utils";
-import MeetingParticipantGrid from '../vc/CenteredMeetingParticipantGrid';
+import MeetingParticipantGrid, {MAX_COLS, MAX_ROWS} from '../vc/CenteredMeetingParticipantGrid';
 import ClosablePanel from "../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
 import appManager from "../../../common/service/AppManager";
@@ -996,7 +996,7 @@ const MeetingRoom = (props) => {
     currentUserStream.init(!videoMuted, !audioMuted, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
       soundMonitor.start(stream, async (data, participants) => {
-        if(data.level > 0) {
+        if(data.level > 0 && !audioMuted) {
           transmitAudioLevel(data, participants);
         }
       });
@@ -1526,9 +1526,6 @@ const MeetingRoom = (props) => {
                   } else {
                     setPinnedParticipant(null);
                   }
-                }}
-                onBringToViewHandler={(participant) => {
-                  alert("Bring to view firee : " + participant.userId);
                 }}
               />
             </ClosablePanel>

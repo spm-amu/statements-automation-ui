@@ -3,13 +3,11 @@ import './InCallCard.css';
 import {IconButton, ListItemIcon, Menu, MenuItem} from '@material-ui/core';
 import Icon from '../Icon';
 import {PersonAdd} from '@material-ui/icons';
-import {PersonPinCircle} from '@material-ui/icons';
-import {PinDrop} from '@material-ui/icons';
 import Tooltip from '@material-ui/core/Tooltip';
 import {useNavigate} from 'react-router-dom';
 import appManager from "../../service/AppManager";
 import Utils from '../../Utils';
-import {MessageType} from "../../types";
+import {MessageType, SystemEventType} from "../../types";
 import socketManager from "../../service/SocketManager";
 
 const InCall = (props) => {
@@ -17,8 +15,10 @@ const InCall = (props) => {
   const openMoreActions = Boolean(anchorEl);
   const {participant} = props;
   const [handRaised, setHandRaised] = React.useState(false);
+  const [inView, setInView] = React.useState(participant.inView);
   const [pinned, setPinned] = React.useState(participant.pinned);
   const [eventHandler] = useState({});
+  const [systemEventHandler] = useState({});
   const navigate = useNavigate();
 
   const handler = () => {
@@ -39,6 +39,27 @@ const InCall = (props) => {
     }
   };
 
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'in-call-card-' + participant.userId;
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.PARTICIPANT_OFF_VIEW:
+            handleParticipantOffView(be);
+            break;
+        }
+      }
+    }
+  };
+
+  const handleParticipantOffView = (payload) => {
+    if(payload.userId === participant.userId) {
+      setInView(false);
+    }
+  };
+
   const onRaiseHand = (payload) => {
     if (participant && payload && payload.userId === participant.userId) {
       setHandRaised(true);
@@ -53,13 +74,16 @@ const InCall = (props) => {
 
   useEffect(() => {
     eventHandler.api = handler();
+    systemEventHandler.api = systemEventHandlerApi();
   });
 
   useEffect(() => {
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_OFF_VIEW);
 
     return () => {
       socketManager.removeSubscriptions(eventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
     };
   }, []);
 
@@ -219,8 +243,11 @@ const InCall = (props) => {
                 Change Meeting Host
               </MenuItem>
               <MenuItem
-                disabled={participant.inView || !props.onBringToViewHandler}
-                onClick={() => props.onBringToViewHandler(participant)}
+                disabled={inView}
+                onClick={() => {
+                  setInView(true);
+                  appManager.fireEvent(SystemEventType.PARTICIPANT_IN_VIEW, participant)
+                }}
               >
                 <ListItemIcon>
                   <Icon id={'MAXIMIZE'}/>

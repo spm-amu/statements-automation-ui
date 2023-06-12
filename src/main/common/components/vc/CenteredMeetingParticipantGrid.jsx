@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {Fragment, useEffect} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import './CenteredMeetingParticipantGrid.css';
 import MeetingParticipant from "./MeetingParticipant";
 import LobbyWaitingList from "./LobbyWaitingList";
@@ -7,9 +7,10 @@ import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
 import Lobby from "./Lobby";
+import {SystemEventType} from "../../types";
 
-const MAX_COLS = 3;
-const MAX_ROWS = 2;
+const MAX_COLS = 1;
+const MAX_ROWS = 1;
 const VH = 60;
 
 const MeetingParticipantGrid = (props) => {
@@ -18,6 +19,7 @@ const MeetingParticipantGrid = (props) => {
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
   const [refresher, setRefresher] = React.useState(false);
+  const [systemEventHandler] = useState({});
   const {
     waitingList,
     mode,
@@ -28,6 +30,51 @@ const MeetingParticipantGrid = (props) => {
     isHost,
     autoPermit
   } = props;
+
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'meeting-participant-grid';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.PARTICIPANT_IN_VIEW:
+            handleParticipantInView(be);
+            break;
+        }
+      }
+    }
+  };
+
+  const handleParticipantInView = (payload) => {
+    let participant = participants.find(((p) => p.userId === payload.userId));
+    if(participant) {
+      let maxNumberOfInViewParticipants = MAX_ROWS * MAX_COLS;
+      let participantsInView = participants.filter((p) => p.inView);
+
+      if(participantsInView.length === maxNumberOfInViewParticipants) {
+        let offViewParticipant = participantsInView[participantsInView.length - 1];
+        offViewParticipant.inView = false;
+        offViewParticipant.active = false;
+        appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, offViewParticipant);
+      }
+
+      participant.inView = true;
+      participant.active = true;
+
+      console.log("\n\n\n\n\n\n\n\nparticipantsInView : " + participant.userId + " : " + participant.inView);
+      console.log("\n\n\n\n\n\n\n\nPARTS STATE : ", participants);
+
+      let gridData = createGrid(participants);
+      console.log(gridData);
+      setGrid(gridData.mainGrid);
+      setOverflowGrid(gridData.overflowGrid);
+    }
+  };
+
+  useEffect(() => {
+    systemEventHandler.api = systemEventHandlerApi();
+  });
 
   useEffect(() => {
     if (props.participants && props.mode) {
@@ -51,6 +98,14 @@ const MeetingParticipantGrid = (props) => {
       }
 
       let i = 0;
+      let participantsInView = props.participants.filter((p) => p.inView);
+      for (const participant of participantsInView) {
+        if (i++ < (MAX_ROWS * MAX_COLS)) {
+          participant.active = true;
+          participant.inView = true;
+        }
+      }
+
       for (const participant of props.participants) {
         if (!participant.isCurrentUser) {
           newParticipants.push(participant);
@@ -75,6 +130,15 @@ const MeetingParticipantGrid = (props) => {
     }
   }, [props.participants, props.mode]);
 
+
+  useEffect(() => {
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_IN_VIEW);
+
+    return () => {
+      appManager.removeSubscriptions(systemEventHandler);
+    };
+  }, []);
+
   const createGrid = (participants) => {
     let itemGrid = {
       mainGrid: [],
@@ -95,7 +159,7 @@ const MeetingParticipantGrid = (props) => {
 
       let currentRowIndex = 0;
       for (let i = 0; i < inViewParticipants.length; i++) {
-        itemGrid.mainGrid[currentRowIndex].push(participants[i]);
+        itemGrid.mainGrid[currentRowIndex].push(inViewParticipants[i]);
         if (currentRowIndex++ === rows - 1) {
           currentRowIndex = 0;
         }
