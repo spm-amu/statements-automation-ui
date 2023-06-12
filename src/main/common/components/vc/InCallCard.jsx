@@ -17,6 +17,8 @@ const InCall = (props) => {
   const [handRaised, setHandRaised] = React.useState(participant.handRaised);
   const [inView, setInView] = React.useState(participant.inView);
   const [pinned, setPinned] = React.useState(participant.pinned);
+  const [videoMuted, setVideoMuted] = React.useState(participant.videoMuted);
+  const [audioMuted, setAudioMuted] = React.useState(participant.audioMuted);
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const navigate = useNavigate();
@@ -134,17 +136,6 @@ const InCall = (props) => {
     >
       <div className="participant-card">
         <div className="row no-margin person-card">
-          <div className={'avatar-small'}>
-            <img
-              src={
-                participant.avatar
-                  ? participant.avatar
-                  : require('../../../desktop/dashboard/images/noimage-person.png')
-              }
-              alt={''}
-              style={{borderRadius: '50%'}}
-            />
-          </div>
           <div className={'col user-details'}>{computeParticipantName()}</div>
           <div style={{
             marginTop: '4px',
@@ -156,16 +147,6 @@ const InCall = (props) => {
           }}>
             <div>
               {
-                appManager.getUserDetails().userId !== participant.userId &&
-                <IconButton
-                  onClick={privateChatHandler}
-                  size="small"
-                  sx={{ml: 2}}
-                >
-                  <Icon id={'CHAT_BUBBLE'} fontSize={'small'}/>
-                </IconButton>
-              }
-              {
                 appManager.getUserDetails().userId !== participant.userId && handRaised &&
                 <IconButton
                   onClick={() => {
@@ -175,6 +156,60 @@ const InCall = (props) => {
                   style={{color: '#e2b030'}}
                 >
                   <Icon id={'PANTOOL'} fontSize={'small'}/>
+                </IconButton>
+              }
+              {
+                <span style={{marginLeft: '4px'}}>
+                  {
+                    props.isHost && !audioMuted ?
+                      <IconButton
+                        onClick={(e) => {
+                          props.onHostAudioMute(props.data)
+                        }}
+                        style={{
+                          marginRight: '4px',
+                          width: '16px',
+                          height: '16px',
+                          color: 'white'
+                        }}
+                      >
+                        <Icon id={'MIC'}/>
+                      </IconButton>
+                      :
+                      <>
+                        {audioMuted ? (
+                          <Icon id={'MIC_OFF'}/>
+                        ) : (
+                          <Icon id={'MIC'}/>
+                        )}
+                      </>
+                  }
+                  {
+                    props.isHost && !videoMuted &&
+                    <IconButton
+                      onClick={(e) => {
+                        props.onHostVideoMute(props.data)
+                      }}
+                      style={{
+                        marginRight: '4px',
+                        width: '16px',
+                        height: '16px',
+                        color: 'white'
+                      }}
+                    >
+                      <Icon id={'CAMERA'}/>
+                    </IconButton>
+                  }
+                </span>
+              }
+              {
+                appManager.getUserDetails().userId !== participant.userId &&
+                <IconButton
+                  onClick={privateChatHandler}
+                  size="small"
+                  sx={{ml: 2}}
+                >
+                  <Icon id={'CHAT_BUBBLE'} fontSize={'small'}/>
                 </IconButton>
               }
               {
