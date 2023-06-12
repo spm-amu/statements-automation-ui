@@ -77,6 +77,7 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     if(props.soundMonitor && !props.inView) {
       props.soundMonitor(props.data.userId, soundLevel > 3);
+      setActive(soundLevel > 3);
     }
   }, [soundLevel]);
 
@@ -95,6 +96,10 @@ const MeetingParticipant = (props) => {
     if (props.data.userId === payload.userId) {
       setAudioMuted(payload.audioMuted);
       setVideoMuted(payload.videoMuted);
+
+      if(!props.inView && payload.audioMuted) {
+        setActive(false);
+      }
     }
   };
 
