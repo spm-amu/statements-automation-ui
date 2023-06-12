@@ -9,8 +9,8 @@ import appManager from "../../../common/service/AppManager";
 import Lobby from "./Lobby";
 import {SystemEventType} from "../../types";
 
-const MAX_COLS = 1;
-const MAX_ROWS = 1;
+const MAX_COLS = 3;
+const MAX_ROWS = 2;
 const VH = 60;
 
 const MeetingParticipantGrid = (props) => {

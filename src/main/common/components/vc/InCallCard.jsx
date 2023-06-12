@@ -51,8 +51,18 @@ const InCall = (props) => {
           case SystemEventType.PARTICIPANT_OFF_VIEW:
             handleParticipantOffView(be);
             break;
+          case SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED:
+            onAVSettingsChange(be);
+            break;
         }
       }
+    }
+  };
+
+  const onAVSettingsChange = (payload) => {
+    if (payload.userId === participant.userId) {
+      setAudioMuted(payload.audioMuted);
+      setVideoMuted(payload.videoMuted);
     }
   };
 
@@ -81,7 +91,7 @@ const InCall = (props) => {
 
   useEffect(() => {
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
-    appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_OFF_VIEW);
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_OFF_VIEW, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
 
     return () => {
       socketManager.removeSubscriptions(eventHandler);
@@ -164,13 +174,12 @@ const InCall = (props) => {
                     props.isHost && !audioMuted ?
                       <IconButton
                         onClick={(e) => {
-                          props.onHostAudioMute(props.data)
+                          props.onHostAudioMute(participant)
                         }}
                         style={{
                           marginRight: '4px',
                           width: '16px',
-                          height: '16px',
-                          color: 'white'
+                          height: '16px'
                         }}
                       >
                         <Icon id={'MIC'}/>
@@ -188,7 +197,7 @@ const InCall = (props) => {
                     props.isHost && !videoMuted &&
                     <IconButton
                       onClick={(e) => {
-                        props.onHostVideoMute(props.data)
+                        props.onHostVideoMute(participant)
                       }}
                       style={{
                         marginRight: '4px',
@@ -197,8 +206,16 @@ const InCall = (props) => {
                         color: 'white'
                       }}
                     >
-                      <Icon id={'CAMERA'}/>
+                      <Icon id={'CAMERA'} color='green'/>
                     </IconButton>
+                  }
+                  {
+                    !props.isHost && !videoMuted &&
+                    <Icon id={'CAMERA'} color='green'/>
+                  }
+                  {
+                    videoMuted &&
+                    <Icon id={'CAMERA_OFF'}/>
                   }
                 </span>
               }

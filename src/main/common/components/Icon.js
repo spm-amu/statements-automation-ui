@@ -125,7 +125,7 @@ class Icon extends Component {
     } else if (this.props.id === 'MIC_OFF') {
       return <MicrophoneOff/>
     } else if (this.props.id === 'CAMERA') {
-      return <Camera/>
+      return <Camera style={{color: this.props.color}}/>
     } else if (this.props.id === 'CAMERA_OFF') {
       return <CameraOff/>
     } else if (this.props.id === 'VIDEOCAM_OFF') {

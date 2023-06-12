@@ -128,6 +128,8 @@ const MeetingRoomSideBarContent = (props) => {
               onChangeMeetingHostHandler={(e) => props.onChangeMeetingHostHandler(e)}
               onPinHandler={(participant, pinned) => props.onPinHandler(participant, pinned)}
               onBringToViewHandler={(participant) => props.onBringToViewHandler(participant)}
+              onHostVideoMute={(participant) => props.onHostVideoMute(participant)}
+              onHostAudioMute={(participant) => props.onHostAudioMute(participant)}
               isHost={isHost}
               participants={participants}
             /> :

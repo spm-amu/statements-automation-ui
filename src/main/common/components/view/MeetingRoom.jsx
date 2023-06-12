@@ -1530,6 +1530,12 @@ const MeetingRoom = (props) => {
                     setPinnedParticipant(null);
                   }
                 }}
+                onHostAudioMute={(participant) => {
+                  changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
+                }}
+                onHostVideoMute={(participant) => {
+                  changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
+                }}
               />
             </ClosablePanel>
           </div>
