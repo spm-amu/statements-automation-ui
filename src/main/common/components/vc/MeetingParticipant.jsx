@@ -110,7 +110,7 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     if (props.data.peer) {
-      peer.on('stream', (stream) => {
+      props.data.peer.on('stream', (stream) => {
         if (!streamRef.current) {
           streamRef.current = stream;
           videoRef.current.srcObject = stream;
