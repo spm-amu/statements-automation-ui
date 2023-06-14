@@ -718,7 +718,7 @@ const BasicBusinessAppDashboard = (props) => {
   return (
     loading ?
       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px'}}>
-        <LottieIcon id={'waiting'}/>
+        {/*<LottieIcon id={'waiting'}/>*/}
       </div>
       :
       networkErrorMessage ?

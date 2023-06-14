@@ -1442,7 +1442,7 @@ const MeetingRoom = (props) => {
                             height: '100%'
                           }} className={'centered-flex-box'}>
                             <div>
-                              <LottieIcon id={'waiting'}/>
+                              {/*<LottieIcon id={'waiting'}/>*/}
                               {CONNECTION_ERROR_MESSAGE}
                             </div>
                           </div>
@@ -1456,7 +1456,7 @@ const MeetingRoom = (props) => {
                               height: '100%'
                             }} className={'centered-flex-box'}>
                               <div>
-                                <LottieIcon id={'waiting'}/>
+                                {/*<LottieIcon id={'waiting'}/>*/}
                                 {STREAM_ERROR_MESSAGE}
                               </div>
                             </div>

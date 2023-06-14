@@ -58,7 +58,7 @@ const Lobby = (props) => {
               {props.meetingTitle}
             </div>
             <div className={'centered-flex-box'}>
-              <LottieIcon id={props.displayState === 'MINIMIZED' ? 'waiting-sm' : 'waiting'}/>
+              {/*<LottieIcon id={props.displayState === 'MINIMIZED' ? 'waiting-sm' : 'waiting'}/>*/}
             </div>
             <div style={props.displayState === 'MINIMIZED' ? {margin: '0 8px', fontSize: '20px'} : null}>
               {
