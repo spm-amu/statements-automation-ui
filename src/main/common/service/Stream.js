@@ -9,6 +9,12 @@ export class Stream {
         audio: true,
         video: retry ? false : {
           mandatory: {
+            width: {min: 160, ideal: 320, max: 640},
+            height: {min: 120, ideal: 240, max: 480},
+            frameRate: {
+              min: 15,
+              max: 15
+            },
             googCpuOveruseDetection: true,
             googCpuOveruseEncodeUsage: true,
             googCpuOveruseThreshold: 70
