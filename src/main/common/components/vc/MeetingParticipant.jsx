@@ -19,6 +19,7 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
+  const streamRef = useRef();
   const showVideo = true;
 
   const handler = () => {
@@ -109,7 +110,13 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     if (props.data.peer) {
-      videoRef.current.srcObject = props.data.stream;
+      peer.on('stream', (stream) => {
+        if (!streamRef.current) {
+          streamRef.current = stream;
+          videoRef.current.srcObject = stream;
+        }
+      });
+
       props.data.peer.on('data', data => {
         let dataJSON = JSON.parse("" + data);
         if (dataJSON.userId === props.data.userId) {
@@ -125,7 +132,7 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     if (videoRef.current) {
       if (props.data.peer) {
-        videoRef.current.srcObject = props.data.stream;
+        videoRef.current.srcObject = streamRef.current;
       } else {
         videoRef.current.srcObject = props.userStream;
       }

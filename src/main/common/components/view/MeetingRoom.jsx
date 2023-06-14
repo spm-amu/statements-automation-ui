@@ -698,7 +698,6 @@ const MeetingRoom = (props) => {
       user.avatar = item.user.avatar;
       user.audioMuted = item.user.audioMuted;
       user.videoMuted = item.user.videoMuted;
-      user.stream = item.mainStream;
       user.shareStream = item.shareStream;
     } else {
       console.log("DID NOT FIND EXISTING USER : ", user);
@@ -709,7 +708,6 @@ const MeetingRoom = (props) => {
         avatar: item.user.avatar,
         audioMuted: item.user.audioMuted,
         videoMuted: item.user.videoMuted,
-        stream: item.mainStream,
         shareStream: item.shareStream,
         active: false,
         inView: false

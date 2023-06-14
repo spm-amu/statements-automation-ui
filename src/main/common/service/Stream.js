@@ -7,10 +7,7 @@ export class Stream {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: true,
-        video: retry ? false : {
-          width: { min: 160, ideal: 320, max: 640 },
-          height: { min: 120, ideal: 240, max: 480 },
-        }
+        video: false
       });
 
     userMedia
@@ -26,19 +23,17 @@ export class Stream {
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
             audio: true,
-            video: retry ? false : {
-              width: { min: 160, ideal: 320, max: 640 },
-              height: { min: 120, ideal: 240, max: 480 },
-            }
+            video: false
           });
 
-        if(createScreenShareStream) {
+        if (createScreenShareStream) {
           shareUserMedia
             .then((stream) => {
               this.shareScreenObj = stream;
               stream.getAudioTracks()[0].enabled = false;
               if (stream.getVideoTracks().length > 0) {
                 stream.getVideoTracks()[0].enabled = false;
+                stream.getVideoTracks()[0].stop();
               }
 
               navigator.mediaDevices.ondevicechange = () => {
@@ -65,12 +60,12 @@ export class Stream {
               };
 
               if (successHandler) {
-                successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length === 0);
+                successHandler(this.obj, this.shareScreenObj, false);
               }
             });
         } else {
           if (successHandler) {
-            successHandler(this.obj, null, stream.getVideoTracks().length === 0);
+            successHandler(this.obj, null, false);
           }
         }
       }).catch((e) => {
@@ -156,18 +151,18 @@ export class Stream {
           {
             audio: true,
             video: {
-              width: { min: 160, ideal: 320, max: 640 },
-              height: { min: 120, ideal: 240, max: 480 },
+              width: {min: 160, ideal: 320, max: 640},
+              height: {min: 120, ideal: 240, max: 480},
             }
           });
       userMedia
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
-          if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
-            if(socketManager) {
-              this.replacePeerVideoTracks(socketManager);
-            }
+          if (socketManager) {
+            this.addVideoVideoTrackToPeers(socketManager);
+          }
 
+          if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
             this.getVideoTracks()[0].stop();
             this.obj.removeTrack(this.getVideoTracks()[0]);
           }
@@ -175,30 +170,37 @@ export class Stream {
           this.obj.addTrack(this.videoTrack);
         })
     } else {
-      let videoTrack = this.getVideoTracks()[0];
-      if (videoTrack) {
-        videoTrack.stop();
+      if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
+        let videoTrack = this.getVideoTracks()[0];
+        if (socketManager) {
+          socketManager.userPeerMap.forEach((peerObj) => {
+            peerObj.peer.removeTrack(videoTrack,
+              this.obj);
+          });
+        }
+        if (videoTrack) {
+          videoTrack.stop();
+        }
       }
     }
   };
 
-  async replacePeerVideoTracks(socketManager) {
+  async addVideoVideoTrackToPeers(socketManager) {
     console.log("REPLACING TRACKS");
     console.log(socketManager.userPeerMap.length);
     console.log(socketManager.userPeerMap);
 
     if (socketManager) {
       socketManager.userPeerMap.forEach((peerObj) => {
-        this.replacePeerVideoTrack(peerObj);
+        this.addVideoTrackToPeer(peerObj);
       });
     }
   }
 
-  async replacePeerVideoTrack(peerObj) {
+  async addVideoTrackToPeer(peerObj) {
     if (peerObj.peer.connected) {
       try {
-        peerObj.peer.replaceTrack(
-          this.getVideoTracks()[0],
+        peerObj.peer.addTrack(
           this.videoTrack,
           this.obj
         );
