@@ -70,11 +70,13 @@ const MeetingSettingsComponent = (props) => {
       }, (e) => {
       });
 
-    selectedMeeting.attendees.forEach(att => {
-      if (att.userId === userDetails.userId) {
-        setIsHost(att.type === 'HOST');
-      }
-    });
+    if(selectedMeeting && selectedMeeting.attendees) {
+      selectedMeeting.attendees.forEach(att => {
+        if (att.userId === userDetails.userId) {
+          setIsHost(att.type === 'HOST');
+        }
+      });
+    }
   }, []);
 
   const muteVideo = () => {
