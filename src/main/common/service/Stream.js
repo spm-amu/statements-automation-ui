@@ -1,13 +1,18 @@
+import {osName} from "react-device-detect";
+
 export class Stream {
   constructor() {
   }
 
   init = async (video = true, audio = true, successHandler, errorhandler, retry = false,
-                socketManager, createScreenShareStream = true) => {
+                socketManager) => {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: true,
-        video: false
+        video: retry ? false : {
+          width: {min: 160, ideal: 320, max: 640},
+          height: {min: 120, ideal: 240, max: 480},
+        }
       });
 
     userMedia
@@ -19,54 +24,31 @@ export class Stream {
           //stream.getVideoTracks()[0].stop();
         }
 
+        navigator.mediaDevices.ondevicechange = () => {
+          console.log("MEDIA CHANGED");
+          console.log("UPDATING TRACKS");
 
-        let shareUserMedia = navigator.mediaDevices
-          .getUserMedia({
-            audio: true,
-            video: false
-          });
-
-        if (createScreenShareStream) {
-          shareUserMedia
-            .then((stream) => {
-              this.shareScreenObj = stream;
-              stream.getAudioTracks()[0].enabled = false;
-              if (stream.getVideoTracks().length > 0) {
-                stream.getVideoTracks()[0].enabled = false;
-                stream.getVideoTracks()[0].stop();
-              }
-
-              navigator.mediaDevices.ondevicechange = () => {
-                console.log("MEDIA CHANGED");
-                console.log("UPDATING TRACKS");
-
-                let newUserMedia = navigator.mediaDevices
-                  .getUserMedia({
-                    audio: true,
-                    video: false
-                  });
-
-                newUserMedia
-                  .then((stream) => {
-                      let newAudioTrack = stream.getAudioTracks()[0];
-                      if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
-                        this.replacePeerAudioTracks(socketManager, newAudioTrack);
-                        this.obj.removeTrack(this.getAudioTracks()[0]);
-                      }
-
-                      this.obj.addTrack(newAudioTrack);
-                    }
-                  );
-              };
-
-              if (successHandler) {
-                successHandler(this.obj, this.shareScreenObj, false);
-              }
+          let newUserMedia = navigator.mediaDevices
+            .getUserMedia({
+              audio: true,
+              video: false
             });
-        } else {
-          if (successHandler) {
-            successHandler(this.obj, null, false);
-          }
+
+          newUserMedia
+            .then((stream) => {
+                let newAudioTrack = stream.getAudioTracks()[0];
+                if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
+                  this.replacePeerAudioTracks(socketManager, newAudioTrack);
+                  this.obj.removeTrack(this.getAudioTracks()[0]);
+                }
+
+                this.obj.addTrack(newAudioTrack);
+              }
+            );
+        };
+
+        if (successHandler) {
+          successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length === 0);
         }
       }).catch((e) => {
       if (!retry) {
@@ -79,6 +61,58 @@ export class Stream {
         }
       }
     });
+  };
+
+  createScreenShareStream = (socketManager, source) => {
+    const videoConstraints = {
+      cursor: true,
+      audio: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+        },
+      },
+      video: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: source,
+          minWidth: 1280,
+          maxWidth: 1280,
+          minHeight: 720,
+          maxHeight: 720
+        }
+      }
+    };
+
+    if (osName === 'Mac OS') {
+      videoConstraints.audio = false;
+    }
+
+    navigator.mediaDevices
+      .getUserMedia(videoConstraints)
+      .then((stream) => {
+        console.log("ADDING SHARE SCREEN STREAM");
+        this.shareScreenObj = stream;
+        socketManager.userPeerMap.forEach((peerObj) => {
+          peerObj.peer.addStream(stream);
+        });
+      })
+      .catch(e => {
+        console.log(e)
+      });
+  };
+
+  closeScreenStream = (socketManager) => {
+    if(this.shareScreenObj) {
+      this.closeObj(this.shareScreenObj);
+      console.log("REMOVING SHARE SCREEN STREAM");
+      socketManager.userPeerMap.forEach((peerObj) => {
+        try {
+          peerObj.peer.removeStream(this.shareScreenObj);
+        } catch(e) {
+          console.log("Share stream does not exist for : " + peerObj.user.userId);
+        }
+      });
+    }
   };
 
   async replacePeerAudioTracks(socketManager, newAudioTrack) {
@@ -158,11 +192,11 @@ export class Stream {
       userMedia
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
-          if (socketManager) {
-            this.addVideoVideoTrackToPeers(socketManager);
-          }
-
           if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
+            if (socketManager) {
+              this.replacePeerVideoTracks(socketManager);
+            }
+
             this.getVideoTracks()[0].stop();
             this.obj.removeTrack(this.getVideoTracks()[0]);
           }
@@ -170,37 +204,30 @@ export class Stream {
           this.obj.addTrack(this.videoTrack);
         })
     } else {
-      if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
-        let videoTrack = this.getVideoTracks()[0];
-        if (socketManager) {
-          socketManager.userPeerMap.forEach((peerObj) => {
-            peerObj.peer.removeTrack(videoTrack,
-              this.obj);
-          });
-        }
-        if (videoTrack) {
-          videoTrack.stop();
-        }
+      let videoTrack = this.getVideoTracks()[0];
+      if (videoTrack) {
+        videoTrack.stop();
       }
     }
   };
 
-  async addVideoVideoTrackToPeers(socketManager) {
+  async replacePeerVideoTracks(socketManager) {
     console.log("REPLACING TRACKS");
     console.log(socketManager.userPeerMap.length);
     console.log(socketManager.userPeerMap);
 
     if (socketManager) {
       socketManager.userPeerMap.forEach((peerObj) => {
-        this.addVideoTrackToPeer(peerObj);
+        this.replacePeerVideoTrack(peerObj);
       });
     }
   }
 
-  async addVideoTrackToPeer(peerObj) {
+  async replacePeerVideoTrack(peerObj) {
     if (peerObj.peer.connected) {
       try {
-        peerObj.peer.addTrack(
+        peerObj.peer.replaceTrack(
+          this.getVideoTracks()[0],
           this.videoTrack,
           this.obj
         );

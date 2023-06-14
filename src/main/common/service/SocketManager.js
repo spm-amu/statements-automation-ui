@@ -305,7 +305,21 @@ class SocketManager {
 
     this.userPeerMap.push(item);
     let promise = new Promise((resolve, reject) => {
-      resolve(item);
+      peer.on('stream', (stream) => {
+        if (!item.mainStream) {
+          console.log("\n\n\n\nMAIN STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
+          console.log(peer);
+          item.mainStream = stream;
+        } else {
+          console.log("\n\n\n\nSHARE STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
+          console.log(peer);
+          item.shareStream = stream;
+        }
+
+        if (item.mainStream && item.shareStream) {
+          resolve(item);
+        }
+      });
     });
 
     if (eventType === MessageType.USER_JOINED) {
