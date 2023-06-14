@@ -7,7 +7,10 @@ export class Stream {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: true,
-        video: false
+        video: retry ? false : {
+          width: { min: 160, ideal: 320, max: 640 },
+          height: { min: 120, ideal: 240, max: 480 },
+        }
       });
 
     userMedia
@@ -16,7 +19,7 @@ export class Stream {
         this.obj = stream;
         if (!video && stream.getVideoTracks().length > 0) {
           stream.getVideoTracks()[0].enabled = false;
-          //stream.getVideoTracks()[0].stop();
+          stream.getVideoTracks()[0].stop();
         }
 
 
@@ -25,6 +28,7 @@ export class Stream {
             audio: true,
             video: false
           });
+
 
         if(createScreenShareStream) {
           shareUserMedia
