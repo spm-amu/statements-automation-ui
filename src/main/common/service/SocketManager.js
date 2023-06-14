@@ -156,7 +156,7 @@ class SocketManager {
     let opts = {
       initiator: true,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj]
+      stream: stream.obj
     };
 
     if (!appManager.isOnline()) {
@@ -212,7 +212,7 @@ class SocketManager {
     let opts = {
       initiator: false,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj]
+      stream: stream.obj
     };
 
     if (!appManager.isOnline()) {
@@ -316,7 +316,7 @@ class SocketManager {
           item.shareStream = stream;
         }
 
-        if (item.mainStream && item.shareStream) {
+        if (item.mainStream) {
           resolve(item);
         }
       });

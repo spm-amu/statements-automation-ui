@@ -1,70 +1,55 @@
+import {osName} from "react-device-detect";
+
 export class Stream {
   constructor() {
   }
 
-  init = async (video = true, audio = true, successHandler, errorhandler, retry = false, socketManager) => {
+  init = async (video = true, audio = true, successHandler, errorhandler, retry = false,
+                socketManager) => {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: true,
         video: retry ? false : {
-          width: { min: 160, ideal: 320, max: 640 },
-          height: { min: 120, ideal: 240, max: 480 },
+          width: {min: 160, ideal: 320, max: 640},
+          height: {min: 120, ideal: 240, max: 480},
         }
       });
 
     userMedia
       .then((stream) => {
         stream.getAudioTracks()[0].enabled = audio;
-        let shareUserMedia = navigator.mediaDevices
-          .getUserMedia({
-            audio: true,
-            video: retry ? false : {
-              width: { min: 160, ideal: 320, max: 640 },
-              height: { min: 120, ideal: 240, max: 480 },
-            }
-          });
-
         this.obj = stream;
         if (!video && stream.getVideoTracks().length > 0) {
           stream.getVideoTracks()[0].enabled = false;
           //stream.getVideoTracks()[0].stop();
         }
 
-        shareUserMedia
-          .then((stream) => {
-            this.shareScreenObj = stream;
-            stream.getAudioTracks()[0].enabled = false;
-            if (stream.getVideoTracks().length > 0) {
-              stream.getVideoTracks()[0].enabled = false;
-            }
+        navigator.mediaDevices.ondevicechange = () => {
+          console.log("MEDIA CHANGED");
+          console.log("UPDATING TRACKS");
 
-            navigator.mediaDevices.ondevicechange = () => {
-              console.log("MEDIA CHANGED");
-              console.log("UPDATING TRACKS");
+          let newUserMedia = navigator.mediaDevices
+            .getUserMedia({
+              audio: true,
+              video: false
+            });
 
-              let newUserMedia = navigator.mediaDevices
-                .getUserMedia({
-                  audio: true,
-                  video: false
-                });
+          newUserMedia
+            .then((stream) => {
+                let newAudioTrack = stream.getAudioTracks()[0];
+                if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
+                  this.replacePeerAudioTracks(socketManager, newAudioTrack);
+                  this.obj.removeTrack(this.getAudioTracks()[0]);
+                }
 
-              newUserMedia
-                .then((stream) => {
-                    let newAudioTrack = stream.getAudioTracks()[0];
-                    if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
-                      this.replacePeerAudioTracks(socketManager, newAudioTrack);
-                      this.obj.removeTrack(this.getAudioTracks()[0]);
-                    }
+                this.obj.addTrack(newAudioTrack);
+              }
+            );
+        };
 
-                    this.obj.addTrack(newAudioTrack);
-                  }
-                );
-            };
-
-            if (successHandler) {
-              successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length === 0);
-            }
-          });
+        if (successHandler) {
+          successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length === 0);
+        }
       }).catch((e) => {
       if (!retry) {
         this.init(false, audio, successHandler, errorhandler, true, socketManager);
@@ -76,6 +61,56 @@ export class Stream {
         }
       }
     });
+  };
+
+  createScreenShareStream = (socketManager) => {
+    const videoConstraints = {
+      cursor: true,
+      audio: {
+        mandatory: {
+          chromeMediaSource: 'desktop',
+        },
+      },
+      video: {
+        width: {min: 160, ideal: 320, max: 640},
+        height: {min: 120, ideal: 240, max: 480},
+        mandatory: {
+          chromeMediaSource: 'desktop',
+          chromeMediaSourceId: shareScreenSource.current.id,
+          minWidth: 1280,
+          maxWidth: 1280,
+          minHeight: 720,
+          maxHeight: 720
+        }
+      }
+    };
+
+    if (osName === 'Mac OS') {
+      videoConstraints.audio = false;
+    }
+
+    navigator.mediaDevices
+      .getUserMedia(videoConstraints)
+      .then((stream) => {
+        console.log("ADDING SHARE SCREEN STREAM");
+        this.shareScreenObj = stream;
+        socketManager.userPeerMap.forEach((peerObj) => {
+          peerObj.addStream(stream);
+        });
+      })
+      .catch(e => {
+        console.log(e)
+      });
+  };
+
+  closeScreenStream = (socketManager) => {
+    if(this.shareScreenObj) {
+      this.closeObj(this.shareScreenObj);
+      console.log("REMOVING SHARE SCREEN STREAM");
+      socketManager.userPeerMap.forEach((peerObj) => {
+        peerObj.removeStream(this.shareScreenObj);
+      });
+    }
   };
 
   async replacePeerAudioTracks(socketManager, newAudioTrack) {
@@ -101,15 +136,20 @@ export class Stream {
     }
   }
 
-  close = () => {
-    if (this.obj) {
-      this.obj
-        .getTracks()
+  closeObj = (obj) => {
+    if (obj) {
+      obj.getTracks()
         .forEach((track) => {
+          track.enabled = false;
           track.stop();
           this.removeTrack(track);
         });
     }
+  };
+
+  close = () => {
+    this.closeObj(this.obj);
+    this.closeObj(this.shareScreenObj);
   };
 
   addTrack = (track) => {
@@ -143,18 +183,19 @@ export class Stream {
           {
             audio: true,
             video: {
-              width: { min: 160, ideal: 320, max: 640 },
-              height: { min: 120, ideal: 240, max: 480 },
+              width: {min: 160, ideal: 320, max: 640},
+              height: {min: 120, ideal: 240, max: 480},
             }
           });
       userMedia
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
           if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
-            if(socketManager) {
+            if (socketManager) {
               this.replacePeerVideoTracks(socketManager);
             }
 
+            this.getVideoTracks()[0].stop();
             this.obj.removeTrack(this.getVideoTracks()[0]);
           }
 

@@ -15,7 +15,7 @@ import {Alert} from "@material-ui/lab";
 const MeetingSettingsComponent = (props) => {
   const userVideo = useRef();
   const [stream, setStream] = useState();
-  const [videoOptionDisabled, setVideoOptionDisabled] = useState(null);
+  const [videoOptionDisabled, setVideoOptionDisabled] = useState(false);
   const [videoMuted, setVideoMuted] = useState(true);
   const [audioMuted, setAudioMuted] = useState(true);
   const [autoPermit, setAutoPermit] = useState(true);
@@ -33,8 +33,12 @@ const MeetingSettingsComponent = (props) => {
   }, []);
 
   useEffect(() => {
-    if (stream) {
-      stream.enableVideo(!videoMuted, null, null);
+    if(!videoMuted && !stream) {
+      setupStream();
+    } else {
+      if (stream) {
+        stream.enableVideo(!videoMuted, null, null);
+      }
     }
   }, [videoMuted]);
 
@@ -53,7 +57,6 @@ const MeetingSettingsComponent = (props) => {
   };
 
   useEffect(() => {
-    setupStream();
     let userDetails = appManager.getUserDetails();
     setLoggedInUser(userDetails.name);
 
@@ -87,7 +90,9 @@ const MeetingSettingsComponent = (props) => {
   };
 
   const closeStreams = () => {
-    stream.close();
+    if(stream) {
+      stream.close();
+    }
   };
 
   const close = () => {

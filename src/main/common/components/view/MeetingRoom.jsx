@@ -228,10 +228,6 @@ const MeetingRoom = (props) => {
     }
   };
 
-  const audioLevelTransmissionHandlerApi = () => {
-
-  };
-
   const {
     selectedMeeting,
     userToCall,
@@ -425,7 +421,7 @@ const MeetingRoom = (props) => {
     }
   };
 
-  async function replaceShareScreenStream(peerObj, stream) {
+  /*async function replaceShareScreenStream(peerObj, stream) {
     if (peerObj.peer.connected) {
       try {
         peerObj.peer.replaceTrack(
@@ -437,9 +433,9 @@ const MeetingRoom = (props) => {
         console.log(e);
       }
     }
-  }
+  }*/
 
-  const handleScreenShareStream = async (stream) => {
+  /*const handleScreenShareStream = async (stream) => {
     tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
@@ -454,7 +450,7 @@ const MeetingRoom = (props) => {
     //setMeetingParticipantGridMode('STRIP');
 
     //setSomeoneSharing(false);
-  };
+  };*/
 
   const handleRecordingDataAvailable = (e) => {
     if (e.data.size > 0) {
@@ -617,37 +613,8 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (screenShared) {
-      const videoConstraints = {
-        cursor: true,
-        audio: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-          },
-        },
-        video: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-            chromeMediaSourceId: shareScreenSource.current.id,
-            minWidth: 1280,
-            maxWidth: 1280,
-            minHeight: 720,
-            maxHeight: 720
-          }
-        }
-      };
-
-      if (osName === 'Mac OS') {
-        videoConstraints.audio = false;
-      }
-
-      navigator.mediaDevices
-        .getUserMedia(videoConstraints)
-        .then((stream) => {
-          handleScreenShareStream(stream);
-        })
-        .catch(e => {
-          console.log(e)
-        });
+      currentUserStream.closeScreenStream(socketManager);
+      currentUserStream.createScreenShareStream(socketManager);
     }
 
     if (!Utils.isNull(screenShared)) {
@@ -657,6 +624,7 @@ const MeetingRoom = (props) => {
       });
     }
   }, [screenShared]);
+
 
   useEffect(() => {
     setAutoPermit(props.autoPermit);
@@ -1289,7 +1257,7 @@ const MeetingRoom = (props) => {
 
   const handleEndCall = async () => {
     if (screenShared) {
-      socketManager.userPeerMap.forEach((peerObj) => {
+      /*socketManager.userPeerMap.forEach((peerObj) => {
         if (peerObj.peer.connected) {
           try {
             peerObj.peer.replaceTrack(
@@ -1301,7 +1269,9 @@ const MeetingRoom = (props) => {
             console.log(e);
           }
         }
-      });
+      });*/
+
+      currentUserStream.closeScreenStream(socketManager);
 
       emitSystemEvent("SHARE_SCREEN", {
         shared: false,
