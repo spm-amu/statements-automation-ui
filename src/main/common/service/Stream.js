@@ -22,7 +22,6 @@ export class Stream {
           stream.getVideoTracks()[0].stop();
         }
 
-
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
             audio: true,
