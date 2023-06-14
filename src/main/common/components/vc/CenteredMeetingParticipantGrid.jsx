@@ -48,11 +48,11 @@ const MeetingParticipantGrid = (props) => {
 
   const handleParticipantInView = (payload) => {
     let participant = participants.find(((p) => p.userId === payload.userId));
-    if(participant) {
+    if (participant) {
       let maxNumberOfInViewParticipants = MAX_ROWS * MAX_COLS;
       let participantsInView = participants.filter((p) => p.inView);
 
-      if(participantsInView.length === maxNumberOfInViewParticipants) {
+      if (participantsInView.length === maxNumberOfInViewParticipants) {
         let offViewParticipant = participantsInView[participantsInView.length - 1];
         offViewParticipant.inView = false;
         offViewParticipant.active = false;
@@ -75,7 +75,7 @@ const MeetingParticipantGrid = (props) => {
   });
 
   useEffect(() => {
-    if(grid === null && overflowGrid === null) {
+    if (grid === null && overflowGrid === null) {
       let gridData = createGrid(participants);
       console.log(gridData);
       setGrid(gridData.mainGrid);
@@ -83,57 +83,58 @@ const MeetingParticipantGrid = (props) => {
     }
   }, [grid, overflowGrid]);
 
+  function renderGrid() {
+    let newParticipants = [];
+    let currentUserParticipant = props.participants.find((p) => p.isCurrentUser);
+    if (!currentUserParticipant) {
+      currentUserParticipant = {
+        isCurrentUser: true,
+        userId: appManager.getUserDetails().userId,
+        peer: null,
+        name: appManager.getUserDetails().name,
+        avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+        videoMuted,
+        audioMuted
+      };
+
+      setCurrentUserParticipant(currentUserParticipant);
+      currentUserParticipant.active = true;
+      //currentUserParticipant.inView = true;
+      //newParticipants.push(currentUserParticipant);
+    }
+
+    let participantsInView = props.participants.filter((p) => p.inView);
+    for (const participant of participantsInView) {
+      participant.active = true;
+    }
+
+    let i = 0;
+    for (const participant of props.participants) {
+      if (!participant.isCurrentUser) {
+        newParticipants.push(participant);
+      }
+
+      if (participant.inView) {
+        i++;
+        continue;
+      }
+
+      if (i++ < (MAX_ROWS * MAX_COLS)) {
+        participant.active = true;
+        participant.inView = true;
+      }
+    }
+
+    setParticipants(newParticipants);
+    let gridData = createGrid(newParticipants);
+    console.log(gridData);
+    setGrid(gridData.mainGrid);
+    setOverflowGrid(gridData.overflowGrid);
+  }
+
   useEffect(() => {
     if (props.participants && props.mode) {
-      let newParticipants = [];
-      let currentUserParticipant = props.participants.find((p) => p.isCurrentUser);
-      if (!currentUserParticipant) {
-        currentUserParticipant = {
-          isCurrentUser: true,
-          userId: appManager.getUserDetails().userId,
-          peer: null,
-          name: appManager.getUserDetails().name,
-          avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
-          videoMuted,
-          audioMuted
-        };
-
-        setCurrentUserParticipant(currentUserParticipant);
-        currentUserParticipant.active = true;
-        //currentUserParticipant.inView = true;
-        //newParticipants.push(currentUserParticipant);
-      }
-
-      let i = 0;
-      let participantsInView = props.participants.filter((p) => p.inView);
-      for (const participant of participantsInView) {
-        if (i++ < (MAX_ROWS * MAX_COLS)) {
-          participant.active = true;
-          participant.inView = true;
-        }
-      }
-
-      for (const participant of props.participants) {
-        if (!participant.isCurrentUser) {
-          newParticipants.push(participant);
-        } else {
-          participant.active = true;
-          participant.inView = true;
-        }
-
-        if (i++ < (MAX_ROWS * MAX_COLS)) {
-          participant.active = true;
-          participant.inView = true;
-        }
-      }
-
-      console.log("\n\n\nPARTS : ", newParticipants);
-
-      setParticipants(newParticipants);
-      let gridData = createGrid(newParticipants);
-      console.log(gridData);
-      setGrid(gridData.mainGrid);
-      setOverflowGrid(gridData.overflowGrid);
+      renderGrid();
     }
   }, [props.participants, props.mode]);
 
@@ -153,7 +154,7 @@ const MeetingParticipantGrid = (props) => {
     };
 
     if (mode === 'DEFAULT') {
-      let inViewParticipants =participants.filter((p) => p.inView);
+      let inViewParticipants = participants.filter((p) => p.inView);
       let overflowParticipants = participants.filter((p) => !p.inView).sort(function (a, b) {
         return b.active - a.active
       });
@@ -321,7 +322,15 @@ const MeetingParticipantGrid = (props) => {
             </Box>
             <div className={'row'} style={{width: '100%', height: '88px', marginLeft: '0', marginRight: '0'}}>
               <div className={'col'}
-                   style={{width: 'calc(100% - 200px)', height: '120px', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: '16px', paddingRight: '0'}}>
+                   style={{
+                     width: 'calc(100% - 200px)',
+                     height: '120px',
+                     overflow: 'hidden',
+                     display: 'flex',
+                     alignItems: 'center',
+                     paddingLeft: '16px',
+                     paddingRight: '0'
+                   }}>
                 {
                   renderOverflowGrid()
                 }
@@ -355,7 +364,15 @@ const MeetingParticipantGrid = (props) => {
           (mode === 'STRIP' || step === "LOBBY") &&
           <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
             <div className={'col'}
-                 style={{width: 'calc(100% - 200px)', height: '120px', overflow: 'hidden', display: 'flex', alignItems: 'center', paddingLeft: '16px', paddingRight: '0'}}>
+                 style={{
+                   width: 'calc(100% - 200px)',
+                   height: '120px',
+                   overflow: 'hidden',
+                   display: 'flex',
+                   alignItems: 'center',
+                   paddingLeft: '16px',
+                   paddingRight: '0'
+                 }}>
               {
                 renderOverflowGrid()
               }

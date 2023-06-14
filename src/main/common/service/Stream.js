@@ -8,8 +8,11 @@ export class Stream {
       .getUserMedia({
         audio: true,
         video: retry ? false : {
-          width: { min: 160, ideal: 320, max: 640 },
-          height: { min: 120, ideal: 240, max: 480 },
+          mandatory: {
+            googCpuOveruseDetection: true,
+            googCpuOveruseEncodeUsage: true,
+            googCpuOveruseThreshold: 70
+          }
         }
       });
 
