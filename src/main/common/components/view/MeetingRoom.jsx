@@ -1182,7 +1182,7 @@ const MeetingRoom = (props) => {
   }
 
   useEffect(() => {
-    if (shareScreenRef.current) {
+    if (shareScreenRef.current && currentUserStream.shareScreenObj) {
       shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
     }
   }, [shareScreenRef.current]);
