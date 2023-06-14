@@ -211,6 +211,8 @@ const MeetingParticipant = (props) => {
                         <video
                           id={props.data.userId}
                           hidden={videoMuted}
+                          width={640}
+                          height={320}
                           autoPlay muted playsInline ref={videoRef}
                           style={{
                             width: '100%',
@@ -222,6 +224,8 @@ const MeetingParticipant = (props) => {
                         <video
                           id={props.data.userId}
                           hidden={videoMuted}
+                          width={640}
+                          height={320}
                           autoPlay playsInline ref={videoRef}
                           style={{
                             width: '100%',
