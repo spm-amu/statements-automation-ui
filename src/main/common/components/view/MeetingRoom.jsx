@@ -17,7 +17,6 @@ import appManager from "../../../common/service/AppManager";
 import MeetingRoomSummary from "../vc/MeetingRoomSummary";
 import {get, post} from '../../service/RestService';
 import SelectScreenShareDialog from '../SelectScreenShareDialog';
-import {osName} from "react-device-detect";
 import {Stream} from "../../service/Stream";
 import WhiteBoard from "../whiteboard/WhiteBoard";
 import Alert from "react-bootstrap/Alert";
@@ -141,6 +140,7 @@ const MeetingRoom = (props) => {
             addUser(be.payload);
             break;
           case MessageType.RECEIVING_RETURNED_SIGNAL:
+            console.log("RECEIVING_RETURNED_SIGNAL : ", be.payload);
             socketManager.signal(be.payload);
             break;
           case MessageType.USER_LEFT:
@@ -226,10 +226,6 @@ const MeetingRoom = (props) => {
         }
       }
     }
-  };
-
-  const audioLevelTransmissionHandlerApi = () => {
-
   };
 
   const {
@@ -425,7 +421,7 @@ const MeetingRoom = (props) => {
     }
   };
 
-  async function replaceShareScreenStream(peerObj, stream) {
+  /*async function replaceShareScreenStream(peerObj, stream) {
     if (peerObj.peer.connected) {
       try {
         peerObj.peer.replaceTrack(
@@ -437,9 +433,9 @@ const MeetingRoom = (props) => {
         console.log(e);
       }
     }
-  }
+  }*/
 
-  const handleScreenShareStream = async (stream) => {
+  /*const handleScreenShareStream = async (stream) => {
     tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
@@ -454,7 +450,7 @@ const MeetingRoom = (props) => {
     //setMeetingParticipantGridMode('STRIP');
 
     //setSomeoneSharing(false);
-  };
+  };*/
 
   const handleRecordingDataAvailable = (e) => {
     if (e.data.size > 0) {
@@ -555,7 +551,7 @@ const MeetingRoom = (props) => {
     setScreenShared(false);
     setMeetingParticipantGridMode('DEFAULT');
 
-    socketManager.userPeerMap.forEach((peerObj) => {
+    /*socketManager.userPeerMap.forEach((peerObj) => {
       if (peerObj.peer.connected) {
         try {
           peerObj.peer.replaceTrack(
@@ -567,14 +563,16 @@ const MeetingRoom = (props) => {
           console.log(e);
         }
       }
-    });
+    });*/
 
     //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
     //currentUserStream.shareScreenObj.addTrack(tmpVideoTrack.current);
 
-    if (shareScreenRef.current) {
+    /*if (shareScreenRef.current) {
       shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
-    }
+    }*/
+
+    currentUserStream.closeScreenStream(socketManager);
 
     setMeetingParticipantGridMode('DEFAULT');
   };
@@ -617,37 +615,8 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (screenShared) {
-      const videoConstraints = {
-        cursor: true,
-        audio: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-          },
-        },
-        video: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-            chromeMediaSourceId: shareScreenSource.current.id,
-            minWidth: 1280,
-            maxWidth: 1280,
-            minHeight: 720,
-            maxHeight: 720
-          }
-        }
-      };
-
-      if (osName === 'Mac OS') {
-        videoConstraints.audio = false;
-      }
-
-      navigator.mediaDevices
-        .getUserMedia(videoConstraints)
-        .then((stream) => {
-          handleScreenShareStream(stream);
-        })
-        .catch(e => {
-          console.log(e)
-        });
+      currentUserStream.closeScreenStream(socketManager);
+      currentUserStream.createScreenShareStream(socketManager, shareScreenSource.current.id);
     }
 
     if (!Utils.isNull(screenShared)) {
@@ -657,6 +626,7 @@ const MeetingRoom = (props) => {
       });
     }
   }, [screenShared]);
+
 
   useEffect(() => {
     setAutoPermit(props.autoPermit);
@@ -698,6 +668,7 @@ const MeetingRoom = (props) => {
       user.avatar = item.user.avatar;
       user.audioMuted = item.user.audioMuted;
       user.videoMuted = item.user.videoMuted;
+      user.stream = item.mainStream;
       user.shareStream = item.shareStream;
     } else {
       console.log("DID NOT FIND EXISTING USER : ", user);
@@ -708,6 +679,7 @@ const MeetingRoom = (props) => {
         avatar: item.user.avatar,
         audioMuted: item.user.audioMuted,
         videoMuted: item.user.videoMuted,
+        stream: item.mainStream,
         shareStream: item.shareStream,
         active: false,
         inView: false
@@ -732,8 +704,13 @@ const MeetingRoom = (props) => {
     }
   }
 
+  const shareScreenStreamCallback = (stream) => {
+    shareScreenRef.current.srcObject = stream;
+  };
+
   const addUser = (payload) => {
-    socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted)
+    socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted,
+      shareScreenStreamCallback)
       .then((item) => {
         console.log("ADD USER : ", payload);
         addUserToParticipants(item, item.user.callerSocketId);
@@ -774,7 +751,8 @@ const MeetingRoom = (props) => {
     socketManager.clearUserToPeerMap();
     let newParticipants = [];
     users.forEach((user) => {
-      socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted)
+      socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted,
+        shareScreenStreamCallback)
         .then((item) => {
           console.log("ADDING ITEM TO PARTICIPANTS : ", item);
           addUserToParticipants(item);
@@ -979,7 +957,7 @@ const MeetingRoom = (props) => {
   };
 
   const transmitAudioLevel = async (data, participants) => {
-    if(participants) {
+    if (participants) {
       //console.log("TRANSMITTING AUDIO LEVEL TO PARTS : ");
       //console.log(participants);
       for (const participant of participants) {
@@ -996,7 +974,7 @@ const MeetingRoom = (props) => {
     currentUserStream.init(!videoMuted, !audioMuted, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
       soundMonitor.start(stream, async (data, participants, muted) => {
-        if(data.level > 0 && !muted) {
+        if (data.level > 0 && !muted) {
           transmitAudioLevel(data, participants);
         }
       });
@@ -1287,7 +1265,7 @@ const MeetingRoom = (props) => {
 
   const handleEndCall = async () => {
     if (screenShared) {
-      socketManager.userPeerMap.forEach((peerObj) => {
+      /*socketManager.userPeerMap.forEach((peerObj) => {
         if (peerObj.peer.connected) {
           try {
             peerObj.peer.replaceTrack(
@@ -1299,7 +1277,9 @@ const MeetingRoom = (props) => {
             console.log(e);
           }
         }
-      });
+      });*/
+
+      currentUserStream.closeScreenStream(socketManager);
 
       emitSystemEvent("SHARE_SCREEN", {
         shared: false,
@@ -1522,7 +1502,7 @@ const MeetingRoom = (props) => {
                   changeHost(newHost);
                 }}
                 onPinHandler={(participant, pinned) => {
-                  if(pinned) {
+                  if (pinned) {
                     setPinnedParticipant(participant);
                   } else {
                     setPinnedParticipant(null);
