@@ -704,11 +704,13 @@ const MeetingRoom = (props) => {
     }
   }
 
+  const shareScreenStreamCallback = (stream) => {
+    shareScreenRef.current.srcObject = stream;
+  };
+
   const addUser = (payload) => {
     socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted,
-      (shareStream) => {
-        shareScreenRef.current.srcObject = shareStream;
-      })
+      shareScreenStreamCallback)
       .then((item) => {
         console.log("ADD USER : ", payload);
         addUserToParticipants(item, item.user.callerSocketId);
@@ -750,9 +752,7 @@ const MeetingRoom = (props) => {
     let newParticipants = [];
     users.forEach((user) => {
       socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted,
-        (shareStream) => {
-          shareScreenRef.current = shareStream;
-        })
+        shareScreenStreamCallback)
         .then((item) => {
           console.log("ADDING ITEM TO PARTICIPANTS : ", item);
           addUserToParticipants(item);
