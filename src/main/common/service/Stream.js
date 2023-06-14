@@ -29,7 +29,6 @@ export class Stream {
             video: false
           });
 
-
         if(createScreenShareStream) {
           shareUserMedia
             .then((stream) => {
