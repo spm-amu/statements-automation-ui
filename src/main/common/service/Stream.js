@@ -1,17 +1,15 @@
-import {osName} from "react-device-detect";
-
 export class Stream {
   constructor() {
   }
 
   init = async (video = true, audio = true, successHandler, errorhandler, retry = false,
-                socketManager) => {
+                socketManager, createScreenShareStream = true) => {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: true,
         video: retry ? false : {
-          width: {min: 160, ideal: 320, max: 640},
-          height: {min: 120, ideal: 240, max: 480},
+          width: { min: 160, ideal: 320, max: 640 },
+          height: { min: 120, ideal: 240, max: 480 },
         }
       });
 
@@ -24,31 +22,56 @@ export class Stream {
           //stream.getVideoTracks()[0].stop();
         }
 
-        navigator.mediaDevices.ondevicechange = () => {
-          console.log("MEDIA CHANGED");
-          console.log("UPDATING TRACKS");
 
-          let newUserMedia = navigator.mediaDevices
-            .getUserMedia({
-              audio: true,
-              video: false
-            });
+        let shareUserMedia = navigator.mediaDevices
+          .getUserMedia({
+            audio: true,
+            video: retry ? false : {
+              width: { min: 160, ideal: 320, max: 640 },
+              height: { min: 120, ideal: 240, max: 480 },
+            }
+          });
 
-          newUserMedia
+        if(createScreenShareStream) {
+          shareUserMedia
             .then((stream) => {
-                let newAudioTrack = stream.getAudioTracks()[0];
-                if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
-                  this.replacePeerAudioTracks(socketManager, newAudioTrack);
-                  this.obj.removeTrack(this.getAudioTracks()[0]);
-                }
-
-                this.obj.addTrack(newAudioTrack);
+              this.shareScreenObj = stream;
+              stream.getAudioTracks()[0].enabled = false;
+              if (stream.getVideoTracks().length > 0) {
+                stream.getVideoTracks()[0].enabled = false;
               }
-            );
-        };
 
-        if (successHandler) {
-          successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length === 0);
+              navigator.mediaDevices.ondevicechange = () => {
+                console.log("MEDIA CHANGED");
+                console.log("UPDATING TRACKS");
+
+                let newUserMedia = navigator.mediaDevices
+                  .getUserMedia({
+                    audio: true,
+                    video: false
+                  });
+
+                newUserMedia
+                  .then((stream) => {
+                      let newAudioTrack = stream.getAudioTracks()[0];
+                      if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
+                        this.replacePeerAudioTracks(socketManager, newAudioTrack);
+                        this.obj.removeTrack(this.getAudioTracks()[0]);
+                      }
+
+                      this.obj.addTrack(newAudioTrack);
+                    }
+                  );
+              };
+
+              if (successHandler) {
+                successHandler(this.obj, this.shareScreenObj, stream.getVideoTracks().length === 0);
+              }
+            });
+        } else {
+          if (successHandler) {
+            successHandler(this.obj, null, stream.getVideoTracks().length === 0);
+          }
         }
       }).catch((e) => {
       if (!retry) {
@@ -61,58 +84,6 @@ export class Stream {
         }
       }
     });
-  };
-
-  createScreenShareStream = (socketManager, source) => {
-    const videoConstraints = {
-      cursor: true,
-      audio: {
-        mandatory: {
-          chromeMediaSource: 'desktop',
-        },
-      },
-      video: {
-        mandatory: {
-          chromeMediaSource: 'desktop',
-          chromeMediaSourceId: source,
-          minWidth: 1280,
-          maxWidth: 1280,
-          minHeight: 720,
-          maxHeight: 720
-        }
-      }
-    };
-
-    if (osName === 'Mac OS') {
-      videoConstraints.audio = false;
-    }
-
-    navigator.mediaDevices
-      .getUserMedia(videoConstraints)
-      .then((stream) => {
-        console.log("ADDING SHARE SCREEN STREAM");
-        this.shareScreenObj = stream;
-        socketManager.userPeerMap.forEach((peerObj) => {
-          peerObj.peer.addStream(stream);
-        });
-      })
-      .catch(e => {
-        console.log(e)
-      });
-  };
-
-  closeScreenStream = (socketManager) => {
-    if(this.shareScreenObj) {
-      this.closeObj(this.shareScreenObj);
-      console.log("REMOVING SHARE SCREEN STREAM");
-      socketManager.userPeerMap.forEach((peerObj) => {
-        try {
-          peerObj.peer.removeStream(this.shareScreenObj);
-        } catch(e) {
-          console.log("Share stream does not exist for : " + peerObj.user.userId);
-        }
-      });
-    }
   };
 
   async replacePeerAudioTracks(socketManager, newAudioTrack) {
@@ -185,15 +156,15 @@ export class Stream {
           {
             audio: true,
             video: {
-              width: {min: 160, ideal: 320, max: 640},
-              height: {min: 120, ideal: 240, max: 480},
+              width: { min: 160, ideal: 320, max: 640 },
+              height: { min: 120, ideal: 240, max: 480 },
             }
           });
       userMedia
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
           if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
-            if (socketManager) {
+            if(socketManager) {
               this.replacePeerVideoTracks(socketManager);
             }
 

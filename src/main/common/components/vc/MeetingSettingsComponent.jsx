@@ -51,7 +51,7 @@ const MeetingSettingsComponent = (props) => {
     }, (e) => {
       console.log(e);
       setVideoOptionDisabled(true);
-    });
+    }, false, null, false);
 
     setStream(videoStream);
   };

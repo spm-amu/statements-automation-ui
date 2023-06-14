@@ -156,7 +156,7 @@ class SocketManager {
     let opts = {
       initiator: true,
       trickle: false,
-      stream: stream.obj
+      streams: [stream.obj, stream.shareScreenObj]
     };
 
     if (!appManager.isOnline()) {
@@ -212,7 +212,7 @@ class SocketManager {
     let opts = {
       initiator: false,
       trickle: false,
-      stream: stream.obj
+      streams: [stream.obj, stream.shareScreenObj]
     };
 
     if (!appManager.isOnline()) {
@@ -272,7 +272,7 @@ class SocketManager {
     item.peer.signal(payload.signal);
   };
 
-  mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted, screenShareStreamCallback) => {
+  mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted) => {
     const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.userId, stream, audioMuted, videoMuted) :
       this.addPeer(payload.userId, stream, audioMuted, videoMuted);
 
@@ -313,11 +313,10 @@ class SocketManager {
         } else {
           console.log("\n\n\n\nSHARE STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
           console.log(peer);
-          //item.shareStream = stream;
-          screenShareStreamCallback(stream);
+          item.shareStream = stream;
         }
 
-        if (item.mainStream) {
+        if (item.mainStream && item.shareStream) {
           resolve(item);
         }
       });
