@@ -705,7 +705,10 @@ const MeetingRoom = (props) => {
   }
 
   const addUser = (payload) => {
-    socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted)
+    socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted,
+      (shareStream) => {
+        shareScreenRef.current = shareStream;
+      })
       .then((item) => {
         console.log("ADD USER : ", payload);
         addUserToParticipants(item, item.user.callerSocketId);
