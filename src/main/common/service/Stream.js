@@ -106,7 +106,11 @@ export class Stream {
       this.closeObj(this.shareScreenObj);
       console.log("REMOVING SHARE SCREEN STREAM");
       socketManager.userPeerMap.forEach((peerObj) => {
-        peerObj.peer.removeStream(this.shareScreenObj);
+        try {
+          peerObj.peer.removeStream(this.shareScreenObj);
+        } catch(e) {
+          console.log("Share stream does not exist for : " + peerObj.user.userId);
+        }
       });
     }
   };
