@@ -194,7 +194,7 @@ const MeetingParticipantGrid = (props) => {
         alignItems="center" container item spacing={2}>
         <React.Fragment>
           {row.map((participant, index) => {
-            return <Grid spacing={0} item xs={4} key={index}
+            return <Grid item xs={4} key={index}
                          className={'meetingParticipantContainer'} style={
               {
                 borderRadius: '4px',

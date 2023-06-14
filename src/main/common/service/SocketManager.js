@@ -272,7 +272,7 @@ class SocketManager {
     item.peer.signal(payload.signal);
   };
 
-  mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted) => {
+  mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted, screenShareStreamCallback) => {
     const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.userId, stream, audioMuted, videoMuted) :
       this.addPeer(payload.userId, stream, audioMuted, videoMuted);
 
@@ -313,7 +313,8 @@ class SocketManager {
         } else {
           console.log("\n\n\n\nSHARE STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
           console.log(peer);
-          item.shareStream = stream;
+          //item.shareStream = stream;
+          screenShareStreamCallback(stream);
         }
 
         if (item.mainStream) {

@@ -63,7 +63,7 @@ export class Stream {
     });
   };
 
-  createScreenShareStream = (socketManager) => {
+  createScreenShareStream = (socketManager, source) => {
     const videoConstraints = {
       cursor: true,
       audio: {
@@ -72,11 +72,9 @@ export class Stream {
         },
       },
       video: {
-        width: {min: 160, ideal: 320, max: 640},
-        height: {min: 120, ideal: 240, max: 480},
         mandatory: {
           chromeMediaSource: 'desktop',
-          chromeMediaSourceId: shareScreenSource.current.id,
+          chromeMediaSourceId: source,
           minWidth: 1280,
           maxWidth: 1280,
           minHeight: 720,
@@ -95,7 +93,7 @@ export class Stream {
         console.log("ADDING SHARE SCREEN STREAM");
         this.shareScreenObj = stream;
         socketManager.userPeerMap.forEach((peerObj) => {
-          peerObj.addStream(stream);
+          peerObj.peer.addStream(stream);
         });
       })
       .catch(e => {
@@ -108,7 +106,7 @@ export class Stream {
       this.closeObj(this.shareScreenObj);
       console.log("REMOVING SHARE SCREEN STREAM");
       socketManager.userPeerMap.forEach((peerObj) => {
-        peerObj.removeStream(this.shareScreenObj);
+        peerObj.peer.removeStream(this.shareScreenObj);
       });
     }
   };
