@@ -154,9 +154,9 @@ class SocketManager {
     var arr = sdp.split('\n');
     arr.forEach((str, i) => {
       if (/^a=fmtp:\d*/.test(str)) {
-        arr[i] = str + ';x-google-max-bitrate=10;x-google-min-bitrate=0;x-google-start-bitrate=6';
+        arr[i] = str + ';x-google-max-bitrate=128;x-google-min-bitrate=0;x-google-start-bitrate=64';
       } else if (/^a=mid:(1|video)/.test(str)) {
-        arr[i] += '\nb=AS:10';
+        arr[i] += '\nb=AS:64';
       }
     });
 

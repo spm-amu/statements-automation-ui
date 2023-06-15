@@ -10,3 +10,4 @@ docker pull 662032958478.dkr.ecr.us-east-2.amazonaws.com/armscor-connect-ui-web;
 
 npx cross-env DEBUG_PROD=true npm run package
 
+
