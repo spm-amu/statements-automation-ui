@@ -1,3 +1,17 @@
+const VIDEO_CONSTRAINTS = {
+  mandatory: {
+    width: {min: 160, ideal: 320, max: 640},
+    height: {min: 120, ideal: 240, max: 480},
+    frameRate: {
+      min: 15,
+      max: 15
+    },
+    googCpuOveruseDetection: true,
+    googCpuOveruseEncodeUsage: true,
+    googCpuOveruseThreshold: 70
+  }
+};
+
 export class Stream {
   constructor() {
   }
@@ -7,19 +21,7 @@ export class Stream {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: true,
-        video: retry ? false : {
-          mandatory: {
-            width: {min: 160, ideal: 320, max: 640},
-            height: {min: 120, ideal: 240, max: 480},
-            frameRate: {
-              min: 15,
-              max: 15
-            },
-            googCpuOveruseDetection: true,
-            googCpuOveruseEncodeUsage: true,
-            googCpuOveruseThreshold: 70
-          }
-        }
+        video: retry ? false : VIDEO_CONSTRAINTS
       });
 
     userMedia
@@ -160,11 +162,8 @@ export class Stream {
       let userMedia = navigator.mediaDevices
         .getUserMedia(
           {
-            audio: true,
-            video: {
-              width: { min: 160, ideal: 320, max: 640 },
-              height: { min: 120, ideal: 240, max: 480 },
-            }
+            audio: false,
+            video: VIDEO_CONSTRAINTS
           });
       userMedia
         .then((stream) => {
