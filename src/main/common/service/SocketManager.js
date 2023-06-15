@@ -150,37 +150,6 @@ class SocketManager {
     this.subscriptions.splice(0, this.subscriptions.length);
   };
 
-  setMediaBitrate = (sdp, bitrate) => {
-    console.log("\n\n\n\\n\nSET MEDIA BITRATE");
-    const sdpLines = sdp.split('\n');
-
-    /*for (const sdpLine of sdpLines) {
-      console.log(sdpLine);
-    }*/
-
-    let mediaLineIndex = -1;
-    let bitrateLineIndex = -1;
-    const bitrateLine = `b=AS:${bitrate}`;
-    bitrateLineIndex = 0;
-
-    // Skip both i=* and c=* lines (bandwidths limiters have to come afterwards)
-    while (sdpLines[bitrateLineIndex].startsWith('i=') || sdpLines[bitrateLineIndex].startsWith('c=')) {
-      bitrateLineIndex += 1;
-    }
-
-    if (sdpLines[bitrateLineIndex].startsWith('b=')) {
-      // If the next line is a b=* line, replace it with our new bandwidth
-      console.log("A : " + sdpLines[bitrateLineIndex]);
-      sdpLines[bitrateLineIndex] = bitrateLine;
-    } else {
-      // Otherwise insert a new bitrate line.
-      console.log("B : " + sdpLines[bitrateLineIndex]);
-      //sdpLines.splice(bitrateLineIndex, 0, bitrateLine);
-    }
-
-    return sdpLines.join('\n');
-  };
-
   updateBitRate = (sdp) => {
     var arr = sdp.split('\n');
     arr.forEach((str, i) => {
