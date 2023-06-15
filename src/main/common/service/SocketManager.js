@@ -150,13 +150,60 @@ class SocketManager {
     this.subscriptions.splice(0, this.subscriptions.length);
   };
 
+  setMediaBitrate = (sdp, bitrate) => {
+    console.log("\n\n\n\\n\nSET MEDIA BITRATE");
+    const sdpLines = sdp.split('\n');
+
+    /*for (const sdpLine of sdpLines) {
+      console.log(sdpLine);
+    }*/
+
+    let mediaLineIndex = -1;
+    let bitrateLineIndex = -1;
+    const bitrateLine = `b=AS:${bitrate}`;
+    bitrateLineIndex = 0;
+
+    // Skip both i=* and c=* lines (bandwidths limiters have to come afterwards)
+    while (sdpLines[bitrateLineIndex].startsWith('i=') || sdpLines[bitrateLineIndex].startsWith('c=')) {
+      bitrateLineIndex += 1;
+    }
+
+    if (sdpLines[bitrateLineIndex].startsWith('b=')) {
+      // If the next line is a b=* line, replace it with our new bandwidth
+      console.log("A : " + sdpLines[bitrateLineIndex]);
+      sdpLines[bitrateLineIndex] = bitrateLine;
+    } else {
+      // Otherwise insert a new bitrate line.
+      console.log("B : " + sdpLines[bitrateLineIndex]);
+      //sdpLines.splice(bitrateLineIndex, 0, bitrateLine);
+    }
+
+    return sdpLines.join('\n');
+  };
+
+  updateBitRate = (sdp) => {
+    var arr = sdp.split('\n');
+    arr.forEach((str, i) => {
+      if (/^a=fmtp:\d*/.test(str)) {
+        arr[i] = str + ';x-google-max-bitrate=10;x-google-min-bitrate=0;x-google-start-bitrate=6';
+      } else if (/^a=mid:(1|video)/.test(str)) {
+        arr[i] += '\nb=AS:10';
+      }
+    });
+
+    return arr.join('\n');
+  };
+
   createPeer = (userToSignal, stream, audioMuted, videoMuted) => {
     let userDetails = appManager.getUserDetails();
 
     let opts = {
       initiator: true,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj]
+      streams: [stream.obj, stream.shareScreenObj],
+      sdpTransform: (sdp) => this.updateBitRate(sdp),
+      reconnectTimer: 5000,
+      objectMode: false,
     };
 
     if (!appManager.isOnline()) {
@@ -212,7 +259,8 @@ class SocketManager {
     let opts = {
       initiator: false,
       trickle: false,
-      streams: [stream.obj, stream.shareScreenObj]
+      streams: [stream.obj, stream.shareScreenObj],
+      sdpTransform: (sdp) => this.updateBitRate(sdp),
     };
 
     if (!appManager.isOnline()) {
@@ -248,7 +296,7 @@ class SocketManager {
   removeFromUserToPeerMap = (id) => {
     let find = this.userPeerMap.find((item) => item.user.userId === id);
     console.log("REMOVING : " + id);
-    if(find) {
+    if (find) {
       this.destroyPeer(id);
       let filtered = this.userPeerMap.filter((item) => item.user.userId !== id);
       this.userPeerMap.splice(0, this.userPeerMap.length);
@@ -294,7 +342,7 @@ class SocketManager {
       console.log("PEER ERROR : ");
       console.log(err);
       console.log(JSON.stringify(err));
-      if(err.code === 'ERR_CONNECTION_FAILURE') {
+      if (err.code === 'ERR_CONNECTION_FAILURE') {
         appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
           payload: payload
         });
