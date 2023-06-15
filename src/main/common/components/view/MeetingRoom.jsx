@@ -1406,6 +1406,16 @@ const MeetingRoom = (props) => {
                     height: (screenShared && shareScreenSource.current && shareScreenSource.current.name.toLowerCase() !== 'entire screen'
                       && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') || someoneSharing ? 'calc(100% - 152px)' : '0'
                   }}>
+                    <div style={{color: '#ffffff', fontSize: '20px', padding: '8px'}}>
+                      {
+                        someoneSharing &&
+                          <span>
+                            {
+                              participants.find((p) => p.userId === someoneSharing)?.name + ' is sharing'
+                            }
+                          </span>
+                      }
+                    </div>
                     <video
                       hidden={false}
                       muted playsinline autoPlay ref={shareScreenRef}

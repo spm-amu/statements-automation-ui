@@ -36,7 +36,7 @@ export class Stream {
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
             audio: true,
-            video: false
+            video: VIDEO_CONSTRAINTS
           });
 
         if(createScreenShareStream) {
