@@ -81,6 +81,9 @@ const MeetingParticipant = (props) => {
     if (props.soundMonitor && !props.inView) {
       props.soundMonitor(props.data.userId, soundLevel > 3);
       setActive(soundLevel > 3);
+
+      // Just ensuring that the src object is always set if there is incoming sound
+      videoRef.current.srcObject = props.data.stream;
     }
   }, [soundLevel]);
 
