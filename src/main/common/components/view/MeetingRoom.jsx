@@ -555,6 +555,8 @@ const MeetingRoom = (props) => {
     setScreenShared(false);
     setMeetingParticipantGridMode('DEFAULT');
 
+    currentUserStream.shareScreenObj.getVideoTracks()[0].enabled = false;
+    currentUserStream.shareScreenObj.getVideoTracks()[0].stop();
     socketManager.userPeerMap.forEach((peerObj) => {
       if (peerObj.peer.connected) {
         try {
@@ -628,10 +630,15 @@ const MeetingRoom = (props) => {
           mandatory: {
             chromeMediaSource: 'desktop',
             chromeMediaSourceId: shareScreenSource.current.id,
-            minWidth: 1280,
-            maxWidth: 1280,
-            minHeight: 720,
-            maxHeight: 720
+            width: {min: 160, max: 1280},
+            height: {min: 120, max: 720},
+            frameRate: {
+              min: 15,
+              max: 15
+            },
+            googCpuOveruseDetection: true,
+            googCpuOveruseEncodeUsage: true,
+            googCpuOveruseThreshold: 70
           }
         }
       };
