@@ -196,6 +196,8 @@ class SocketManager {
         audioMuted: audioMuted,
         videoMuted: videoMuted
       });
+
+      peer.removeAllListeners('signal');
     });
 
     return peer;
@@ -219,6 +221,8 @@ class SocketManager {
         audioMuted: !stream.getTracks()[1].enabled,
         videoMuted: !stream.getTracks()[0].enabled
       });
+
+      peer.removeAllListeners('signal');
     });
 
     return peer;
