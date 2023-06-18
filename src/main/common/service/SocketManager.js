@@ -334,6 +334,7 @@ class SocketManager {
         }
 
         if (item.mainStream && item.shareStream) {
+          props.data.peer.removeAllListeners('stream');
           resolve(item);
         }
       });
