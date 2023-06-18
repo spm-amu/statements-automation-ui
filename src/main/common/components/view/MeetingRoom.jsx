@@ -1013,7 +1013,7 @@ const MeetingRoom = (props) => {
       createMediaRecorder().then((recorder) => {
         mediaRecorder.current = recorder;
         setVideoDisabled(videoDisabled);
-      })
+      });
     }, (e) => {
       setVideoDisabled(true);
       console.log(e);

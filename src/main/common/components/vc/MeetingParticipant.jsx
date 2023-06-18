@@ -82,7 +82,7 @@ const MeetingParticipant = (props) => {
       props.soundMonitor(props.data.userId, soundLevel > 3);
       setActive(soundLevel > 3);
 
-      // Just ensuring that the src object is always set if there is incoming sound
+      // Just ensuring that the src object is always set if there is incoming
       videoRef.current.srcObject = props.data.stream;
     }
   }, [soundLevel]);
@@ -120,6 +120,8 @@ const MeetingParticipant = (props) => {
           setSoundLevel(dataJSON.data.level);
         }
       });
+
+      peer2.onaddtrack = ev => alert('Track fireeeeee');
     } else {
       videoRef.current.srcObject = props.userStream;
     }
@@ -219,8 +221,7 @@ const MeetingParticipant = (props) => {
                           autoPlay muted playsInline ref={videoRef}
                           style={{
                             width: '100%',
-                            height: props.videoHeight ? props.videoHeight : '100%',
-                            border: props.inView && !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                            height: props.videoHeight ? props.videoHeight : '100%'
                           }}
                         />
                         :

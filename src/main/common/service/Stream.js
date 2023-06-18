@@ -21,17 +21,17 @@ export class Stream {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: true,
-        video: retry ? false : VIDEO_CONSTRAINTS
+        video: retry || !video ? false : VIDEO_CONSTRAINTS
       });
 
     userMedia
       .then((stream) => {
         stream.getAudioTracks()[0].enabled = audio;
         this.obj = stream;
-        if (!video && stream.getVideoTracks().length > 0) {
-          stream.getVideoTracks()[0].enabled = false;
-          stream.getVideoTracks()[0].stop();
-        }
+        //if (!video && stream.getVideoTracks().length > 0) {
+          //stream.getVideoTracks()[0].enabled = false;
+          //stream.getVideoTracks()[0].stop();
+        //}
 
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
@@ -170,6 +170,7 @@ export class Stream {
           this.videoTrack = stream.getVideoTracks()[0];
           if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
             if(socketManager) {
+              this.videoTrack.enabled = true;
               this.replacePeerVideoTracks(socketManager);
             }
 
@@ -202,13 +203,21 @@ export class Stream {
   async replacePeerVideoTrack(peerObj) {
     if (peerObj.peer.connected) {
       try {
+        alert(1);
         peerObj.peer.replaceTrack(
           this.getVideoTracks()[0],
           this.videoTrack,
           this.obj
         );
       } catch (e) {
+        alert(2);
         console.log(e);
+        this.obj.addTrack(this.videoTrack);
+        this.obj.video = true;
+        peerObj.peer.addTrack(
+          this.videoTrack,
+          this.obj
+        );
       }
     }
   }
