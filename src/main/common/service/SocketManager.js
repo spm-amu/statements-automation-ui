@@ -294,7 +294,6 @@ class SocketManager {
       let userPeerMapItem = this.userPeerMap.find((u) => u.user.userId === payload.userId);
       if (userPeerMapItem) {
         if (eventType === MessageType.USER_JOINED) {
-          alert("SIGNALLING");
           userPeerMapItem.peer.signal(payload.signal);
         }
 

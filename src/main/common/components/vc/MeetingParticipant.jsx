@@ -121,7 +121,7 @@ const MeetingParticipant = (props) => {
         }
       });
 
-      props.data.peer.on('stream', (stream) => {
+      /*props.data.peer.on('stream', (stream) => {
         alert("STREAM FIREEEEEEEE");
         videoRef.current.srcObject = stream;
       });
@@ -129,7 +129,7 @@ const MeetingParticipant = (props) => {
       props.data.peer.on('track', (stream, track) => {
         alert("TRACK FIREEEEEEEE");
         videoRef.current.srcObject = stream;
-      });
+      });*/
     } else {
       videoRef.current.srcObject = props.userStream;
     }
@@ -156,7 +156,7 @@ const MeetingParticipant = (props) => {
 
       if (props.data.peer) {
         props.data.peer.removeAllListeners('data');
-        props.data.peer.removeAllListeners('stream');
+        //props.data.peer.removeAllListeners('stream');
       }
     };
   }, []);
