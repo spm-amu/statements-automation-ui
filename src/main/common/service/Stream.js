@@ -29,8 +29,8 @@ export class Stream {
         stream.getAudioTracks()[0].enabled = audio;
         this.obj = stream;
         //if (!video && stream.getVideoTracks().length > 0) {
-          //stream.getVideoTracks()[0].enabled = false;
-          //stream.getVideoTracks()[0].stop();
+        //stream.getVideoTracks()[0].enabled = false;
+        //stream.getVideoTracks()[0].stop();
         //}
 
         let shareUserMedia = navigator.mediaDevices
@@ -39,7 +39,7 @@ export class Stream {
             video: VIDEO_CONSTRAINTS
           });
 
-        if(createScreenShareStream) {
+        if (createScreenShareStream) {
           shareUserMedia
             .then((stream) => {
               this.shareScreenObj = stream;
@@ -168,12 +168,13 @@ export class Stream {
       userMedia
         .then((stream) => {
           this.videoTrack = stream.getVideoTracks()[0];
-          if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
-            if(socketManager) {
-              this.videoTrack.enabled = true;
-              this.replacePeerVideoTracks(socketManager);
-            }
 
+          if (socketManager) {
+            this.videoTrack.enabled = true;
+            this.replacePeerVideoTracks(socketManager);
+          }
+
+          if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
             this.getVideoTracks()[0].stop();
             this.obj.removeTrack(this.getVideoTracks()[0]);
           }
@@ -203,12 +204,15 @@ export class Stream {
   async replacePeerVideoTrack(peerObj) {
     if (peerObj.peer.connected) {
       try {
+        alert(1);
         peerObj.peer.replaceTrack(
           this.getVideoTracks()[0],
           this.videoTrack,
           this.obj
         );
+        alert(2);
       } catch (e) {
+        alert(3);
         console.log(e);
         peerObj.peer.addTrack(
           this.videoTrack,
