@@ -775,7 +775,9 @@ const MeetingRoom = (props) => {
         });
 
         joinInAudio.play();
-      });
+      }).catch((e) => {
+
+    });
   };
 
   const createParticipants = (users, socket) => {
