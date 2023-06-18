@@ -291,20 +291,16 @@ class SocketManager {
 
   mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted) => {
     return new Promise((resolve, reject) => {
-      let peer = this.userPeerMap.find((u) => u.user.userId === payload.userId);
-      if (peer) {
-        peer.on('stream', (stream) => {
-          alert("Stream event test");
-        });
-
+      let userPeerMapItem = this.userPeerMap.find((u) => u.user.userId === payload.userId);
+      if (userPeerMapItem) {
         if (eventType === MessageType.USER_JOINED) {
           alert("SIGNALLING");
-          peer.signal(payload.signal);
+          userPeerMapItem.peer.signal(payload.signal);
         }
 
         reject();
       } else {
-        peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.userId, stream, audioMuted, videoMuted) :
+        const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.userId, stream, audioMuted, videoMuted) :
           this.addPeer(payload.userId, stream, audioMuted, videoMuted);
 
         let itemUser = JSON.parse(JSON.stringify(payload));
