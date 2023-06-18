@@ -125,6 +125,11 @@ const MeetingParticipant = (props) => {
         alert("STREAM FIREEEEEEEE");
         videoRef.current.srcObject = stream;
       });
+
+      props.data.peer.on('track', (stream) => {
+        alert("TRACK FIREEEEEEEE");
+        videoRef.current.srcObject = stream;
+      });
     } else {
       videoRef.current.srcObject = props.userStream;
     }

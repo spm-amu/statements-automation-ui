@@ -290,7 +290,7 @@ class SocketManager {
   };
 
   mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted) => {
-    return new Promise((resolve, reject) => {
+    let promise = new Promise((resolve, reject) => {
       if(this.userPeerMap.find((u) => u.user.userId === payload.userId)) {
         reject()
       } else {
@@ -341,12 +341,14 @@ class SocketManager {
             resolve(item);
           }
         });
-
-        if (eventType === MessageType.USER_JOINED) {
-          peer.signal(payload.signal);
-        }
       }
     });
+
+    if (eventType === MessageType.USER_JOINED) {
+      peer.signal(payload.signal);
+    }
+
+    return promise;
   };
 
   endCall = (isDirect = false, caller = null, roomId) => {
