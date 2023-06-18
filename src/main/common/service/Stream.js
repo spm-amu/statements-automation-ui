@@ -204,15 +204,12 @@ export class Stream {
   async replacePeerVideoTrack(peerObj) {
     if (peerObj.peer.connected) {
       try {
-        alert(1);
         peerObj.peer.replaceTrack(
           this.getVideoTracks()[0],
           this.videoTrack,
           this.obj
         );
-        alert(2);
       } catch (e) {
-        alert(3);
         console.log(e);
         peerObj.peer.addTrack(
           this.videoTrack,
