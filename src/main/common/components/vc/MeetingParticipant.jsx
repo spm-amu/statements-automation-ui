@@ -139,7 +139,6 @@ const MeetingParticipant = (props) => {
     }
   }, [videoRef.current]);
 
-
   useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
