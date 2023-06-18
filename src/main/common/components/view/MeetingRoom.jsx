@@ -1204,14 +1204,14 @@ const MeetingRoom = (props) => {
 
   function toggleVideo() {
     if (currentUserStream.obj) {
-      currentUserStream.enableVideo(!videoMuted, socketManager);
+      currentUserStream.enableVideo(!videoMuted, socketManager).then((stream) => {
+        onAVSettingsChange({
+          userId: appManager.getUserDetails().userId,
+          videoMuted,
+          audioMuted
+        });
+      });
     }
-
-    onAVSettingsChange({
-      userId: appManager.getUserDetails().userId,
-      videoMuted,
-      audioMuted
-    });
   }
 
   useEffect(() => {
