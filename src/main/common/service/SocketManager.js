@@ -290,61 +290,63 @@ class SocketManager {
   };
 
   mapUserToPeer = (payload, stream, eventType, audioMuted, videoMuted) => {
-    const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.userId, stream, audioMuted, videoMuted) :
-      this.addPeer(payload.userId, stream, audioMuted, videoMuted);
+    return new Promise((resolve, reject) => {
+      if(this.userPeerMap.find((u) => u.user.userId === payload.userId)) {
+        reject()
+      } else {
+        const peer = eventType === MessageType.ALL_USERS ? this.createPeer(payload.userId, stream, audioMuted, videoMuted) :
+          this.addPeer(payload.userId, stream, audioMuted, videoMuted);
 
-    let itemUser = JSON.parse(JSON.stringify(payload));
-    let item = {
-      peer: peer,
-      user: payload
-    };
+        let itemUser = JSON.parse(JSON.stringify(payload));
+        let item = {
+          peer: peer,
+          user: payload
+        };
 
-    peer.on('close', () => {
-      console.log("PEER CLOSE : ");
-      console.log(payload);
-      /*appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
-        payload: payload
-      });*/
-    });
-
-    peer.on("error", (err) => {
-      console.log("PEER ERROR : ");
-      console.log(err);
-      console.log(JSON.stringify(err));
-      if (err.code === 'ERR_CONNECTION_FAILURE') {
-        appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
-          payload: payload
+        peer.on('close', () => {
+          console.log("PEER CLOSE : ");
+          console.log(payload);
+          /*appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
+            payload: payload
+          });*/
         });
 
-        console.log("PEER_DISCONNECT FIRED");
+        peer.on("error", (err) => {
+          console.log("PEER ERROR : ");
+          console.log(err);
+          console.log(JSON.stringify(err));
+          if (err.code === 'ERR_CONNECTION_FAILURE') {
+            appManager.fireEvent(SystemEventType.PEER_DISCONNECT, {
+              payload: payload
+            });
+
+            console.log("PEER_DISCONNECT FIRED");
+          }
+        });
+
+        this.userPeerMap.push(item);
+        peer.on('stream', (stream) => {
+          if (!item.mainStream) {
+            console.log("\n\n\n\nMAIN STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
+            console.log(peer);
+            item.mainStream = stream;
+          } else {
+            console.log("\n\n\n\nSHARE STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
+            console.log(peer);
+            item.shareStream = stream;
+          }
+
+          if (item.mainStream && item.shareStream) {
+            peer.removeAllListeners('stream');
+            resolve(item);
+          }
+        });
+
+        if (eventType === MessageType.USER_JOINED) {
+          peer.signal(payload.signal);
+        }
       }
     });
-
-    this.userPeerMap.push(item);
-    let promise = new Promise((resolve, reject) => {
-      peer.on('stream', (stream) => {
-        if (!item.mainStream) {
-          console.log("\n\n\n\nMAIN STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
-          console.log(peer);
-          item.mainStream = stream;
-        } else {
-          console.log("\n\n\n\nSHARE STREAM AUDIO TRACK COUNT : " + stream.getAudioTracks().length);
-          console.log(peer);
-          item.shareStream = stream;
-        }
-
-        if (item.mainStream && item.shareStream) {
-          peer.removeAllListeners('stream');
-          resolve(item);
-        }
-      });
-    });
-
-    if (eventType === MessageType.USER_JOINED) {
-      peer.signal(payload.signal);
-    }
-
-    return promise;
   };
 
   endCall = (isDirect = false, caller = null, roomId) => {

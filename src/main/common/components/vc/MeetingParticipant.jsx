@@ -149,7 +149,8 @@ const MeetingParticipant = (props) => {
       socketManager.removeSubscriptions(eventHandler);
 
       if (props.data.peer) {
-        props.data.peer.removeAllListeners('data')
+        props.data.peer.removeAllListeners('data');
+        props.data.peer.removeAllListeners('stream');
       }
     };
   }, []);
