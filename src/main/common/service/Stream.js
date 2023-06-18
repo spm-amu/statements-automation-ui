@@ -157,36 +157,39 @@ export class Stream {
     return this.obj.getTracks();
   };
 
-  enableVideo = (enabled, socketManager) => {
-    if (enabled) {
-      let userMedia = navigator.mediaDevices
-        .getUserMedia(
-          {
-            audio: false,
-            video: VIDEO_CONSTRAINTS
-          });
-      userMedia
-        .then((stream) => {
-          this.videoTrack = stream.getVideoTracks()[0];
+  enableVideo = async (enabled, socketManager) => {
+    return new Promise((resolve, reject) => {
+      if (enabled) {
+        let userMedia = navigator.mediaDevices
+          .getUserMedia(
+            {
+              audio: false,
+              video: VIDEO_CONSTRAINTS
+            });
+        userMedia
+          .then((stream) => {
+            this.videoTrack = stream.getVideoTracks()[0];
 
-          if (socketManager) {
-            this.videoTrack.enabled = true;
-            this.replacePeerVideoTracks(socketManager);
-          }
+            if (socketManager) {
+              this.videoTrack.enabled = true;
+              this.replacePeerVideoTracks(socketManager);
+            }
 
-          if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
-            this.getVideoTracks()[0].stop();
-            this.obj.removeTrack(this.getVideoTracks()[0]);
-          }
+            if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
+              this.getVideoTracks()[0].stop();
+              this.obj.removeTrack(this.getVideoTracks()[0]);
+            }
 
-          this.obj.addTrack(this.videoTrack);
-        })
-    } else {
-      let videoTrack = this.getVideoTracks()[0];
-      if (videoTrack) {
-        videoTrack.stop();
+            this.obj.addTrack(this.videoTrack);
+            resolve(this.obj);
+          })
+      } else {
+        let videoTrack = this.getVideoTracks()[0];
+        if (videoTrack) {
+          videoTrack.stop();
+        }
       }
-    }
+    });
   };
 
   async replacePeerVideoTracks(socketManager) {
