@@ -281,8 +281,7 @@
       "./assets/**"
     ],
     "publish": {
-      "provider": "generic",
-      "url": "https://localhost:8080",
+      "provider": "github",
       "owner": "",
       "repo": ""
     }
