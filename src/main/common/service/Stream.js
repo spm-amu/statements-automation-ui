@@ -33,17 +33,7 @@ export class Stream {
             audio: false,
             video: {
               mandatory: {
-                chromeMediaSource: 'desktop',
-                chromeMediaSourceId: shareScreenSource.current.id,
-                width: {min: 160, ideal: 320, max: 640},
-                height: {min: 120, ideal: 240, max: 480},
-                frameRate: {
-                  min: 15,
-                  max: 15
-                },
-                googCpuOveruseDetection: true,
-                googCpuOveruseEncodeUsage: true,
-                googCpuOveruseThreshold: 70
+                chromeMediaSource: 'desktop'
               }
             }
           });
@@ -52,7 +42,6 @@ export class Stream {
           shareUserMedia
             .then((stream) => {
               this.shareScreenObj = stream;
-              stream.getAudioTracks()[0].enabled = false;
               if (stream.getVideoTracks().length > 0) {
                 stream.getVideoTracks()[0].enabled = false;
                 stream.getVideoTracks()[0].stop();
