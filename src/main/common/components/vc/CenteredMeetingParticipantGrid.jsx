@@ -8,9 +8,10 @@ import Grid from "@material-ui/core/Grid";
 import appManager from "../../../common/service/AppManager";
 import Lobby from "./Lobby";
 import {SystemEventType} from "../../types";
+import TalkerCard from "./TalkerCard";
 
-const MAX_COLS = 3;
-const MAX_ROWS = 2;
+const MAX_COLS = 1;
+const MAX_ROWS = 1;
 const VH = 60;
 
 const MeetingParticipantGrid = (props) => {
@@ -18,7 +19,7 @@ const MeetingParticipantGrid = (props) => {
   const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
   const [grid, setGrid] = React.useState(null);
   const [overflowGrid, setOverflowGrid] = React.useState(null);
-  const [refresher, setRefresher] = React.useState(false);
+  const [talkers, setTalkers] = React.useState([]);
   const [systemEventHandler] = useState({});
   const {
     waitingList,
@@ -55,16 +56,10 @@ const MeetingParticipantGrid = (props) => {
       if (participantsInView.length === maxNumberOfInViewParticipants) {
         let offViewParticipant = participantsInView[participantsInView.length - 1];
         offViewParticipant.inView = false;
-        offViewParticipant.active = false;
         appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, offViewParticipant);
       }
 
       participant.inView = true;
-      participant.active = true;
-
-      console.log("\n\n\n\n\n\n\n\nparticipantsInView : " + participant.userId + " : " + participant.inView);
-      console.log("\n\n\n\n\n\n\n\nPARTS STATE : ", participants);
-
       setGrid(null);
       setOverflowGrid(null);
     }
@@ -98,14 +93,6 @@ const MeetingParticipantGrid = (props) => {
       };
 
       setCurrentUserParticipant(currentUserParticipant);
-      currentUserParticipant.active = true;
-      //currentUserParticipant.inView = true;
-      //newParticipants.push(currentUserParticipant);
-    }
-
-    let participantsInView = props.participants.filter((p) => p.inView);
-    for (const participant of participantsInView) {
-      participant.active = true;
     }
 
     let i = 0;
@@ -120,7 +107,6 @@ const MeetingParticipantGrid = (props) => {
       }
 
       if (i++ < (MAX_ROWS * MAX_COLS)) {
-        participant.active = true;
         participant.inView = true;
       }
     }
@@ -155,9 +141,7 @@ const MeetingParticipantGrid = (props) => {
 
     if (mode === 'DEFAULT') {
       let inViewParticipants = participants.filter((p) => p.inView);
-      let overflowParticipants = participants.filter((p) => !p.inView).sort(function (a, b) {
-        return b.active - a.active
-      });
+      let overflowParticipants = participants.filter((p) => !p.inView);
       let numRows = inViewParticipants.length < MAX_ROWS ? inViewParticipants.length : MAX_ROWS;
       let rows = inViewParticipants.length === 2 ? 1 : numRows;
 
@@ -218,7 +202,6 @@ const MeetingParticipantGrid = (props) => {
                                   userStream={userStream}
                                   videoMuted={participant.videoMuted}
                                   audioMuted={participant.audioMuted}
-                                  active={participant.active}
                                   inView={participant.inView}
                                   isHost={isHost}/>
             </Grid>
@@ -229,11 +212,7 @@ const MeetingParticipantGrid = (props) => {
   };
 
   function renderOverflowGrid() {
-    let sortedOverflowGrid = overflowGrid.sort(function (a, b) {
-      return b.active - a.active
-    });
-    console.log("\n\n\n\n\n\n\n\nRENDERING OFG : , ", overflowGrid);
-    return sortedOverflowGrid && sortedOverflowGrid.length > 0 &&
+    return overflowGrid && overflowGrid.length > 0 &&
       <div
         style={{
           overflowX: 'auto',
@@ -246,7 +225,7 @@ const MeetingParticipantGrid = (props) => {
           alignItems: 'center'
         }}
         className="row flex-row flex-nowrap">
-        {sortedOverflowGrid.map((participant, index) => {
+        {overflowGrid.map((participant, index) => {
           return <div className={'col-*-*'} key={index}
                       style={{
                         borderRadius: '4px',
@@ -260,9 +239,16 @@ const MeetingParticipantGrid = (props) => {
                                     props.userVideoChangeHandler(ref);
                                   } : null
                                 }
-                                soundMonitor={(userId, active) => {
-                                  //participants.find((p) => p.userId === userId).active = active;
-                                  //setRefresher(!refresher);
+                                soundMonitor={(userId, quite) => {
+                                  let participant = participants.find((p) => p.userId === userId);
+                                  if(quite) {
+                                    setTalkers(talkers.filter((t) => t.userId !== userId));
+                                  } else {
+                                    if(!talkers.find((t) => t.userId === userId)) {
+                                      talkers.push({userId, name: participant.name});
+                                      setTalkers([].concat(talkers));
+                                    }
+                                  }
                                 }}
                                 onHostAudioMute={() => props.onHostAudioMute(participant)}
                                 onHostVideoMute={() => props.onHostVideoMute(participant)}
@@ -271,8 +257,7 @@ const MeetingParticipantGrid = (props) => {
                                 showName={!participant.isCurrentUser}
                                 videoMuted={participant.videoMuted}
                                 audioMuted={participant.audioMuted} sizing={'sm'}
-                                inView={participant.inView}
-                                active={participant.active}/>
+                                inView={participant.inView}/>
           </div>
         })}
       </div>;
@@ -290,9 +275,21 @@ const MeetingParticipantGrid = (props) => {
         {
           grid && mode === 'DEFAULT' && step !== "LOBBY" &&
           <>
+            <div style={{height: '48px', width: '100%', color: 'white', fontSize: '16px'}} className={}>
+              {
+                (talkers && talkers.length > 0) &&
+                  <>
+                    {
+                      talkers.map((talker, index) => {
+                        return <TalkerCard data={talker} />
+                      })
+                    }
+                  </>
+              }
+            </div>
             <Box sx={{
               flexGrow: 1,
-              height: step === "LOBBY" ? null : 'calc(100% - 152px)',
+              height: step === "LOBBY" ? null : 'calc(100% - 220px)',
               width: '100%',
               justifyContent: 'center',
               alignItems: 'center',
@@ -351,7 +348,6 @@ const MeetingParticipantGrid = (props) => {
                                       userStream={userStream}
                                       videoMuted={currentUserParticipant.videoMuted}
                                       audioMuted={currentUserParticipant.audioMuted}
-                                      active={currentUserParticipant.active}
                                       videoHeight={'120px'}
                                       sizing={'md'}
                                       isHost={isHost}/>
@@ -393,7 +389,6 @@ const MeetingParticipantGrid = (props) => {
                                     userStream={userStream}
                                     videoMuted={currentUserParticipant.videoMuted}
                                     audioMuted={currentUserParticipant.audioMuted}
-                                    active={currentUserParticipant.active}
                                     videoHeight={'120px'}
                                     sizing={'md'}
                                     isHost={isHost}/>

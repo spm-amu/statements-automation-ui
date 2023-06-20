@@ -71,8 +71,8 @@ const permitAudio = new Audio(appManager.getSoundFileHost() + '/permission.mp3')
 //const waitingAudio = new Audio(appManager.getSoundFileHost() + '/waiting.mp3');
 
 const MeetingRoom = (props) => {
-  const [sideBarOpen, setSideBarOpen] = useState(false);
-  const [sideBarTab, setSideBarTab] = useState('');
+  const [sideBarOpen, setSideBarOpen] = useState(true);
+  const [sideBarTab, setSideBarTab] = useState('People');
   const [isHost, setIsHost] = useState(false);
   const [displayState, setDisplayState] = useState(props.displayState);
   const [participants, setParticipants] = useState([]);
@@ -643,7 +643,11 @@ const MeetingRoom = (props) => {
     if (screenShared) {
       const videoConstraints = {
         cursor: true,
-        audio: false,
+        audio: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+          },
+        },
         video: {
           mandatory: {
             chromeMediaSource: 'desktop',
@@ -660,6 +664,10 @@ const MeetingRoom = (props) => {
           }
         }
       };
+
+      if (osName === 'Mac OS') {
+        videoConstraints.audio = false;
+      }
 
       navigator.mediaDevices
         .getUserMedia(videoConstraints)

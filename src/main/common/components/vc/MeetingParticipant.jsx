@@ -11,7 +11,6 @@ import IconButton from "@material-ui/core/IconButton";
 import {PanTool} from "@material-ui/icons";
 
 const MeetingParticipant = (props) => {
-  const [active, setActive] = React.useState(false);
   const [handRaised, setHandRaised] = React.useState(false);
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
@@ -19,6 +18,7 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
+  const soundLevelCounter = useRef(0);
   const showVideo = true;
 
   const handler = () => {
@@ -79,8 +79,13 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     if (props.soundMonitor && !props.inView) {
-      props.soundMonitor(props.data.userId, soundLevel > 3);
-      setActive(soundLevel > 3);
+      if(soundLevel > 3) {
+        soundLevelCounter.current = 10;
+      } else if(soundLevelCounter.current > 0) {
+        soundLevelCounter.current--;
+      }
+
+      props.soundMonitor(props.data.userId, soundLevelCounter.current === 0 || audioMuted);
 
       // Just ensuring that the src object is always set if there is incoming
       videoRef.current.srcObject = props.data.stream;
@@ -89,24 +94,18 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     setAudioMuted(props.audioMuted);
-    if (props.audioMuted) {
-      setSoundLevel(0);
-    }
   }, [props.audioMuted]);
 
   useEffect(() => {
-    setActive(props.active);
-  }, [props.active]);
+    if (audioMuted) {
+      setSoundLevel(0);
+    }
+  }, [audioMuted]);
 
   const onAVSettingsChange = (payload) => {
     if (props.data.userId === payload.userId) {
       setAudioMuted(payload.audioMuted);
       setVideoMuted(payload.videoMuted);
-
-      if (!props.inView && payload.audioMuted && !props.isCurrentUser) {
-        setActive(false);
-        props.data.active = false;
-      }
     }
   };
 
@@ -175,11 +174,11 @@ const MeetingParticipant = (props) => {
   return (
     <>
       {
-        !active ?
-          audioMuted || props.data.peer === null ?
-            <audio autoPlay muted ref={videoRef}/>
+        (!props.inView && props.data.peer !== null) ?
+          audioMuted ?
+            <audio autoPlay muted ref={videoRef} style={{display: 'none'}}/>
             :
-            <audio autoPlay ref={videoRef}/>
+            <audio autoPlay ref={videoRef} style={{display: 'none'}}/>
           :
           <div className={'col-*-* meeting-participant-container'}
                style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null}}>
