@@ -397,7 +397,7 @@ const MeetingRoom = (props) => {
 
           //shareScreenRef.current.srcObject = participant.shareStream;
           //setSomeoneSharing(payload.data.userId);
-          //setMeetingParticipantGridMode('STRIP');
+          setMeetingParticipantGridMode('STRIP');
         } else {
           shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
           setSomeoneSharing(null);
