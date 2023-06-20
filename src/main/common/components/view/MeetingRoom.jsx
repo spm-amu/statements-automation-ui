@@ -71,8 +71,8 @@ const permitAudio = new Audio(appManager.getSoundFileHost() + '/permission.mp3')
 //const waitingAudio = new Audio(appManager.getSoundFileHost() + '/waiting.mp3');
 
 const MeetingRoom = (props) => {
-  const [sideBarOpen, setSideBarOpen] = useState(true);
-  const [sideBarTab, setSideBarTab] = useState('People');
+  const [sideBarOpen, setSideBarOpen] = useState(false);
+  const [sideBarTab, setSideBarTab] = useState('');
   const [isHost, setIsHost] = useState(false);
   const [displayState, setDisplayState] = useState(props.displayState);
   const [participants, setParticipants] = useState([]);
@@ -773,6 +773,8 @@ const MeetingRoom = (props) => {
         if (step === Steps.LOBBY) {
           setStep(Steps.SESSION);
           props.windowHandler.show();
+          setSideBarTab('People');
+          setSideBarOpen('true')
         }
 
         if (screenShared) {
@@ -816,6 +818,8 @@ const MeetingRoom = (props) => {
           if (socketManager.userPeerMap.length > 0) {
             if (step === Steps.LOBBY) {
               setStep(Steps.SESSION);
+              setSideBarTab('People');
+              setSideBarOpen('true')
               props.windowHandler.show();
             }
           }
