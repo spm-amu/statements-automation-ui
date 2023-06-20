@@ -99,6 +99,9 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     if (audioMuted) {
       setSoundLevel(0);
+      if (props.soundMonitor && !props.inView) {
+        props.soundMonitor(props.data.userId, true);
+      }
     }
   }, [audioMuted]);
 
@@ -196,7 +199,7 @@ const MeetingParticipant = (props) => {
                             </div>
                           }
                           {
-                            audioMuted ?
+                            audioMuted || props.data.peer === null ?
                               <audio autoPlay muted ref={videoRef} style={{display: 'none'}}/>
                               :
                               <audio autoPlay ref={videoRef} style={{display: 'none'}}/>

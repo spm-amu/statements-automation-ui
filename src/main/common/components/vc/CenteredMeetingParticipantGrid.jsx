@@ -10,7 +10,7 @@ import Lobby from "./Lobby";
 import {SystemEventType} from "../../types";
 import TalkerCard from "./TalkerCard";
 
-const MAX_COLS = 2;
+const MAX_COLS = 1;
 const MAX_ROWS = 1;
 const VH = 60;
 
@@ -240,6 +240,7 @@ const MeetingParticipantGrid = (props) => {
                                   } : null
                                 }
                                 soundMonitor={(userId, quite) => {
+                                  //console.log(userId + " is " + (quite ? "quite" : "speaking"));
                                   let participant = participants.find((p) => p.userId === userId);
                                   if(quite) {
                                     setTalkers(talkers.filter((t) => t.userId !== userId));
@@ -275,18 +276,6 @@ const MeetingParticipantGrid = (props) => {
         {
           grid && mode === 'DEFAULT' && step !== "LOBBY" &&
           <>
-            <div style={{height: '48px', width: '100%', color: 'white', fontSize: '16px'}} className={}>
-              {
-                (talkers && talkers.length > 0) &&
-                  <>
-                    {
-                      talkers.map((talker, index) => {
-                        return <TalkerCard data={talker} />
-                      })
-                    }
-                  </>
-              }
-            </div>
             <Box sx={{
               flexGrow: 1,
               height: step === "LOBBY" ? null : 'calc(100% - 220px)',
@@ -317,6 +306,20 @@ const MeetingParticipantGrid = (props) => {
                 })}
               </Grid>
             </Box>
+            {
+              <div style={{height: '48px', width: '100%', color: 'white', fontSize: '16px'}} className={}>
+                {
+                  (talkers && talkers.length > 0) &&
+                  <>
+                    {
+                      talkers.map((talker, index) => {
+                        return <TalkerCard data={talker} />
+                      })
+                    }
+                  </>
+                }
+              </div>
+            }
             <div className={'row'} style={{width: '100%', height: '88px', marginLeft: '0', marginRight: '0'}}>
               <div className={'col'}
                    style={{
@@ -354,8 +357,21 @@ const MeetingParticipantGrid = (props) => {
         {
           (mode === 'STRIP' || step === "LOBBY") &&
           <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
-            <div className={'col'}
-                 style={{
+            {
+              <div style={{height: '48px', width: '100%', color: 'white', fontSize: '16px'}}>
+                {
+                  (talkers && talkers.length > 0) &&
+                  <>
+                    {
+                      talkers.map((talker, index) => {
+                        return <TalkerCard data={talker} />
+                      })
+                    }
+                  </>
+                }
+              </div>
+            }
+            <div style={{
                    width: 'calc(100% - 200px)',
                    height: '120px',
                    overflow: 'hidden',

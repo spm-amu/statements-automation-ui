@@ -5,13 +5,13 @@ import {PhoneInTalk} from '@material-ui/icons';
 const TalkerCard = (props) => {
   return (
     <div
-      className={'col talker-card'}
+      className={'talker-card'}
     >
       <div className="row">
         <div style={{width: '32px'}}>
           <PhoneInTalk/>
         </div>
-        <div className="col no-margin">
+        <div className="no-margin">
           {
             props.data.name
           }
