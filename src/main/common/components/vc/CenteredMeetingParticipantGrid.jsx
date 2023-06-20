@@ -10,8 +10,8 @@ import Lobby from "./Lobby";
 import {SystemEventType} from "../../types";
 import TalkerCard from "./TalkerCard";
 
-const MAX_COLS = 1;
-const MAX_ROWS = 1;
+const MAX_COLS = 2;
+const MAX_ROWS = 2;
 const VH = 60;
 
 const MeetingParticipantGrid = (props) => {
