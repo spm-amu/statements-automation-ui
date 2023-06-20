@@ -565,13 +565,13 @@ const MeetingRoom = (props) => {
               currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
               currentUserStream.shareScreenObj
             );
-
-            currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
           } catch (e) {
             console.log(e);
           }
         }
       });
+
+      currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
     }
 
     //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
