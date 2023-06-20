@@ -11,7 +11,7 @@ import {SystemEventType} from "../../types";
 import TalkerCard from "./TalkerCard";
 
 const MAX_COLS = 2;
-const MAX_ROWS = 2;
+const MAX_ROWS = 1;
 const VH = 60;
 
 const MeetingParticipantGrid = (props) => {
