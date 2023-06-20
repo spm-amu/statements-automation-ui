@@ -195,34 +195,43 @@ const MeetingParticipant = (props) => {
                                  }/>
                           </div>
                         }
+                        {
+                          audioMuted ?
+                            <audio autoPlay muted ref={videoRef} style={{display: 'none'}}/>
+                            :
+                            <audio autoPlay ref={videoRef} style={{display: 'none'}}/>
+                        }
                       </div>
                     }
                     {
-                      audioMuted || props.data.peer === null ?
-                        <video
-                          id={props.data.userId}
-                          hidden={videoMuted}
-                          width={640}
-                          height={320}
-                          autoPlay muted playsInline ref={videoRef}
-                          style={{
-                            width: '100%',
-                            height: props.videoHeight ? props.videoHeight : '100%'
-                          }}
-                        />
-                        :
-                        <video
-                          id={props.data.userId}
-                          hidden={videoMuted}
-                          width={640}
-                          height={320}
-                          autoPlay playsInline ref={videoRef}
-                          style={{
-                            width: '100%',
-                            height: props.videoHeight ? props.videoHeight : '100%',
-                            border: props.inView && !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
-                          }}
-                        />
+                      !videoMuted &&
+                        <>
+                        {
+                          audioMuted || props.data.peer === null ?
+                            <video
+                              id={props.data.userId}
+                              width={640}
+                              height={320}
+                              autoPlay muted playsInline ref={videoRef}
+                              style={{
+                                width: '100%',
+                                height: props.videoHeight ? props.videoHeight : '100%'
+                              }}
+                            />
+                            :
+                            <video
+                              id={props.data.userId}
+                              width={640}
+                              height={320}
+                              autoPlay playsInline ref={videoRef}
+                              style={{
+                                width: '100%',
+                                height: props.videoHeight ? props.videoHeight : '100%',
+                                border: props.inView && !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                              }}
+                            />
+                        }
+                        </>
                     }
                     <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}>
                       {props.showName ? computeParticipantName() : 'You'}
