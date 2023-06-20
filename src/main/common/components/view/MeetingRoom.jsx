@@ -769,7 +769,8 @@ const MeetingRoom = (props) => {
 
         if (screenShared) {
           try {
-            item.peer.addTrack(
+            item.peer.replaceTrack(
+              currentUserStream.shareScreenObj.getVideoTracks()[0],
               shareScreenRef.current.srcObject.getVideoTracks()[0],
               currentUserStream.shareScreenObj
             );
