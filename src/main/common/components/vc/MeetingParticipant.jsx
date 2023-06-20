@@ -79,9 +79,9 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     if (props.soundMonitor && !props.inView) {
-      if(soundLevel > 3) {
+      if (soundLevel > 3) {
         soundLevelCounter.current = 10;
-      } else if(soundLevelCounter.current > 0) {
+      } else if (soundLevelCounter.current > 0) {
         soundLevelCounter.current--;
       }
 
@@ -132,7 +132,7 @@ const MeetingParticipant = (props) => {
         videoRef.current.srcObject = props.userStream;
       }
     }
-  }, [videoRef.current]);
+  }, [videoRef.current, videoMuted]);
 
   useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
@@ -176,62 +176,56 @@ const MeetingParticipant = (props) => {
                 showVideo ?
                   <div style={{width: '100%', height: '100%', backgroundColor: 'rgb(40, 40, 43)'}}>
                     {
-                      videoMuted &&
-                      <div className={'centered-flex-box'}
-                           style={{width: '100%', height: '100%', marginBottom: props.sizing === 'sm' ? '8px' : 0}}>
-                        {
-                          <div className={'avatar-wrapper'}
-                               style={{
-                                 width: ((props.sizing === 'sm' ? 1 : 3) + soundLevel / 10) + 'em',
-                                 height: ((props.sizing === 'sm' ? 1 : 3) + soundLevel / 10) + 'em',
-                                 border: !audioMuted && soundLevel > 3 ? (props.sizing === 'sm' ? 2 : 4) + 'px solid #00476a' : 'none'
-                               }}>
-                            <div className={props.sizing === 'md' ? 'avatar avatar-md' : 'avatar'}
-                                 data-label={Utils.getInitials(props.data.name)}
-                                 style={
-                                   {
-                                     fontSize: props.sizing === 'sm' ? '14px' : null
-                                   }
-                                 }/>
-                          </div>
-                        }
-                        {
-                          audioMuted ?
-                            <audio autoPlay muted ref={videoRef} style={{display: 'none'}}/>
-                            :
-                            <audio autoPlay ref={videoRef} style={{display: 'none'}}/>
-                        }
-                      </div>
-                    }
-                    {
-                      !videoMuted &&
-                        <>
-                        {
-                          audioMuted || props.data.peer === null ?
-                            <video
-                              id={props.data.userId}
-                              width={640}
-                              height={320}
-                              autoPlay muted playsInline ref={videoRef}
-                              style={{
-                                width: '100%',
-                                height: props.videoHeight ? props.videoHeight : '100%'
-                              }}
-                            />
-                            :
-                            <video
-                              id={props.data.userId}
-                              width={640}
-                              height={320}
-                              autoPlay playsInline ref={videoRef}
-                              style={{
-                                width: '100%',
-                                height: props.videoHeight ? props.videoHeight : '100%',
-                                border: props.inView && !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
-                              }}
-                            />
-                        }
-                        </>
+                      videoMuted ?
+                        <div className={'centered-flex-box'}
+                             style={{width: '100%', height: '100%', marginBottom: props.sizing === 'sm' ? '8px' : 0}}>
+                          {
+                            <div className={'avatar-wrapper'}
+                                 style={{
+                                   width: ((props.sizing === 'sm' ? 1 : 3) + soundLevel / 10) + 'em',
+                                   height: ((props.sizing === 'sm' ? 1 : 3) + soundLevel / 10) + 'em',
+                                   border: !audioMuted && soundLevel > 3 ? (props.sizing === 'sm' ? 2 : 4) + 'px solid #00476a' : 'none'
+                                 }}>
+                              <div className={props.sizing === 'md' ? 'avatar avatar-md' : 'avatar'}
+                                   data-label={Utils.getInitials(props.data.name)}
+                                   style={
+                                     {
+                                       fontSize: props.sizing === 'sm' ? '14px' : null
+                                     }
+                                   }/>
+                            </div>
+                          }
+                          {
+                            audioMuted ?
+                              <audio autoPlay muted ref={videoRef} style={{display: 'none'}}/>
+                              :
+                              <audio autoPlay ref={videoRef} style={{display: 'none'}}/>
+                          }
+                        </div>
+                        :
+                        audioMuted || props.data.peer === null ?
+                          <video
+                            id={props.data.userId}
+                            width={640}
+                            height={320}
+                            autoPlay muted playsInline ref={videoRef}
+                            style={{
+                              width: '100%',
+                              height: props.videoHeight ? props.videoHeight : '100%'
+                            }}
+                          />
+                          :
+                          <video
+                            id={props.data.userId}
+                            width={640}
+                            height={320}
+                            autoPlay playsInline ref={videoRef}
+                            style={{
+                              width: '100%',
+                              height: props.videoHeight ? props.videoHeight : '100%',
+                              border: props.inView && !audioMuted && soundLevel > 3 ? '4px solid #00476a' : 'none'
+                            }}
+                          />
                     }
                     <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}>
                       {props.showName ? computeParticipantName() : 'You'}

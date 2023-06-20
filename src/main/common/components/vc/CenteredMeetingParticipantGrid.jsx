@@ -332,7 +332,7 @@ const MeetingParticipantGrid = (props) => {
                   renderOverflowGrid()
                 }
               </div>
-              <div style={{width: '200px'}}>
+              <div style={{width: '200px', height: '120px'}}>
                 {
                   currentUserParticipant &&
                   <MeetingParticipant data={currentUserParticipant}
