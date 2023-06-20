@@ -428,31 +428,11 @@ const MeetingRoom = (props) => {
   async function replaceShareScreenStream(peerObj, stream) {
     if (peerObj.peer.connected) {
       try {
-        if (currentUserStream.shareScreenObj.getVideoTracks().length > 0) {
-          console.log("REPLACING EXISTING SCREEN SHARE TRACK");
-          currentUserStream.shareScreenObj.getVideoTracks()[0].enabled = false;
-          currentUserStream.shareScreenObj.getVideoTracks()[0].stop();
-
-          try {
-            peerObj.peer.replaceTrack(
-              currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
-              stream.getVideoTracks()[0], // current video track - screen track
-              currentUserStream.shareScreenObj
-            );
-          } catch (e) {
-            peerObj.peer.addTrack(
-              stream.getVideoTracks()[0], // current video track - screen track
-              currentUserStream.shareScreenObj
-            );
-          }
-        } else {
-          console.log("ADDING NEW SCREEN SHARE TRACK");
-          currentUserStream.shareScreenObj.addTrack(stream.getVideoTracks()[0]);
-          peerObj.peer.addTrack(
-            stream.getVideoTracks()[0], // current video track - screen track
-            currentUserStream.shareScreenObj
-          );
-        }
+        peerObj.peer.replaceTrack(
+          currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+          stream.getVideoTracks()[0], // current video track - screen track
+          currentUserStream.shareScreenObj
+        );
       } catch (e) {
         console.log(e);
       }
@@ -650,11 +630,7 @@ const MeetingRoom = (props) => {
     if (screenShared) {
       const videoConstraints = {
         cursor: true,
-        audio: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-          },
-        },
+        audio: false,
         video: {
           mandatory: {
             chromeMediaSource: 'desktop',
@@ -671,10 +647,6 @@ const MeetingRoom = (props) => {
           }
         }
       };
-
-      if (osName === 'Mac OS') {
-        videoConstraints.audio = false;
-      }
 
       navigator.mediaDevices
         .getUserMedia(videoConstraints)

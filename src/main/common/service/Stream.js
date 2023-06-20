@@ -28,15 +28,24 @@ export class Stream {
       .then((stream) => {
         stream.getAudioTracks()[0].enabled = audio;
         this.obj = stream;
-        //if (!video && stream.getVideoTracks().length > 0) {
-        //stream.getVideoTracks()[0].enabled = false;
-        //stream.getVideoTracks()[0].stop();
-        //}
-
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
-            audio: true,
-            video: false
+            audio: false,
+            video: {
+              mandatory: {
+                chromeMediaSource: 'desktop',
+                chromeMediaSourceId: shareScreenSource.current.id,
+                width: {min: 160, ideal: 320, max: 640},
+                height: {min: 120, ideal: 240, max: 480},
+                frameRate: {
+                  min: 15,
+                  max: 15
+                },
+                googCpuOveruseDetection: true,
+                googCpuOveruseEncodeUsage: true,
+                googCpuOveruseThreshold: 70
+              }
+            }
           });
 
         if (createScreenShareStream) {
