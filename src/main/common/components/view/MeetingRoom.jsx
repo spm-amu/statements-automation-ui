@@ -100,7 +100,6 @@ const MeetingRoom = (props) => {
   const [eventHandler] = useState({});
   const [audioLevelTransmissionHandler] = useState({});
   const [systemEventHandler] = useState({});
-  const [userVideo, setUserVideo] = useState(null);
   const [activityMessage, setActivityMessage] = useState(null);
   const [chatMessage, setChatMessage] = useState(null);
   const [chatSender, setChatSender] = useState(null);
@@ -1086,23 +1085,9 @@ const MeetingRoom = (props) => {
     }
 
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
-    //setupStream();
+    setupStream();
     appManager.add('CURRENT_MEETING', selectedMeeting);
   }, []);
-
-  useEffect(() => {
-    if (userVideo && userVideo.current && !userVideo.current.srcObject) {
-      if (!streamsInitiated) {
-        setupStream();
-      }
-    }
-  }, [userVideo]);
-
-  useEffect(() => {
-    if (streamsInitiated && userVideo.current) {
-      userVideo.current.srcObject = currentUserStream.obj;
-    }
-  }, [streamsInitiated]);
 
   const persistMeetingSettings = (autoPermit) => {
     post(
@@ -1235,12 +1220,6 @@ const MeetingRoom = (props) => {
   }, [audioMuted]);
 
   useEffect(() => {
-    if (userVideo && userVideo.current) {
-      userVideo.current.srcObject = currentUserStream.obj;
-    }
-  }, [currentUserStream.videoTrack]);
-
-  useEffect(() => {
     if (videoMuted !== null) {
       toggleVideo();
       emitAVSettingsChange();
@@ -1277,8 +1256,7 @@ const MeetingRoom = (props) => {
   function toggleAudio() {
     if (currentUserStream.obj && currentUserStream.getAudioTracks() && currentUserStream.getAudioTracks().length > 0) {
       let audioTrack = currentUserStream.getAudioTracks()[0];
-      if (audioTrack && userVideo && !Utils.isNull(userVideo.current) && userVideo.current.srcObject) {
-        //audioTrack.muted = !audioMuted;
+      if (audioTrack) {
         audioTrack.enabled = !audioMuted;
         emitAVSettingsChange();
       }
@@ -1506,7 +1484,6 @@ const MeetingRoom = (props) => {
                                                       isHost={isHost}
                                                       autoPermit={autoPermit}
                                                       allUserParticipantsLeft={allUserParticipantsLeft}
-                                                      userVideoChangeHandler={(ref) => setUserVideo(ref)}
                                                       onHostAudioMute={(participant) => {
                                                         changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
                                                       }}

@@ -150,17 +150,6 @@ const MeetingParticipant = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (props.refChangeHandler) {
-      props.refChangeHandler(videoRef);
-
-      if (videoRef.current) {
-        console.log(props.userStream);
-        videoRef.current.srcObject = props.userStream;
-      }
-    }
-  }, [videoRef.current, props.userStream]);
-
   const computeParticipantName = () => {
     let name = props.data.name;
 

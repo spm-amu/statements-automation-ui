@@ -336,11 +336,6 @@ const MeetingParticipantGrid = (props) => {
                 {
                   currentUserParticipant &&
                   <MeetingParticipant data={currentUserParticipant}
-                                      refChangeHandler={
-                                        currentUserParticipant.isCurrentUser ? (ref) => {
-                                          props.userVideoChangeHandler(ref);
-                                        } : null
-                                      }
                                       onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
                                       onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
                                       showName={!currentUserParticipant.isCurrentUser}

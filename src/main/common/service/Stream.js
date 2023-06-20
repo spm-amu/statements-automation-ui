@@ -161,7 +161,7 @@ export class Stream {
         let userMedia = navigator.mediaDevices
           .getUserMedia(
             {
-              audio: false,
+              audio: true,
               video: VIDEO_CONSTRAINTS
             });
         userMedia
