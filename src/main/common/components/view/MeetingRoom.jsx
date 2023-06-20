@@ -433,11 +433,18 @@ const MeetingRoom = (props) => {
           currentUserStream.shareScreenObj.getVideoTracks()[0].enabled = false;
           currentUserStream.shareScreenObj.getVideoTracks()[0].stop();
 
-          peerObj.peer.replaceTrack(
-            currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
-            stream.getVideoTracks()[0], // current video track - screen track
-            currentUserStream.shareScreenObj
-          );
+          try {
+            peerObj.peer.replaceTrack(
+              currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+              stream.getVideoTracks()[0], // current video track - screen track
+              currentUserStream.shareScreenObj
+            );
+          } catch (e) {
+            peerObj.peer.addTrack(
+              stream.getVideoTracks()[0], // current video track - screen track
+              currentUserStream.shareScreenObj
+            );
+          }
         } else {
           console.log("ADDING NEW SCREEN SHARE TRACK");
           currentUserStream.shareScreenObj.addTrack(stream.getVideoTracks()[0]);
@@ -819,7 +826,7 @@ const MeetingRoom = (props) => {
             if (step === Steps.LOBBY) {
               setStep(Steps.SESSION);
               setSideBarTab('People');
-              setSideBarOpen('true')
+              setSideBarOpen('true');
               props.windowHandler.show();
             }
           }
