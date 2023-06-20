@@ -599,6 +599,7 @@ const MeetingRoom = (props) => {
       track.stop();
     }
 
+    tmpShareScreenStream.current = null;
     setMeetingParticipantGridMode('DEFAULT');
   };
 
@@ -642,11 +643,7 @@ const MeetingRoom = (props) => {
     if (screenShared) {
       const videoConstraints = {
         cursor: true,
-        audio: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-          },
-        },
+        audio: false,
         video: {
           mandatory: {
             chromeMediaSource: 'desktop',
@@ -664,14 +661,9 @@ const MeetingRoom = (props) => {
         }
       };
 
-      if (osName === 'Mac OS') {
-        videoConstraints.audio = false;
-      }
-
       navigator.mediaDevices
         .getUserMedia(videoConstraints)
         .then((stream) => {
-          alert(stream.getTracks().length);
           handleScreenShareStream(stream);
           tmpShareScreenStream.current = stream;
         })
