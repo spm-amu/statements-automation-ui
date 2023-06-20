@@ -22,7 +22,6 @@ import {Stream} from "../../service/Stream";
 import WhiteBoard from "../whiteboard/WhiteBoard";
 import Alert from "react-bootstrap/Alert";
 import Icon from "../Icon";
-import LottieIcon from "../LottieIcon";
 import soundMonitor from "../../service/SoundMonitor";
 
 const {electron} = window;
@@ -118,6 +117,7 @@ const MeetingRoom = (props) => {
   const isRecordingRef = useRef(false);
   const mediaRecorder = useRef(null);
   const tmpVideoTrack = useRef();
+  const tmpShareScreenStream = useRef();
   const onloadScreenShareData = useRef(null);
 
   const handler = () => {
@@ -428,11 +428,24 @@ const MeetingRoom = (props) => {
   async function replaceShareScreenStream(peerObj, stream) {
     if (peerObj.peer.connected) {
       try {
-        peerObj.peer.replaceTrack(
-          currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
-          stream.getVideoTracks()[0], // current video track - screen track
-          currentUserStream.shareScreenObj
-        );
+        if (currentUserStream.shareScreenObj.getVideoTracks().length > 0) {
+          console.log("REPLACING EXISTING SCREEN SHARE TRACK");
+          currentUserStream.shareScreenObj.getVideoTracks()[0].enabled = false;
+          currentUserStream.shareScreenObj.getVideoTracks()[0].stop();
+
+          peerObj.peer.replaceTrack(
+            currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+            stream.getVideoTracks()[0], // current video track - screen track
+            currentUserStream.shareScreenObj
+          );
+        } else {
+          console.log("ADDING NEW SCREEN SHARE TRACK");
+          currentUserStream.shareScreenObj.addTrack(stream.getVideoTracks()[0]);
+          peerObj.peer.addTrack(
+            stream.getVideoTracks()[0], // current video track - screen track
+            currentUserStream.shareScreenObj
+          );
+        }
       } catch (e) {
         console.log(e);
       }
@@ -440,7 +453,7 @@ const MeetingRoom = (props) => {
   }
 
   const handleScreenShareStream = async (stream) => {
-    tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
+    //tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
     socketManager.userPeerMap.forEach((peerObj) => {
       replaceShareScreenStream(peerObj, stream);
@@ -555,27 +568,35 @@ const MeetingRoom = (props) => {
     setScreenShared(false);
     setMeetingParticipantGridMode('DEFAULT');
 
-    currentUserStream.shareScreenObj.getVideoTracks()[0].enabled = false;
-    currentUserStream.shareScreenObj.getVideoTracks()[0].stop();
-    socketManager.userPeerMap.forEach((peerObj) => {
-      if (peerObj.peer.connected) {
-        try {
-          peerObj.peer.replaceTrack(
-            currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
-            tmpVideoTrack.current, // current video track - screen track
-            currentUserStream.shareScreenObj
-          );
-        } catch (e) {
-          console.log(e);
+    if(currentUserStream.shareScreenObj.getVideoTracks()[0].length > 0) {
+      currentUserStream.shareScreenObj.getVideoTracks()[0].enabled = false;
+      currentUserStream.shareScreenObj.getVideoTracks()[0].stop();
+      socketManager.userPeerMap.forEach((peerObj) => {
+        if (peerObj.peer.connected) {
+          try {
+            peerObj.peer.removeTrack(
+              currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+              currentUserStream.shareScreenObj
+            );
+
+            currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
+          } catch (e) {
+            console.log(e);
+          }
         }
-      }
-    });
+      });
+    }
 
     //currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
     //currentUserStream.shareScreenObj.addTrack(tmpVideoTrack.current);
 
     if (shareScreenRef.current) {
-      shareScreenRef.current.srcObject = currentUserStream.shareScreenObj;
+      shareScreenRef.current.srcObject = null;
+    }
+
+    for (const track of tmpShareScreenStream.current.getTracks()) {
+      track.enabled = false;
+      track.stop();
     }
 
     setMeetingParticipantGridMode('DEFAULT');
@@ -630,8 +651,8 @@ const MeetingRoom = (props) => {
           mandatory: {
             chromeMediaSource: 'desktop',
             chromeMediaSourceId: shareScreenSource.current.id,
-            width: {min: 160, max: 1280},
-            height: {min: 120, max: 720},
+            width: {min: 160, ideal: 320, max: 640},
+            height: {min: 120, ideal: 240, max: 480},
             frameRate: {
               min: 15,
               max: 15
@@ -650,7 +671,9 @@ const MeetingRoom = (props) => {
       navigator.mediaDevices
         .getUserMedia(videoConstraints)
         .then((stream) => {
+          alert(stream.getTracks().length);
           handleScreenShareStream(stream);
+          tmpShareScreenStream.current = stream;
         })
         .catch(e => {
           console.log(e)
@@ -754,8 +777,7 @@ const MeetingRoom = (props) => {
 
         if (screenShared) {
           try {
-            item.peer.replaceTrack(
-              currentUserStream.shareScreenObj.getVideoTracks()[0],
+            item.peer.addTrack(
               shareScreenRef.current.srcObject.getVideoTracks()[0],
               currentUserStream.shareScreenObj
             );
@@ -990,7 +1012,7 @@ const MeetingRoom = (props) => {
   };
 
   const transmitAudioLevel = async (data, participants) => {
-    if(participants) {
+    if (participants) {
       //console.log("TRANSMITTING AUDIO LEVEL TO PARTS : ");
       //console.log(participants);
       for (const participant of participants) {
@@ -1007,7 +1029,7 @@ const MeetingRoom = (props) => {
     currentUserStream.init(!videoMuted, !audioMuted, (stream, shareStream, videoDisabled) => {
       setStreamsInitiated(true);
       soundMonitor.start(stream, async (data, participants, muted) => {
-        if(data.level > 0 && !muted) {
+        if (data.level > 0 && !muted) {
           transmitAudioLevel(data, participants);
         }
       });
@@ -1298,19 +1320,25 @@ const MeetingRoom = (props) => {
 
   const handleEndCall = async () => {
     if (screenShared) {
-      socketManager.userPeerMap.forEach((peerObj) => {
-        if (peerObj.peer.connected) {
-          try {
-            peerObj.peer.replaceTrack(
-              currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
-              tmpVideoTrack.current, // current video track - screen track
-              currentUserStream.shareScreenObj
-            );
-          } catch (e) {
-            console.log(e);
+      if (currentUserStream.shareScreenObj.getVideoTracks().length > 0) {
+        currentUserStream.shareScreenObj.getVideoTracks()[0].enabled = false;
+        currentUserStream.shareScreenObj.getVideoTracks()[0].stop();
+
+        socketManager.userPeerMap.forEach((peerObj) => {
+          if (peerObj.peer.connected) {
+            try {
+              peerObj.peer.removeTrack(
+                currentUserStream.shareScreenObj.getVideoTracks()[0], // prev video track - webcam
+                currentUserStream.shareScreenObj
+              );
+            } catch (e) {
+              console.log(e);
+            }
           }
-        }
-      });
+        });
+
+        currentUserStream.shareScreenObj.removeTrack(currentUserStream.shareScreenObj.getVideoTracks()[0]);
+      }
 
       emitSystemEvent("SHARE_SCREEN", {
         shared: false,
@@ -1418,7 +1446,7 @@ const MeetingRoom = (props) => {
                     <div style={{color: '#ffffff', fontSize: '20px', padding: '8px'}}>
                       {
                         someoneSharing &&
-                          <span>
+                        <span>
                             {
                               participants.find((p) => p.userId === someoneSharing)?.name + ' is sharing'
                             }
@@ -1543,7 +1571,7 @@ const MeetingRoom = (props) => {
                   changeHost(newHost);
                 }}
                 onPinHandler={(participant, pinned) => {
-                  if(pinned) {
+                  if (pinned) {
                     setPinnedParticipant(participant);
                   } else {
                     setPinnedParticipant(null);

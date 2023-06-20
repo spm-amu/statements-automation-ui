@@ -36,7 +36,7 @@ export class Stream {
         let shareUserMedia = navigator.mediaDevices
           .getUserMedia({
             audio: true,
-            video: VIDEO_CONSTRAINTS
+            video: false
           });
 
         if (createScreenShareStream) {
@@ -188,15 +188,13 @@ export class Stream {
         if (videoTrack) {
           videoTrack.stop();
         }
+
+        resolve(this.obj);
       }
     });
   };
 
   async replacePeerVideoTracks(socketManager) {
-    console.log("REPLACING TRACKS");
-    console.log(socketManager.userPeerMap.length);
-    console.log(socketManager.userPeerMap);
-
     if (socketManager) {
       socketManager.userPeerMap.forEach((peerObj) => {
         this.replacePeerVideoTrack(peerObj);
@@ -207,17 +205,22 @@ export class Stream {
   async replacePeerVideoTrack(peerObj) {
     if (peerObj.peer.connected) {
       try {
-        peerObj.peer.replaceTrack(
-          this.getVideoTracks()[0],
-          this.videoTrack,
-          this.obj
-        );
+        if (this.obj.getVideoTracks().length > 0) {
+          console.log("REPLACING AN EXISTING VIDEO TRACK");
+          peerObj.peer.replaceTrack(
+            this.getVideoTracks()[0],
+            this.videoTrack,
+            this.obj
+          );
+        } else {
+          console.log("ADDING A NEW VIDEO TRACK");
+          peerObj.peer.addTrack(
+            this.videoTrack,
+            this.obj
+          );
+        }
       } catch (e) {
         console.log(e);
-        peerObj.peer.addTrack(
-          this.videoTrack,
-          this.obj
-        );
       }
     }
   }

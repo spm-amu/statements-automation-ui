@@ -120,16 +120,6 @@ const MeetingParticipant = (props) => {
           setSoundLevel(dataJSON.data.level);
         }
       });
-
-      /*props.data.peer.on('stream', (stream) => {
-        alert("STREAM FIREEEEEEEE");
-        videoRef.current.srcObject = stream;
-      });
-
-      props.data.peer.on('track', (stream, track) => {
-        alert("TRACK FIREEEEEEEE");
-        videoRef.current.srcObject = stream;
-      });*/
     } else {
       videoRef.current.srcObject = props.userStream;
     }
