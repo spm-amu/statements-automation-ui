@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {Fragment, useEffect, useState} from 'react';
 import './MeetingParticipantGrid.css';
-import MeetingParticipant from "./MeetingParticipant";
+import MeetingParticipant from "./simplepeer/MeetingParticipant";
 import LobbyWaitingList from "./LobbyWaitingList";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
