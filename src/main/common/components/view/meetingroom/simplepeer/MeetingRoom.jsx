@@ -8,6 +8,7 @@ import Paper from "@material-ui/core/Paper";
 import Draggable from "react-draggable";
 import Footer from "../../../meetingroom/Footer";
 import socketManager from "../../../../service/SocketManager";
+import peerManager from "../../../../service/simplepeer/PeerManager";
 import {MessageType, SystemEventType} from "../../../../types";
 import Utils, {CONNECTION_ERROR_MESSAGE, STREAM_ERROR_MESSAGE, SYSTEM_ERROR_MESSAGE} from "../../../../Utils";
 import MeetingParticipantGrid from '../../../meetingroom/MeetingParticipantGrid';
@@ -139,7 +140,7 @@ const MeetingRoom = (props) => {
             addUser(be.payload);
             break;
           case MessageType.RECEIVING_RETURNED_SIGNAL:
-            socketManager.signal(be.payload);
+            peerManager.signal(be.payload);
             break;
           case MessageType.USER_LEFT:
             console.log("\n\nUSER_LEFT calling remove user");
@@ -192,7 +193,7 @@ const MeetingRoom = (props) => {
             //initMeetingSession();
             //} else
             if (preErrorStep === Steps.SESSION) {
-              socketManager.clearUserToPeerMap();
+              peerManager.clearUserToPeerMap();
               participants.splice(0, participants.length);
               console.log("RE-JOINING FROM SESSION AFTER CONNECT");
               join();
@@ -355,7 +356,7 @@ const MeetingRoom = (props) => {
       console.log(find);
 
       if (find) {
-        socketManager.removeFromUserToPeerMap(userId);
+        peerManager.removeFromUserToPeerMap(userId);
         const newParticipants = participants.filter((p) => p.userId !== userId);
 
         if (newParticipants.length === 0 && isDirectCall) {
@@ -440,7 +441,7 @@ const MeetingRoom = (props) => {
   const handleScreenShareStream = async (stream) => {
     //tmpVideoTrack.current = currentUserStream.shareScreenObj.getVideoTracks()[0];
 
-    socketManager.userPeerMap.forEach((peerObj) => {
+    peerManager.userPeerMap.forEach((peerObj) => {
       replaceShareScreenStream(peerObj, stream);
     });
 
@@ -556,7 +557,7 @@ const MeetingRoom = (props) => {
     if(currentUserStream.shareScreenObj.getVideoTracks()[0].length > 0) {
       currentUserStream.shareScreenObj.getVideoTracks()[0].enabled = false;
       currentUserStream.shareScreenObj.getVideoTracks()[0].stop();
-      socketManager.userPeerMap.forEach((peerObj) => {
+      peerManager.userPeerMap.forEach((peerObj) => {
         if (peerObj.peer.connected) {
           try {
             peerObj.peer.removeTrack(
@@ -742,7 +743,7 @@ const MeetingRoom = (props) => {
   }
 
   const addUser = (payload) => {
-    socketManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted)
+    peerManager.mapUserToPeer(payload, currentUserStream, MessageType.USER_JOINED, audioMuted, videoMuted)
       .then((item) => {
         console.log("ADD USER : ", payload);
         addUserToParticipants(item, item.user.callerSocketId);
@@ -784,15 +785,15 @@ const MeetingRoom = (props) => {
 
   const createParticipants = (users, socket) => {
     console.log("ALL_USERS received and creating participants : ", users);
-    socketManager.clearUserToPeerMap();
+    peerManager.clearUserToPeerMap();
     let newParticipants = [];
     users.forEach((user) => {
-      socketManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted)
+      peerManager.mapUserToPeer(user, currentUserStream, MessageType.ALL_USERS, audioMuted, videoMuted)
         .then((item) => {
           console.log("ADDING ITEM TO PARTICIPANTS : ", item);
           addUserToParticipants(item);
           setAllUserParticipantsLeft(false);
-          if (socketManager.userPeerMap.length > 0) {
+          if (peerManager.userPeerMap.length > 0) {
             if (step === Steps.LOBBY) {
               setStep(Steps.SESSION);
               setSideBarTab('People');
@@ -1026,7 +1027,7 @@ const MeetingRoom = (props) => {
 
       setPreErrorStep(step);
       setStep(Steps.STREAM_ERROR);
-    }, false, socketManager);
+    }, false, peerManager);
   };
 
   const createMediaRecorder = () => {
@@ -1142,7 +1143,7 @@ const MeetingRoom = (props) => {
 
     socketManager.removeSubscriptions(eventHandler);
     appManager.removeSubscriptions(systemEventHandler);
-    socketManager.clearUserToPeerMap();
+    peerManager.clearUserToPeerMap();
     socketManager.disconnectSocket();
     socketManager.init();
     //if ((isHost && !isDirectCall) || (step !== Steps.SESSION)) {
@@ -1194,7 +1195,7 @@ const MeetingRoom = (props) => {
 
   function toggleVideo() {
     if (currentUserStream.obj) {
-      currentUserStream.enableVideo(!videoMuted, socketManager).then((stream) => {
+      currentUserStream.enableVideo(!videoMuted, peerManager).then((stream) => {
         onAVSettingsChange({
           userId: appManager.getUserDetails().userId,
           videoMuted,
@@ -1285,7 +1286,7 @@ const MeetingRoom = (props) => {
         currentUserStream.shareScreenObj.getVideoTracks()[0].enabled = false;
         currentUserStream.shareScreenObj.getVideoTracks()[0].stop();
 
-        socketManager.userPeerMap.forEach((peerObj) => {
+        peerManager.userPeerMap.forEach((peerObj) => {
           if (peerObj.peer.connected) {
             try {
               peerObj.peer.removeTrack(

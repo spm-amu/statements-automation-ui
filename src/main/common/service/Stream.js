@@ -17,7 +17,7 @@ export class Stream {
   }
 
   init = async (video = true, audio = true, successHandler, errorhandler, retry = false,
-                socketManager, createScreenShareStream = true) => {
+                peerManager, createScreenShareStream = true) => {
     let userMedia = navigator.mediaDevices
       .getUserMedia({
         audio: true,
@@ -61,7 +61,7 @@ export class Stream {
                   .then((stream) => {
                       let newAudioTrack = stream.getAudioTracks()[0];
                       if (this.getAudioTracks().length > 0 && this.getAudioTracks()[0]) {
-                        this.replacePeerAudioTracks(socketManager, newAudioTrack);
+                        this.replacePeerAudioTracks(peerManager, newAudioTrack);
                         this.obj.removeTrack(this.getAudioTracks()[0]);
                       }
 
@@ -81,7 +81,7 @@ export class Stream {
         }
       }).catch((e) => {
       if (!retry) {
-        this.init(false, audio, successHandler, errorhandler, true, socketManager);
+        this.init(false, audio, successHandler, errorhandler, true, peerManager);
       } else {
         console.log("STREAM FAILED");
         console.log(e);
@@ -92,10 +92,10 @@ export class Stream {
     });
   };
 
-  async replacePeerAudioTracks(socketManager, newAudioTrack) {
-    if (socketManager) {
+  async replacePeerAudioTracks(peerManager, newAudioTrack) {
+    if (peerManager) {
       console.log("REPLACING PEER TRACKS");
-      socketManager.userPeerMap.forEach((peerObj) => {
+      peerManager.userPeerMap.forEach((peerObj) => {
         this.replacePeerAudioTrack(peerObj, newAudioTrack);
       });
     }
@@ -155,7 +155,7 @@ export class Stream {
     return this.obj.getTracks();
   };
 
-  enableVideo = async (enabled, socketManager) => {
+  enableVideo = async (enabled, peerManager) => {
     return new Promise((resolve, reject) => {
       if (enabled) {
         let userMedia = navigator.mediaDevices
@@ -168,9 +168,9 @@ export class Stream {
           .then((stream) => {
             this.videoTrack = stream.getVideoTracks()[0];
 
-            if (socketManager) {
+            if (peerManager) {
               this.videoTrack.enabled = true;
-              this.replacePeerVideoTracks(socketManager);
+              this.replacePeerVideoTracks(peerManager);
             }
 
             if (this.getVideoTracks().length > 0 && this.getVideoTracks()[0]) {
@@ -192,9 +192,9 @@ export class Stream {
     });
   };
 
-  async replacePeerVideoTracks(socketManager) {
-    if (socketManager) {
-      socketManager.userPeerMap.forEach((peerObj) => {
+  async replacePeerVideoTracks(peerManager) {
+    if (peerManager) {
+      peerManager.userPeerMap.forEach((peerObj) => {
         this.replacePeerVideoTrack(peerObj);
       });
     }
