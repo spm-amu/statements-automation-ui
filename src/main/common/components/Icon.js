@@ -77,9 +77,9 @@ class Icon extends Component {
     } else if (this.props.id === 'CLOSE') {
       return <Close/>
     } else if (this.props.id === 'MINIMIZE') {
-      return <Minimize/>
+      return <Minimize style={{color: this.props.color}}/>
     } else if (this.props.id === 'MAXIMIZE') {
-      return <Maximize/>
+      return <Maximize style={{color: this.props.color}}/>
     } else if (this.props.id === 'DONE') {
       return <Done/>
     } else if (this.props.id === 'REMOVE') {

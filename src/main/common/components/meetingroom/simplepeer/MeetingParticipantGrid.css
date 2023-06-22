@@ -1,0 +1,75 @@
+.grid,
+.grid .item {
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  height: 100%;
+  width: 100%;
+}
+
+.grid .item {
+  display: flex;
+}
+
+.grid {
+  height: 100%;
+  background-color: #000000;
+  border-radius: 4px;
+}
+
+.grid-side-bar {
+  width: 320px;
+  margin: 4px 12px !important;
+  height: 98%;
+  max-height: 98%;
+  overflow: auto;
+}
+
+.side-grid-item {
+  height: 200px;
+  max-height: 200px;
+  border-bottom: 16px solid #000000;
+}
+
+.grid-side-bar .side-grid-item:last-child {
+  border-bottom: unset;
+}
+
+.horizontal-scrollable > .row {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.horizontal-scrollable > .row > .col-xs-4 {
+  display: inline-block;
+  float: none;
+}
+/* Decorations */
+
+.col-xs-4 {
+  color: white;
+  font-size: 24px;
+  padding-bottom: 20px;
+  padding-top: 18px;
+}
+
+.col-xs-4:nth-child(2n+1) {
+  background: green;
+}
+
+.col-xs-4:nth-child(2n+2) {
+  background: black;
+}
+
+@media (max-device-width: 820px) {
+  .meetingParticipantContainer {
+    min-width: 100% !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .meetingParticipantContainer {
+    min-width: 100% !important;
+  }
+}

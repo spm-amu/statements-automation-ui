@@ -11,7 +11,7 @@ import socketManager from "../../../../service/SocketManager";
 import peerManager from "../../../../service/simplepeer/PeerManager";
 import {MessageType, SystemEventType} from "../../../../types";
 import Utils, {CONNECTION_ERROR_MESSAGE, STREAM_ERROR_MESSAGE, SYSTEM_ERROR_MESSAGE} from "../../../../Utils";
-import MeetingParticipantGrid from '../../../meetingroom/MeetingParticipantGrid';
+import MeetingParticipantGrid from '../../../meetingroom/simplepeer/MeetingParticipantGrid';
 import ClosablePanel from "../../../layout/ClosablePanel";
 import MeetingRoomSideBarContent from "../../../meetingroom/SideBarContent";
 import appManager from "../../../../../common/service/AppManager";

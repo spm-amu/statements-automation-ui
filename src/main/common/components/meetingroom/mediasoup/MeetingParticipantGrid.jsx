@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {Fragment, useEffect, useState} from 'react';
 import './MeetingParticipantGrid.css';
-import MeetingParticipant from "./simplepeer/MeetingParticipant";
-import LobbyWaitingList from "./LobbyWaitingList";
+import MeetingParticipant from "../simplepeer/MeetingParticipant";
+import LobbyWaitingList from "../LobbyWaitingList";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
-import appManager from "../../../common/service/AppManager";
-import Lobby from "./Lobby";
-import {SystemEventType} from "../../types";
-import TalkerCard from "./TalkerCard";
+import appManager from "../../../../common/service/AppManager";
+import Lobby from "../Lobby";
+import {SystemEventType} from "../../../types";
+import TalkerCard from "../TalkerCard";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
@@ -87,7 +87,7 @@ const MeetingParticipantGrid = (props) => {
         userId: appManager.getUserDetails().userId,
         peer: null,
         name: appManager.getUserDetails().name,
-        avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+        avatar: require('../../../../desktop/dashboard/images/noimage-person.png'),
         videoMuted,
         audioMuted
       };

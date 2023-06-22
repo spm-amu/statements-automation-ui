@@ -16,7 +16,6 @@ const StyledDialog = withStyles({
     maxWidth: 'calc(100% - 144px)',
     maxHeight: 'calc(100% - 48px)',
     margin: '48px 0 0 144px',
-    padding: '16px',
     overflow: 'hidden',
     boxShadow: 'none !important',
     ['@media (max-width:800px)']: {
@@ -117,7 +116,8 @@ const Window = (props) => {
       maxHeight: '100%',
       overflowX: 'hidden',
       overflowY: 'auto',
-      display: 'none'
+      display: 'none',
+      backgroundColor: '#000000'
     }}>
       <StyledDialog
         disableEnforceFocus
@@ -155,7 +155,7 @@ const Window = (props) => {
                             marginRight: '4px'
                           }}
                         >
-                          <Icon id={'MINIMIZE'}/>
+                          <Icon id={'MINIMIZE'} color={'white'}/>
                         </IconButton>
                         :
                         <IconButton

@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useRef, useState} from "react";
 import './MeetingParticipant.css'
-import Utils from '../../Utils';
-import {MessageType, SystemEventType} from "../../types";
-import appManager from "../../../common/service/AppManager";
-import socketManager from "../../../common/service/SocketManager";
+import Utils from '../../../Utils';
+import {MessageType, SystemEventType} from "../../../types";
+import appManager from "../../../../common/service/AppManager";
+import socketManager from "../../../../common/service/SocketManager";
 import {Buffer} from "buffer/";
-import Icon from "../Icon";
+import Icon from "../../Icon";
 import IconButton from "@material-ui/core/IconButton";
 import {PanTool} from "@material-ui/icons";
 

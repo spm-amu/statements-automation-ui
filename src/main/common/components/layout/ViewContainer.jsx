@@ -9,7 +9,7 @@ import Meeting from '../view/Meeting';
 import JoinMeetingSettings from '../view/JoinMeetingSettings';
 import People from "../view/People";
 import Math from "../view/Math";
-import SimplePeerMeetingRoom from "../view/meetingroom/simplepeer/MeetingRoom";
+import MeetingRoom from "../view/meetingroom/mediasoup/MeetingRoom";
 import Window from "../Window";
 import appManager from "../../../common/service/AppManager";
 import "./ViewContainer.css"
@@ -171,7 +171,7 @@ const ViewContainer = (props) => {
               setRefresher(!refresher);
             }
           }>
-            <SimplePeerMeetingRoom
+            <MeetingRoom
               windowHandler={
                 {
                   show: () => {

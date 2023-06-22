@@ -1,0 +1,15 @@
+.meeting-room-container {
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+}
+
+.footer-container {
+  background-color: transparent;
+  margin: 0 16px;
+  height: 72px;
+}
+
+.meeting-room-content {
+  background-color: transparent;
+}
