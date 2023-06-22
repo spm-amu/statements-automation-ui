@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 
 import '../../Calendar.css';
 import './MeetingRoom.css';
@@ -36,6 +36,7 @@ const MeetingRoom = (props) => {
   const [videoDisabled, setVideoDisabled] = useState(null);
   const [handRaised, setHandRaised] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const isRecordingRef = useRef(false);
   const [screenShared, setScreenShared] = useState(null);
   const [someoneSharing, setSomeoneSharing] = useState(null);
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
@@ -214,6 +215,15 @@ const MeetingRoom = (props) => {
     }
   };
 
+  const handleSidebarToggle = (e) => {
+    let paper = document.getElementById('meetingDialogPaper');
+    if (e.detail.open) {
+      paper.style.margin = '54px 0 0 144px';
+    } else {
+      paper.style.margin = '54px 0 0 0';
+    }
+  };
+
   const join = () => {
 
   };
@@ -255,7 +265,8 @@ const MeetingRoom = (props) => {
   };
 
   const endCall = () => {
-
+    setSideBarOpen(false);
+    setSideBarTab('');
   };
 
   return (
@@ -265,7 +276,9 @@ const MeetingRoom = (props) => {
         maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 72px)' : '90%',
         overflow: displayState === 'MAXIMIZED' ? null : 'hidden',
       }}>
-        <span>Mediasoup meeting room</span>
+        <div className={'row no-margin no-padding w-100 h-100'}>
+
+        </div>
       </div>
       {
         device &&
