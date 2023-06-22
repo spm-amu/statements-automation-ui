@@ -9,16 +9,15 @@ import Meeting from '../view/Meeting';
 import JoinMeetingSettings from '../view/JoinMeetingSettings';
 import People from "../view/People";
 import Math from "../view/Math";
-import MeetingRoom from "../view/MeetingRoom";
+import SimplePeerMeetingRoom from "../view/meetingroom/simplepeer/MeetingRoom";
 import Window from "../Window";
 import appManager from "../../../common/service/AppManager";
 import "./ViewContainer.css"
-import Activity from "../view/Activity";
 import WhiteboardView from "../view/WhiteboardView";
-import MeetingRoomToolbar from "../vc/MeetingRoomToolbar";
+import MeetingRoomToolbar from "../meetingroom/MeetingRoomToolbar";
 import RecordingView from '../view/RecordingView';
 import ChatPollsHistoryView from '../view/ChatPollsHistoryView';
-import MeetingRoomSessionEndedView from "../view/MeetingRoomSessionEndedView";
+import PostMeetingMessage from "../view/meetingroom/PostMeetingMessage";
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -128,7 +127,7 @@ const ViewContainer = (props) => {
       {
         attributes.current.currentWindow === 'meetingRoomSessionEnded' && attributes.current.data && windowOpen.current ?
           <Window minimizable={false} open={windowOpen.current}>
-            <MeetingRoomSessionEndedView isDirectCall={attributes.current.data.isDirectCall} closeHandler={() => {
+            <PostMeetingMessage isDirectCall={attributes.current.data.isDirectCall} closeHandler={() => {
               attributes.current.windowDisplayState = 'MAXIMIZED';
               attributes.current.currentWindow = null;
               attributes.current.data = null;
@@ -172,7 +171,7 @@ const ViewContainer = (props) => {
               setRefresher(!refresher);
             }
           }>
-            <MeetingRoom
+            <SimplePeerMeetingRoom
               windowHandler={
                 {
                   show: () => {

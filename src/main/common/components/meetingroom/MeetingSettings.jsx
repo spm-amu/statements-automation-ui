@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import './MettingSettingsComponent.css';
+import './MettingSettings.css';
 import Button from '@material-ui/core/Button';
 import {Switch} from '@material-ui/core';
 import Icon from '../Icon';
@@ -12,7 +12,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import {get, post} from '../../service/RestService';
 import {Alert} from "@material-ui/lab";
 
-const MeetingSettingsComponent = (props) => {
+const MeetingSettings = (props) => {
   const userVideo = useRef();
   const [stream, setStream] = useState();
   const [videoOptionDisabled, setVideoOptionDisabled] = useState(false);
@@ -261,4 +261,4 @@ const MeetingSettingsComponent = (props) => {
   );
 };
 
-export default MeetingSettingsComponent;
+export default MeetingSettings;

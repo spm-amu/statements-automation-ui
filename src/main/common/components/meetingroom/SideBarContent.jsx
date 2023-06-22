@@ -11,7 +11,7 @@ import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "../Icon";
 import People from "../view/People";
-import "./MeetingRoomSideBarContent.css"
+import "./SideBarContent.css"
 import InCall from '../view/InCall';
 import ChatRoom from '../chat/ChatRoom';
 
@@ -37,7 +37,7 @@ const PaperComponent = (props) => (
   </Draggable>
 );
 
-const MeetingRoomSideBarContent = (props) => {
+const SideBarContent = (props) => {
   const [peopleDialogOpen, setPeopleDialogOpen] = useState(false);
   const [peopleExclusions] = useState([]);
   const {
@@ -140,4 +140,4 @@ const MeetingRoomSideBarContent = (props) => {
   );
 };
 
-export default MeetingRoomSideBarContent;
+export default SideBarContent;

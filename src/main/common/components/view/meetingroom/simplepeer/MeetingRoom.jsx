@@ -1,28 +1,27 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
 
-import './Calendar.css';
+import '../../Calendar.css';
 import './MeetingRoom.css';
 import Dialog from "@material-ui/core/Dialog";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Paper from "@material-ui/core/Paper";
 import Draggable from "react-draggable";
-import Footer from "../vc/Footer";
-import socketManager from "../../service/SocketManager";
-import {MessageType, SystemEventType} from "../../types";
-import Utils, {CONNECTION_ERROR_MESSAGE, STREAM_ERROR_MESSAGE, SYSTEM_ERROR_MESSAGE} from "../../Utils";
-import MeetingParticipantGrid, {MAX_COLS, MAX_ROWS} from '../vc/CenteredMeetingParticipantGrid';
-import ClosablePanel from "../layout/ClosablePanel";
-import MeetingRoomSideBarContent from "../vc/MeetingRoomSideBarContent";
-import appManager from "../../../common/service/AppManager";
-import MeetingRoomSummary from "../vc/MeetingRoomSummary";
-import {get, post} from '../../service/RestService';
-import SelectScreenShareDialog from '../SelectScreenShareDialog';
-import {osName} from "react-device-detect";
-import {Stream} from "../../service/Stream";
-import WhiteBoard from "../whiteboard/WhiteBoard";
+import Footer from "../../../meetingroom/Footer";
+import socketManager from "../../../../service/SocketManager";
+import {MessageType, SystemEventType} from "../../../../types";
+import Utils, {CONNECTION_ERROR_MESSAGE, STREAM_ERROR_MESSAGE, SYSTEM_ERROR_MESSAGE} from "../../../../Utils";
+import MeetingParticipantGrid from '../../../meetingroom/MeetingParticipantGrid';
+import ClosablePanel from "../../../layout/ClosablePanel";
+import MeetingRoomSideBarContent from "../../../meetingroom/SideBarContent";
+import appManager from "../../../../../common/service/AppManager";
+import MeetingRoomSummary from "../../../meetingroom/MeetingRoomSummary";
+import {get, post} from '../../../../service/RestService';
+import SelectScreenShareDialog from '../../../SelectScreenShareDialog';
+import {Stream} from "../../../../service/Stream";
+import WhiteBoard from "../../../whiteboard/WhiteBoard";
 import Alert from "react-bootstrap/Alert";
-import Icon from "../Icon";
-import soundMonitor from "../../service/SoundMonitor";
+import Icon from "../../../Icon";
+import soundMonitor from "../../../../service/SoundMonitor";
 
 const {electron} = window;
 
@@ -847,7 +846,7 @@ const MeetingRoom = (props) => {
       room: selectedMeeting.id,
       userIdentity: userDetails.userId,
       name: userDetails.name,
-      avatar: require('../../../desktop/dashboard/images/noimage-person.png'),
+      avatar: require('../../../../../desktop/dashboard/images/noimage-person.png'),
       email: userDetails.emailAddress,
       isHost: isHost,
       audioMuted: audioMuted,

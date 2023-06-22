@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import './InCall.css'
-import InCallCard from '../vc/InCallCard';
+import InCallCard from '../meetingroom/InCallCard';
 
 const InCall = (props) => {
   const [anchorEl, setAnchorEl] = useState(null);

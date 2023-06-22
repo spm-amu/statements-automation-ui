@@ -1,9 +1,9 @@
 import React, {useEffect} from "react";
-import Icon from "../Icon";
+import Icon from "../../Icon";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from '@material-ui/core/Tooltip';
 
-const MeetingRoomSessionEndedView = (props) => {
+const PostMeetingMessage = (props) => {
 
   useEffect(() => {
   }, []);
@@ -23,7 +23,6 @@ const MeetingRoomSessionEndedView = (props) => {
         width: '100%',
         height: '64px'
       }} className={'centered-flex-box'}>
-
         <Tooltip title="Call">
           <IconButton
             onClick={() => {
@@ -44,4 +43,4 @@ const MeetingRoomSessionEndedView = (props) => {
   );
 };
 
-export default MeetingRoomSessionEndedView;
+export default PostMeetingMessage;

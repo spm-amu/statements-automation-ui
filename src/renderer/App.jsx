@@ -10,12 +10,12 @@ import ThemeProvider from "@material-ui/styles/ThemeProvider";
 // ** Fake Database
 import '../main/@fake-db';
 import SignIn from '../main/common/components/view/security/SignIn';
-import InComingCallWindow from '../main/common/components/vc/InComingCallWindow';
-import MessagePreview from '../main/common/components/vc/MessagePreview';
+import InComingCallWindow from '../main/common/components/meetingroom/InComingCallWindow';
+import MessagePreview from '../main/common/components/meetingroom/MessagePreview';
 import ExternalMeetingAttendee from "../main/common/components/view/security/ExternalMeetingAttendee";
 import WebLinkLanding from '../main/common/components/view/WebLinkLanding';
 import Guest from '../main/common/components/view/security/Guest';
-import SystemAlertWindow from "../main/common/components/vc/SystemAlertWindow";
+import SystemAlertWindow from "../main/common/components/meetingroom/SystemAlertWindow";
 
 const armscorTheme = createTheme({
     palette: {

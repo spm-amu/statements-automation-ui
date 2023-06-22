@@ -1,5 +1,5 @@
 import React from "react";
-import MeetingSettingsComponent from "../vc/MeetingSettingsComponent";
+import MeetingSettingsComponent from "../meetingroom/MeetingSettings";
 
 const JoinMeetingSettings = (props) => {
 
