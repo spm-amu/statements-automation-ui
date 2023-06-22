@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 
 import '../../Calendar.css';
 import './MeetingRoom.css';
@@ -6,6 +6,7 @@ import Footer from "../../../meetingroom/Footer";
 import appManager from "../../../../service/AppManager";
 import {MessageType, SystemEventType} from "../../../../types";
 import peerManager from "../../../../service/simplepeer/PeerManager";
+import socketManager from "../../../../service/SocketManager";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -19,8 +20,6 @@ const Steps = {
 const hangUpAudio = new Audio(appManager.getSoundFileHost() + '/hangupsound.mp3');
 const joinInAudio = new Audio(appManager.getSoundFileHost() + '/joinsound.mp3');
 const permitAudio = new Audio(appManager.getSoundFileHost() + '/permission.mp3');
-//const errorAudio = new Audio(appManager.getSoundFileHost() + '/error.mp3');
-//const waitingAudio = new Audio(appManager.getSoundFileHost() + '/waiting.mp3');
 
 const {electron} = window;
 
@@ -45,6 +44,11 @@ const MeetingRoom = (props) => {
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
   const [activityMessage, setActivityMessage] = useState(null);
   const [autoPermit, setAutoPermit] = useState(false);
+  const [meetingChat, setMeetingChat] = useState(null);
+  const [meetingStarted, setMeetingStarted] = useState(null);
+  const [eventHandler] = useState({});
+  const [systemEventHandler] = useState({});
+  const [preErrorStep, setPreErrorStep] = useState('');
   const {
     selectedMeeting,
     userToCall,
@@ -105,6 +109,93 @@ const MeetingRoom = (props) => {
     }
   };
 
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'meeting-room-system-event-handler-api-' + selectedMeeting.id;
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.SOCKET_CONNECT:
+            if (preErrorStep) {
+              setStep(preErrorStep);
+            }
+
+            if (preErrorStep === Steps.SESSION) {
+              peerManager.clearUserToPeerMap();
+              participants.splice(0, participants.length);
+              console.log("RE-JOINING FROM SESSION AFTER CONNECT");
+              join();
+            }
+            break;
+          case SystemEventType.SOCKET_DISCONNECT:
+            if (step !== Steps.SYSTEM_ERROR && step !== Steps.CONNECTION_ERROR) {
+              setPreErrorStep(step);
+            }
+
+            setStep(Steps.CONNECTION_ERROR);
+            break;
+        }
+      }
+    }
+  };
+
+  /********************************** USE EFFECT **************************************/
+
+  useEffect(() => {
+    if (displayState) {
+      setDisplayState(props.displayState);
+    }
+  }, [props.displayState]);
+
+  useEffect(() => {
+    setMeetingStarted(props.meetingStarted);
+  }, [props.meetingStarted]);
+
+  useEffect(() => {
+    setAutoPermit(props.autoPermit);
+  }, [props.autoPermit]);
+
+  useEffect(() => {
+    eventHandler.api = handler();
+  });
+
+  useEffect(() => {
+    systemEventHandler.api = systemEventHandlerApi();
+  });
+
+  useEffect(() => {
+    socketManager.removeSubscriptions(eventHandler);
+    appManager.removeSubscriptions(systemEventHandler);
+
+    socketManager.addSubscriptions(eventHandler, MessageType.PERMIT, MessageType.ALLOWED, MessageType.USER_JOINED, MessageType.USER_LEFT,
+      MessageType.ALL_USERS, MessageType.RECEIVING_RETURNED_SIGNAL, MessageType.CALL_ENDED,
+      MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, MessageType.MEETING_ENDED, MessageType.WHITEBOARD_EVENT, MessageType.WHITEBOARD,
+      MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT, MessageType.SYSTEM_ALERT);
+
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT, SystemEventType.PEER_DISCONNECT);
+    return () => {
+      if (isRecordingRef.current) {
+        stopRecordingMeeting();
+      }
+
+      socketManager.removeSubscriptions(eventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
+      document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
+      appManager.remove('CURRENT_MEETING');
+    };
+  }, []);
+
+  useEffect(() => {
+    if (meetingChat) {
+      setSideBarTab('Chat');
+      setSideBarOpen(true);
+      setHasUnreadChats(false);
+    }
+  }, [meetingChat]);
+
+  /******************************** END USE EFFECT ************************************/
+
   const onSystemAlert = (payload) => {
     if (payload.type === 'MEETING_STARTED_ALERT') {
       handleMessageArrived({
@@ -121,6 +212,10 @@ const MeetingRoom = (props) => {
         clearTimeout(messageTimeout);
       }, 4000)
     }
+  };
+
+  const join = () => {
+
   };
 
   const recordMeeting = () => {
