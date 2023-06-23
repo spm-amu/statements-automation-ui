@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import '../../Calendar.css';
 import './MeetingRoom.css';
@@ -9,7 +9,6 @@ import peerManager from "../../../../service/simplepeer/PeerManager";
 import socketManager from "../../../../service/SocketManager";
 import MeetingRoomSideBarContent from "../../../meetingroom/SideBarContent";
 import ClosablePanel from "../../../layout/ClosablePanel";
-import MediaSoupHelper from './MediaSoupHelper';
 import Utils from "../../../../Utils";
 
 const Steps = {
@@ -217,7 +216,6 @@ const MeetingRoom = (props) => {
     }*/
   }
 
-
   const askForPermission = () => {
     let userDetails = appManager.getUserDetails();
     const userAlias = Utils.isNull(userDetails.userId) ? `${userDetails.name} (Guest)` : userDetails.userId;
@@ -373,9 +371,51 @@ const MeetingRoom = (props) => {
 
   };
 
-  const handleEndCall = () => {
+  /********************************** HANG-UP *******************************/
+
+  const removeUser = (user) => {
 
   };
+
+  const endCall = (showMessage = true) => {
+    socketManager.endCall(isDirectCall, callerUser, selectedMeeting.id);
+    props.onEndCall(isDirectCall, showMessage);
+    setSideBarOpen(false);
+    setSideBarTab('');
+  };
+
+  const onCallEnded = (showMessage = true) => {
+    socketManager.removeSubscriptions(eventHandler);
+    appManager.removeSubscriptions(systemEventHandler);
+    socketManager.disconnectSocket();
+    socketManager.init();
+    props.onEndCall(isDirectCall, showMessage);
+    props.closeHandler();
+  };
+
+  const handleEndCall = () => {
+    if (screenShared) {
+      // TODO : Clean-up any screenshare stuff
+    }
+
+    if (userToCall && isDirectCall && participants.length <= 1) {
+      socketManager.emitEvent(MessageType.CANCEL_CALL, {
+        userId: userToCall.userId,
+        userDescription: userToCall.name,
+        callerId: appManager.getUserDetails().userId,
+        callerDescription: appManager.getUserDetails().name,
+        meetingId: selectedMeeting.id
+      }).catch((error) => {
+      });
+
+      onCallEnded(false);
+    } else {
+      endCall(false);
+      props.closeHandler();
+    }
+  };
+
+  /******************************** END HANG-UP *****************************/
 
   const shareScreen = () => {
 
@@ -399,11 +439,6 @@ const MeetingRoom = (props) => {
 
   const persistMeetingSettings = (autoPermit) => {
 
-  };
-
-  const endCall = () => {
-    setSideBarOpen(false);
-    setSideBarTab('');
   };
 
   return (
