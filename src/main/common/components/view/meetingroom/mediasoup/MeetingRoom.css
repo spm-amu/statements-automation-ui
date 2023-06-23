@@ -1,15 +1,40 @@
 .meeting-room-container {
   width: 100%;
   height: 100%;
+  max-height: 100%;
   background-color: #000000;
+  overflow-y: auto;
 }
 
 .footer-container {
-  background-color: transparent;
+  position: absolute;
   margin: 0 16px;
   height: 72px;
+  width: 100%;
+  padding: 0 4px;
+  background-color: #000000;
 }
 
 .meeting-room-content {
   background-color: transparent;
+}
+
+.closable-panel-container {
+  background-color: white;
+  height: 100%;
+  width: 25%;
+  min-width: 320px;
+}
+
+.participants-container {
+  background-color: red;
+  width: 25%;
+  height: 100%;
+  min-width: 320px;
+}
+
+@media (max-width: 991px) {
+  .closable-panel-container {
+    width: 100%;
+  }
 }

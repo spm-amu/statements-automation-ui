@@ -7,6 +7,10 @@ import appManager from "../../../../service/AppManager";
 import {MessageType, SystemEventType} from "../../../../types";
 import peerManager from "../../../../service/simplepeer/PeerManager";
 import socketManager from "../../../../service/SocketManager";
+import MeetingRoomSideBarContent from "../../../meetingroom/SideBarContent";
+import ClosablePanel from "../../../layout/ClosablePanel";
+import MediaSoupHelper from './MediaSoupHelper';
+import Utils from "../../../../Utils";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -50,6 +54,8 @@ const MeetingRoom = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const [preErrorStep, setPreErrorStep] = useState('');
+  const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
+  const onloadScreenShareData = useRef(null);
   const {
     selectedMeeting,
     userToCall,
@@ -175,6 +181,8 @@ const MeetingRoom = (props) => {
       MessageType.CHANGE_HOST, MessageType.CHAT_MESSAGE, MessageType.SYSTEM_EVENT, MessageType.SYSTEM_ALERT);
 
     appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT, SystemEventType.PEER_DISCONNECT);
+    initMeetingSession();
+
     return () => {
       if (isRecordingRef.current) {
         stopRecordingMeeting();
@@ -196,6 +204,137 @@ const MeetingRoom = (props) => {
   }, [meetingChat]);
 
   /******************************** END USE EFFECT ************************************/
+
+  /********************************* HANDSHAKE *******************************/
+
+  function initMeetingSession() {
+    if (isHost || isDirectCall || isRequestToJoin || autoPermit) {
+      console.log("CALLING JOIN FROM INIT initMeetingSession()");
+      join();
+    } else {
+      askForPermission();
+    }
+  }
+
+  const askForPermission = () => {
+    let userDetails = appManager.getUserDetails();
+    const userAlias = Utils.isNull(userDetails.userId) ? `${userDetails.name} (Guest)` : userDetails.userId;
+
+    // TODO : Implement re-try and timeout
+    socketManager.emitEvent(MessageType.PERMISSION, {
+      user: userAlias,
+      room: selectedMeeting.id,
+      email: userDetails.emailAddress,
+    }).then((data) => {
+    }).catch((exp) => {
+      setPreErrorStep(step);
+      setStep(exp.message);
+    });
+  };
+
+  function addUserToParticipants(item) {
+    // Typically, a user shoud not exist. We are ensuring that there are never duplicates
+    console.log("SEARCHING USER : " + item.user.userId);
+    console.log(participants);
+    let user = participants.find((u) => u.userId === item.user.userId);
+    if (user) {
+      console.log("FOUND EXISTING USER : ", user);
+      user.name = item.user.name;
+      user.avatar = item.user.avatar;
+      user.audioMuted = item.user.audioMuted;
+      user.videoMuted = item.user.videoMuted;
+    } else {
+      console.log("DID NOT FIND EXISTING USER : ", user);
+      user = {
+        userId: item.user.userId,
+        name: item.user.name,
+        avatar: item.user.avatar,
+        audioMuted: item.user.audioMuted,
+        videoMuted: item.user.videoMuted
+      };
+
+      participants.push(user);
+      setParticipants([].concat(participants));
+    }
+
+    console.log("CHECK SCREEN SHARE ONLOAD");
+    if (onloadScreenShareData.current && onloadScreenShareData.current.userId === item.user.userId) {
+      // TODO : Add screen share code
+      setMeetingParticipantGridMode('STRIP');
+      onloadScreenShareData.current = null;
+    }
+  }
+
+  const createParticipants = (users, socket) => {
+    console.log("ALL USERS received and creating participants : ", users);
+    users.forEach((user) => {
+      console.log("ADDING ITEM TO PARTICIPANTS : ", user);
+      addUserToParticipants(user);
+      setAllUserParticipantsLeft(false);
+      if (peerManager.userPeerMap.length > 0) {
+        if (step === Steps.LOBBY) {
+          setStep(Steps.SESSION);
+          setSideBarTab('People');
+          setSideBarOpen('true');
+          props.windowHandler.show();
+        }
+      }
+    });
+  };
+
+  const join = () => {
+    let userDetails = appManager.getUserDetails();
+    socketManager.emitEvent(MessageType.JOIN_MEETING, {
+      room: selectedMeeting.id,
+      userIdentity: userDetails.userId,
+      name: userDetails.name,
+      avatar: require('../../../../../desktop/dashboard/images/noimage-person.png'),
+      email: userDetails.emailAddress,
+      isHost: isHost,
+      audioMuted: audioMuted,
+      videoMuted: videoMuted,
+      direct: isDirectCall,
+      userToCall
+    }).then((result) => {
+      if (result.status === 'SUCCESS') {
+        if (userToCall && isHost && isDirectCall) {
+          socketManager.emitEvent(MessageType.CALL_USER, {
+            room: selectedMeeting.id,
+            userToCall: userToCall,
+            callerId: socketManager.socket.id,
+            name: appManager.getUserDetails().name
+          }).catch((error) => {
+          });
+        }
+
+        createParticipants(result.data.usersInRoom);
+
+        if (result.data.whiteboard) {
+          setWhiteboardItems(result.data.whiteboard.items);
+        }
+
+        if (isHost) {
+          socketManager.emitEvent(MessageType.GET_LOBBY, {
+            roomId: selectedMeeting.id
+          }).then((result) => {
+            if (result.status === 'SUCCESS' && result.lobby && result.lobby.people) {
+              for (const person of result.lobby.people) {
+                addUserToLobby(person);
+              }
+            }
+          })
+        }
+      } else {
+        setPreErrorStep(step);
+        setStep(result.status);
+      }
+    }).catch((error) => {
+      setPreErrorStep(step);
+      setStep(error.message);
+    });
+  };
+
+  /****************************** END HANDSHAKE ******************************/
 
   const onSystemAlert = (payload) => {
     if (payload.type === 'MEETING_STARTED_ALERT') {
@@ -222,10 +361,6 @@ const MeetingRoom = (props) => {
     } else {
       paper.style.margin = '54px 0 0 0';
     }
-  };
-
-  const join = () => {
-
   };
 
   const recordMeeting = () => {
@@ -277,7 +412,44 @@ const MeetingRoom = (props) => {
         overflow: displayState === 'MAXIMIZED' ? null : 'hidden',
       }}>
         <div className={'row no-margin no-padding w-100 h-100'}>
+          <div className={'participants-container col no-margin no-padding'}>
 
+          </div>
+          <div className={'closable-panel-container'}>
+            <ClosablePanel
+              closeHandler={(e) => {
+                setSideBarOpen(false);
+                setSideBarTab(null);
+              }}
+              title={sideBarTab}
+            >
+              <MeetingRoomSideBarContent
+                meetingChat={meetingChat}
+                isHost={isHost}
+                tab={sideBarTab}
+                meetingId={selectedMeeting.id}
+                participants={participants}
+                onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
+                onAudioCallCancelHandler={(requestedUser) => cancelRequestCall(requestedUser)}
+                onChangeMeetingHostHandler={(newHost) => {
+                  changeHost(newHost);
+                }}
+                onPinHandler={(participant, pinned) => {
+                  if (pinned) {
+                    setPinnedParticipant(participant);
+                  } else {
+                    setPinnedParticipant(null);
+                  }
+                }}
+                onHostAudioMute={(participant) => {
+                  changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
+                }}
+                onHostVideoMute={(participant) => {
+                  changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
+                }}
+              />
+            </ClosablePanel>
+          </div>
         </div>
       </div>
       {
