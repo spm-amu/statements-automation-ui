@@ -208,13 +208,15 @@ const MeetingRoom = (props) => {
   /********************************* HANDSHAKE *******************************/
 
   function initMeetingSession() {
-    if (isHost || isDirectCall || isRequestToJoin || autoPermit) {
+    join();
+    /*if (isHost || isDirectCall || isRequestToJoin || autoPermit) {
       console.log("CALLING JOIN FROM INIT initMeetingSession()");
       join();
     } else {
       askForPermission();
-    }
+    }*/
   }
+
 
   const askForPermission = () => {
     let userDetails = appManager.getUserDetails();
