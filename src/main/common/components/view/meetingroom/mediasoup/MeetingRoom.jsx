@@ -10,6 +10,8 @@ import socketManager from "../../../../service/SocketManager";
 import MeetingRoomSideBarContent from "../../../meetingroom/SideBarContent";
 import ClosablePanel from "../../../layout/ClosablePanel";
 import Utils from "../../../../Utils";
+import MeetingParticipantGrid from "../../../meetingroom/mediasoup/MeetingParticipantGrid";
+import {post} from "../../../../service/RestService";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -54,6 +56,7 @@ const MeetingRoom = (props) => {
   const [systemEventHandler] = useState({});
   const [preErrorStep, setPreErrorStep] = useState('');
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
+  const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const onloadScreenShareData = useRef(null);
   const {
     selectedMeeting,
@@ -232,33 +235,33 @@ const MeetingRoom = (props) => {
     });
   };
 
-  function addUserToParticipants(item) {
+  function addUserToParticipants(user) {
     // Typically, a user shoud not exist. We are ensuring that there are never duplicates
-    console.log("SEARCHING USER : " + item.user.userId);
+    console.log("SEARCHING PARTICIPANT : " + user.userId);
     console.log(participants);
-    let user = participants.find((u) => u.userId === item.user.userId);
-    if (user) {
-      console.log("FOUND EXISTING USER : ", user);
-      user.name = item.user.name;
-      user.avatar = item.user.avatar;
-      user.audioMuted = item.user.audioMuted;
-      user.videoMuted = item.user.videoMuted;
+    let participant = participants.find((u) => u.userId === user.userId);
+    if (participant) {
+      console.log("FOUND EXISTING PARTICIPANT : ", participant);
+      participant.name = user.name;
+      participant.avatar = user.avatar;
+      participant.audioMuted = user.audioMuted;
+      participant.videoMuted = user.videoMuted;
     } else {
-      console.log("DID NOT FIND EXISTING USER : ", user);
-      user = {
-        userId: item.user.userId,
-        name: item.user.name,
-        avatar: item.user.avatar,
-        audioMuted: item.user.audioMuted,
-        videoMuted: item.user.videoMuted
+      console.log("DID NOT FIND EXISTING PARTICIPANT : ", participant);
+      participant = {
+        userId: user.userId,
+        name: user.name,
+        avatar: user.avatar,
+        audioMuted: user.audioMuted,
+        videoMuted: user.videoMuted
       };
 
-      participants.push(user);
+      participants.push(participant);
       setParticipants([].concat(participants));
     }
 
     console.log("CHECK SCREEN SHARE ONLOAD");
-    if (onloadScreenShareData.current && onloadScreenShareData.current.userId === item.user.userId) {
+    if (onloadScreenShareData.current && onloadScreenShareData.current.userId === user.userId) {
       // TODO : Add screen share code
       setMeetingParticipantGridMode('STRIP');
       onloadScreenShareData.current = null;
@@ -271,7 +274,7 @@ const MeetingRoom = (props) => {
       console.log("ADDING ITEM TO PARTICIPANTS : ", user);
       addUserToParticipants(user);
       setAllUserParticipantsLeft(false);
-      if (peerManager.userPeerMap.length > 0) {
+      if (participants.length > 0) {
         if (step === Steps.LOBBY) {
           setStep(Steps.SESSION);
           setSideBarTab('People');
@@ -329,6 +332,7 @@ const MeetingRoom = (props) => {
         setStep(result.status);
       }
     }).catch((error) => {
+      console.log(error);
       setPreErrorStep(step);
       setStep(error.message);
     });
@@ -418,7 +422,7 @@ const MeetingRoom = (props) => {
   /******************************** END HANG-UP *****************************/
 
   const shareScreen = () => {
-
+    setDisplayState('STRIP');
   };
 
   const stopShareScreen = () => {
@@ -441,6 +445,50 @@ const MeetingRoom = (props) => {
 
   };
 
+  const onChangeHost = (args) => {
+    let userDetails = appManager.getUserDetails();
+    setIsHost(userDetails.userId === args.payload.host);
+  };
+
+  const changeHost = (participant) => {
+    post(
+      `${appManager.getAPIHost()}/api/v1/meeting/changeHost`,
+      (response) => {
+        socketManager.emitEvent(MessageType.CHANGE_HOST, {
+          roomID: selectedMeeting.id,
+          host: participant.userId,
+          state: {
+            meetingStarted: props.meetingStarted
+          }
+        }).catch((error) => {
+        });
+
+        setIsHost(!isHost);
+      },
+      (e) => {
+      },
+      {
+        meetingId: selectedMeeting.id,
+        userId: participant.userId
+      },
+      '',
+      false
+    );
+  };
+
+  const changeOtherParticipantAVSettings = (userId, audioMuted, videoMuted) => {
+    socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
+      systemEventType: "HOST_CHANGED_AV_SETTINGS",
+      recipients: [userId],
+      data: {
+        userId,
+        audioMuted,
+        videoMuted
+      }
+    }).catch((error) => {
+    });
+  };
+
   return (
     <div className={'meeting-room-container'}>
       <div className={'meeting-room-content'} style={{
@@ -450,7 +498,34 @@ const MeetingRoom = (props) => {
       }}>
         <div className={'row no-margin no-padding w-100 h-100'}>
           <div className={'participants-container col no-margin no-padding'}>
-
+            <>
+              <MeetingParticipantGrid participants={participants}
+                                      waitingList={lobbyWaitingList}
+                                      mode={meetingParticipantGridMode}
+                                      audioMuted={audioMuted}
+                                      videoMuted={videoMuted}
+                                      meetingTitle={selectedMeeting.title}
+                                      userToCall={userToCall}
+                                      step={step}
+                                      isHost={isHost}
+                                      autoPermit={autoPermit}
+                                      allUserParticipantsLeft={allUserParticipantsLeft}
+                                      onHostAudioMute={(participant) => {
+                                        changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
+                                      }}
+                                      onHostVideoMute={(participant) => {
+                                        changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
+                                      }}
+                                      acceptUserHandler={
+                                        (item) => {
+                                          acceptUser(item);
+                                        }}
+                                      rejectUserHandler={
+                                        (item) => {
+                                          rejectUser(item);
+                                        }}
+              />
+            </>
           </div>
           <div className={'closable-panel-container'}>
             <ClosablePanel
@@ -470,13 +545,6 @@ const MeetingRoom = (props) => {
                 onAudioCallCancelHandler={(requestedUser) => cancelRequestCall(requestedUser)}
                 onChangeMeetingHostHandler={(newHost) => {
                   changeHost(newHost);
-                }}
-                onPinHandler={(participant, pinned) => {
-                  if (pinned) {
-                    setPinnedParticipant(participant);
-                  } else {
-                    setPinnedParticipant(null);
-                  }
                 }}
                 onHostAudioMute={(participant) => {
                   changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);

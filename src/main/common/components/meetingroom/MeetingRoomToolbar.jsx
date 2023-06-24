@@ -171,11 +171,10 @@ const MeetingRoomToolbar = (props) => {
           isHost && !isDirectCall &&
           <div style={{margin: '0 8px 0 0'}}>
             <Button
-              style={{color: '#FFFFFF'}}
+              style={{color: '#FFFFFF', backgroundColor: 'rgb(235, 63, 33)', borderRadius: '8px'}}
               variant={'contained'}
               disabled={!started}
               size="large"
-              color={'primary'}
               onClick={(e) => handleEndMeetingButton()}
             >
               END MEETING
