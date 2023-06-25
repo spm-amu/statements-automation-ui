@@ -87,7 +87,6 @@ const Toolbar = (props) => {
   };
 
   useEffect(() => {
-    alert(props.step);
     setStep(props.step);
   }, [props.step]);
 

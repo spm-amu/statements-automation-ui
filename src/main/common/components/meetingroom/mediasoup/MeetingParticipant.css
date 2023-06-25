@@ -1,0 +1,8 @@
+.meeting-participant-container {
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  background-color: rgb(40, 40, 43);
+}

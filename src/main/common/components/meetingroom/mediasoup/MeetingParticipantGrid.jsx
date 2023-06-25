@@ -1,14 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect} from 'react';
+import React, {Fragment, useEffect} from 'react';
 import './MeetingParticipantGrid.css';
 import LobbyWaitingList from "../LobbyWaitingList";
 import Lobby from "../Lobby";
+import Grid from "@material-ui/core/Grid";
+import MeetingParticipant from "../mediasoup/MeetingParticipant";
+import Box from "@material-ui/core/Box";
+import appManager from "../../../service/AppManager";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
 const VH = 60;
 
 const MeetingParticipantGrid = (props) => {
+  const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
   const [inViewParticipants, setInViewParticipants] = React.useState([]);
   const [activeOffViewParticipants, setActiveOffViewParticipants] = React.useState([]);
   const [grid, setGrid] = React.useState(null);
@@ -16,7 +21,7 @@ const MeetingParticipantGrid = (props) => {
     waitingList,
     mode,
     step,
-    userStream,
+    meetingId,
     videoMuted,
     audioMuted,
     isHost,
@@ -25,15 +30,26 @@ const MeetingParticipantGrid = (props) => {
 
   useEffect(() => {
     if (props.participants && props.mode) {
+      setCurrentUserParticipant({
+        isCurrentUser: true,
+        userId: appManager.getUserDetails().userId,
+        peer: null,
+        name: appManager.getUserDetails().name,
+        avatar: require('../../../../desktop/dashboard/images/noimage-person.png'),
+        videoMuted,
+        audioMuted
+      });
+
       setupGrid();
     }
   }, [props.participants, props.mode]);
 
   const setupGrid = () => {
     let counter = 0;
+    inViewParticipants.splice(0, inViewParticipants.length);
     for (const participant of props.participants) {
       inViewParticipants.push(participant);
-      if(counter++ >= MAX_ROWS * MAX_COLS) {
+      if (counter++ >= MAX_ROWS * MAX_COLS) {
         break;
       }
     }
@@ -42,25 +58,65 @@ const MeetingParticipantGrid = (props) => {
     let numRows = inViewParticipants.length < MAX_ROWS ? inViewParticipants.length : MAX_ROWS;
     let rows = inViewParticipants.length === 2 ? 1 : numRows;
 
-    for (let i = 0; i < rows; i++) {
-      inViewGrid.push([]);
-    }
+    if (props.mode === 'DEFAULT') {
+      for (let i = 0; i < rows; i++) {
+        inViewGrid.push([]);
+      }
 
-    let currentRowIndex = 0;
-    for (let i = 0; i < props.participants.length; i++) {
-      inViewGrid.push(props.participants[i]);
-      if (currentRowIndex++ === rows - 1) {
-        currentRowIndex = 0;
+      let currentRowIndex = 0;
+      for (let i = 0; i < props.participants.length; i++) {
+        inViewGrid[currentRowIndex].push(props.participants[i]);
+        if (currentRowIndex++ === rows - 1) {
+          currentRowIndex = 0;
+        }
+      }
+    } else {
+      inViewGrid.push([]);
+      for (const inViewParticipant of inViewParticipants) {
+        inViewGrid[0].push(inViewParticipant);
       }
     }
 
     setGrid(inViewGrid);
   };
 
+  const renderRow = (row, index) => {
+    return (
+      <Grid
+        style={{height: '100%'}}
+        key={index}
+        direction="row"
+        justifyContent="center"
+        alignItems="center" container item spacing={2}>
+        <React.Fragment>
+          {row.map((participant, index) => {
+            return <Grid item xs={4} key={index}
+                         className={'meetingParticipantContainer'} style={
+              {
+                borderRadius: '4px',
+                width: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
+                height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
+                flexBasis: null,
+                maxWidth: null
+              }
+            }
+            >
+              <MeetingParticipant data={participant}
+                                  meetingId={meetingId}
+                                  onHostAudioMute={() => props.onHostAudioMute(participant)}
+                                  onHostVideoMute={() => props.onHostVideoMute(participant)}
+                                  isHost={isHost}/>
+            </Grid>
+          })}
+        </React.Fragment>
+      </Grid>
+    )
+  };
+
   return (
     grid !== null ?
       <div className={'row grid'}
-           style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%', border: '2px solid white'}}>
+           style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
         {
           step === "LOBBY" &&
           <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState}
@@ -69,6 +125,36 @@ const MeetingParticipantGrid = (props) => {
         {
           grid && mode === 'DEFAULT' && step !== "LOBBY" &&
           <>
+            <Box sx={{
+              flexGrow: 1,
+              height: step === "LOBBY" ? null : '100%',
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              display: 'flex'
+            }}>
+              <Grid container spacing={1} style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                border: '2px solid white'
+              }}>
+                {grid.map((row, index) => {
+                  return <div style={{
+                    width: "100%",
+                    height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh"
+                  }}>
+                    {
+                      <Fragment key={index}>
+                        {
+                          renderRow(row, index)
+                        }
+                      </Fragment>
+                    }
+                  </div>
+                })}
+              </Grid>
+            </Box>
           </>
         }
         {
@@ -93,6 +179,18 @@ const MeetingParticipantGrid = (props) => {
                                 rejectUserHandler={props.rejectUserHandler}
                                 acceptUserHandler={props.acceptUserHandler}/>
             }
+          </div>
+        }
+        {
+          currentUserParticipant &&
+          <div style={{width: '200px', height: '120px', position: 'absolute', right: '4px', bottom: '0'}}>
+            <MeetingParticipant data={currentUserParticipant}
+                                meetingId={meetingId}
+                                audioMuted={audioMuted}
+                                videoMuted={videoMuted}
+                                onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
+                                onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
+                                isHost={isHost}/>
           </div>
         }
       </div>

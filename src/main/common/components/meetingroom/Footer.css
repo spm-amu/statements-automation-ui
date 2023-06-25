@@ -2,6 +2,7 @@
   display: grid;
   grid-template-rows: auto auto;
   height: 72px;
+  padding: 16px 0 0 0;
 }
 
 .vc-footer .toolbar-container {

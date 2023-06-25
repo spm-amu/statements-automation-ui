@@ -110,6 +110,7 @@
     "linkify-react": "^4.1.0",
     "linkifyjs": "^4.1.0",
     "material-ui": "^0.20.2",
+    "mediasoup-client": "^3.6.89",
     "mobx": "^6.6.2",
     "moment": "^2.29.4",
     "net": "^1.0.2",

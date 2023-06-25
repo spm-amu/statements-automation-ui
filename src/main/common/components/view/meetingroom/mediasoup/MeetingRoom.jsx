@@ -12,6 +12,8 @@ import ClosablePanel from "../../../layout/ClosablePanel";
 import Utils from "../../../../Utils";
 import MeetingParticipantGrid from "../../../meetingroom/mediasoup/MeetingParticipantGrid";
 import {post} from "../../../../service/RestService";
+import { Device } from 'mediasoup-client';
+import soundMonitor from "../../../../service/SoundMonitor";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -149,6 +151,17 @@ const MeetingRoom = (props) => {
     }
   };
 
+  function emitAVSettingsChange() {
+    let userDetails = appManager.getUserDetails();
+    socketManager.emitEvent(MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, {
+      meetingId: selectedMeeting.id,
+      userId: userDetails.userId,
+      audioMuted: audioMuted,
+      videoMuted: videoMuted
+    }).catch((error) => {
+    });
+  }
+
   /********************************** USE EFFECT **************************************/
 
   useEffect(() => {
@@ -205,6 +218,13 @@ const MeetingRoom = (props) => {
     }
   }, [meetingChat]);
 
+  useEffect(() => {
+    if (audioMuted !== null) {
+      emitAVSettingsChange();
+      //soundMonitor.setAudioMuted(audioMuted);
+    }
+  }, [audioMuted]);
+
   /******************************** END USE EFFECT ************************************/
 
   /********************************* HANDSHAKE *******************************/
@@ -235,7 +255,7 @@ const MeetingRoom = (props) => {
     });
   };
 
-  function addUserToParticipants(user) {
+  function addUserToParticipants(user, routerRtpCapabilities) {
     // Typically, a user shoud not exist. We are ensuring that there are never duplicates
     console.log("SEARCHING PARTICIPANT : " + user.userId);
     console.log(participants);
@@ -253,7 +273,8 @@ const MeetingRoom = (props) => {
         name: user.name,
         avatar: user.avatar,
         audioMuted: user.audioMuted,
-        videoMuted: user.videoMuted
+        videoMuted: user.videoMuted,
+        rtpCapabilities: routerRtpCapabilities
       };
 
       participants.push(participant);
@@ -268,11 +289,11 @@ const MeetingRoom = (props) => {
     }
   }
 
-  const createParticipants = (users, socket) => {
+  const createParticipants = (users, routerRtpCapabilities) => {
     console.log("ALL USERS received and creating participants : ", users);
     users.forEach((user) => {
       console.log("ADDING ITEM TO PARTICIPANTS : ", user);
-      addUserToParticipants(user);
+      addUserToParticipants(user, routerRtpCapabilities);
       setAllUserParticipantsLeft(false);
       if (participants.length > 0) {
         if (step === Steps.LOBBY) {
@@ -310,7 +331,7 @@ const MeetingRoom = (props) => {
           });
         }
 
-        createParticipants(result.data.usersInRoom);
+        createParticipants(result.data.usersInRoom, result.data.rtpCapabilities);
 
         if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);
@@ -439,6 +460,8 @@ const MeetingRoom = (props) => {
 
   const lowerHand = () => {
 
+
+
   };
 
   const persistMeetingSettings = (autoPermit) => {
@@ -506,6 +529,7 @@ const MeetingRoom = (props) => {
                                       videoMuted={videoMuted}
                                       meetingTitle={selectedMeeting.title}
                                       userToCall={userToCall}
+                                      meetingId={selectedMeeting.id}
                                       step={step}
                                       isHost={isHost}
                                       autoPermit={autoPermit}
