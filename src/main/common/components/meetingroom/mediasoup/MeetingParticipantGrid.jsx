@@ -25,7 +25,8 @@ const MeetingParticipantGrid = (props) => {
     videoMuted,
     audioMuted,
     isHost,
-    autoPermit
+    autoPermit,
+    rtpCapabilities
   } = props;
 
   useEffect(() => {
@@ -103,6 +104,7 @@ const MeetingParticipantGrid = (props) => {
             >
               <MeetingParticipant data={participant}
                                   meetingId={meetingId}
+                                  rtpCapabilities={rtpCapabilities}
                                   onHostAudioMute={() => props.onHostAudioMute(participant)}
                                   onHostVideoMute={() => props.onHostVideoMute(participant)}
                                   isHost={isHost}/>
@@ -186,6 +188,7 @@ const MeetingParticipantGrid = (props) => {
           <div style={{width: '200px', height: '120px', position: 'absolute', right: '4px', bottom: '0'}}>
             <MeetingParticipant data={currentUserParticipant}
                                 meetingId={meetingId}
+                                rtpCapabilities={rtpCapabilities}
                                 audioMuted={audioMuted}
                                 videoMuted={videoMuted}
                                 onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}

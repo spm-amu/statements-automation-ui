@@ -141,6 +141,7 @@ const MeetingParticipant = (props) => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
 
+    alert(props.rtpCapabilities);
     let participantDevice = mediaSoupHelper.getParticipantDevice(props.rtpCapabilities);
     setDevice(participantDevice);
     setTransports(mediaSoupHelper.initTransports(participantDevice, props.meetingId, props.data.userId));
@@ -152,12 +153,12 @@ const MeetingParticipant = (props) => {
   }, []);
 
   const produce = async (type) => {
-    if (!props.device) {
+    if (!device) {
       console.error('No available device');
       return;
     }
 
-    if (!props.device.canProduce('video') && type === 'video') {
+    if (!device.canProduce('video') && type === 'video') {
       console.error('Cannot produce video');
       return;
     }
@@ -187,11 +188,7 @@ const MeetingParticipant = (props) => {
         return;
     }
 
-    let stream = screen
-      ? await navigator.mediaDevices.getDisplayMedia()
-      : await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    console.log(navigator.mediaDevices.getSupportedConstraints());
-
+    let stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     const track = type === 'audio' ? stream.getAudioTracks()[0] : stream.getVideoTracks()[0];
     const params = {
       track
@@ -222,39 +219,25 @@ const MeetingParticipant = (props) => {
       }
     }
 
-    let producer = await this.producerTransport.produce(params);
-
-
-
-
-
-
-
-
-
-
+    let producer = await producers.get(type).produce(params);
 
     videoRef.current.srcObject = stream;
     producer.on('transportclose', () => {
-      if (!audio) {
-        elem.srcObject.getTracks().forEach(function (track) {
-          track.stop()
-        });
+      videoRef.current.srcObject.getTracks().forEach(function (track) {
+        track.stop()
+      });
 
-        elem.parentNode.removeChild(elem)
-      }
+      videoRef.current.parentNode.removeChild(elem)
 
-      this.producers.delete(producer.id)
+      this.producers.delete(type)
     });
 
     producer.on('close', () => {
-      if (!audio) {
-        elem.srcObject.getTracks().forEach(function (track) {
-          track.stop()
-        });
-        elem.parentNode.removeChild(elem)
-      }
-      this.producers.delete(producer.id)
+      videoRef.current.srcObject.getTracks().forEach(function (track) {
+        track.stop()
+      });
+
+      this.producers.delete(type)
     });
   };
 
@@ -277,16 +260,24 @@ const MeetingParticipant = (props) => {
       {
         <div className={'col-*-* meeting-participant-container'}
              style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null}}>
-          <video
-            id={props.data.userId}
-            width={640}
-            height={320}
-            autoPlay muted ref={videoRef}
-            style={{
-              width: '100%',
-              height: props.videoHeight ? props.videoHeight : '100%'
-            }}
-          />
+          {
+            !videoMuted ?
+              <video
+                id={props.data.userId}
+                width={640}
+                height={320}
+                autoPlay muted={audioMuted} ref={videoRef}
+                style={{
+                  width: '100%',
+                  height: '100%'
+                }}
+              />
+              :
+              audioMuted ?
+                <audio autoPlay muted ref={videoRef}/>
+                :
+                <audio autoPlay ref={videoRef}/>
+          }
         </div>
       }
     </>

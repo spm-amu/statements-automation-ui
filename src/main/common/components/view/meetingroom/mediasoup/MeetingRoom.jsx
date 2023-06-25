@@ -12,8 +12,6 @@ import ClosablePanel from "../../../layout/ClosablePanel";
 import Utils from "../../../../Utils";
 import MeetingParticipantGrid from "../../../meetingroom/mediasoup/MeetingParticipantGrid";
 import {post} from "../../../../service/RestService";
-import { Device } from 'mediasoup-client';
-import soundMonitor from "../../../../service/SoundMonitor";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -34,7 +32,6 @@ const MeetingRoom = (props) => {
   const [sideBarOpen, setSideBarOpen] = useState(false);
   const [sideBarTab, setSideBarTab] = useState('');
   const [displayState, setDisplayState] = useState(props.displayState);
-  const [device, setDevice] = useState({});
   const [hasUnreadChats, setHasUnreadChats] = useState(null);
   const [hasUnseenWhiteboardEvent, setHasUnseenWhiteboardEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -60,6 +57,7 @@ const MeetingRoom = (props) => {
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const onloadScreenShareData = useRef(null);
+  const rtpCapabilities = useRef(null);
   const {
     selectedMeeting,
     userToCall,
@@ -255,7 +253,7 @@ const MeetingRoom = (props) => {
     });
   };
 
-  function addUserToParticipants(user, routerRtpCapabilities) {
+  function addUserToParticipants(user) {
     // Typically, a user shoud not exist. We are ensuring that there are never duplicates
     console.log("SEARCHING PARTICIPANT : " + user.userId);
     console.log(participants);
@@ -273,8 +271,7 @@ const MeetingRoom = (props) => {
         name: user.name,
         avatar: user.avatar,
         audioMuted: user.audioMuted,
-        videoMuted: user.videoMuted,
-        rtpCapabilities: routerRtpCapabilities
+        videoMuted: user.videoMuted
       };
 
       participants.push(participant);
@@ -289,11 +286,11 @@ const MeetingRoom = (props) => {
     }
   }
 
-  const createParticipants = (users, routerRtpCapabilities) => {
+  const createParticipants = (users) => {
     console.log("ALL USERS received and creating participants : ", users);
     users.forEach((user) => {
       console.log("ADDING ITEM TO PARTICIPANTS : ", user);
-      addUserToParticipants(user, routerRtpCapabilities);
+      addUserToParticipants(user);
       setAllUserParticipantsLeft(false);
       if (participants.length > 0) {
         if (step === Steps.LOBBY) {
@@ -331,7 +328,8 @@ const MeetingRoom = (props) => {
           });
         }
 
-        createParticipants(result.data.usersInRoom, result.data.rtpCapabilities);
+        rtpCapabilities.current = result.data.rtpCapabilities;
+        createParticipants(result.data.usersInRoom);
 
         if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);
@@ -461,7 +459,6 @@ const MeetingRoom = (props) => {
   const lowerHand = () => {
 
 
-
   };
 
   const persistMeetingSettings = (autoPermit) => {
@@ -521,7 +518,8 @@ const MeetingRoom = (props) => {
       }}>
         <div className={'row no-margin no-padding w-100 h-100'}>
           <div className={'participants-container col no-margin no-padding'}>
-            <>
+            {
+              rtpCapabilities.current &&
               <MeetingParticipantGrid participants={participants}
                                       waitingList={lobbyWaitingList}
                                       mode={meetingParticipantGridMode}
@@ -533,6 +531,7 @@ const MeetingRoom = (props) => {
                                       step={step}
                                       isHost={isHost}
                                       autoPermit={autoPermit}
+                                      rtpCapabilities={rtpCapabilities.current}
                                       allUserParticipantsLeft={allUserParticipantsLeft}
                                       onHostAudioMute={(participant) => {
                                         changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
@@ -549,7 +548,7 @@ const MeetingRoom = (props) => {
                                           rejectUser(item);
                                         }}
               />
-            </>
+            }
           </div>
           <div className={'closable-panel-container'}>
             <ClosablePanel
@@ -582,7 +581,7 @@ const MeetingRoom = (props) => {
         </div>
       </div>
       {
-        device &&
+        rtpCapabilities &&
         <div className={'footer-container no-margin no-padding'}>
           <Footer audioMuted={audioMuted}
                   hasUnreadChats={hasUnreadChats}
