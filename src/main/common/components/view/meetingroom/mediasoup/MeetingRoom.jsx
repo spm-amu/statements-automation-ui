@@ -55,9 +55,9 @@ const MeetingRoom = (props) => {
   const [systemEventHandler] = useState({});
   const [preErrorStep, setPreErrorStep] = useState('');
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
+  const [rtpCapabilities, setRtpCapabilities] = useState(null);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const onloadScreenShareData = useRef(null);
-  const rtpCapabilities = useRef(null);
   const {
     selectedMeeting,
     userToCall,
@@ -339,7 +339,7 @@ const MeetingRoom = (props) => {
           });
         }
 
-        rtpCapabilities.current = result.data.rtpCapabilities;
+        setRtpCapabilities(result.data.rtpCapabilities);
         createParticipants(result.data.usersInRoom);
 
         if (result.data.whiteboard) {
@@ -530,7 +530,7 @@ const MeetingRoom = (props) => {
         <div className={'row no-margin no-padding w-100 h-100'}>
           <div className={'participants-container col no-margin no-padding'}>
             {
-              rtpCapabilities.current &&
+              rtpCapabilities &&
               <MeetingParticipantGrid participants={participants}
                                       waitingList={lobbyWaitingList}
                                       mode={meetingParticipantGridMode}
@@ -542,7 +542,7 @@ const MeetingRoom = (props) => {
                                       step={step}
                                       isHost={isHost}
                                       autoPermit={autoPermit}
-                                      rtpCapabilities={rtpCapabilities.current}
+                                      rtpCapabilities={rtpCapabilities}
                                       allUserParticipantsLeft={allUserParticipantsLeft}
                                       onHostAudioMute={(participant) => {
                                         changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
