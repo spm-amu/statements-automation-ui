@@ -149,6 +149,17 @@ const MeetingRoom = (props) => {
     }
   };
 
+  const onAVSettingsChange = (payload) => {
+    let participant = participants.find((p) => p.userId === payload.userId);
+    if (participant) {
+      participant.audioMuted = payload.audioMuted;
+      participant.videoMuted = payload.videoMuted;
+    }
+
+    //setParticipants([].concat(participants));
+    appManager.fireEvent(SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED, payload);
+  };
+
   function emitAVSettingsChange() {
     let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.AUDIO_VISUAL_SETTINGS_CHANGED, {
