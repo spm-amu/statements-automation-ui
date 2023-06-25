@@ -117,13 +117,12 @@ const MeetingParticipant = (props) => {
       if (props.soundMonitor && !props.inView) {
         props.soundMonitor(props.data.userId, true);
       }
-
+    } else {
       produce('audio');
     }
   }, [audioMuted]);
 
   const onAVSettingsChange = (payload) => {
-    alert(payload.audioMuted);
     if (props.data.userId === payload.userId) {
       setAudioMuted(payload.audioMuted);
       setVideoMuted(payload.videoMuted);
@@ -136,15 +135,18 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
   }, [videoMuted]);
 
+  const setupDevice = async () => {
+    let participantDevice = await mediaSoupHelper.getParticipantDevice(props.rtpCapabilities);
+    setDevice(participantDevice);
+    setTransports(mediaSoupHelper.initTransports(participantDevice, props.meetingId, props.data.userId));
+  };
+
   useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
 
-    alert(props.rtpCapabilities);
-    let participantDevice = mediaSoupHelper.getParticipantDevice(props.rtpCapabilities);
-    setDevice(participantDevice);
-    setTransports(mediaSoupHelper.initTransports(participantDevice, props.meetingId, props.data.userId));
+    setupDevice();
 
     return () => {
       appManager.removeSubscriptions(systemEventHandler);
@@ -227,8 +229,7 @@ const MeetingParticipant = (props) => {
         track.stop()
       });
 
-      videoRef.current.parentNode.removeChild(elem)
-
+      videoRef.current.parentNode.removeChild(elem);
       this.producers.delete(type)
     });
 

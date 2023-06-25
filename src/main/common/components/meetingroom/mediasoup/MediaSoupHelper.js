@@ -40,7 +40,7 @@ class MediaSoupHelper {
         return;
       }
 
-      producerTransport = device.createSendTransport(data);
+      producerTransport = device.createSendTransport(data.params);
       producerTransport.on(
         'connect',
         async function ({dtlsParameters}, callback, errback) {
