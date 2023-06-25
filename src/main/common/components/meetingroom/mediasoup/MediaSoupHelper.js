@@ -47,7 +47,7 @@ class MediaSoupHelper {
       }.bind(this)
     );
 
-    this.consumerTransport.on(
+    consumerTransport.on(
       'connectionstatechange',
       async function (state) {
         switch (state) {
@@ -86,7 +86,9 @@ class MediaSoupHelper {
       async function ({dtlsParameters}, callback, errback) {
         socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
           dtlsParameters,
-          transportId: data.id
+          transportId: data.id,
+          roomId,
+          userId
         }).then(callback)
           .catch(errback);
       }.bind(this)
@@ -99,7 +101,9 @@ class MediaSoupHelper {
           const {producerId} = socketManager.emitEvent(MessageType.PRODUCE, {
             producerTransportId: producerTransport.id,
             kind,
-            rtpParameters
+            rtpParameters,
+            roomId,
+            userId
           }).then(callback)
             .catch(errback);
 

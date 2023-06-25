@@ -118,8 +118,12 @@ const MeetingParticipant = (props) => {
       if (props.soundMonitor && !props.inView) {
         props.soundMonitor(props.data.userId, true);
       }
+
+      stopProducing('audio');
     } else {
-      produce('audio');
+      if(device) {
+        produce('audio');
+      }
     }
   }, [audioMuted]);
 
@@ -134,14 +138,37 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
+    if (videoMuted) {
+      stopProducing('video');
+    } else {
+      if(device) {
+        produce('video');
+      }
+    }
   }, [videoMuted]);
+
+  useEffect(() => {
+    if(producerTransport) {
+      if (videoMuted) {
+        stopProducing('video');
+      } else {
+        produce('video');
+      }
+
+      if (audioMuted) {
+        stopProducing('audio');
+      } else {
+        produce('audio');
+      }
+    }
+  }, [producerTransport]);
 
   const setupDevice = async () => {
     let participantDevice = await mediaSoupHelper.getParticipantDevice(props.rtpCapabilities);
     setDevice(participantDevice);
-    setConsumerTransport(mediaSoupHelper.initConsumerTransport(participantDevice, props.meetingId, props.data.userId));
+    setConsumerTransport(await mediaSoupHelper.initConsumerTransport(participantDevice, props.meetingId, props.data.userId));
     if(props.isCurrentUser) {
-      setProducerTransport(mediaSoupHelper.initProducerTransport(participantDevice, props.meetingId, props.data.userId));
+      setProducerTransport(await mediaSoupHelper.initProducerTransport(participantDevice, props.meetingId, props.data.userId));
     }
   };
 
@@ -225,7 +252,8 @@ const MeetingParticipant = (props) => {
       }
     }
 
-    let producer = await producers.get(type).produce(params);
+    let producer = await producerTransport.produce(params);
+    producers.set(type, producer);
 
     videoRef.current.srcObject = stream;
     producer.on('transportclose', () => {
@@ -264,7 +292,7 @@ const MeetingParticipant = (props) => {
     <>
       {
         <div className={'col-*-* meeting-participant-container'}
-             style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null}}>
+             style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null, color: 'white'}}>
           {
             !videoMuted ?
               <video
