@@ -35,7 +35,7 @@ class MediaSoupHelper {
       return;
     }
 
-    let consumerTransport = device.createRecvTransport(data);
+    let consumerTransport = device.createRecvTransport(data.params);
     consumerTransport.on(
       'connect',
       function ({dtlsParameters}, callback, errback) {
