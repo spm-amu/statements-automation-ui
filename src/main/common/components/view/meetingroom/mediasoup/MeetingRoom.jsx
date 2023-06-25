@@ -307,7 +307,7 @@ const MeetingRoom = (props) => {
         if (step === Steps.LOBBY) {
           setStep(Steps.SESSION);
           setSideBarTab('People');
-          setSideBarOpen('true');
+          setSideBarOpen(true);
           props.windowHandler.show();
         }
       }
@@ -569,24 +569,27 @@ const MeetingRoom = (props) => {
               }}
               title={sideBarTab}
             >
-              <MeetingRoomSideBarContent
-                meetingChat={meetingChat}
-                isHost={isHost}
-                tab={sideBarTab}
-                meetingId={selectedMeeting.id}
-                participants={participants}
-                onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
-                onAudioCallCancelHandler={(requestedUser) => cancelRequestCall(requestedUser)}
-                onChangeMeetingHostHandler={(newHost) => {
-                  changeHost(newHost);
-                }}
-                onHostAudioMute={(participant) => {
-                  changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
-                }}
-                onHostVideoMute={(participant) => {
-                  changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
-                }}
-              />
+              {
+                sideBarOpen &&
+                <MeetingRoomSideBarContent
+                  meetingChat={meetingChat}
+                  isHost={isHost}
+                  tab={sideBarTab}
+                  meetingId={selectedMeeting.id}
+                  participants={participants}
+                  onAudioCallHandler={(requestedUser) => requestUserToJoin(requestedUser)}
+                  onAudioCallCancelHandler={(requestedUser) => cancelRequestCall(requestedUser)}
+                  onChangeMeetingHostHandler={(newHost) => {
+                    changeHost(newHost);
+                  }}
+                  onHostAudioMute={(participant) => {
+                    changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
+                  }}
+                  onHostVideoMute={(participant) => {
+                    changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
+                  }}
+                />
+              }
             </ClosablePanel>
           </div>
         </div>
