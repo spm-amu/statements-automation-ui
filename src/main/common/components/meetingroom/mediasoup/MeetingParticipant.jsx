@@ -275,7 +275,6 @@ const MeetingParticipant = (props) => {
   };
 
   const stopProducing = (type) => {
-    alert('STOP PRODUCE : ' + type);
   };
 
   const getParticipantName = () => {
