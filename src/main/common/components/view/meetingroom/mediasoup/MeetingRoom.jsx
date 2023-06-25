@@ -561,16 +561,16 @@ const MeetingRoom = (props) => {
               />
             }
           </div>
-          <div className={'closable-panel-container'}>
-            <ClosablePanel
-              closeHandler={(e) => {
-                setSideBarOpen(false);
-                setSideBarTab(null);
-              }}
-              title={sideBarTab}
-            >
-              {
-                sideBarOpen &&
+          {
+            sideBarOpen &&
+            <div className={'closable-panel-container'}>
+              <ClosablePanel
+                closeHandler={(e) => {
+                  setSideBarOpen(false);
+                  setSideBarTab(null);
+                }}
+                title={sideBarTab}
+              >
                 <MeetingRoomSideBarContent
                   meetingChat={meetingChat}
                   isHost={isHost}
@@ -589,9 +589,9 @@ const MeetingRoom = (props) => {
                     changeOtherParticipantAVSettings(participant.userId, participant.audioMuted, true);
                   }}
                 />
-              }
-            </ClosablePanel>
-          </div>
+              </ClosablePanel>
+            </div>
+          }
         </div>
       </div>
       {
