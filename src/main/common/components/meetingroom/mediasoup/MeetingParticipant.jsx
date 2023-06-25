@@ -29,7 +29,8 @@ const MeetingParticipant = (props) => {
   const [producers] = React.useState(new Map());
   const [soundLevel, setSoundLevel] = React.useState(0);
   const [device, setDevice] = React.useState(null);
-  const [transports, setTransports] = React.useState(null);
+  const [consumerTransport, setConsumerTransport] = React.useState(null);
+  const [producerTransport, setProducerTransport] = React.useState(null);
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
@@ -138,7 +139,10 @@ const MeetingParticipant = (props) => {
   const setupDevice = async () => {
     let participantDevice = await mediaSoupHelper.getParticipantDevice(props.rtpCapabilities);
     setDevice(participantDevice);
-    setTransports(mediaSoupHelper.initTransports(participantDevice, props.meetingId, props.data.userId));
+    setConsumerTransport(mediaSoupHelper.initConsumerTransport(participantDevice, props.meetingId, props.data.userId));
+    if(props.isCurrentUser) {
+      setProducerTransport(mediaSoupHelper.initProducerTransport(participantDevice, props.meetingId, props.data.userId));
+    }
   };
 
   useEffect(() => {

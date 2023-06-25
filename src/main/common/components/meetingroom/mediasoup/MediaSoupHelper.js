@@ -22,120 +22,114 @@ class MediaSoupHelper {
     return device
   };
 
-  async initTransports(device, roomId, userId) {
-    let producerTransport;
-    let consumerTransport;
+  async initConsumerTransport(device, roomId, userId) {
+    console.log("CREATING CONSUMER TRANSPORT FOR : " + userId);
+    const data = await socketManager.emitEvent(MessageType.CREATE_WEBRTC_TRANSPORT, {
+      forceTcp: false,
+      userId,
+      roomId
+    });
 
-    // init producerTransport
-    {
-      const data = await socketManager.emitEvent(MessageType.CREATE_WEBRTC_TRANSPORT, {
-        forceTcp: false,
-        rtpCapabilities: device.rtpCapabilities,
-        roomId,
-        userId
-      });
+    if (data.status === 'ERROR') {
+      console.error(data.error);
+      return;
+    }
 
-      if (data.status === 'ERROR') {
-        console.error(data.error);
-        return;
-      }
+    let consumerTransport = device.createRecvTransport(data);
+    consumerTransport.on(
+      'connect',
+      function ({dtlsParameters}, callback, errback) {
+        socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
+          dtlsParameters,
+          transportId: data.id
+        }).then(callback)
+          .catch(errback);
+      }.bind(this)
+    );
 
-      producerTransport = device.createSendTransport(data.params);
-      producerTransport.on(
-        'connect',
-        async function ({dtlsParameters}, callback, errback) {
-          socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
-            dtlsParameters,
-            transportId: data.id
+    this.consumerTransport.on(
+      'connectionstatechange',
+      async function (state) {
+        switch (state) {
+          case 'connecting':
+            break;
+          case 'connected':
+            break;
+          case 'failed':
+            this.consumerTransport.close();
+            break;
+          default:
+            break
+        }
+      }.bind(this)
+    );
+
+    return consumerTransport;
+  }
+
+  async initProducerTransport(device, roomId, userId) {
+    const data = await socketManager.emitEvent(MessageType.CREATE_WEBRTC_TRANSPORT, {
+      forceTcp: false,
+      rtpCapabilities: device.rtpCapabilities,
+      roomId,
+      userId
+    });
+
+    if (data.status === 'ERROR') {
+      console.error(data.error);
+      return;
+    }
+
+    let producerTransport = device.createSendTransport(data.params);
+    producerTransport.on(
+      'connect',
+      async function ({dtlsParameters}, callback, errback) {
+        socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
+          dtlsParameters,
+          transportId: data.id
+        }).then(callback)
+          .catch(errback);
+      }.bind(this)
+    );
+
+    producerTransport.on(
+      'produce',
+      async function ({kind, rtpParameters}, callback, errback) {
+        try {
+          const {producerId} = socketManager.emitEvent(MessageType.PRODUCE, {
+            producerTransportId: producerTransport.id,
+            kind,
+            rtpParameters
           }).then(callback)
             .catch(errback);
-        }.bind(this)
-      );
 
-      producerTransport.on(
-        'produce',
-        async function ({kind, rtpParameters}, callback, errback) {
-          try {
-            const {producerId} = socketManager.emitEvent(MessageType.PRODUCE, {
-              producerTransportId: producerTransport.id,
-              kind,
-              rtpParameters
-            }).then(callback)
-              .catch(errback);
+          callback({
+            id: producerId
+          })
+        } catch (err) {
+          errback(err)
+        }
+      }.bind(this)
+    );
 
-            callback({
-              id: producerId
-            })
-          } catch (err) {
-            errback(err)
-          }
-        }.bind(this)
-      );
+    producerTransport.on(
+      'connectionstatechange',
+      function (state) {
+        switch (state) {
+          case 'connecting':
+            break;
+          case 'connected':
+            break;
+          case 'failed':
+            this.producerTransport.close();
+            break;
+          default:
+            break
+        }
+      }.bind(this)
+    );
 
-      producerTransport.on(
-        'connectionstatechange',
-        function (state) {
-          switch (state) {
-            case 'connecting':
-              break;
-            case 'connected':
-              break;
-            case 'failed':
-              this.producerTransport.close();
-              break;
-            default:
-              break
-          }
-        }.bind(this)
-      )
-    }
-
-    // init consumerTransport
-    {
-      const data = await socketManager.emitEvent(MessageType.CREATE_WEBRTC_TRANSPORT, {
-        forceTcp: false
-      });
-
-      if (data.status === 'ERROR') {
-        console.error(data.error);
-        return;
-      }
-
-      // only one needed
-      consumerTransport = device.createRecvTransport(data);
-      consumerTransport.on(
-        'connect',
-        function ({dtlsParameters}, callback, errback) {
-          socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
-            dtlsParameters,
-            transportId: data.id
-          }).then(callback)
-            .catch(errback);
-        }.bind(this)
-      );
-
-      this.consumerTransport.on(
-        'connectionstatechange',
-        async function (state) {
-          switch (state) {
-            case 'connecting':
-              break;
-            case 'connected':
-              break;
-            case 'failed':
-              this.consumerTransport.close();
-              break;
-            default:
-              break
-          }
-        }.bind(this)
-      )
-    }
-
-    return {
-      producerTransport,
-      consumerTransport
-    }
+    return producerTransport;
   }
 }
 

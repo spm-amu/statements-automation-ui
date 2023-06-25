@@ -23,6 +23,7 @@ class SocketManager {
           if (data.status === 'SUCCESS') {
             resolve(data);
           } else {
+            console.error("ERROR EMITTING EVENT : " + eventType);
             reject(new Error(data.status));
           }
         });

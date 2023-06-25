@@ -189,6 +189,7 @@ const MeetingParticipantGrid = (props) => {
             <MeetingParticipant data={currentUserParticipant}
                                 meetingId={meetingId}
                                 rtpCapabilities={rtpCapabilities}
+                                isCurrentUser={true}
                                 audioMuted={audioMuted}
                                 videoMuted={videoMuted}
                                 onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
