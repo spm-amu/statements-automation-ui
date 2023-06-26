@@ -135,6 +135,35 @@ class MediaSoupHelper {
 
     return producerTransport;
   }
+
+  getConsumeStream = async (producerId, rtpCapabilities, consumerTransport) => {
+    const data = await socketManager.emitEvent(MessageType.CONSUME, {
+      rtpCapabilities,
+      consumerTransportId: consumerTransport.id,
+      roomId,
+      userId
+    });
+
+    const { id, kind, rtpParameters } = data.params;
+
+    let codecOptions = {};
+    const consumer = await consumerTransport.consume({
+      id,
+      producerId,
+      kind,
+      rtpParameters,
+      codecOptions
+    });
+
+    const stream = new MediaStream();
+    stream.addTrack(consumer.track);
+
+    return {
+      consumer,
+      stream,
+      kind
+    }
+  }
 }
 
 const instance = new MediaSoupHelper();

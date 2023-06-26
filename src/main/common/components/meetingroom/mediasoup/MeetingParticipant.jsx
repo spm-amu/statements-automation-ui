@@ -27,6 +27,7 @@ const MeetingParticipant = (props) => {
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
   const [producers] = React.useState(new Map());
+  const [consumers] = React.useState(new Map());
   const [soundLevel, setSoundLevel] = React.useState(0);
   const [device, setDevice] = React.useState(null);
   const [consumerTransport, setConsumerTransport] = React.useState(null);
@@ -34,6 +35,7 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
+  const audioRef = useRef();
   const soundLevelCounter = useRef(0);
   const showVideo = true;
 
@@ -49,6 +51,9 @@ const MeetingParticipant = (props) => {
             break;
           case MessageType.LOWER_HAND:
             onLowerHand(be.payload);
+            break;
+          case MessageType.NEW_PRODUCERS:
+            onNewProducers(be.payload);
             break;
         }
       }
@@ -123,7 +128,7 @@ const MeetingParticipant = (props) => {
 
   const onAVSettingsChange = (payload) => {
     if (props.data.userId === payload.userId) {
-      if(props.isCurrentUser) {
+      if (props.isCurrentUser) {
         if (payload.audioMuted) {
           stopProducing('audio');
         } else {
@@ -153,7 +158,7 @@ const MeetingParticipant = (props) => {
   }, [videoMuted]);
 
   useEffect(() => {
-    if(producerTransport) {
+    if (producerTransport) {
       if (videoMuted) {
         stopProducing('video');
       } else {
@@ -172,7 +177,7 @@ const MeetingParticipant = (props) => {
     let participantDevice = await mediaSoupHelper.getParticipantDevice(props.rtpCapabilities);
     setDevice(participantDevice);
     setConsumerTransport(await mediaSoupHelper.initConsumerTransport(participantDevice, props.meetingId, props.data.userId));
-    if(props.isCurrentUser) {
+    if (props.isCurrentUser) {
       setProducerTransport(await mediaSoupHelper.initProducerTransport(participantDevice, props.meetingId, props.data.userId));
     }
   };
@@ -297,9 +302,58 @@ const MeetingParticipant = (props) => {
     producers.get(type).close();
     producers.delete(type);
 
-    videoRef.current.srcObject.getTracks().forEach(function (track) {
-      track.stop()
-    })
+    let stream = type === 'video' ? videoRef.current.srcObject : audioRef.current.srcObject;
+    if(stream) {
+      stream.getTracks().forEach(function (track) {
+        track.stop()
+      })
+    }
+  };
+
+  const onNewProducers = (producers) => {
+    console.log("CONSUMING : ", producers);
+    for (const producer of producers) {
+      consume(producer.id);
+    }
+  };
+
+  const removeConsumer = (consumerId, type) => {
+    let stream = type === 'video' ? videoRef.current.srcObject : audioRef.current.srcObject;
+    if(stream) {
+      stream.getTracks().forEach(function (track) {
+        track.stop()
+      })
+    }
+
+    consumers.delete(consumerId)
+  };
+
+  const consume = async (producerId) => {
+    mediaSoupHelper.getConsumeStream(producerId, props.rtpCapabilities, consumerTransport).then(
+      ({consumer, stream, kind}) => {
+        consumers.set(consumer.id, consumer);
+
+        if (kind === 'video') {
+          videoRef.current.srcObject = stream;
+        } else {
+          audioRef.current.srcObject = stream;
+        }
+
+        consumer.on(
+          'trackended',
+          () => {
+            removeConsumer(consumer.id, king)
+          }
+        );
+
+        consumer.on(
+          'transportclose',
+          () => {
+            removeConsumer(consumer.id, kind)
+          }
+        )
+      }
+    )
   };
 
   const getParticipantName = () => {
@@ -316,24 +370,28 @@ const MeetingParticipant = (props) => {
     <>
       {
         <div className={'col-*-* meeting-participant-container'}
-             style={{padding: props.padding ? props.padding : null, height: props.height ? props.height : null, color: 'white'}}>
+             style={{
+               padding: props.padding ? props.padding : null,
+               height: props.height ? props.height : null,
+               color: 'white'
+             }}>
           {
-            !videoMuted ?
+            <>
               <video
                 id={props.data.userId}
                 width={640}
                 height={320}
-                autoPlay muted={audioMuted} ref={videoRef}
+                autoPlay muted ref={videoRef}
                 style={{
                   width: '100%',
                   height: '100%'
                 }}
               />
-              :
-              audioMuted ?
-                <audio autoPlay muted ref={videoRef}/>
-                :
-                <audio autoPlay ref={videoRef}/>
+              {
+                !props.isCurrentUser &&
+                <audio autoPlay muted={audioMuted} ref={audioRef}/>
+              }
+            </>
           }
         </div>
       }
