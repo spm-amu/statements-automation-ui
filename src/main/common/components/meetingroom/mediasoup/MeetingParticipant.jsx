@@ -122,7 +122,7 @@ const MeetingParticipant = (props) => {
   }, [audioMuted]);
 
   const onAVSettingsChange = (payload) => {
-    alert("AV : " + payload.userId);
+    alert("AV : " + payload.userId + " : " + props.data.userId);
     if (props.data.userId === payload.userId) {
       if (payload.audioMuted) {
         stopProducing('audio');
