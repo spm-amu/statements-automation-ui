@@ -197,6 +197,16 @@ const MeetingParticipant = (props) => {
   }, []);
 
   const produce = async (type) => {
+    let deviceId;
+
+    navigator.mediaDevices.enumerateDevices().then((devices) =>
+      devices.forEach((device) => {
+        if ('videoinput' === device.kind) {
+          deviceId = device.deviceId;
+        }
+      })
+    );
+
     if (!device) {
       console.error('No available device');
       return;
@@ -224,7 +234,20 @@ const MeetingParticipant = (props) => {
       case 'video':
         mediaConstraints = {
           audio: false,
-          video: VIDEO_CONSTRAINTS
+          video: {
+            width: {
+              min: 640,
+              ideal: 1920
+            },
+            height: {
+              min: 400,
+              ideal: 1080
+            },
+            deviceId: deviceId
+            /*aspectRatio: {
+                            ideal: 1.7777777778
+                        }*/
+          }
         };
 
         break;
@@ -265,6 +288,7 @@ const MeetingParticipant = (props) => {
 
     let producer = await producerTransport.produce(params);
     console.log("\n\n\n\n\nPRODUCING TO : " + producer.id);
+    console.log("STREAM : " + stream.getVideoTracks()[0].id);
     producers.set(type, producer);
 
     videoRef.current.srcObject = stream;
@@ -278,6 +302,7 @@ const MeetingParticipant = (props) => {
     });
 
     producer.on('close', () => {
+      alert("CLOSING");
       stream.srcObject.getTracks().forEach(function (track) {
         track.stop()
       });
@@ -332,7 +357,7 @@ const MeetingParticipant = (props) => {
   };
 
   const consume = async (producerId) => {
-    mediaSoupHelper.getConsumeStream(producerId, props.rtpCapabilities, consumerTransport, props.meetingId, props.data.userId).then(
+    mediaSoupHelper.getConsumeStream(producerId, device.rtpCapabilities, consumerTransport, props.meetingId, appManager.getUserDetails().userId).then(
       ({consumer, stream, kind}) => {
         consumers.set(consumer.id, consumer);
 
