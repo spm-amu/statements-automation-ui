@@ -264,6 +264,7 @@ const MeetingParticipant = (props) => {
     }
 
     let producer = await producerTransport.produce(params);
+    console.log("\n\n\n\n\nPRODUCING TO : " + producer.id);
     producers.set(type, producer);
 
     videoRef.current.srcObject = stream;
@@ -384,7 +385,7 @@ const MeetingParticipant = (props) => {
                 id={props.data.userId}
                 width={640}
                 height={320}
-                autoPlay muted ref={videoRef}
+                autoPlay ref={videoRef}
                 style={{
                   width: '100%',
                   height: '100%'

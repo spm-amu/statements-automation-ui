@@ -138,6 +138,7 @@ class MediaSoupHelper {
   }
 
   getConsumeStream = async (producerId, rtpCapabilities, consumerTransport, roomId, userId) => {
+    console.log("\n\n\n\n\nCONSUMING FROM : " + producerId);
     const data = await socketManager.emitEvent(MessageType.CONSUME, {
       rtpCapabilities,
       consumerTransportId: consumerTransport.id,
