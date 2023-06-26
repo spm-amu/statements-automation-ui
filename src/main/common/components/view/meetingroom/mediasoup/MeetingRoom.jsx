@@ -118,6 +118,28 @@ const MeetingRoom = (props) => {
     }
   };
 
+  const addUser = (payload) => {
+    console.log("ADD USER : ", payload);
+    addUserToParticipants(payload.user);
+    setAllUserParticipantsLeft(false);
+    if (step === Steps.LOBBY) {
+      setStep(Steps.SESSION);
+      props.windowHandler.show();
+      setSideBarTab('People');
+      setSideBarOpen('true')
+    }
+
+    if (screenShared) {
+      // TODO : do the share screen stuff
+    }
+
+    handleMessageArrived({
+      message: payload.user.name + " has joined"
+    });
+
+    joinInAudio.play();
+  };
+
   const systemEventHandlerApi = () => {
     return {
       get id() {
@@ -239,7 +261,10 @@ const MeetingRoom = (props) => {
   /********************************* HANDSHAKE *******************************/
 
   function initMeetingSession() {
-    join();
+    if(step === Steps.LOBBY) {
+      join();
+    }
+
     /*if (isHost || isDirectCall || isRequestToJoin || autoPermit) {
       console.log("CALLING JOIN FROM INIT initMeetingSession()");
       join();
