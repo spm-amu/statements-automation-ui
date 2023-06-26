@@ -38,7 +38,7 @@ class MediaSoupHelper {
     let consumerTransport = device.createRecvTransport(data.params);
     consumerTransport.on(
       'connect',
-       ({dtlsParameters}, callback, errback) => {
+      function ({dtlsParameters}, callback, errback) {
         socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
           dtlsParameters,
           transportId: data.id,
@@ -46,12 +46,12 @@ class MediaSoupHelper {
           roomId
         }).then(callback)
           .catch(errback);
-      }
+      }.bind(this)
     );
 
     consumerTransport.on(
       'connectionstatechange',
-      async (state) => {
+      async function (state) {
         switch (state) {
           case 'connecting':
             break;
@@ -63,7 +63,7 @@ class MediaSoupHelper {
           default:
             break
         }
-      }
+      }.bind(this)
     );
 
     return consumerTransport;
@@ -85,7 +85,7 @@ class MediaSoupHelper {
     let producerTransport = device.createSendTransport(data.params);
     producerTransport.on(
       'connect',
-      async ({dtlsParameters}, callback, errback) => {
+      async function ({dtlsParameters}, callback, errback) {
         socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
           dtlsParameters,
           transportId: data.id,
@@ -93,12 +93,12 @@ class MediaSoupHelper {
           userId
         }).then(callback)
           .catch(errback);
-      }
+      }.bind(this)
     );
 
     producerTransport.on(
       'produce',
-      async ({kind, rtpParameters}, callback, errback) => {
+      async function ({kind, rtpParameters}, callback, errback) {
         try {
           const {producerId} = socketManager.emitEvent(MessageType.PRODUCE, {
             producerTransportId: producerTransport.id,
@@ -115,12 +115,12 @@ class MediaSoupHelper {
         } catch (err) {
           errback(err)
         }
-      }
+      }.bind(this)
     );
 
     producerTransport.on(
       'connectionstatechange',
-      (state) => {
+      function (state) {
         switch (state) {
           case 'connecting':
             break;
@@ -132,7 +132,7 @@ class MediaSoupHelper {
           default:
             break
         }
-      }
+      }.bind(this)
     );
 
     return producerTransport;
