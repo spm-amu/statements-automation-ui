@@ -100,14 +100,13 @@ class MediaSoupHelper {
       'produce',
       async function ({kind, rtpParameters}, callback, errback) {
         try {
-          const {producerId} = socketManager.emitEvent(MessageType.PRODUCE, {
+          const {producerId} = await socketManager.emitEvent(MessageType.PRODUCE, {
             producerTransportId: producerTransport.id,
             kind,
             rtpParameters,
             roomId,
             userId
-          }).then(callback)
-            .catch(errback);
+          });
 
           callback({
             id: producerId

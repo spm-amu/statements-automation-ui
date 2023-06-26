@@ -264,9 +264,6 @@ const MeetingParticipant = (props) => {
     }
 
     let producer = await producerTransport.produce(params);
-    if(!producer.id) {
-      producer.id = props.data.userId + "-video-producer";
-    }
     producers.set(type, producer);
 
     videoRef.current.srcObject = stream;
