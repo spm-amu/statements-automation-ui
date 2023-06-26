@@ -335,6 +335,7 @@ const MeetingParticipant = (props) => {
         consumers.set(consumer.id, consumer);
 
         if (kind === 'video') {
+          stream.getVideoTracks()[0].enabled = true;
           videoRef.current.srcObject = stream;
         } else {
           audioRef.current.srcObject = stream;
