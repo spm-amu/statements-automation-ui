@@ -7,6 +7,7 @@ import Grid from "@material-ui/core/Grid";
 import MeetingParticipant from "../mediasoup/MeetingParticipant";
 import Box from "@material-ui/core/Box";
 import appManager from "../../../service/AppManager";
+import mediaSoupHelper from "./MediaSoupHelper";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
@@ -15,7 +16,8 @@ const VH = 60;
 const MeetingParticipantGrid = (props) => {
   const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
   const [inViewParticipants, setInViewParticipants] = React.useState([]);
-  const [activeOffViewParticipants, setActiveOffViewParticipants] = React.useState([]);
+  const [consumerTransport, setConsumerTransport] = React.useState(null);
+  const [participantDevice, setParticipantDevice] = React.useState(null);
   const [grid, setGrid] = React.useState(null);
   const {
     waitingList,
@@ -28,6 +30,16 @@ const MeetingParticipantGrid = (props) => {
     autoPermit,
     rtpCapabilities
   } = props;
+
+  const setupSelfDevices = async () => {
+    let participantDevice = await mediaSoupHelper.getParticipantDevice(props.rtpCapabilities);
+    setParticipantDevice(participantDevice);
+    setConsumerTransport(await mediaSoupHelper.initConsumerTransport(participantDevice, meetingId, appManager.getUserDetails().userId));
+  };
+
+  useEffect(() => {
+    setupSelfDevices();
+  });
 
   useEffect(() => {
     if (props.participants && props.mode) {
@@ -103,7 +115,9 @@ const MeetingParticipantGrid = (props) => {
             }
             >
               <MeetingParticipant data={participant}
+                                  device={participantDevice}
                                   meetingId={meetingId}
+                                  consumerTransport={consumerTransport}
                                   rtpCapabilities={rtpCapabilities}
                                   onHostAudioMute={() => props.onHostAudioMute(participant)}
                                   onHostVideoMute={() => props.onHostVideoMute(participant)}
@@ -116,7 +130,7 @@ const MeetingParticipantGrid = (props) => {
   };
 
   return (
-    grid !== null ?
+    grid !== null && participantDevice ?
       <div className={'row grid'}
            style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
         {
@@ -187,6 +201,7 @@ const MeetingParticipantGrid = (props) => {
           currentUserParticipant &&
           <div style={{width: '200px', height: '120px', position: 'absolute', right: '4px', bottom: '0'}}>
             <MeetingParticipant data={currentUserParticipant}
+                                device={participantDevice}
                                 meetingId={meetingId}
                                 rtpCapabilities={rtpCapabilities}
                                 isCurrentUser={true}
