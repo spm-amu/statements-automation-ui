@@ -157,6 +157,7 @@ class MediaSoupHelper {
       codecOptions
     });
 
+    console.log(consumer.track);
     const stream = new MediaStream();
     stream.addTrack(consumer.track);
 
