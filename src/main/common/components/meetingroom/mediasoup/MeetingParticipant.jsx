@@ -118,17 +118,28 @@ const MeetingParticipant = (props) => {
       if (props.soundMonitor && !props.inView) {
         props.soundMonitor(props.data.userId, true);
       }
-
-      stopProducing('audio');
-    } else {
-      if(device) {
-        produce('audio');
-      }
     }
   }, [audioMuted]);
 
   const onAVSettingsChange = (payload) => {
+    alert("AV : " + payload.userId);
     if (props.data.userId === payload.userId) {
+      if (payload.audioMuted) {
+        stopProducing('audio');
+      } else {
+        if(device) {
+          produce('audio');
+        }
+      }
+
+      if (payload.videoMuted) {
+        stopProducing('video');
+      } else {
+        if(device) {
+          produce('video');
+        }
+      }
+
       setAudioMuted(payload.audioMuted);
       setVideoMuted(payload.videoMuted);
     }
@@ -138,13 +149,6 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
-    if (videoMuted) {
-      stopProducing('video');
-    } else {
-      if(device) {
-        produce('video');
-      }
-    }
   }, [videoMuted]);
 
   useEffect(() => {
@@ -275,6 +279,26 @@ const MeetingParticipant = (props) => {
   };
 
   const stopProducing = (type) => {
+    if (!producers.has(type)) {
+      console.log('There is no producer for this type ' + type);
+      return;
+    }
+
+    let producerId = producers.get(type).id;
+    console.log('Close producer', producerId);
+
+    socketManager.emitEvent(MessageType.PRODUCER_CLOSED, {
+      userId: props.data.userId,
+      producerId,
+      roomId: props.meetingId
+    });
+
+    producers.get(type).close();
+    producers.delete(type);
+
+    videoRef.current.srcObject.getTracks().forEach(function (track) {
+      track.stop()
+    })
   };
 
   const getParticipantName = () => {

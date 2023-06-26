@@ -12,6 +12,7 @@ import ClosablePanel from "../../../layout/ClosablePanel";
 import Utils from "../../../../Utils";
 import MeetingParticipantGrid from "../../../meetingroom/mediasoup/MeetingParticipantGrid";
 import {post} from "../../../../service/RestService";
+import soundMonitor from "../../../../service/SoundMonitor";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -194,6 +195,31 @@ const MeetingRoom = (props) => {
   }
 
   /********************************** USE EFFECT **************************************/
+
+  useEffect(() => {
+    if (audioMuted !== null) {
+      onAVSettingsChange({
+        userId: appManager.getUserDetails().userId,
+        videoMuted,
+        audioMuted
+      });
+
+      emitAVSettingsChange();
+      //soundMonitor.setAudioMuted(audioMuted);
+    }
+  }, [audioMuted]);
+
+  useEffect(() => {
+    if (videoMuted !== null) {
+      onAVSettingsChange({
+        userId: appManager.getUserDetails().userId,
+        videoMuted,
+        audioMuted
+      });
+
+      emitAVSettingsChange();
+    }
+  }, [videoMuted]);
 
   useEffect(() => {
     if (displayState) {
