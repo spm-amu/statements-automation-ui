@@ -263,17 +263,16 @@ const MeetingParticipant = (props) => {
     }
 
     let producer = await producerTransport.produce(params);
-    alert(producer.id);
-    console.log('Producer', producer);
     producers.set(type, producer);
 
     videoRef.current.srcObject = stream;
     producer.on('transportclose', () => {
-      stream.getTracks().forEach(function (track) {
+      videoRef.current.srcObject.getTracks().forEach(function (track) {
         track.stop()
       });
 
-      producers.delete(type)
+      videoRef.current.parentNode.removeChild(elem);
+      this.producers.delete(type)
     });
 
     producer.on('close', () => {
@@ -281,7 +280,7 @@ const MeetingParticipant = (props) => {
         track.stop()
       });
 
-      producers.delete(type)
+      this.producers.delete(type)
     });
   };
 
@@ -292,7 +291,6 @@ const MeetingParticipant = (props) => {
     }
 
     let producerId = producers.get(type).id;
-    console.log("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCLOSING : ", producers.get(type));
     console.log('Close producer', producerId);
 
     socketManager.emitEvent(MessageType.PRODUCER_CLOSED, {
@@ -337,8 +335,17 @@ const MeetingParticipant = (props) => {
         consumers.set(consumer.id, consumer);
 
         if (kind === 'video') {
-          stream.getVideoTracks()[0].enabled = true;
-          videoRef.current.srcObject = stream;
+          //videoRef.current.srcObject = stream;
+          let userMedia = navigator.mediaDevices
+            .getUserMedia({
+              audio: true,
+              video: VIDEO_CONSTRAINTS
+            });
+
+          userMedia
+            .then((stream) => {
+              videoRef.current.srcObject = stream;
+            });
         } else {
           audioRef.current.srcObject = stream;
         }
