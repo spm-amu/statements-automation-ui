@@ -263,16 +263,17 @@ const MeetingParticipant = (props) => {
     }
 
     let producer = await producerTransport.produce(params);
+    alert(producer.id);
+    console.log('Producer', producer);
     producers.set(type, producer);
 
     videoRef.current.srcObject = stream;
     producer.on('transportclose', () => {
-      videoRef.current.srcObject.getTracks().forEach(function (track) {
+      stream.getTracks().forEach(function (track) {
         track.stop()
       });
 
-      videoRef.current.parentNode.removeChild(elem);
-      this.producers.delete(type)
+      producers.delete(type)
     });
 
     producer.on('close', () => {
@@ -280,7 +281,7 @@ const MeetingParticipant = (props) => {
         track.stop()
       });
 
-      this.producers.delete(type)
+      producers.delete(type)
     });
   };
 
@@ -291,6 +292,7 @@ const MeetingParticipant = (props) => {
     }
 
     let producerId = producers.get(type).id;
+    console.log("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCLOSING : ", producers.get(type));
     console.log('Close producer', producerId);
 
     socketManager.emitEvent(MessageType.PRODUCER_CLOSED, {
