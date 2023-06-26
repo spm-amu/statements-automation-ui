@@ -185,7 +185,7 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
-    socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
+    socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS);
 
     setupDevice();
 
@@ -303,7 +303,7 @@ const MeetingParticipant = (props) => {
     producers.delete(type);
 
     let stream = type === 'video' ? videoRef.current.srcObject : audioRef.current.srcObject;
-    if(stream) {
+    if (stream) {
       stream.getTracks().forEach(function (track) {
         track.stop()
       })
@@ -311,15 +311,16 @@ const MeetingParticipant = (props) => {
   };
 
   const onNewProducers = (producers) => {
-    console.log("CONSUMING : ", producers);
     for (const producer of producers) {
-      consume(producer.id);
+      if(producer.userId === props.data.userId) {
+        consume(producer.producerId);
+      }
     }
   };
 
   const removeConsumer = (consumerId, type) => {
     let stream = type === 'video' ? videoRef.current.srcObject : audioRef.current.srcObject;
-    if(stream) {
+    if (stream) {
       stream.getTracks().forEach(function (track) {
         track.stop()
       })
@@ -329,7 +330,7 @@ const MeetingParticipant = (props) => {
   };
 
   const consume = async (producerId) => {
-    mediaSoupHelper.getConsumeStream(producerId, props.rtpCapabilities, consumerTransport).then(
+    mediaSoupHelper.getConsumeStream(producerId, props.rtpCapabilities, consumerTransport, props.meetingId, props.data.userId).then(
       ({consumer, stream, kind}) => {
         consumers.set(consumer.id, consumer);
 
@@ -339,10 +340,13 @@ const MeetingParticipant = (props) => {
           audioRef.current.srcObject = stream;
         }
 
+        setVideoMuted(true);
+        setVideoMuted(false);
+
         consumer.on(
           'trackended',
           () => {
-            removeConsumer(consumer.id, king)
+            removeConsumer(consumer.id, kind)
           }
         );
 

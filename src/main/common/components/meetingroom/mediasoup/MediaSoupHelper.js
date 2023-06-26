@@ -41,7 +41,9 @@ class MediaSoupHelper {
       function ({dtlsParameters}, callback, errback) {
         socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
           dtlsParameters,
-          transportId: data.id
+          transportId: data.id,
+          userId,
+          roomId
         }).then(callback)
           .catch(errback);
       }.bind(this)
@@ -136,10 +138,11 @@ class MediaSoupHelper {
     return producerTransport;
   }
 
-  getConsumeStream = async (producerId, rtpCapabilities, consumerTransport) => {
+  getConsumeStream = async (producerId, rtpCapabilities, consumerTransport, roomId, userId) => {
     const data = await socketManager.emitEvent(MessageType.CONSUME, {
       rtpCapabilities,
       consumerTransportId: consumerTransport.id,
+      producerId,
       roomId,
       userId
     });
