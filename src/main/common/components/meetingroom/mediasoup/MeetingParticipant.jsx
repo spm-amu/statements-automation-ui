@@ -29,14 +29,13 @@ const MeetingParticipant = (props) => {
   const [producers] = React.useState(new Map());
   const [consumers] = React.useState(new Map());
   const [soundLevel, setSoundLevel] = React.useState(0);
-  const [producerTransport, setProducerTransport] = React.useState(null);
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
   const audioRef = useRef();
   const soundLevelCounter = useRef(0);
   const showVideo = true;
-  const {consumerTransport, device} = props;
+  const {consumerTransport, producerTransport, device} = props;
 
   const handler = () => {
     return {
@@ -173,18 +172,10 @@ const MeetingParticipant = (props) => {
     }
   }, [producerTransport]);
 
-  const setupDevice = async () => {
-    if (props.isCurrentUser) {
-      setProducerTransport(await mediaSoupHelper.initProducerTransport(props.participantDevice, props.meetingId, props.data.userId));
-    }
-  };
-
   useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS);
-
-    setupDevice();
 
     return () => {
       appManager.removeSubscriptions(systemEventHandler);

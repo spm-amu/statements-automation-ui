@@ -18,6 +18,7 @@ const MeetingParticipantGrid = (props) => {
   const [inViewParticipants, setInViewParticipants] = React.useState([]);
   const [consumerTransport, setConsumerTransport] = React.useState(null);
   const [participantDevice, setParticipantDevice] = React.useState(null);
+  const [producerTransport, setProducerTransport] = React.useState(null);
   const [grid, setGrid] = React.useState(null);
   const {
     waitingList,
@@ -32,14 +33,15 @@ const MeetingParticipantGrid = (props) => {
   } = props;
 
   const setupSelfDevices = async () => {
-    let participantDevice = await mediaSoupHelper.getParticipantDevice(props.rtpCapabilities);
-    setParticipantDevice(participantDevice);
-    setConsumerTransport(await mediaSoupHelper.initConsumerTransport(participantDevice, meetingId, appManager.getUserDetails().userId));
+    let device = await mediaSoupHelper.getParticipantDevice(rtpCapabilities);
+    setParticipantDevice(device);
+    setConsumerTransport(await mediaSoupHelper.initConsumerTransport(device, meetingId, appManager.getUserDetails().userId));
+    setProducerTransport(await mediaSoupHelper.initProducerTransport(device, meetingId, appManager.getUserDetails().userId));
   };
 
   useEffect(() => {
     setupSelfDevices();
-  });
+  }, []);
 
   useEffect(() => {
     if (props.participants && props.mode) {
@@ -205,6 +207,7 @@ const MeetingParticipantGrid = (props) => {
                                 meetingId={meetingId}
                                 rtpCapabilities={rtpCapabilities}
                                 isCurrentUser={true}
+                                producerTransport={producerTransport}
                                 audioMuted={audioMuted}
                                 videoMuted={videoMuted}
                                 onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
