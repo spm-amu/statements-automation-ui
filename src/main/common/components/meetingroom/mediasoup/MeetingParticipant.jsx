@@ -340,9 +340,6 @@ const MeetingParticipant = (props) => {
           audioRef.current.srcObject = stream;
         }
 
-        setVideoMuted(true);
-        setVideoMuted(false);
-
         consumer.on(
           'trackended',
           () => {
