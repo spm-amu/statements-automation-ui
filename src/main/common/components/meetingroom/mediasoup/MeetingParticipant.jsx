@@ -122,21 +122,22 @@ const MeetingParticipant = (props) => {
   }, [audioMuted]);
 
   const onAVSettingsChange = (payload) => {
-    alert("AV : " + payload.userId + " : " + props.data.userId);
     if (props.data.userId === payload.userId) {
-      if (payload.audioMuted) {
-        stopProducing('audio');
-      } else {
-        if(device) {
-          produce('audio');
+      if(props.isCurrentUser) {
+        if (payload.audioMuted) {
+          stopProducing('audio');
+        } else {
+          if (device) {
+            produce('audio');
+          }
         }
-      }
 
-      if (payload.videoMuted) {
-        stopProducing('video');
-      } else {
-        if(device) {
-          produce('video');
+        if (payload.videoMuted) {
+          stopProducing('video');
+        } else {
+          if (device) {
+            produce('video');
+          }
         }
       }
 
