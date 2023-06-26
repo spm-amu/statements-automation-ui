@@ -53,6 +53,7 @@ const MeetingParticipant = (props) => {
             onLowerHand(be.payload);
             break;
           case MessageType.NEW_PRODUCERS:
+            alert("NEW_PRODUCERS");
             onNewProducers(be.payload);
             break;
         }
@@ -263,24 +264,27 @@ const MeetingParticipant = (props) => {
     }
 
     let producer = await producerTransport.produce(params);
+    if(!producer.id) {
+      producer.id = props.data.userId + "-video-producer";
+    }
     producers.set(type, producer);
 
     videoRef.current.srcObject = stream;
     producer.on('transportclose', () => {
-      videoRef.current.srcObject.getTracks().forEach(function (track) {
+      stream.srcObject.getTracks().forEach(function (track) {
         track.stop()
       });
 
-      videoRef.current.parentNode.removeChild(elem);
-      this.producers.delete(type)
+      stream.parentNode.removeChild(elem);
+      producers.delete(type)
     });
 
     producer.on('close', () => {
-      videoRef.current.srcObject.getTracks().forEach(function (track) {
+      stream.srcObject.getTracks().forEach(function (track) {
         track.stop()
       });
 
-      this.producers.delete(type)
+      producers.delete(type)
     });
   };
 
@@ -334,18 +338,9 @@ const MeetingParticipant = (props) => {
       ({consumer, stream, kind}) => {
         consumers.set(consumer.id, consumer);
 
+        alert("CONSUME : " + kind);
         if (kind === 'video') {
-          //videoRef.current.srcObject = stream;
-          let userMedia = navigator.mediaDevices
-            .getUserMedia({
-              audio: true,
-              video: VIDEO_CONSTRAINTS
-            });
-
-          userMedia
-            .then((stream) => {
-              videoRef.current.srcObject = stream;
-            });
+          videoRef.current.srcObject = stream;
         } else {
           audioRef.current.srcObject = stream;
         }
