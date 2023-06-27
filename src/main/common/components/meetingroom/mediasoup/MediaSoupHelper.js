@@ -84,7 +84,6 @@ class MediaSoupHelper {
       return;
     }
 
-    alert(123);
     console.log("\n\n\n\n\nPRODUCER PARAMS : ", data.params);
     let producerTransport = device.createSendTransport(data.params);
     producerTransport.on(
