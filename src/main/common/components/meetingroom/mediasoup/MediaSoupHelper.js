@@ -92,7 +92,7 @@ class MediaSoupHelper {
         console.log("\n\n\n\n\nPRODUCER CONNECT DTLS PARAMS : ", dtlsParameters);
         socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
           dtlsParameters,
-          transportId: data.id,
+          transportId: producerTransport.id,
           roomId,
           userId
         }).then(callback)
@@ -130,7 +130,7 @@ class MediaSoupHelper {
           case 'connected':
             break;
           case 'failed':
-            this.producerTransport.close();
+            producerTransport.close();
             break;
           default:
             break

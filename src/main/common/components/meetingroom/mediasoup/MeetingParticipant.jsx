@@ -398,7 +398,6 @@ const MeetingParticipant = (props) => {
                 id={props.data.userId}
                 width={640}
                 height={320}
-                controls
                 autoPlay ref={videoRef}
                 style={{
                   width: '100%',

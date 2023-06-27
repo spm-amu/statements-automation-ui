@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {LARGE} from 'material-ui/utils/withWidth';
 import PropTypes from 'prop-types';
 import Utils from '../../common/Utils'
@@ -12,21 +12,20 @@ import "./BasicBusinessAppDashboard.css"
 import {get, post} from '../../common/service/RestService';
 import socketManager from "../../common/service/SocketManager";
 import appManager from "../../common/service/AppManager";
-import Button from "@material-ui/core/Button";
 import tokenManager, {
   ACCESS_TOKEN_PROPERTY,
   LAST_LOGIN,
   REFRESH_TOKEN_PROPERTY
 } from "../../common/service/TokenManager";
 import {MessageType, SystemEventType} from '../../common/types';
-import LottieIcon from "../../common/components/LottieIcon";
 import LoadingIndicator from "../../common/components/LoadingIndicator";
 import Alert from "react-bootstrap/Alert";
 import {isChrome, isEdge, isIE, isSafari} from 'react-device-detect';
+import * as process from 'process';
+import io from "socket.io-client";
+import mediaSoupHelper from "../../common/components/meetingroom/mediasoup/MediaSoupHelper";
 
 const {electron} = window;
-
-import * as process from 'process';
 
 window.global = window;
 window.process = process;
@@ -60,6 +59,7 @@ const BasicBusinessAppDashboard = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activityMessage, setActivityMessage] = useState(null);
+  const vidTestRef = useRef();
 
   //const dispatch = useDispatch();
 
@@ -70,6 +70,122 @@ const BasicBusinessAppDashboard = (props) => {
   const handleBgClick = color => {
     setActiveColor(color);
   };
+
+  const test = async () => {
+    let socket = io.connect("https://localhost:8000");
+    socket.on("connect", () => {
+      socket.emit('createRoom', {
+        room_id: "123"
+      }, (id) => {
+      });
+
+      socket
+        .emit('join', {
+          name: 'amu',
+          room_id: '123'
+        }, async (e) => {
+          console.log('Joined to room', e);
+          socket.emit('getRouterRtpCapabilities', {}, async (rtpCapabilities) => {
+            let device = await mediaSoupHelper.getParticipantDevice(rtpCapabilities);
+            socket.emit('createWebRtcTransport', {
+              forceTcp: false,
+              rtpCapabilities: rtpCapabilities
+            }, (data) => {
+              if (data === 'error') {
+                console.error(data);
+                return;
+              }
+
+              console.log("\n\n\n\n\nPRODUCER PARAMS : ", data);
+              let producerTransport = device.createSendTransport(data);
+              producerTransport.on(
+                'connect',
+                async function ({dtlsParameters}, callback, errback) {
+                  console.log("\n\n\n\n\nPRODUCER CONNECT DTLS PARAMS : ", dtlsParameters);
+                  /*socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
+                    dtlsParameters,
+                    transportId: data.id,
+                    roomId,
+                    userId
+                  }).then(callback)
+                    .catch(errback);*/
+                }.bind(this)
+              );
+
+              producerTransport.on(
+                'produce',
+                async function ({kind, rtpParameters}, callback, errback) {
+                  /*try {
+                    const {producerId} = await socketManager.emitEvent(MessageType.PRODUCE, {
+                      producerTransportId: producerTransport.id,
+                      kind,
+                      rtpParameters,
+                      roomId,
+                      userId
+                    });
+
+                    callback({
+                      id: producerId
+                    })
+                  } catch (err) {
+                    errback(err)
+                  }*/
+                }.bind(this)
+              );
+
+              producerTransport.on(
+                'connectionstatechange',
+                function (state) {
+                  switch (state) {
+                    case 'connecting':
+                      break;
+                    case 'connected':
+                      break;
+                    case 'failed':
+                      producerTransport.close();
+                      break;
+                    default:
+                      break
+                  }
+                }.bind(this)
+              );
+
+              navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: true
+              }).then((stream) => {
+                const track = stream.getVideoTracks()[0];
+                const params = {
+                  track
+                };
+
+                vidTestRef.current.srcObject = stream;
+
+                producerTransport.produce(params).then((producer) => {
+                  console.log("\n\n\n\n\nPRODUCING TO : " + producer.id);
+                  console.log("STREAM : " + stream.getVideoTracks()[0].id);
+                });
+              });
+            });
+          });
+
+          //console.log("CAPABILITIES : ", data);
+          /*let device = await this.loadDevice(data)
+          this.device = device
+          await this.initTransports(device)
+          this.socket.emit('getProducers')*/
+        })
+    });
+
+    socket.on('disconnect', function () {
+    });
+  };
+
+  React.useEffect(() => {
+    if(vidTestRef.current) {
+      //test();
+    }
+  }, [vidTestRef.current]);
 
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
@@ -458,7 +574,7 @@ const BasicBusinessAppDashboard = (props) => {
         post(
           `${appManager.getAPIHost()}/api/v1/meeting/answerCall`,
           (response) => {
-            if ( args.payload.meetingJoinRequest ) {
+            if (args.payload.meetingJoinRequest) {
               socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
                 systemEventType: MessageType.REQUEST_TO_JOIN_MEETING_ANSWERED,
                 recipients: [
@@ -592,7 +708,7 @@ const BasicBusinessAppDashboard = (props) => {
     }*/
 
     //loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za", true);
-    loadHost("https://svn.agilemotion.co.za/vc", "https://localhost:8000", true);
+    loadHost("https://svn.agilemotion.co.za/vc", "https://0.0.0.0:8000", true);
   }, []);
 
   React.useEffect(() => {
@@ -727,101 +843,102 @@ const BasicBusinessAppDashboard = (props) => {
         </div>
         :
         userDetails &&
-          <>
-            <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>
-              <LoadingIndicator color={"#945c33"}/>
-              <Sidebar
-                {...props}
-                routes={routes}
-                utilsRoutes={utilsRoutes}
-                activeColor={"agility"}
-                secondaryThemeColor={secondaryThemeColor}
-                activeRouteMenu={'calendar'}
-                className={"sidebar"}
-                viewLauncher={(path) => {
-                  appManager.setCurrentView(path);
-                  navigate('/view/' + path);
-                }}
-                appLogoPath={props.appLogoPath}
-                logo={{
-                  outterLink: "",
-                  text: "",
-                  imgSrc: logo,
-                }}
-                closeSidebar={closeSidebar}
-              />{" "}
-              <div className="main-panel" data={activeColor}>
-                <div className="content">
-                  <div style={{height: '48px'}}>
-                    <HomeNavbar
-                      {...props}
-                      color={"#FFFFFF"}
-                      themeTextColor={"#ADA7A7"}
-                      brandText={getActiveRoute(routes)}
-                      sidebarOpened={sidebarOpened}
-                      userDetails={userDetails}
-                      avatar={props.avatar}
-                      settingsMenu={null}
-                      toggleSidebar={toggleSidebar}
-                      logoutCallBack={(e) => {
-                        appManager.remove("accessToken");
-                        appManager.remove("refreshToken");
-                        appManager.remove("lastLogin");
+        <>
+          {/*<video ref={vidTestRef} autoPlay />*/}
+          <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>
+            <LoadingIndicator color={"#945c33"}/>
+            <Sidebar
+              {...props}
+              routes={routes}
+              utilsRoutes={utilsRoutes}
+              activeColor={"agility"}
+              secondaryThemeColor={secondaryThemeColor}
+              activeRouteMenu={'calendar'}
+              className={"sidebar"}
+              viewLauncher={(path) => {
+                appManager.setCurrentView(path);
+                navigate('/view/' + path);
+              }}
+              appLogoPath={props.appLogoPath}
+              logo={{
+                outterLink: "",
+                text: "",
+                imgSrc: logo,
+              }}
+              closeSidebar={closeSidebar}
+            />{" "}
+            <div className="main-panel" data={activeColor}>
+              <div className="content">
+                <div style={{height: '48px'}}>
+                  <HomeNavbar
+                    {...props}
+                    color={"#FFFFFF"}
+                    themeTextColor={"#ADA7A7"}
+                    brandText={getActiveRoute(routes)}
+                    sidebarOpened={sidebarOpened}
+                    userDetails={userDetails}
+                    avatar={props.avatar}
+                    settingsMenu={null}
+                    toggleSidebar={toggleSidebar}
+                    logoutCallBack={(e) => {
+                      appManager.remove("accessToken");
+                      appManager.remove("refreshToken");
+                      appManager.remove("lastLogin");
 
-                        tokenManager.stopTokenRefreshMonitor();
+                      tokenManager.stopTokenRefreshMonitor();
 
-                        if (!isSafari && !isChrome && !isIE && !isEdge) {
-                          electron.ipcRenderer.sendMessage('removeTokens', {});
-                        }
+                      if (!isSafari && !isChrome && !isIE && !isEdge) {
+                        electron.ipcRenderer.sendMessage('removeTokens', {});
+                      }
 
-                        navigate("/login");
-                      }}
-                    />{" "}
-                  </div>
-                  <div>
-                    <div style={{
-                      padding: '0 32px 0 32px',
-                      maxHeight: '64px',
-                      width: '90%',
-                      zIndex: '1200',
-                      position: 'absolute'
-                    }}>
-                      <Alert
-                        variant={'danger'}
-                        show={errorMessage !== null}
-                        fade={true}
-                        onClose={() => {
-                          setErrorMessage(null)
-                        }}
-                        dismissible
-                      >
-                        <Alert.Heading>Error</Alert.Heading>
-                        <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{errorMessage}</p>
-                      </Alert>
-                      <Alert
-                        variant={'success'}
-                        show={successMessage !== null}
-                        fade={true}
-                      >
-                        <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
-                      </Alert>
-
-                      <Alert
-                        variant={'danger'}
-                        show={activityMessage !== null}
-                        fade={true}
-                      >
-                        <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{activityMessage}</p>
-                      </Alert>
-                    </div>
-                    <ViewPort/>
-                  </div>
+                      navigate("/login");
+                    }}
+                  />{" "}
                 </div>
-                {/*<HomeFooter fluid /> {" "}*/}
+                <div>
+                  <div style={{
+                    padding: '0 32px 0 32px',
+                    maxHeight: '64px',
+                    width: '90%',
+                    zIndex: '1200',
+                    position: 'absolute'
+                  }}>
+                    <Alert
+                      variant={'danger'}
+                      show={errorMessage !== null}
+                      fade={true}
+                      onClose={() => {
+                        setErrorMessage(null)
+                      }}
+                      dismissible
+                    >
+                      <Alert.Heading>Error</Alert.Heading>
+                      <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{errorMessage}</p>
+                    </Alert>
+                    <Alert
+                      variant={'success'}
+                      show={successMessage !== null}
+                      fade={true}
+                    >
+                      <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
+                    </Alert>
+
+                    <Alert
+                      variant={'danger'}
+                      show={activityMessage !== null}
+                      fade={true}
+                    >
+                      <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{activityMessage}</p>
+                    </Alert>
+                  </div>
+                  <ViewPort/>
+                </div>
               </div>
-              {" "}
+              {/*<HomeFooter fluid /> {" "}*/}
             </div>
-          </>
+            {" "}
+          </div>
+        </>
 
   );
 };
