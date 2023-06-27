@@ -51,7 +51,7 @@ const MeetingParticipant = (props) => {
             onLowerHand(be.payload);
             break;
           case MessageType.NEW_PRODUCERS:
-            alert("NEW_PRODUCERS");
+            //alert("NEW_PRODUCERS");
             onNewProducers(be.payload);
             break;
         }
@@ -276,6 +276,7 @@ const MeetingParticipant = (props) => {
     let producer = await producerTransport.produce(params);
     console.log("\n\n\n\n\nPRODUCING TO : " + producer.id);
     console.log("STREAM : " + stream.getVideoTracks()[0].id);
+    producerTransport.getStats().then((data) => console.log(data));
     producers.set(type, producer);
 
     videoRef.current.srcObject = stream;
@@ -397,6 +398,7 @@ const MeetingParticipant = (props) => {
                 id={props.data.userId}
                 width={640}
                 height={320}
+                controls
                 autoPlay ref={videoRef}
                 style={{
                   width: '100%',

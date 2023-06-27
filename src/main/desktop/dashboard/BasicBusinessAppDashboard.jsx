@@ -592,7 +592,7 @@ const BasicBusinessAppDashboard = (props) => {
     }*/
 
     //loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za", true);
-    loadHost("https://svn.agilemotion.co.za/vc", "http://localhost:8000", true);
+    loadHost("https://svn.agilemotion.co.za/vc", "https://localhost:8000", true);
   }, []);
 
   React.useEffect(() => {

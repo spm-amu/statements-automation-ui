@@ -39,6 +39,7 @@ class MediaSoupHelper {
     consumerTransport.on(
       'connect',
       function ({dtlsParameters}, callback, errback) {
+        console.log("\n\n\n\n\nCONSUMER CONNECT DTLS PARAMS : ", dtlsParameters);
         socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
           dtlsParameters,
           transportId: data.id,
@@ -70,6 +71,7 @@ class MediaSoupHelper {
   }
 
   async initProducerTransport(device, roomId, userId) {
+    console.log("\n\n\n\nPRODUCER TRANSPORT CAPABILITIES : ", device.rtpCapabilities);
     const data = await socketManager.emitEvent(MessageType.CREATE_WEBRTC_TRANSPORT, {
       forceTcp: false,
       rtpCapabilities: device.rtpCapabilities,
@@ -82,10 +84,13 @@ class MediaSoupHelper {
       return;
     }
 
+    alert(123);
+    console.log("\n\n\n\n\nPRODUCER PARAMS : ", data.params);
     let producerTransport = device.createSendTransport(data.params);
     producerTransport.on(
       'connect',
       async function ({dtlsParameters}, callback, errback) {
+        console.log("\n\n\n\n\nPRODUCER CONNECT DTLS PARAMS : ", dtlsParameters);
         socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
           dtlsParameters,
           transportId: data.id,
