@@ -25,6 +25,7 @@ const url = `${server}/update/${process.platform}/${app.getVersion()}`;
 
 //autoUpdater.setFeedURL({url})
 
+app.commandLine.appendSwitch('ignore-certificate-errors');
 app.commandLine.appendSwitch('force_high_performance_gpu');
 app.commandLine.appendSwitch('force_low_power_gpu');
 setInterval(() => {
