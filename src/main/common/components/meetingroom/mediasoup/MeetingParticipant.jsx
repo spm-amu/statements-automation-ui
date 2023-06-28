@@ -282,6 +282,7 @@ const MeetingParticipant = (props) => {
     } else {
       videoRef.current.srcObject = stream;
     }
+
     producer.on('transportclose', () => {
       stream.srcObject.getTracks().forEach(function (track) {
         track.stop()
