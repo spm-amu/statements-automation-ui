@@ -285,6 +285,24 @@ const MeetingRoom = (props) => {
     }
   }, [audioMuted]);
 
+  useEffect(() => {
+    if (allUserParticipantsLeft) {
+      if (!isDirectCall) {
+        // TODO : Introduce a new step for this
+        setStep(Steps.LOBBY);
+        setShowWhiteBoard(false);
+        setMeetingParticipantGridMode('DEFAULT');
+        if (screenShared) {
+          stopShareScreen();
+        }
+
+        props.windowHandler.hide();
+      } else {
+        endCall();
+        onCallEnded();
+      }
+    }
+  }, [allUserParticipantsLeft]);
   /******************************** END USE EFFECT ************************************/
 
   /********************************* HANDSHAKE *******************************/
@@ -478,16 +496,12 @@ const MeetingRoom = (props) => {
         const newParticipants = participants.filter((p) => p.userId !== userId);
 
         if (newParticipants.length === 0 && isDirectCall) {
-          setStep(Steps.SESSION_ENDED);
           onCallEnded();
           props.closeHandler();
         } else {
           setParticipants(newParticipants);
           if (newParticipants.length === 0 && step !== Steps.CONNECTION_ERROR) {
-            //onCallEnded();
-            //props.closeHandler();
             setAllUserParticipantsLeft(true);
-            setStep(Steps.SESSION_ENDED);
 
             get(
               `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,
