@@ -112,7 +112,7 @@ const MeetingParticipant = (props) => {
       props.soundMonitor(props.data.userId, soundLevelCounter.current === 0 || audioMuted);
 
       // Just ensuring that the src object is always set if there is incoming
-      videoRef.current.srcObject = props.data.stream;
+      //videoRef.current.srcObject = props.data.stream;
     }
   }, [soundLevel]);
 
@@ -277,7 +277,11 @@ const MeetingParticipant = (props) => {
     producerTransport.getStats().then((data) => console.log(data));
     producers.set(type, producer);
 
-    videoRef.current.srcObject = stream;
+    if(type === 'audio') {
+      videoRef.current.srcObject = stream;
+    } else {
+      audioRef.current.srcObject = stream;
+    }
     producer.on('transportclose', () => {
       stream.srcObject.getTracks().forEach(function (track) {
         track.stop()
@@ -288,7 +292,6 @@ const MeetingParticipant = (props) => {
     });
 
     producer.on('close', () => {
-      alert("CLOSING");
       stream.srcObject.getTracks().forEach(function (track) {
         track.stop()
       });
