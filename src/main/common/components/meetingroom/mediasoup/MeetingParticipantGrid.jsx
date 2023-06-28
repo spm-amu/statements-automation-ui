@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {Fragment, useEffect} from 'react';
+import React, {Fragment, useEffect, useRef} from 'react';
 import './MeetingParticipantGrid.css';
 import LobbyWaitingList from "../LobbyWaitingList";
 import Lobby from "../Lobby";
@@ -9,6 +9,8 @@ import Box from "@material-ui/core/Box";
 import appManager from "../../../service/AppManager";
 import mediaSoupHelper from "./MediaSoupHelper";
 import socketManager from "../../../service/SocketManager";
+import Tracks from "./Tracks";
+import Transports from "./Transports";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
@@ -21,6 +23,7 @@ const MeetingParticipantGrid = (props) => {
   const [participantDevice, setParticipantDevice] = React.useState(null);
   const [producerTransport, setProducerTransport] = React.useState(null);
   const [grid, setGrid] = React.useState(null);
+  const transports = useRef(new Transports());
   const {
     waitingList,
     mode,
@@ -36,15 +39,20 @@ const MeetingParticipantGrid = (props) => {
   const setupSelfDevices = async () => {
     let device = await mediaSoupHelper.getParticipantDevice(rtpCapabilities);
     setParticipantDevice(device);
-    setConsumerTransport(await mediaSoupHelper.initConsumerTransport(device, meetingId, appManager.getUserDetails().userId));
-    setProducerTransport(await mediaSoupHelper.initProducerTransport(device, meetingId, appManager.getUserDetails().userId));
+    let consumerTransport = await mediaSoupHelper.initConsumerTransport(device, meetingId, appManager.getUserDetails().userId);
+    setConsumerTransport(consumerTransport);
+    let producerTransport = await mediaSoupHelper.initProducerTransport(device, meetingId, appManager.getUserDetails().userId);
+    setProducerTransport(producerTransport);
+
+    transports.current.setConsumerTransport(consumerTransport);
+    transports.current.setProducerTransport(producerTransport);
   };
 
   useEffect(() => {
     setupSelfDevices();
     return () => {
-      consumerTransport.close();
-      producerTransport.close();
+      transports.current.closeConsumerTransport();
+      transports.current.closeProducerTransport();
     };
   }, []);
 

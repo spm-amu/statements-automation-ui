@@ -8,8 +8,8 @@ export default class Tracks {
     }
   };
 
-  setVideoTrack = () => {
-    this.setVideoTrack();
+  setVideoTrack = (track) => {
+    this.videoTrack = track;
   };
 
   stopAudioTrack = () => {
@@ -18,7 +18,7 @@ export default class Tracks {
     }
   };
 
-  setAudioTrack = () => {
-    this.setAudioTrack();
+  setAudioTrack = (track) => {
+    this.audioTrack = track;
   }
 }
