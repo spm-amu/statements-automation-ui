@@ -138,10 +138,9 @@ const MeetingRoom = (props) => {
       message: payload.user.name + " has joined"
     });
 
-    try {
-      joinInAudio.play();
-    } catch(e) {
-    }
+    joinInAudio.play().catch((e) => {
+      console.log(e);
+    });
   };
 
   const systemEventHandlerApi = () => {
