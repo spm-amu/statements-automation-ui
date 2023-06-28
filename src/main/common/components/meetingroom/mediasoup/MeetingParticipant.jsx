@@ -302,7 +302,7 @@ const MeetingParticipant = (props) => {
       userId: props.data.userId,
       producerId,
       roomId: props.meetingId
-    });
+    }).catch((e) => console.log("PRODUCER_CLOSED ERROR : ", e));
 
     producers.get(type).close();
     producers.delete(type);
