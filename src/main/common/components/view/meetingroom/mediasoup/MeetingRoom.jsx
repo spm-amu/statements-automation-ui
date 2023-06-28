@@ -688,7 +688,6 @@ const MeetingRoom = (props) => {
         </div>
       </div>
       {
-        rtpCapabilities &&
         <div className={'footer-container no-margin no-padding'}>
           <Footer audioMuted={audioMuted}
                   hasUnreadChats={hasUnreadChats}
