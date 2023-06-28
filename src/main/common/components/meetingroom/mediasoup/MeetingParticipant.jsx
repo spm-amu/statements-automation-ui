@@ -274,8 +274,6 @@ const MeetingParticipant = (props) => {
     }
 
     let producer = await producerTransport.produce(params);
-    console.log("\n\n\n\n\nPRODUCING TO : " + producer.id);
-    console.log("STREAM : " + stream.getVideoTracks()[0].id);
     producerTransport.getStats().then((data) => console.log(data));
     producers.set(type, producer);
 
