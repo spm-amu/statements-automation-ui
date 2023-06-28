@@ -11,8 +11,7 @@ import MeetingRoomSideBarContent from "../../../meetingroom/SideBarContent";
 import ClosablePanel from "../../../layout/ClosablePanel";
 import Utils from "../../../../Utils";
 import MeetingParticipantGrid from "../../../meetingroom/mediasoup/MeetingParticipantGrid";
-import {post} from "../../../../service/RestService";
-import soundMonitor from "../../../../service/SoundMonitor";
+import {get, post} from "../../../../service/RestService";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -291,7 +290,7 @@ const MeetingRoom = (props) => {
   /********************************* HANDSHAKE *******************************/
 
   function initMeetingSession() {
-    if(step === Steps.LOBBY) {
+    if (step === Steps.LOBBY) {
       join();
     }
 
@@ -464,6 +463,45 @@ const MeetingRoom = (props) => {
 
   const removeUser = (user) => {
 
+    console.log("REMOVING USER : ");
+    console.log(user);
+
+    if (selectedMeeting.id === user.meetingId) {
+      const userId = user.userId;
+      const find = participants.find((p) => p.userId === userId);
+
+      console.log("REMOVING USER - CHECKING USER : ");
+      console.log(find);
+
+      if (find) {
+        peerManager.removeFromUserToPeerMap(userId);
+        const newParticipants = participants.filter((p) => p.userId !== userId);
+
+        if (newParticipants.length === 0 && isDirectCall) {
+          setStep(Steps.SESSION_ENDED);
+          onCallEnded();
+          props.closeHandler();
+        } else {
+          setParticipants(newParticipants);
+          if (newParticipants.length === 0 && step !== Steps.CONNECTION_ERROR) {
+            //onCallEnded();
+            //props.closeHandler();
+            setAllUserParticipantsLeft(true);
+            setStep(Steps.SESSION_ENDED);
+
+            get(
+              `${appManager.getAPIHost()}/api/v1/meeting/end/${selectedMeeting.id}`,
+              (response) => {
+              },
+              (e) => {
+              },
+              '',
+              true
+            );
+          }
+        }
+      }
+    }
   };
 
   const endCall = (showMessage = true) => {
