@@ -8,6 +8,7 @@ import MeetingParticipant from "../mediasoup/MeetingParticipant";
 import Box from "@material-ui/core/Box";
 import appManager from "../../../service/AppManager";
 import mediaSoupHelper from "./MediaSoupHelper";
+import socketManager from "../../../service/SocketManager";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
@@ -41,6 +42,10 @@ const MeetingParticipantGrid = (props) => {
 
   useEffect(() => {
     setupSelfDevices();
+    return () => {
+      consumerTransport.close();
+      producerTransport.close();
+    };
   }, []);
 
   useEffect(() => {

@@ -262,6 +262,8 @@ const MeetingRoom = (props) => {
         stopRecordingMeeting();
       }
 
+      endCall(false);
+
       socketManager.removeSubscriptions(eventHandler);
       appManager.removeSubscriptions(systemEventHandler);
       document.removeEventListener('sideBarToggleEvent', handleSidebarToggle);
