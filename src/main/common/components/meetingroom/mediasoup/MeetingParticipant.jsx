@@ -349,7 +349,7 @@ const MeetingParticipant = (props) => {
       ({consumer, stream, kind}) => {
         consumers.set(consumer.id, consumer);
 
-        alert("CONSUME : " + kind);
+        console.log("\n\n\n\n\n\n\n=====================================CONSUME : " + kind);
         if (kind === 'video') {
           videoRef.current.srcObject = stream;
         } else {
