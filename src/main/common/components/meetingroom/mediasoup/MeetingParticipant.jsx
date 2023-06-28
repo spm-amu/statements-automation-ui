@@ -396,7 +396,7 @@ const MeetingParticipant = (props) => {
                 id={props.data.userId}
                 width={640}
                 height={320}
-                autoPlay ref={videoRef}
+                autoPlay ref={videoRef} muted
                 style={{
                   width: '100%',
                   height: '100%'
