@@ -42,7 +42,7 @@ class MediaSoupHelper {
         console.log("\n\n\n\n\nCONSUMER CONNECT DTLS PARAMS : ", dtlsParameters);
         socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
           dtlsParameters,
-          transportId: data.id,
+          transportId: data.params.id,
           userId,
           roomId
         }).then(callback)
