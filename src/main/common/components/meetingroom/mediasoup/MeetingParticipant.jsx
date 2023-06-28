@@ -7,20 +7,7 @@ import appManager from "../../../../common/service/AppManager";
 import socketManager from "../../../../common/service/SocketManager";
 import mediaSoupHelper from "./MediaSoupHelper";
 import {Buffer} from "buffer/";
-
-const VIDEO_CONSTRAINTS = {
-  mandatory: {
-    width: {min: 160, ideal: 320, max: 640},
-    height: {min: 120, ideal: 240, max: 480},
-    frameRate: {
-      min: 15,
-      max: 15
-    },
-    googCpuOveruseDetection: true,
-    googCpuOveruseEncodeUsage: true,
-    googCpuOveruseThreshold: 70
-  }
-};
+import Tracks from "./Tracks";
 
 const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
@@ -33,6 +20,7 @@ const MeetingParticipant = (props) => {
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
   const audioRef = useRef();
+  const tracks = useRef(new Tracks());
   const soundLevelCounter = useRef(0);
   const showVideo = true;
   const {consumerTransport, producerTransport, device} = props;
@@ -125,6 +113,9 @@ const MeetingParticipant = (props) => {
     }
   }, [audioMuted]);
 
+  useEffect(() => {
+  }, [videoMuted]);
+
   const onAVSettingsChange = (payload) => {
     if (props.data.userId === payload.userId) {
       if (props.isCurrentUser) {
@@ -154,9 +145,6 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
-  }, [videoMuted]);
-
-  useEffect(() => {
     if (producerTransport) {
       if (videoMuted) {
         stopProducing('video');
@@ -178,6 +166,8 @@ const MeetingParticipant = (props) => {
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS);
 
     return () => {
+      stopProducing('audio');
+      stopProducing('video');
       appManager.removeSubscriptions(systemEventHandler);
       socketManager.removeSubscriptions(eventHandler);
     };
@@ -231,12 +221,8 @@ const MeetingParticipant = (props) => {
               ideal: 1080
             },
             deviceId: deviceId
-            /*aspectRatio: {
-                            ideal: 1.7777777778
-                        }*/
           }
         };
-
         break;
       default:
         return;
@@ -277,8 +263,8 @@ const MeetingParticipant = (props) => {
     producerTransport.getStats().then((data) => console.log(data));
     producers.set(type, producer);
 
-    if(type === 'audio') {
-      if(!props.isCurrentUser) {
+    if (type === 'audio') {
+      if (!props.isCurrentUser) {
         audioRef.current.srcObject = stream;
       }
     } else {
@@ -321,22 +307,18 @@ const MeetingParticipant = (props) => {
     producers.get(type).close();
     producers.delete(type);
 
-    if(type === 'audio') {
-      if(!props.isCurrentUser) {
-        audioRef.current.srcObject.getTracks().forEach(function (track) {
-          track.stop()
-        })
+    if (type === 'audio') {
+      if (!props.isCurrentUser) {
+        tracks.current.stopAudioTrack();
       }
     } else {
-      videoRef.current.srcObject.getTracks().forEach(function (track) {
-        track.stop()
-      })
+      tracks.current.stopVideoTrack();
     }
   };
 
   const onNewProducers = (producers) => {
     for (const producer of producers) {
-      if(producer.userId === props.data.userId) {
+      if (producer.userId === props.data.userId) {
         consume(producer.producerId);
       }
     }
@@ -358,11 +340,13 @@ const MeetingParticipant = (props) => {
       ({consumer, stream, kind}) => {
         consumers.set(consumer.id, consumer);
 
-        console.log("\n\n\n\n\n\n\n=====================================CONSUME : " + kind);
+        console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
         if (kind === 'video') {
           videoRef.current.srcObject = stream;
+          tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
         } else {
           audioRef.current.srcObject = stream;
+          tracks.current.setAudioTrack(stream.getAudioTracks()[0]);
         }
 
         consumer.on(
@@ -404,7 +388,7 @@ const MeetingParticipant = (props) => {
           {
             <>
               <video
-                id={props.data.userId}
+                id={props.data.userId + '-video'}
                 width={640}
                 height={320}
                 autoPlay ref={videoRef} muted
@@ -415,7 +399,7 @@ const MeetingParticipant = (props) => {
               />
               {
                 !props.isCurrentUser &&
-                <audio autoPlay muted={audioMuted} ref={audioRef}/>
+                <audio autoPlay muted={audioMuted} ref={audioRef} id={props.data.userId + '-audio'}/>
               }
             </>
           }
