@@ -278,7 +278,9 @@ const MeetingParticipant = (props) => {
     producers.set(type, producer);
 
     if(type === 'audio') {
-      audioRef.current.srcObject = stream;
+      if(!props.isCurrentUser) {
+        audioRef.current.srcObject = stream;
+      }
     } else {
       videoRef.current.srcObject = stream;
     }
@@ -319,9 +321,14 @@ const MeetingParticipant = (props) => {
     producers.get(type).close();
     producers.delete(type);
 
-    let stream = type === 'video' ? videoRef.current.srcObject : audioRef.current.srcObject;
-    if (stream) {
-      stream.getTracks().forEach(function (track) {
+    if(type === 'audio') {
+      if(!props.isCurrentUser) {
+        audioRef.current.srcObject.getTracks().forEach(function (track) {
+          track.stop()
+        })
+      }
+    } else {
+      videoRef.current.srcObject.getTracks().forEach(function (track) {
         track.stop()
       })
     }
