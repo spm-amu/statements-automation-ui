@@ -8,232 +8,283 @@ import MeetingParticipant from "../mediasoup/MeetingParticipant";
 import Box from "@material-ui/core/Box";
 import appManager from "../../../service/AppManager";
 import mediaSoupHelper from "./MediaSoupHelper";
-import socketManager from "../../../service/SocketManager";
-import Tracks from "./Tracks";
 import Transports from "./Transports";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
-const VH = 60;
+const VH = 64;
 
 const MeetingParticipantGrid = (props) => {
-  const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
-  const [inViewParticipants, setInViewParticipants] = React.useState([]);
-  const [consumerTransport, setConsumerTransport] = React.useState(null);
-  const [participantDevice, setParticipantDevice] = React.useState(null);
-  const [producerTransport, setProducerTransport] = React.useState(null);
-  const [grid, setGrid] = React.useState(null);
-  const transports = useRef(new Transports());
-  const {
-    waitingList,
-    mode,
-    step,
-    meetingId,
-    videoMuted,
-    audioMuted,
-    isHost,
-    autoPermit,
-    rtpCapabilities
-  } = props;
+    const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
+    const [inViewParticipants, setInViewParticipants] = React.useState([]);
+    const [consumerTransport, setConsumerTransport] = React.useState(null);
+    const [participantDevice, setParticipantDevice] = React.useState(null);
+    const [producerTransport, setProducerTransport] = React.useState(null);
+    const [mode, setMode] = React.useState('DEFAULT');
+    const [grid, setGrid] = React.useState(null);
+    const transports = useRef(new Transports());
+    const {
+      waitingList,
+      step,
+      meetingId,
+      whiteboardShown,
+      screenShared,
+      videoMuted,
+      audioMuted,
+      isHost,
+      autoPermit,
+      rtpCapabilities
+    } = props;
 
-  const setupSelfDevices = async () => {
-    let device = await mediaSoupHelper.getParticipantDevice(rtpCapabilities);
-    setParticipantDevice(device);
-    let consumerTransport = await mediaSoupHelper.initConsumerTransport(device, meetingId, appManager.getUserDetails().userId);
-    setConsumerTransport(consumerTransport);
-    let producerTransport = await mediaSoupHelper.initProducerTransport(device, meetingId, appManager.getUserDetails().userId);
-    setProducerTransport(producerTransport);
+    const setupSelfDevices = async () => {
+      let device = await mediaSoupHelper.getParticipantDevice(rtpCapabilities);
+      setParticipantDevice(device);
+      let consumerTransport = await mediaSoupHelper.initConsumerTransport(device, meetingId, appManager.getUserDetails().userId);
+      setConsumerTransport(consumerTransport);
+      let producerTransport = await mediaSoupHelper.initProducerTransport(device, meetingId, appManager.getUserDetails().userId);
+      setProducerTransport(producerTransport);
 
-    transports.current.setConsumerTransport(consumerTransport);
-    transports.current.setProducerTransport(producerTransport);
-  };
-
-  useEffect(() => {
-    setupSelfDevices();
-    return () => {
-      transports.current.closeConsumerTransport();
-      transports.current.closeProducerTransport();
+      transports.current.setConsumerTransport(consumerTransport);
+      transports.current.setProducerTransport(producerTransport);
     };
-  }, []);
 
-  useEffect(() => {
-    if (props.participants && props.mode) {
-      setCurrentUserParticipant({
-        isCurrentUser: true,
-        userId: appManager.getUserDetails().userId,
-        peer: null,
-        name: appManager.getUserDetails().name,
-        avatar: require('../../../../desktop/dashboard/images/noimage-person.png'),
-        videoMuted,
-        audioMuted
-      });
+    useEffect(() => {
+      setupSelfDevices();
+      return () => {
+        transports.current.closeConsumerTransport();
+        transports.current.closeProducerTransport();
+      };
+    }, []);
 
-      setupGrid();
-    }
-  }, [props.participants, props.mode]);
+    useEffect(() => {
+      if (props.participants) {
+        setCurrentUserParticipant({
+          isCurrentUser: true,
+          userId: appManager.getUserDetails().userId,
+          peer: null,
+          name: appManager.getUserDetails().name,
+          avatar: require('../../../../desktop/dashboard/images/noimage-person.png'),
+          videoMuted,
+          audioMuted
+        });
 
-  const setupGrid = () => {
-    let counter = 0;
-    inViewParticipants.splice(0, inViewParticipants.length);
-    for (const participant of props.participants) {
-      inViewParticipants.push(participant);
-      if (counter++ >= MAX_ROWS * MAX_COLS) {
-        break;
+        setupGrid();
       }
-    }
+    }, [props.participants]);
 
-    let inViewGrid = [];
-    let numRows = inViewParticipants.length < MAX_ROWS ? inViewParticipants.length : MAX_ROWS;
-    let rows = inViewParticipants.length === 2 ? 1 : numRows;
+    const setupGrid = () => {
+      let counter = 0;
+      inViewParticipants.splice(0, inViewParticipants.length);
+      for (const participant of props.participants) {
+        inViewParticipants.push(participant);
+        if (++counter >= MAX_ROWS * MAX_COLS) {
+          break;
+        }
+      }
 
-    if (props.mode === 'DEFAULT') {
+      let inViewGrid = [];
+      let numRows = inViewParticipants.length < MAX_ROWS ? inViewParticipants.length : MAX_ROWS;
+      let rows = inViewParticipants.length === 2 ? 1 : numRows;
+
       for (let i = 0; i < rows; i++) {
         inViewGrid.push([]);
       }
 
       let currentRowIndex = 0;
-      for (let i = 0; i < props.participants.length; i++) {
+      for (let i = 0; i < inViewParticipants.length; i++) {
         inViewGrid[currentRowIndex].push(props.participants[i]);
         if (currentRowIndex++ === rows - 1) {
           currentRowIndex = 0;
         }
       }
-    } else {
-      inViewGrid.push([]);
-      for (const inViewParticipant of inViewParticipants) {
-        inViewGrid[0].push(inViewParticipant);
-      }
-    }
 
-    setGrid(inViewGrid);
-  };
+      setGrid(inViewGrid);
+    };
 
-  const renderRow = (row, index) => {
-    return (
-      <Grid
-        style={{height: '100%'}}
-        key={index}
-        direction="row"
-        justifyContent="center"
-        alignItems="center" container item spacing={2}>
-        <React.Fragment>
-          {row.map((participant, index) => {
-            return <Grid item xs={4} key={index}
-                         className={'meetingParticipantContainer'} style={
-              {
-                borderRadius: '4px',
-                width: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
-                height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
-                flexBasis: null,
-                maxWidth: null
+    const renderRow = (row, index) => {
+      return (
+        <Grid
+          style={{height: '100%'}}
+          key={index}
+          direction="row"
+          justifyContent="center"
+          alignItems="center" container item spacing={2}>
+          <React.Fragment>
+            {row.map((participant, index) => {
+              return <Grid item xs={4} key={index}
+                           className={'meetingParticipantContainer'} style={
+                {
+                  borderRadius: '4px',
+                  width: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
+                  height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
+                  flexBasis: null,
+                  maxWidth: null
+                }
               }
-            }
-            >
-              <MeetingParticipant data={participant}
-                                  device={participantDevice}
-                                  meetingId={meetingId}
-                                  audioMuted={audioMuted}
-                                  videoMuted={videoMuted}
-                                  consumerTransport={consumerTransport}
-                                  rtpCapabilities={rtpCapabilities}
-                                  onHostAudioMute={() => props.onHostAudioMute(participant)}
-                                  onHostVideoMute={() => props.onHostVideoMute(participant)}
-                                  isHost={isHost}/>
-            </Grid>
-          })}
-        </React.Fragment>
-      </Grid>
-    )
-  };
-
-  return (
-    grid !== null && participantDevice ?
-      <div className={'row grid'}
-           style={{height: mode === 'DEFAULT' ? '100%' : null, width: '100%'}}>
-        {
-          step === "LOBBY" &&
-          <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState}
-                 meetingTitle={props.meetingTitle}/>
-        }
-        {
-          grid && mode === 'DEFAULT' && step !== "LOBBY" &&
-          <>
-            <Box sx={{
-              flexGrow: 1,
-              height: step === "LOBBY" ? null : '100%',
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-              display: 'flex'
-            }}>
-              <Grid container spacing={1} style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                border: '2px solid white'
-              }}>
-                {grid.map((row, index) => {
-                  return <div style={{
-                    width: "100%",
-                    height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh"
-                  }}>
-                    {
-                      <Fragment key={index}>
-                        {
-                          renderRow(row, index)
-                        }
-                      </Fragment>
-                    }
-                  </div>
-                })}
+              >
+                <MeetingParticipant data={participant}
+                                    device={participantDevice}
+                                    meetingId={meetingId}
+                                    audioMuted={audioMuted}
+                                    videoMuted={videoMuted}
+                                    consumerTransport={consumerTransport}
+                                    rtpCapabilities={rtpCapabilities}
+                                    onHostAudioMute={() => props.onHostAudioMute(participant)}
+                                    onHostVideoMute={() => props.onHostVideoMute(participant)}
+                                    isHost={isHost}/>
               </Grid>
-            </Box>
-          </>
-        }
-        {
-          (mode === 'STRIP' || step === "LOBBY") &&
-          <div className={'row'} style={{width: '100%', height: '120px', marginLeft: '0', marginRight: '0'}}>
+            })}
+          </React.Fragment>
+        </Grid>
+      )
+    };
+
+    return (
+      grid !== null && participantDevice ?
+        <div className={'row grid'}
+             style={{height: '100%', width: '100%', padding: '8px'}}>
+          {
+            step === "LOBBY" &&
+            <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState}
+                   meetingTitle={props.meetingTitle}/>
+          }
+          <div className={'row'} style={{
+            width: '100%',
+            height: '40px',
+            marginLeft: '0',
+            marginRight: '0',
+            border: '2px solid red',
+            display: 'flex',
+            alignItems: 'center',
+            color: 'white',
+            fontSize: '16px',
+            padding: '4px'
+          }}>
+            Amu is sharing
           </div>
-        }
-        {
-          ((waitingList && waitingList.length > 0)) &&
-          <div className={'no-side-margin no-side-padding grid-side-bar'} style={
-            {
-              backgroundColor: 'transparent',
-              position: 'absolute',
-              top: '112px',
-              right: '48px'
-            }
-          }>
-            {
-              waitingList && waitingList.length > 0 &&
-              <LobbyWaitingList waitingList={waitingList}
-                                autoHeight={true}
-                                rejectUserHandler={props.rejectUserHandler}
-                                acceptUserHandler={props.acceptUserHandler}/>
-            }
+          {
+            grid && step !== "LOBBY" &&
+            <>
+              {
+                (!screenShared && !whiteboardShown) ?
+                  <Box sx={{
+                    flexGrow: 1,
+                    height: 'calc(100% - 200px)',
+                    width: '100%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex'
+                  }}>
+                    <Grid container spacing={1} style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      border: '2px solid white',
+                      maxHeight: '100%',
+                      overflowY: 'hidden',
+                      overflowX: 'hidden'
+                    }}>
+                      {grid.map((row, index) => {
+                        return <div style={{
+                          width: "100%",
+                          height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh"
+                        }}>
+                          {
+                            <Fragment key={index}>
+                              {
+                                renderRow(row, index)
+                              }
+                            </Fragment>
+                          }
+                        </div>
+                      })}
+                    </Grid>
+                  </Box>
+                  :
+                  screenShared ?
+                    <div className={'content-box'}>
+                      Sharing...
+                    </div>
+                    :
+                    whiteboardShown &&
+                    <div className={'content-box'}>
+                      Whiteboard...
+                    </div>
+              }
+            </>
+          }
+          <div className={'row'} style={{
+            width: '100%',
+            height: '40px',
+            marginLeft: '0',
+            marginRight: '0',
+            border: '2px solid red',
+            display: 'flex',
+            alignItems: 'center',
+            color: 'white',
+            fontSize: '16px',
+            padding: '4px'
+          }}>
+            Talker space
           </div>
-        }
-        {
-          currentUserParticipant &&
-          <div style={{width: '200px', height: '120px', position: 'absolute', right: '4px', bottom: '0'}}>
-            <MeetingParticipant data={currentUserParticipant}
-                                device={participantDevice}
-                                meetingId={meetingId}
-                                rtpCapabilities={rtpCapabilities}
-                                isCurrentUser={true}
-                                producerTransport={producerTransport}
-                                audioMuted={audioMuted}
-                                videoMuted={videoMuted}
-                                onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
-                                onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
-                                isHost={isHost}/>
+          <div className={'row'} style={{
+            width: '100%',
+            height: '120px',
+            marginLeft: '0',
+            marginRight: '0',
+            border: '2px solid red',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <div style={{width: 'calc(100% - 200px)', height: '116px', border: '2px solid blue'}}>
+              {
+                ((screenShared || whiteboardShown) || step === "LOBBY") &&
+                <div style={{width: '100%', height: '100%'}}>
+
+                </div>
+              }
+            </div>
+            <div className={'col no-margin no-padding'} style={{width: '200px', height: '116px'}}>
+              {
+                currentUserParticipant &&
+                <MeetingParticipant data={currentUserParticipant}
+                                    device={participantDevice}
+                                    meetingId={meetingId}
+                                    rtpCapabilities={rtpCapabilities}
+                                    isCurrentUser={true}
+                                    producerTransport={producerTransport}
+                                    audioMuted={audioMuted}
+                                    videoMuted={videoMuted}
+                                    onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
+                                    onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
+                                    isHost={isHost}/>
+              }
+            </div>
           </div>
-        }
-      </div>
-      :
-      null
-  )
-};
+          {
+            ((waitingList && waitingList.length > 0)) &&
+            <div className={'no-side-margin no-side-padding grid-side-bar'} style={
+              {
+                backgroundColor: 'transparent',
+                position: 'absolute',
+                top: '112px',
+                right: '48px'
+              }
+            }>
+              {
+                waitingList && waitingList.length > 0 &&
+                <LobbyWaitingList waitingList={waitingList}
+                                  autoHeight={true}
+                                  rejectUserHandler={props.rejectUserHandler}
+                                  acceptUserHandler={props.acceptUserHandler}/>
+              }
+            </div>
+          }
+        </div>
+        :
+        null
+    )
+  }
+;
 
 export default MeetingParticipantGrid;

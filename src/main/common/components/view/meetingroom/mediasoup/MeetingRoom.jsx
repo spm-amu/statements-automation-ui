@@ -412,7 +412,21 @@ const MeetingRoom = (props) => {
         }
 
         setRtpCapabilities(result.data.rtpCapabilities);
-        createParticipants(result.data.usersInRoom);
+
+
+
+        let fakeDudes = [];
+        for(let i=0;i<100;i++) {
+          fakeDudes.push({
+            userId: 'dude-' + i,
+            name: 'Dude - ' + i,
+            audioMuted: true,
+            videoMuted: true
+          })
+        }
+
+        createParticipants(fakeDudes);
+        //createParticipants(result.data.usersInRoom);
 
         if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);
@@ -648,6 +662,8 @@ const MeetingRoom = (props) => {
                                       meetingId={selectedMeeting.id}
                                       step={step}
                                       isHost={isHost}
+                                      screenShared={screenShared || someoneSharing}
+                                      whiteBoardShown={showWhiteBoard}
                                       autoPermit={autoPermit}
                                       rtpCapabilities={rtpCapabilities}
                                       allUserParticipantsLeft={allUserParticipantsLeft}

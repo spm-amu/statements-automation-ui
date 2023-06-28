@@ -385,6 +385,11 @@ const MeetingParticipant = (props) => {
                height: props.height ? props.height : null,
                color: 'white'
              }}>
+          <div style={{color: 'red'}}>
+            {
+              props.data.name
+            }
+          </div>
           {
             <>
               <video
