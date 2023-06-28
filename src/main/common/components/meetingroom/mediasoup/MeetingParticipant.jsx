@@ -278,9 +278,9 @@ const MeetingParticipant = (props) => {
     producers.set(type, producer);
 
     if(type === 'audio') {
-      videoRef.current.srcObject = stream;
-    } else {
       audioRef.current.srcObject = stream;
+    } else {
+      videoRef.current.srcObject = stream;
     }
     producer.on('transportclose', () => {
       stream.srcObject.getTracks().forEach(function (track) {
