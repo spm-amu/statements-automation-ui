@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {Fragment, useEffect, useRef} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import './MeetingParticipantGrid.css';
 import LobbyWaitingList from "../LobbyWaitingList";
 import Lobby from "../Lobby";
@@ -21,6 +21,7 @@ const MeetingParticipantGrid = (props) => {
     const [participantDevice, setParticipantDevice] = React.useState(null);
     const [producerTransport, setProducerTransport] = React.useState(null);
     const [grid, setGrid] = React.useState(null);
+    const [systemEventHandler] = useState({});
     const transports = useRef(new Transports());
     const {
       waitingList,

@@ -276,7 +276,6 @@ const MeetingParticipant = (props) => {
         track.stop()
       });
 
-      stream.parentNode.removeChild(elem);
       producers.delete(type)
     });
 
@@ -318,6 +317,7 @@ const MeetingParticipant = (props) => {
 
   const onNewProducers = (producers) => {
     for (const producer of producers) {
+      alert(producer.kind);
       if (producer.userId === props.data.userId) {
         consume(producer.producerId);
       }
