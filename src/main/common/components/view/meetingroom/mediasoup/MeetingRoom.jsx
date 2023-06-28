@@ -125,8 +125,6 @@ const MeetingRoom = (props) => {
     if (step === Steps.LOBBY) {
       setStep(Steps.SESSION);
       props.windowHandler.show();
-      setSideBarTab('People');
-      setSideBarOpen('true')
     }
 
     if (screenShared) {
@@ -378,7 +376,6 @@ const MeetingRoom = (props) => {
       if (participants.length > 0) {
         if (step === Steps.LOBBY) {
           setStep(Steps.SESSION);
-          setSideBarTab('People');
           setSideBarOpen(true);
           props.windowHandler.show();
         }
@@ -660,6 +657,7 @@ const MeetingRoom = (props) => {
                                       meetingTitle={selectedMeeting.title}
                                       userToCall={userToCall}
                                       meetingId={selectedMeeting.id}
+                                      onGridSetup={() => setSideBarTab('People')}
                                       step={step}
                                       isHost={isHost}
                                       screenShared={screenShared || someoneSharing}

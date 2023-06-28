@@ -20,14 +20,13 @@ const MeetingParticipantGrid = (props) => {
     const [consumerTransport, setConsumerTransport] = React.useState(null);
     const [participantDevice, setParticipantDevice] = React.useState(null);
     const [producerTransport, setProducerTransport] = React.useState(null);
-    const [mode, setMode] = React.useState('DEFAULT');
     const [grid, setGrid] = React.useState(null);
     const transports = useRef(new Transports());
     const {
       waitingList,
       step,
       meetingId,
-      whiteboardShown,
+      whiteBoardShown,
       screenShared,
       videoMuted,
       audioMuted,
@@ -57,6 +56,12 @@ const MeetingParticipantGrid = (props) => {
     }, []);
 
     useEffect(() => {
+      if(grid) {
+        props.onGridSetup(true);
+      }
+    }, grid);
+
+    useEffect(() => {
       if (props.participants) {
         setCurrentUserParticipant({
           isCurrentUser: true,
@@ -76,6 +81,7 @@ const MeetingParticipantGrid = (props) => {
       let counter = 0;
       inViewParticipants.splice(0, inViewParticipants.length);
       for (const participant of props.participants) {
+        participant.inView = true;
         inViewParticipants.push(participant);
         if (++counter >= MAX_ROWS * MAX_COLS) {
           break;
@@ -100,6 +106,42 @@ const MeetingParticipantGrid = (props) => {
 
       setGrid(inViewGrid);
     };
+
+    function renderStrip() {
+      return inViewParticipants && inViewParticipants.length > 0 &&
+        <div
+          style={{
+            overflowX: 'auto',
+            maxWidth: '100%',
+            width: '100%',
+            borderRadius: '4px',
+            height: '116px',
+            overflowY: 'hidden',
+            alignItems: 'center'
+          }}
+          className="row flex-row flex-nowrap">
+          {inViewParticipants.map((participant, index) => {
+            return <div className={'col-*-*'} key={index}
+                        style={{
+                          borderRadius: '4px',
+                          minWidth: "200px",
+                          padding: '4px',
+                          height: '116px'
+                        }}>
+              <MeetingParticipant data={participant}
+                                  device={participantDevice}
+                                  meetingId={meetingId}
+                                  audioMuted={audioMuted}
+                                  videoMuted={videoMuted}
+                                  consumerTransport={consumerTransport}
+                                  rtpCapabilities={rtpCapabilities}
+                                  onHostAudioMute={() => props.onHostAudioMute(participant)}
+                                  onHostVideoMute={() => props.onHostVideoMute(participant)}
+                                  isHost={isHost}/>
+            </div>
+          })}
+        </div>;
+    }
 
     const renderRow = (row, index) => {
       return (
@@ -166,7 +208,7 @@ const MeetingParticipantGrid = (props) => {
             grid && step !== "LOBBY" &&
             <>
               {
-                (!screenShared && !whiteboardShown) ?
+                (!screenShared && !whiteBoardShown) ?
                   <Box sx={{
                     flexGrow: 1,
                     height: 'calc(100% - 200px)',
@@ -206,7 +248,7 @@ const MeetingParticipantGrid = (props) => {
                       Sharing...
                     </div>
                     :
-                    whiteboardShown &&
+                    whiteBoardShown &&
                     <div className={'content-box'}>
                       Whiteboard...
                     </div>
@@ -238,9 +280,11 @@ const MeetingParticipantGrid = (props) => {
           }}>
             <div style={{width: 'calc(100% - 200px)', height: '116px', border: '2px solid blue'}}>
               {
-                ((screenShared || whiteboardShown) || step === "LOBBY") &&
+                ((screenShared || whiteBoardShown) || step === "LOBBY") &&
                 <div style={{width: '100%', height: '100%'}}>
-
+                  {
+                    renderStrip()
+                  }
                 </div>
               }
             </div>
