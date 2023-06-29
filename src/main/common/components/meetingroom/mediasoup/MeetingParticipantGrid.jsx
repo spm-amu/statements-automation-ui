@@ -239,19 +239,22 @@ const MeetingParticipantGrid = (props) => {
             <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState}
                    meetingTitle={props.meetingTitle}/>
           }
-          <div className={'row'} style={{
-            width: '100%',
-            height: '40px',
-            marginLeft: '0',
-            marginRight: '0',
-            display: 'flex',
-            alignItems: 'center',
-            color: 'white',
-            fontSize: '16px',
-            padding: '4px',
-            overflowY: 'auto'
-          }}>
-          </div>
+          {
+            step !== "LOBBY" &&
+            <div className={'row messages'} style={{
+              width: '100%',
+              height: '40px',
+              marginLeft: '0',
+              marginRight: '0',
+              display: 'flex',
+              alignItems: 'center',
+              color: 'white',
+              fontSize: '16px',
+              padding: '4px',
+              overflowY: 'auto'
+            }}>
+            </div>
+          }
           {
             grid && step !== "LOBBY" &&
             <>
@@ -304,18 +307,21 @@ const MeetingParticipantGrid = (props) => {
               }
             </>
           }
-          <div className={'row'} style={{
-            width: '100%',
-            height: '40px',
-            marginLeft: '0',
-            marginRight: '0',
-            display: 'flex',
-            alignItems: 'center',
-            color: 'white',
-            fontSize: '16px',
-            padding: '4px'
-          }}>
-          </div>
+          {
+            step !== "LOBBY" &&
+            <div className={'row'} style={{
+              width: '100%',
+              height: '40px',
+              marginLeft: '0',
+              marginRight: '0',
+              display: 'flex',
+              alignItems: 'center',
+              color: 'white',
+              fontSize: '16px',
+              padding: '4px'
+            }}>
+            </div>
+          }
           <div className={'row'} style={{
             width: '100%',
             height: '152px',
