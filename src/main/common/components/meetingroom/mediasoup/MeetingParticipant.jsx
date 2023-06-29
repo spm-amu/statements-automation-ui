@@ -369,7 +369,9 @@ const MeetingParticipant = (props) => {
 
         console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
         if (kind === 'video') {
-          videoRef.current?.srcObject = stream;
+          if(videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
           tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
         } else {
           if (props.isCurrentUser) {
@@ -422,7 +424,7 @@ const MeetingParticipant = (props) => {
           {
             <>
               {
-                videoMuted ?
+                (videoMuted || !videoRef.current || !videoRef.current.srcObject) ?
                   <div className={'centered-flex-box'}
                        style={{
                          width: '100%',
