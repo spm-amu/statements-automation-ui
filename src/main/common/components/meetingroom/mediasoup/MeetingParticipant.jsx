@@ -280,7 +280,7 @@ const MeetingParticipant = (props) => {
     producerTransport.getStats().then((data) => console.log(data));
     producers.set(type, producer);
 
-    if (type === 'video') {
+    if (type === 'video' && videoRef.current) {
       videoRef.current.srcObject = stream;
     }
 
