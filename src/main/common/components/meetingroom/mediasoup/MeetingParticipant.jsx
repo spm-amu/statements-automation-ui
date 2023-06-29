@@ -173,6 +173,10 @@ const MeetingParticipant = (props) => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
 
+    if(props.data.videoProducers) {
+      alert("We didi get");
+    }
+
     return () => {
       stopProducing('audio');
       stopProducing('video');
@@ -365,7 +369,7 @@ const MeetingParticipant = (props) => {
 
         console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
         if (kind === 'video') {
-          videoRef.current.srcObject = stream;
+          videoRef.current?.srcObject = stream;
           tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
         } else {
           if (props.isCurrentUser) {

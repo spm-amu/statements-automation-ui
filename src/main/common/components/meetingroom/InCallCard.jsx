@@ -36,6 +36,9 @@ const InCall = (props) => {
           case MessageType.LOWER_HAND:
             onLowerHand(be.payload);
             break;
+          case MessageType.NEW_PRODUCERS:
+            onNewProducers(be.payload);
+            break;
         }
       }
     }
@@ -59,10 +62,24 @@ const InCall = (props) => {
     }
   };
 
+  const onNewProducers = (producers) => {
+    for (const producer of producers) {
+      if (producer.userId === participant.userId) {
+        if (producer.kind === 'video') {
+          participant.videoProducers = producers;
+        }
+      }
+    }
+  };
+
   const onAVSettingsChange = (payload) => {
     if (payload.userId === participant.userId) {
       setAudioMuted(payload.audioMuted);
       setVideoMuted(payload.videoMuted);
+
+      if(payload.videoMuted) {
+        participant.videoProducers = null;
+      }
     }
   };
 
@@ -90,7 +107,7 @@ const InCall = (props) => {
   });
 
   useEffect(() => {
-    socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND);
+    socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS);
     appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_OFF_VIEW, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
 
     return () => {
