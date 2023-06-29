@@ -52,17 +52,19 @@ const MeetingParticipantGrid = (props) => {
     };
 
     const onBringToView = (payload) => {
-      if (inViewParticipants.length === MAX_COLS * MAX_ROWS) {
-        let offViewParticipant = inViewParticipants[inViewParticipants.length - 1];
-        appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, offViewParticipant);
+      if(!inViewParticipants.find(((p) => p.userId === payload.userId))) {
+        if (inViewParticipants.length === MAX_COLS * MAX_ROWS) {
+          let offViewParticipant = inViewParticipants[inViewParticipants.length - 1];
+          appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, offViewParticipant);
 
-        inViewParticipants.splice(inViewParticipants.length - 1, 1);
-        offViewParticipant.inView = false;
+          inViewParticipants.splice(inViewParticipants.length - 1, 1);
+          offViewParticipant.inView = false;
+        }
+
+        let participant = props.participants.find(((p) => p.userId === payload.userId));
+        inViewParticipants.push(participant);
+        setupGrid();
       }
-
-      let participant = props.participants.find(((p) => p.userId === payload.userId));
-      inViewParticipants.push(participant);
-      setupGrid();
     };
 
     const removeFromView = (participant) => {

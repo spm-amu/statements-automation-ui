@@ -23,6 +23,7 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
+  const tmpVideoRef = useRef();
   const tracks = useRef(new Tracks());
   const soundLevelCounter = useRef(0);
   const showVideo = true;
@@ -113,9 +114,6 @@ const MeetingParticipant = (props) => {
     }
   }, [audioMuted]);
 
-  useEffect(() => {
-  }, [videoMuted]);
-
   const onAVSettingsChange = (payload) => {
     if (props.data.userId === payload.userId) {
       if (props.isCurrentUser) {
@@ -147,6 +145,13 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
+    if(videoRef.current && !videoRef.current.srcObject && tmpVideoRef.current) {
+      videoRef.current.srcObject = tmpVideoRef.current;
+      tmpVideoRef.current = null;
+    }
+  }, [videoRef.current, videoMuted]);
+
+  useEffect(() => {
     if (producerTransport) {
       if (videoMuted) {
         stopProducing('video');
@@ -168,7 +173,9 @@ const MeetingParticipant = (props) => {
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
 
     if (props.data.videoProducers) {
-      alert("We didi get");
+      for (const videoProducer of props.data.videoProducers) {
+        consume(videoProducer.producerId, videoProducer.kind);
+      }
     }
 
     return () => {
@@ -274,8 +281,12 @@ const MeetingParticipant = (props) => {
     producerTransport.getStats().then((data) => console.log(data));
     producers.set(type, producer);
 
-    if (type === 'video' && videoRef.current) {
-      videoRef.current.srcObject = stream;
+    if (type === 'video') {
+      if(videoRef.current) {
+        videoRef.current.srcObject = stream;
+      } else {
+        tmpVideoRef.current = stream;
+      }
     }
 
     producer.on('transportclose', () => {
@@ -367,7 +378,11 @@ const MeetingParticipant = (props) => {
         if (kind === 'video') {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
+          } else {
+            tmpVideoRef.current = stream;
           }
+
+          setVideoMuted(false);
           tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
         } else {
           if (props.isCurrentUser) {
@@ -502,13 +517,12 @@ const MeetingParticipant = (props) => {
                           }}
                           style={{
                             marginRight: '4px',
-                            marginTop: '-16px',
                             width: '16px',
                             height: '16px',
                             color: 'white'
                           }}
                         >
-                          <Icon id={'MINIMIZE'}/>
+                          <Icon id={'CLOSE'}/>
                         </IconButton>
                       </Tooltip>
                     }

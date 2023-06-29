@@ -18,7 +18,7 @@ import CameraOff from '@material-ui/icons/VideocamOff';
 import Microphone from '@material-ui/icons/Mic';
 import MicrophoneOff from '@material-ui/icons/MicOff';
 import Minimize from '@material-ui/icons/Minimize';
-import Maximize from '@material-ui/icons/Launch';
+import Launch from '@material-ui/icons/Launch';
 import Work from '@material-ui/icons/Work';
 import PanTool from '@material-ui/icons/PanTool';
 import List from '@material-ui/icons/List';
@@ -79,7 +79,7 @@ class Icon extends Component {
     } else if (this.props.id === 'MINIMIZE') {
       return <Minimize style={{color: this.props.color}}/>
     } else if (this.props.id === 'MAXIMIZE') {
-      return <Maximize style={{color: this.props.color}}/>
+      return <Launch style={{color: this.props.color}}/>
     } else if (this.props.id === 'DONE') {
       return <Done/>
     } else if (this.props.id === 'REMOVE') {
