@@ -173,7 +173,7 @@ const MeetingParticipant = (props) => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
 
-    if(props.data.videoProducers) {
+    if (props.data.videoProducers) {
       alert("We didi get");
     }
 
@@ -342,11 +342,13 @@ const MeetingParticipant = (props) => {
 
   const removeConsumer = (consumerId, kind) => {
     if (kind === 'video') {
-      let stream = videoRef.current.srcObject;
-      if (stream) {
-        stream.getTracks().forEach(function (track) {
-          track.stop()
-        })
+      if (videoRef.current) {
+        let stream = videoRef.current.srcObject;
+        if (stream) {
+          stream.getTracks().forEach(function (track) {
+            track.stop()
+          })
+        }
       }
     } else if (kind === 'audio') {
       let audioElement = document.getElementById(consumerId);
@@ -369,7 +371,7 @@ const MeetingParticipant = (props) => {
 
         console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
         if (kind === 'video') {
-          if(videoRef.current) {
+          if (videoRef.current) {
             videoRef.current.srcObject = stream;
           }
           tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
