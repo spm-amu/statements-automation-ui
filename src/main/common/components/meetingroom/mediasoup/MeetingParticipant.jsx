@@ -43,6 +43,7 @@ const MeetingParticipant = (props) => {
           case MessageType.CONSUMER_CLOSED:
             if(consumers.has(be.payload.consumerId)) {
               //console("REM CONS : " + be.payload.kind);
+              console.log("\n\n\n\n\n\n\n\n\n\n\n\n\nREM CONS : ", be.payload);
               removeConsumer(be.payload.consumerId, be.payload.kind);
             }
             break;
@@ -322,13 +323,13 @@ const MeetingParticipant = (props) => {
     for (const producer of producers) {
       if (producer.userId === props.data.userId) {
         if(producer.kind === 'video') {
-          consume(producer.producerId);
+          consume(producer.producerId, producer.kind);
         }
       } else if(props.isCurrentUser) {
         // The small participant box at the bottom belonging to the current user must consume all audio
         // This is because we do not want to disturb the audio due to any rendering such as Bring to view
         if(producer.kind === 'audio') {
-          consume(producer.producerId);
+          consume(producer.producerId, producer.kind);
         }
       }
     }
@@ -353,11 +354,11 @@ const MeetingParticipant = (props) => {
       }
     }
 
-    consumers.delete(consumer);
+    consumers.delete(consumerId);
   };
 
-  const consume = async (producerId) => {
-    mediaSoupHelper.getConsumeStream(producerId, device.rtpCapabilities, consumerTransport, props.meetingId, appManager.getUserDetails().userId).then(
+  const consume = async (producerId, kind) => {
+    mediaSoupHelper.getConsumeStream(producerId, device.rtpCapabilities, consumerTransport, props.meetingId, appManager.getUserDetails().userId, kind).then(
       ({consumer, stream, kind}) => {
         consumers.set(consumer.id, consumer);
 

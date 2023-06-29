@@ -141,14 +141,15 @@ class MediaSoupHelper {
     return producerTransport;
   }
 
-  getConsumeStream = async (producerId, rtpCapabilities, consumerTransport, roomId, userId) => {
+  getConsumeStream = async (producerId, rtpCapabilities, consumerTransport, roomId, userId, type) => {
     console.log("\n\n\n\n\nCONSUMING FROM : " + producerId);
     const data = await socketManager.emitEvent(MessageType.CONSUME, {
       rtpCapabilities,
       consumerTransportId: consumerTransport.id,
       producerId,
       roomId,
-      userId
+      userId,
+      kind: type
     });
 
     const { id, kind, rtpParameters } = data.params;
