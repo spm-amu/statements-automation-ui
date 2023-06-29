@@ -9,8 +9,9 @@ import Box from "@material-ui/core/Box";
 import appManager from "../../../service/AppManager";
 import mediaSoupHelper from "./MediaSoupHelper";
 import Transports from "./Transports";
-import {SystemEventType} from "../../../types";
+import {MessageType, SystemEventType} from "../../../types";
 import Icon from "../../Icon";
+import socketManager from "../../../service/SocketManager";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
@@ -25,6 +26,7 @@ const MeetingParticipantGrid = (props) => {
     const [shareScreenSource, setShareScreenSource] = React.useState(null);
     const [screenShared, setScreenShared] = React.useState(null);
     const [showSharedScreen, setShowSharedScreen] = React.useState(false);
+    const [message, setMessage] = React.useState(false);
     const [grid, setGrid] = React.useState(null);
     const [systemEventHandler] = useState({});
     const transports = useRef(new Transports());
@@ -80,30 +82,25 @@ const MeetingParticipantGrid = (props) => {
       let stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
       const track = stream.getVideoTracks()[0];
       const params = {
-        track
+        track,
+        appData: {
+          screenSharing: true
+        }
       };
 
-      //let producer = await producerTransport.produce(params);
-      //setShareScreenProducer(producer);
+      let producer = await producerTransport.produce(params);
+      setShareScreenProducer(producer);
 
       if (showSharedScreen) {
         shareScreenRef.current.srcObject = stream;
       }
 
-      /*if (type === 'video') {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        } else {
-          tmpVideoRef.current = stream;
-        }
-      }*/
-
-      /*producer.on('transportclose', () => {
+      producer.on('transportclose', () => {
         stream.srcObject.getTracks().forEach(function (track) {
           track.stop()
         });
 
-        producers.delete(type)
+        setShareScreenProducer(null);
       });
 
       producer.on('close', () => {
@@ -111,12 +108,37 @@ const MeetingParticipantGrid = (props) => {
           track.stop()
         });
 
-        producers.delete(type)
-      });*/
+        setShareScreenProducer(null);
+      });
     };
 
-
     const stopProducingScreenShare = async () => {
+      if (!shareScreenProducer) {
+        console.log('There is no share screen producer');
+        return;
+      }
+
+      let producerId = shareScreenProducer.id;
+      console.log('Close producer', producerId);
+      socketManager.emitEvent(MessageType.PRODUCER_CLOSED, {
+        userId: appManager.getUserDetails().userId,
+        producerId,
+        roomId: meetingId
+      }).catch((e) => console.log("PRODUCER_CLOSED ERROR : ", e));
+
+      shareScreenProducer.close();
+      if(shareScreenRef.current && shareScreenRef.current.srcObject) {
+        shareScreenRef.current.srcObject.getTracks().forEach(function (track) {
+          track.stop()
+        });
+      }
+    };
+
+    const onNewProducers = (producers) => {
+      let screenShareProducer = producers.find((p) => p.isScreenSharing);
+      if(screenShareProducer) {
+        alert(screenShareProducer.username + " is sharing");
+      }
     };
 
     const systemEventHandlerApi = () => {
@@ -373,6 +395,12 @@ const MeetingParticipantGrid = (props) => {
                       + ' is being shared with other participants'
                     }
                   </div>
+                  {
+                    message &&
+                    <span>
+                        {message}
+                      </span>
+                  }
                 </div>
               )}
             </div>

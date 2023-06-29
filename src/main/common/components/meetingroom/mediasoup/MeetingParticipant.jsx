@@ -337,7 +337,7 @@ const MeetingParticipant = (props) => {
   const onNewProducers = (producers) => {
     for (const producer of producers) {
       if (producer.userId === props.data.userId) {
-        if (producer.kind === 'video') {
+        if (producer.kind === 'video' && !producer.isScreenSharing) {
           consume(producer.producerId, producer.kind);
         }
       } else if (props.isCurrentUser) {

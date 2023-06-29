@@ -71,7 +71,6 @@ class MediaSoupHelper {
   }
 
   async initProducerTransport(device, roomId, userId) {
-    console.log("\n\n\n\nPRODUCER TRANSPORT CAPABILITIES : ", device.rtpCapabilities);
     const data = await socketManager.emitEvent(MessageType.CREATE_WEBRTC_TRANSPORT, {
       forceTcp: false,
       rtpCapabilities: device.rtpCapabilities,
@@ -84,7 +83,6 @@ class MediaSoupHelper {
       return;
     }
 
-    console.log("\n\n\n\n\nPRODUCER PARAMS : ", data.params);
     let producerTransport = device.createSendTransport(data.params);
     producerTransport.on(
       'connect',
@@ -102,14 +100,15 @@ class MediaSoupHelper {
 
     producerTransport.on(
       'produce',
-      async function ({kind, rtpParameters}, callback, errback) {
+      async function ({kind, rtpParameters, appData}, callback, errback) {
         try {
           const {producerId} = await socketManager.emitEvent(MessageType.PRODUCE, {
             producerTransportId: producerTransport.id,
             kind,
             rtpParameters,
             roomId,
-            userId
+            userId,
+            appData
           });
 
           callback({
