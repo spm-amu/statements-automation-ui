@@ -426,7 +426,7 @@ const MeetingParticipant = (props) => {
           {
             <>
               {
-                (videoMuted || !videoRef.current || !videoRef.current.srcObject) ?
+                videoMuted ?
                   <div className={'centered-flex-box'}
                        style={{
                          width: '100%',
