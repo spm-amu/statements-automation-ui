@@ -19,7 +19,6 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
-  const audioRef = useRef();
   const tracks = useRef(new Tracks());
   const soundLevelCounter = useRef(0);
   const showVideo = true;
@@ -39,8 +38,13 @@ const MeetingParticipant = (props) => {
             onLowerHand(be.payload);
             break;
           case MessageType.NEW_PRODUCERS:
-            //alert("NEW_PRODUCERS");
             onNewProducers(be.payload);
+            break;
+          case MessageType.CONSUMER_CLOSED:
+            if(consumers.has(be.payload.consumerId)) {
+              //console("REM CONS : " + be.payload.kind);
+              removeConsumer(be.payload.consumerId, be.payload.kind);
+            }
             break;
         }
       }
@@ -138,6 +142,8 @@ const MeetingParticipant = (props) => {
 
       setAudioMuted(payload.audioMuted);
       setVideoMuted(payload.videoMuted);
+    } else if (props.isCurrentUser) {
+
     }
   };
 
@@ -163,11 +169,16 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
-    socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS);
+    socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
 
     return () => {
       stopProducing('audio');
       stopProducing('video');
+
+      for (const consumer of consumers) {
+        consumer.track?.stop();
+      }
+
       appManager.removeSubscriptions(systemEventHandler);
       socketManager.removeSubscriptions(eventHandler);
     };
@@ -263,11 +274,7 @@ const MeetingParticipant = (props) => {
     producerTransport.getStats().then((data) => console.log(data));
     producers.set(type, producer);
 
-    if (type === 'audio') {
-      if (!props.isCurrentUser) {
-        audioRef.current.srcObject = stream;
-      }
-    } else {
+    if (type === 'video') {
       videoRef.current.srcObject = stream;
     }
 
@@ -306,33 +313,47 @@ const MeetingParticipant = (props) => {
     producers.get(type).close();
     producers.delete(type);
 
-    if (type === 'audio') {
-      if (!props.isCurrentUser) {
-        tracks.current.stopAudioTrack();
-      }
-    } else {
+    if (type === 'video') {
       tracks.current.stopVideoTrack();
     }
   };
 
   const onNewProducers = (producers) => {
     for (const producer of producers) {
-      alert(producer.kind);
       if (producer.userId === props.data.userId) {
-        consume(producer.producerId);
+        if(producer.kind === 'video') {
+          consume(producer.producerId);
+        }
+      } else if(props.isCurrentUser) {
+        // The small participant box at the bottom belonging to the current user must consume all audio
+        // This is because we do not want to disturb the audio due to any rendering such as Bring to view
+        if(producer.kind === 'audio') {
+          consume(producer.producerId);
+        }
       }
     }
   };
 
-  const removeConsumer = (consumerId, type) => {
-    let stream = type === 'video' ? videoRef.current.srcObject : audioRef.current.srcObject;
-    if (stream) {
-      stream.getTracks().forEach(function (track) {
-        track.stop()
-      })
+  const removeConsumer = (consumerId, kind) => {
+    if(kind === 'video') {
+      let stream = videoRef.current.srcObject;
+      if (stream) {
+        stream.getTracks().forEach(function (track) {
+          track.stop()
+        })
+      }
+    } else if(kind === 'audio') {
+      let audioElement = document.getElementById(consumerId);
+      if(audioElement) {
+        audioElement.srcObject.getTracks().forEach(function (track) {
+          track.stop()
+        });
+
+        document.getElementById(props.data.userId + '-audio-el-container')?.removeChild(audioElement)
+      }
     }
 
-    consumers.delete(consumerId)
+    consumers.delete(consumer);
   };
 
   const consume = async (producerId) => {
@@ -345,8 +366,14 @@ const MeetingParticipant = (props) => {
           videoRef.current.srcObject = stream;
           tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
         } else {
-          audioRef.current.srcObject = stream;
-          tracks.current.setAudioTrack(stream.getAudioTracks()[0]);
+          if(props.isCurrentUser) {
+            let audioElement = document.createElement('audio');
+            audioElement.srcObject = stream;
+            audioElement.id = consumer.id;
+            audioElement.playsinline = false;
+            audioElement.autoplay = true;
+            document.getElementById(props.data.userId + '-audio-el-container').appendChild(audioElement);
+          }
         }
 
         consumer.on(
@@ -403,8 +430,9 @@ const MeetingParticipant = (props) => {
                 }}
               />
               {
-                !props.isCurrentUser &&
-                <audio autoPlay muted={audioMuted} ref={audioRef} id={props.data.userId + '-audio'}/>
+                props.isCurrentUser &&
+                <div id={props.data.userId + '-audio-el-container'}>
+                </div>
               }
             </>
           }

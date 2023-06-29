@@ -1,7 +1,4 @@
 export default class Tracks {
-  constructor() {
-  }
-
   stopVideoTrack = () => {
     if(this.videoTrack) {
       this.videoTrack.stop();

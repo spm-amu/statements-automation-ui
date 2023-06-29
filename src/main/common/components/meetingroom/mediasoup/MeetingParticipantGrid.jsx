@@ -297,6 +297,7 @@ const MeetingParticipantGrid = (props) => {
                                     meetingId={meetingId}
                                     rtpCapabilities={rtpCapabilities}
                                     isCurrentUser={true}
+                                    consumerTransport={consumerTransport}
                                     producerTransport={producerTransport}
                                     audioMuted={audioMuted}
                                     videoMuted={videoMuted}
