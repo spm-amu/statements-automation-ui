@@ -1,13 +1,12 @@
 .closable-panel {
-  border: 1px solid #e1e1e1;
   border-radius: 4px;
-  background-color: white;
+  background-color: rgb(40, 40, 43);
   height: 100%;
+  color: white;
 }
 
 .closable-panel-header {
   height: 72px;
-  border-bottom: 1px solid #e1e1e1;
   text-align: right;
   padding: 8px;
   display: inline-block;
@@ -19,7 +18,6 @@
 }
 
 .closable-panel-header .title{
-  color: #a1a1a1;
   font-size: 24px;
   text-align: left;
   font-weight: normal;

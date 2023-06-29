@@ -137,7 +137,7 @@ class Icon extends Component {
     } else if (this.props.id === 'PRESENT_TO_ALL') {
       return <PresentToAll/>
     } else if (this.props.id === 'CHAT_BUBBLE') {
-      return <ChatBubbleOutline {...this.props}  />
+      return <ChatBubbleOutline {...this.props} style={{color: this.props.color}}/>
     } else if (this.props.id === 'CALL') {
       return <Call/>
     } else if (this.props.id === 'CALL_END') {
@@ -173,7 +173,7 @@ class Icon extends Component {
     } else if (this.props.id === 'HISTORY') {
       return <History/>
     } else if (this.props.id === 'MORE') {
-      return <MoreHoriz />
+      return <MoreHoriz  style={{color: this.props.color}}/>
     } else if (this.props.id === 'NOTE') {
       return <Note/>
     } else if (this.props.id === 'PLAY') {

@@ -141,7 +141,7 @@ const InCall = (props) => {
       className={'col person-card-wrapper'}
       style={{
         marginLeft: '0', paddingLeft: '0', paddingRight: '0', maxWidth: props.maxWidth ? props.maxWidth : '400px',
-        borderBottom: props.borderBottom ? props.borderBottom : '1px solid #e1e1e1'
+        borderBottom: props.borderBottom ? props.borderBottom : null
       }}
     >
       <div className="participant-card">
@@ -226,7 +226,7 @@ const InCall = (props) => {
                   size="small"
                   sx={{ml: 2}}
                 >
-                  <Icon id={'CHAT_BUBBLE'} fontSize={'small'}/>
+                  <Icon id={'CHAT_BUBBLE'} fontSize={'small'} color={'white'}/>
                 </IconButton>
               }
               {
@@ -240,7 +240,7 @@ const InCall = (props) => {
                     aria-haspopup="true"
                     aria-expanded={openMoreActions ? 'true' : undefined}
                   >
-                    <Icon id={'MORE'}/>
+                    <Icon id={'MORE'} color={'white'}/>
                   </IconButton>
                 </Tooltip>
               }

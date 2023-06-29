@@ -75,7 +75,7 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
 
   return (
     <div className="person-card">
-      <div className="row no-margin" style={{borderBottom: '1px solid #e1e1e1', paddingBottom: '8px', minHeight: '92px'}}>
+      <div className="row no-margin" style={{paddingBottom: '8px', minHeight: '92px'}}>
         <table>
           <tr>
             <td>

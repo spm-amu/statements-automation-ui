@@ -26,8 +26,12 @@
 
 .meeting-room-sb-container .toolbar{
   height: 40px;
-  padding: 8px;
+  padding: 0 8px;
   width: 100%;
+}
+
+.meeting-room-sb-container .toolbar button:hover {
+  transform: unset;
 }
 
 .meeting-room-sb-container .list{
