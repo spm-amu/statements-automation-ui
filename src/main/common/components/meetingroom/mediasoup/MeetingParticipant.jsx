@@ -28,6 +28,7 @@ const MeetingParticipant = (props) => {
   const soundLevelCounter = useRef(0);
   const showVideo = true;
   const {consumerTransport, producerTransport, device} = props;
+  const {numberOfInViewParticipants} = props;
 
   const handler = () => {
     return {
@@ -509,7 +510,7 @@ const MeetingParticipant = (props) => {
                               </>
                           }
                     {
-                      props.data.inView &&
+                      props.data.inView && numberOfInViewParticipants > 1 &&
                       <Tooltip title="Remove from view">
                         <IconButton
                           onClick={(e) => {

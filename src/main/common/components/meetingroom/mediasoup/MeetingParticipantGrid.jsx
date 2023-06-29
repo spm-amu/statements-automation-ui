@@ -184,6 +184,7 @@ const MeetingParticipantGrid = (props) => {
                                   onRemoveFromView={(participant) => removeFromView(participant)}
                                   consumerTransport={consumerTransport}
                                   rtpCapabilities={rtpCapabilities}
+                                  numberOfInViewParticipants={inViewParticipants.length}
                                   sizing={'sm'}
                                   onHostAudioMute={() => props.onHostAudioMute(participant)}
                                   onHostVideoMute={() => props.onHostVideoMute(participant)}
@@ -221,6 +222,7 @@ const MeetingParticipantGrid = (props) => {
                                     videoMuted={videoMuted}
                                     onRemoveFromView={(participant) => removeFromView(participant)}
                                     consumerTransport={consumerTransport}
+                                    numberOfInViewParticipants={inViewParticipants.length}
                                     rtpCapabilities={rtpCapabilities}
                                     onHostAudioMute={() => props.onHostAudioMute(participant)}
                                     onHostVideoMute={() => props.onHostVideoMute(participant)}
@@ -354,6 +356,7 @@ const MeetingParticipantGrid = (props) => {
                                     producerTransport={producerTransport}
                                     audioMuted={audioMuted}
                                     videoMuted={videoMuted}
+                                    numberOfInViewParticipants={inViewParticipants.length}
                                     sizing={'md'}
                                     onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
                                     onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
