@@ -25,7 +25,7 @@ const ClosablePanel = (props) => {
             }}
             onClick={(e) => props.closeHandler(e)}
           >
-            <Icon id={'CLOSE'}/>
+            <Icon id={'CLOSE'} color={'white'}/>
           </IconButton>
         </div>
       </div>

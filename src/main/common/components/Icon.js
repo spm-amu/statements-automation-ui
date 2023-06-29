@@ -75,7 +75,7 @@ class Icon extends Component {
     } else if (this.props.id === 'REPLY') {
       return <Reply/>
     } else if (this.props.id === 'CLOSE') {
-      return <Close/>
+      return <Close style={{color: this.props.color}}/>
     } else if (this.props.id === 'MINIMIZE') {
       return <Minimize style={{color: this.props.color}}/>
     } else if (this.props.id === 'MAXIMIZE') {
