@@ -13,7 +13,6 @@ import {SystemEventType} from "../../../types";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
-const VH = 64;
 
 const MeetingParticipantGrid = (props) => {
     const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
@@ -206,8 +205,8 @@ const MeetingParticipantGrid = (props) => {
                            className={'meetingParticipantContainer'} style={
                 {
                   borderRadius: '4px',
-                  width: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
-                  height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh",
+                  width: (100 / row.length) + "%",
+                  height: "100%",
                   flexBasis: null,
                   maxWidth: null
                 }
@@ -249,7 +248,8 @@ const MeetingParticipantGrid = (props) => {
             alignItems: 'center',
             color: 'white',
             fontSize: '16px',
-            padding: '4px'
+            padding: '4px',
+            overflowY: 'auto'
           }}>
           </div>
           {
@@ -270,13 +270,15 @@ const MeetingParticipantGrid = (props) => {
                       display: 'flex',
                       alignItems: 'center',
                       maxHeight: '100%',
-                      overflowY: 'hidden',
+                      height: "100%",
+                      overflowY: 'auto',
                       overflowX: 'hidden'
                     }}>
                       {grid.map((row, index) => {
                         return <div style={{
                           width: "100%",
-                          height: (VH / (MAX_ROWS === 1 ? 2 : MAX_ROWS)) + "vh"
+                          height: (100 / grid.length) + "%",
+                          maxHeight: "50%"
                         }}>
                           {
                             <Fragment key={index}>
