@@ -12,7 +12,43 @@ import IconButton from "@material-ui/core/IconButton";
 import Icon from "../../Icon";
 import {PanTool} from "@material-ui/icons";
 import Tooltip from "@material-ui/core/Tooltip";
-import {VIDEO_CODEC_OPTIONS, VIDEO_CONSTRAINTS, VIDEO_ENCODINGS} from "./MeetingParticipantGrid";
+
+export const VIDEO_CODEC_OPTIONS = {
+  videoGoogleStartBitrate: 1000
+};
+
+export const VIDEO_CONSTRAINTS = {
+  audio: false,
+  video: {
+    width: {
+      min: 640,
+      ideal: 1920
+    },
+    height: {
+      min: 400,
+      ideal: 1080
+    }
+  }
+};
+
+export const VIDEO_ENCODINGS = [
+  {
+    rid: 'r0',
+    maxBitrate: 100000,
+    //scaleResolutionDownBy: 10.0,
+    scalabilityMode: 'S1T3'
+  },
+  {
+    rid: 'r1',
+    maxBitrate: 300000,
+    scalabilityMode: 'S1T3'
+  },
+  {
+    rid: 'r2',
+    maxBitrate: 900000,
+    scalabilityMode: 'S1T3'
+  }
+];
 
 const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);

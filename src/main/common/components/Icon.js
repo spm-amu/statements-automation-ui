@@ -89,7 +89,7 @@ class Icon extends Component {
     } else if (this.props.id === 'INFO') {
       return <InfoIcon/>
     } else if (this.props.id === 'WARNING') {
-      return <Warning/>
+      return <Warning style={{color: this.props.color}}/>
     } else if (this.props.id === 'DELETE') {
       return <DeleteIcon/>
     } else if (this.props.id === 'DOWNLOAD') {

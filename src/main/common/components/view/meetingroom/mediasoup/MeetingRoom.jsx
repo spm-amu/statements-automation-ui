@@ -12,6 +12,7 @@ import ClosablePanel from "../../../layout/ClosablePanel";
 import Utils from "../../../../Utils";
 import MeetingParticipantGrid from "../../../meetingroom/mediasoup/MeetingParticipantGrid";
 import {get, post} from "../../../../service/RestService";
+import SelectScreenShareDialog from "../../../SelectScreenShareDialog";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -58,6 +59,9 @@ const MeetingRoom = (props) => {
   const [rtpCapabilities, setRtpCapabilities] = useState(null);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
   const onloadScreenShareData = useRef(null);
+  const [screenSources, setScreenSources] = useState();
+  const shareScreenSource = useRef();
+  const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
   const {
     selectedMeeting,
     userToCall,
@@ -571,12 +575,30 @@ const MeetingRoom = (props) => {
 
   /******************************** END HANG-UP *****************************/
 
+  const selectSourceHandler = (selectedSource) => {
+    setScreenSharePopupVisible(false);
+    shareScreenSource.current = selectedSource;
+
+    if (screenSources && selectedSource) {
+      setScreenShared(true);
+      /*if (shareScreenSource.current.name.toLowerCase() !== 'entire screen' && shareScreenSource.current.name.toLowerCase() !== 'armscor connect') {
+        setMeetingParticipantGridMode('STRIP');
+      }*/
+    }
+  };
+
   const shareScreen = () => {
-    setDisplayState('STRIP');
+    electron.ipcRenderer.getSources()
+      .then(sources => {
+        if (sources && sources.length > 0) {
+          setScreenSources(sources);
+          setScreenSharePopupVisible(true);
+        }
+      });
   };
 
   const stopShareScreen = () => {
-
+    setScreenShared(false);
   };
 
   const fetchChats = () => {
@@ -658,6 +680,7 @@ const MeetingRoom = (props) => {
                                       videoMuted={videoMuted}
                                       meetingTitle={selectedMeeting.title}
                                       userToCall={userToCall}
+                                      shareScreenSource={shareScreenSource.current}
                                       meetingId={selectedMeeting.id}
                                       onGridSetup={() => {
                                         setSideBarTab('People');
@@ -717,6 +740,18 @@ const MeetingRoom = (props) => {
               </ClosablePanel>
             </div>
           }
+          {
+            screenSharePopupVisible &&
+            <SelectScreenShareDialog
+              handleCloseHandler={() => {
+                setScreenSharePopupVisible(false);
+                setScreenShared(false);
+              }}
+              open={screenSharePopupVisible}
+              sources={screenSources}
+              selectSourceHandler={(selectedSource) => selectSourceHandler(selectedSource)}
+            />
+          }
         </div>
       </div>
       {
@@ -755,14 +790,10 @@ const MeetingRoom = (props) => {
                         handleEndCall();
                       },
                       shareScreen: () => {
-                        if (device) {
-                          shareScreen();
-                        }
+                        shareScreen();
                       },
                       stopShareScreen: () => {
-                        if (device) {
-                          stopShareScreen();
-                        }
+                        stopShareScreen();
                       },
                       showPeople: () => {
                         setSideBarTab('People');

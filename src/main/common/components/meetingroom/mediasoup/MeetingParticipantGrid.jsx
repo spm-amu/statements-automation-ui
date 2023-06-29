@@ -10,68 +10,114 @@ import appManager from "../../../service/AppManager";
 import mediaSoupHelper from "./MediaSoupHelper";
 import Transports from "./Transports";
 import {SystemEventType} from "../../../types";
+import Icon from "../../Icon";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
-
-export const VIDEO_CONSTRAINTS = {
-  audio: false,
-  video: {
-    width: {
-      min: 640,
-      ideal: 1920
-    },
-    height: {
-      min: 400,
-      ideal: 1080
-    }
-  }
-};
-
-export const VIDEO_ENCODINGS = [
-  {
-    rid: 'r0',
-    maxBitrate: 100000,
-    //scaleResolutionDownBy: 10.0,
-    scalabilityMode: 'S1T3'
-  },
-  {
-    rid: 'r1',
-    maxBitrate: 300000,
-    scalabilityMode: 'S1T3'
-  },
-  {
-    rid: 'r2',
-    maxBitrate: 900000,
-    scalabilityMode: 'S1T3'
-  }
-];
-
-export const VIDEO_CODEC_OPTIONS ={
-  videoGoogleStartBitrate: 1000
-};
 
 const MeetingParticipantGrid = (props) => {
     const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
     const [inViewParticipants, setInViewParticipants] = React.useState([]);
     const [consumerTransport, setConsumerTransport] = React.useState(null);
-    const [participantDevice, setParticipantDevice] = React.useState(null);
+    const [device, setDevice] = React.useState(null);
+    const [shareScreenProducer, setShareScreenProducer] = React.useState(null);
     const [producerTransport, setProducerTransport] = React.useState(null);
+    const [shareScreenSource, setShareScreenSource] = React.useState(null);
+    const [screenShared, setScreenShared] = React.useState(null);
+    const [showSharedScreen, setShowSharedScreen] = React.useState(false);
     const [grid, setGrid] = React.useState(null);
     const [systemEventHandler] = useState({});
     const transports = useRef(new Transports());
+    const shareScreenRef = useRef();
     const {
       waitingList,
       step,
       meetingId,
       whiteBoardShown,
-      screenShared,
       videoMuted,
       audioMuted,
       isHost,
       autoPermit,
       rtpCapabilities
     } = props;
+
+    const produceScreenShare = async () => {
+      if (!device) {
+        console.error('No available device');
+        return;
+      }
+
+      if (!device.canProduce('video')) {
+        console.error('Cannot produce screen share');
+        return;
+      }
+
+      if (shareScreenProducer) {
+        console.log('Share screen producer already exist');
+        return
+      }
+
+      const videoConstraints = {
+        cursor: true,
+        audio: false,
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: shareScreenSource.id,
+            width: {min: 160, ideal: 320, max: 640},
+            height: {min: 120, ideal: 240, max: 480},
+            frameRate: {
+              min: 15,
+              max: 15
+            },
+            googCpuOveruseDetection: true,
+            googCpuOveruseEncodeUsage: true,
+            googCpuOveruseThreshold: 70
+          }
+        }
+      };
+
+      let stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
+      const track = stream.getVideoTracks()[0];
+      const params = {
+        track
+      };
+
+      //let producer = await producerTransport.produce(params);
+      //setShareScreenProducer(producer);
+
+      if (showSharedScreen) {
+        shareScreenRef.current.srcObject = stream;
+      }
+
+      /*if (type === 'video') {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        } else {
+          tmpVideoRef.current = stream;
+        }
+      }*/
+
+      /*producer.on('transportclose', () => {
+        stream.srcObject.getTracks().forEach(function (track) {
+          track.stop()
+        });
+
+        producers.delete(type)
+      });
+
+      producer.on('close', () => {
+        stream.srcObject.getTracks().forEach(function (track) {
+          track.stop()
+        });
+
+        producers.delete(type)
+      });*/
+    };
+
+
+    const stopProducingScreenShare = async () => {
+    };
 
     const systemEventHandlerApi = () => {
       return {
@@ -89,7 +135,7 @@ const MeetingParticipantGrid = (props) => {
     };
 
     const onBringToView = (payload) => {
-      if(!inViewParticipants.find(((p) => p.userId === payload.userId))) {
+      if (!inViewParticipants.find(((p) => p.userId === payload.userId))) {
         if (inViewParticipants.length === MAX_COLS * MAX_ROWS) {
           let offViewParticipant = inViewParticipants[inViewParticipants.length - 1];
           appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, offViewParticipant);
@@ -113,7 +159,7 @@ const MeetingParticipantGrid = (props) => {
 
     const setupSelfDevices = async () => {
       let device = await mediaSoupHelper.getParticipantDevice(rtpCapabilities);
-      setParticipantDevice(device);
+      setDevice(device);
 
       let consumerTransport = await mediaSoupHelper.initConsumerTransport(device, meetingId, appManager.getUserDetails().userId);
       let producerTransport = await mediaSoupHelper.initProducerTransport(device, meetingId, appManager.getUserDetails().userId);
@@ -128,6 +174,28 @@ const MeetingParticipantGrid = (props) => {
     useEffect(() => {
       systemEventHandler.api = systemEventHandlerApi();
     });
+
+    useEffect(() => {
+      if (screenShared && shareScreenSource) {
+        produceScreenShare();
+      } else {
+        stopProducingScreenShare();
+      }
+    }, [screenShared, shareScreenSource]);
+
+    useEffect(() => {
+      setShareScreenSource(props.shareScreenSource);
+      if (props.shareScreenSource) {
+        setShowSharedScreen(
+          props.shareScreenSource.name.toLowerCase() !== 'entire screen' &&
+          props.shareScreenSource.name.toLowerCase() !== 'armscor connect'
+        )
+      }
+    }, [props.shareScreenSource]);
+
+    useEffect(() => {
+      setScreenShared(props.screenShared);
+    }, [props.screenShared]);
 
     useEffect(() => {
       appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_IN_VIEW);
@@ -214,7 +282,7 @@ const MeetingParticipantGrid = (props) => {
                           height: '148px'
                         }}>
               <MeetingParticipant data={participant}
-                                  device={participantDevice}
+                                  device={device}
                                   meetingId={meetingId}
                                   audioMuted={audioMuted}
                                   videoMuted={videoMuted}
@@ -253,7 +321,7 @@ const MeetingParticipantGrid = (props) => {
               }
               >
                 <MeetingParticipant data={participant}
-                                    device={participantDevice}
+                                    device={device}
                                     meetingId={meetingId}
                                     audioMuted={audioMuted}
                                     videoMuted={videoMuted}
@@ -272,7 +340,7 @@ const MeetingParticipantGrid = (props) => {
     };
 
     return (
-      participantDevice ?
+      device ?
         <div className={'row grid'}
              style={{height: '100%', width: '100%'}}>
           {
@@ -294,13 +362,26 @@ const MeetingParticipantGrid = (props) => {
               padding: '4px',
               overflowY: 'auto'
             }}>
+              {screenShared && shareScreenSource && !showSharedScreen && (
+                <div className={'row no-margin no-padding'}>
+                  <div>
+                    <Icon id={'WARNING'} color={'rgb(235, 63, 33)'}/>
+                  </div>
+                  <div>
+                    {
+                      (shareScreenSource.name.toLowerCase() === 'entire screen' ? 'Your entire screen' : 'The ' + shareScreenSource.name + ' window')
+                      + ' is being shared with other participants'
+                    }
+                  </div>
+                </div>
+              )}
             </div>
           }
           {
             grid && step !== "LOBBY" &&
             <>
               {
-                (!screenShared && !whiteBoardShown) ?
+                (!screenShared && !whiteBoardShown || (screenShared && !showSharedScreen)) ?
                   <Box sx={{
                     flexGrow: 1,
                     height: 'calc(100% - 232px)',
@@ -336,9 +417,13 @@ const MeetingParticipantGrid = (props) => {
                     </Grid>
                   </Box>
                   :
-                  screenShared ?
+                  (screenShared && showSharedScreen) ?
                     <div className={'content-box'}>
-                      Sharing...
+                      <video
+                        hidden={false}
+                        muted playsinline autoPlay ref={shareScreenRef}
+                        style={{width: '100%', height: '100%', borderRadius: '4px', zIndex: 0}}
+                      />
                     </div>
                     :
                     whiteBoardShown &&
@@ -366,14 +451,14 @@ const MeetingParticipantGrid = (props) => {
           <div className={'row'} style={{
             width: '100%',
             height: '152px',
-            marginLeft: '0',
+            marginLeft: '12px',
             marginRight: '0',
             display: 'flex',
             alignItems: 'center'
           }}>
             <div style={{width: 'calc(100% - 232px)', height: '148px'}}>
               {
-                ((screenShared || whiteBoardShown || step === "LOBBY") && grid) &&
+                (((screenShared && showSharedScreen) || whiteBoardShown || step === "LOBBY") && grid) &&
                 <div style={{width: '100%', height: '100%'}}>
                   {
                     renderStrip()
@@ -385,7 +470,7 @@ const MeetingParticipantGrid = (props) => {
               {
                 currentUserParticipant &&
                 <MeetingParticipant data={currentUserParticipant}
-                                    device={participantDevice}
+                                    device={device}
                                     meetingId={meetingId}
                                     rtpCapabilities={rtpCapabilities}
                                     isCurrentUser={true}
