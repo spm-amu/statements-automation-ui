@@ -125,6 +125,8 @@ const MeetingRoom = (props) => {
     if (step === Steps.LOBBY) {
       setStep(Steps.SESSION);
       props.windowHandler.show();
+      setSideBarTab('People');
+      setSideBarOpen(true);
     }
 
     if (screenShared) {
@@ -289,6 +291,7 @@ const MeetingRoom = (props) => {
         // TODO : Introduce a new step for this
         setStep(Steps.LOBBY);
         setShowWhiteBoard(false);
+        setSideBarOpen(false);
         setMeetingParticipantGridMode('DEFAULT');
         if (screenShared) {
           stopShareScreen();
@@ -301,6 +304,7 @@ const MeetingRoom = (props) => {
       }
     }
   }, [allUserParticipantsLeft]);
+
   /******************************** END USE EFFECT ************************************/
 
   /********************************* HANDSHAKE *******************************/
@@ -655,7 +659,9 @@ const MeetingRoom = (props) => {
                                       meetingTitle={selectedMeeting.title}
                                       userToCall={userToCall}
                                       meetingId={selectedMeeting.id}
-                                      onGridSetup={() => setSideBarTab('People')}
+                                      onGridSetup={() => {
+                                        setSideBarTab('People');
+                                      }}
                                       step={step}
                                       isHost={isHost}
                                       screenShared={screenShared || someoneSharing}
