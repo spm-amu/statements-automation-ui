@@ -14,6 +14,43 @@ import {SystemEventType} from "../../../types";
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
 
+export const VIDEO_CONSTRAINTS = {
+  audio: false,
+  video: {
+    width: {
+      min: 640,
+      ideal: 1920
+    },
+    height: {
+      min: 400,
+      ideal: 1080
+    }
+  }
+};
+
+export const VIDEO_ENCODINGS = [
+  {
+    rid: 'r0',
+    maxBitrate: 100000,
+    //scaleResolutionDownBy: 10.0,
+    scalabilityMode: 'S1T3'
+  },
+  {
+    rid: 'r1',
+    maxBitrate: 300000,
+    scalabilityMode: 'S1T3'
+  },
+  {
+    rid: 'r2',
+    maxBitrate: 900000,
+    scalabilityMode: 'S1T3'
+  }
+];
+
+export const VIDEO_CODEC_OPTIONS ={
+  videoGoogleStartBitrate: 1000
+};
+
 const MeetingParticipantGrid = (props) => {
     const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
     const [inViewParticipants, setInViewParticipants] = React.useState([]);

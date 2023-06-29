@@ -12,6 +12,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Icon from "../../Icon";
 import {PanTool} from "@material-ui/icons";
 import Tooltip from "@material-ui/core/Tooltip";
+import {VIDEO_CODEC_OPTIONS, VIDEO_CONSTRAINTS, VIDEO_ENCODINGS} from "./MeetingParticipantGrid";
 
 const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
@@ -193,7 +194,7 @@ const MeetingParticipant = (props) => {
   }, []);
 
   const produce = async (type) => {
-    let deviceId;
+    /*let deviceId;
 
     navigator.mediaDevices.enumerateDevices().then((devices) =>
       devices.forEach((device) => {
@@ -201,7 +202,7 @@ const MeetingParticipant = (props) => {
           deviceId = device.deviceId;
         }
       })
-    );
+    );*/
 
     if (!device) {
       console.error('No available device');
@@ -228,20 +229,7 @@ const MeetingParticipant = (props) => {
 
         break;
       case 'video':
-        mediaConstraints = {
-          audio: false,
-          video: {
-            width: {
-              min: 640,
-              ideal: 1920
-            },
-            height: {
-              min: 400,
-              ideal: 1080
-            },
-            deviceId: deviceId
-          }
-        };
+        mediaConstraints = VIDEO_CONSTRAINTS;
         break;
       default:
         return;
@@ -254,28 +242,8 @@ const MeetingParticipant = (props) => {
     };
 
     if (type === 'video') {
-      params.encodings = [
-        {
-          rid: 'r0',
-          maxBitrate: 100000,
-          //scaleResolutionDownBy: 10.0,
-          scalabilityMode: 'S2T1'
-        },
-        {
-          rid: 'r1',
-          maxBitrate: 300000,
-          scalabilityMode: 'S2T1'
-        },
-        {
-          rid: 'r2',
-          maxBitrate: 900000,
-          scalabilityMode: 'S2T1'
-        }
-      ];
-
-      params.codecOptions = {
-        videoGoogleStartBitrate: 1000
-      }
+      params.encodings = VIDEO_ENCODINGS;
+      params.codecOptions = VIDEO_CODEC_OPTIONS;
     }
 
     let producer = await producerTransport.produce(params);
