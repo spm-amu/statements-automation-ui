@@ -234,7 +234,7 @@ const MeetingParticipantGrid = (props) => {
     return (
       participantDevice ?
         <div className={'row grid'}
-             style={{height: '100%', width: '100%', padding: '8px'}}>
+             style={{height: '100%', width: '100%'}}>
           {
             step === "LOBBY" &&
             <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState}
@@ -245,14 +245,12 @@ const MeetingParticipantGrid = (props) => {
             height: '40px',
             marginLeft: '0',
             marginRight: '0',
-            border: '2px solid red',
             display: 'flex',
             alignItems: 'center',
             color: 'white',
             fontSize: '16px',
             padding: '4px'
           }}>
-            Amu is sharing
           </div>
           {
             grid && step !== "LOBBY" &&
@@ -271,7 +269,6 @@ const MeetingParticipantGrid = (props) => {
                       width: '100%',
                       display: 'flex',
                       alignItems: 'center',
-                      border: '2px solid white',
                       maxHeight: '100%',
                       overflowY: 'hidden',
                       overflowX: 'hidden'
@@ -310,25 +307,22 @@ const MeetingParticipantGrid = (props) => {
             height: '40px',
             marginLeft: '0',
             marginRight: '0',
-            border: '2px solid red',
             display: 'flex',
             alignItems: 'center',
             color: 'white',
             fontSize: '16px',
             padding: '4px'
           }}>
-            Talker space
           </div>
           <div className={'row'} style={{
             width: '100%',
             height: '152px',
             marginLeft: '0',
             marginRight: '0',
-            border: '2px solid red',
             display: 'flex',
             alignItems: 'center'
           }}>
-            <div style={{width: 'calc(100% - 232px)', height: '148px', border: '2px solid blue'}}>
+            <div style={{width: 'calc(100% - 232px)', height: '148px'}}>
               {
                 ((screenShared || whiteBoardShown || step === "LOBBY") && grid) &&
                 <div style={{width: '100%', height: '100%'}}>
