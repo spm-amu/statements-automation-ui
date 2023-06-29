@@ -46,8 +46,6 @@ const MeetingParticipant = (props) => {
             break;
           case MessageType.CONSUMER_CLOSED:
             if (consumers.has(be.payload.consumerId)) {
-              //console("REM CONS : " + be.payload.kind);
-              console.log("\n\n\n\n\n\n\n\n\n\n\n\n\nREM CONS : ", be.payload);
               removeConsumer(be.payload.consumerId, be.payload.kind);
             }
             break;
@@ -89,10 +87,6 @@ const MeetingParticipant = (props) => {
     eventHandler.api = handler();
     systemEventHandler.api = systemEventHandlerApi();
   });
-
-  useEffect(() => {
-    setVideoMuted(props.videoMuted);
-  }, [props.videoMuted]);
 
   useEffect(() => {
     setAudioMuted(props.audioMuted);

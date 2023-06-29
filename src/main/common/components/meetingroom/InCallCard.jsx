@@ -63,13 +63,13 @@ const InCall = (props) => {
   };
 
   const onNewProducers = (producers) => {
-    for (const producer of producers) {
+    /*for (const producer of producers) {
       if (producer.userId === participant.userId) {
         if (producer.kind === 'video') {
           participant.videoProducers = producers;
         }
       }
-    }
+    }*/
   };
 
   const onAVSettingsChange = (payload) => {
@@ -78,7 +78,7 @@ const InCall = (props) => {
       setVideoMuted(payload.videoMuted);
 
       if(payload.videoMuted) {
-        participant.videoProducers = null;
+        //participant.videoProducers = null;
       }
     }
   };
