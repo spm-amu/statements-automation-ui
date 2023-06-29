@@ -350,7 +350,7 @@ const MeetingParticipant = (props) => {
       }
     } else if (kind === 'audio') {
       let audioElement = document.getElementById(consumerId);
-      if (audioElement) {
+      if (audioElement && audioElement.srcObject) {
         audioElement.srcObject.getTracks().forEach(function (track) {
           track.stop()
         });
