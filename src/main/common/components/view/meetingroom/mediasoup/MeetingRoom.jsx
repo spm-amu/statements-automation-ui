@@ -422,8 +422,8 @@ const MeetingRoom = (props) => {
           })
         }
 
-        //createParticipants(fakeDudes);
-        createParticipants(result.data.usersInRoom);
+        createParticipants(fakeDudes);
+        //createParticipants(result.data.usersInRoom);
 
         if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);

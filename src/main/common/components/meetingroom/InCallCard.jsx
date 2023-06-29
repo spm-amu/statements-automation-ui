@@ -300,6 +300,7 @@ const InCall = (props) => {
                 disabled={inView}
                 onClick={() => {
                   setInView(true);
+                  participant.inView = true;
                   appManager.fireEvent(SystemEventType.PARTICIPANT_IN_VIEW, participant)
                 }}
               >

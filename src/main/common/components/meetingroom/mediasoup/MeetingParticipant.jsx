@@ -8,6 +8,10 @@ import socketManager from "../../../../common/service/SocketManager";
 import mediaSoupHelper from "./MediaSoupHelper";
 import {Buffer} from "buffer/";
 import Tracks from "./Tracks";
+import IconButton from "@material-ui/core/IconButton";
+import Icon from "../../Icon";
+import {PanTool} from "@material-ui/icons";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
@@ -41,7 +45,7 @@ const MeetingParticipant = (props) => {
             onNewProducers(be.payload);
             break;
           case MessageType.CONSUMER_CLOSED:
-            if(consumers.has(be.payload.consumerId)) {
+            if (consumers.has(be.payload.consumerId)) {
               //console("REM CONS : " + be.payload.kind);
               console.log("\n\n\n\n\n\n\n\n\n\n\n\n\nREM CONS : ", be.payload);
               removeConsumer(be.payload.consumerId, be.payload.kind);
@@ -103,9 +107,6 @@ const MeetingParticipant = (props) => {
       }
 
       props.soundMonitor(props.data.userId, soundLevelCounter.current === 0 || audioMuted);
-
-      // Just ensuring that the src object is always set if there is incoming
-      //videoRef.current.srcObject = props.data.stream;
     }
   }, [soundLevel]);
 
@@ -322,13 +323,13 @@ const MeetingParticipant = (props) => {
   const onNewProducers = (producers) => {
     for (const producer of producers) {
       if (producer.userId === props.data.userId) {
-        if(producer.kind === 'video') {
+        if (producer.kind === 'video') {
           consume(producer.producerId, producer.kind);
         }
-      } else if(props.isCurrentUser) {
+      } else if (props.isCurrentUser) {
         // The small participant box at the bottom belonging to the current user must consume all audio
         // This is because we do not want to disturb the audio due to any rendering such as Bring to view
-        if(producer.kind === 'audio') {
+        if (producer.kind === 'audio') {
           consume(producer.producerId, producer.kind);
         }
       }
@@ -336,16 +337,16 @@ const MeetingParticipant = (props) => {
   };
 
   const removeConsumer = (consumerId, kind) => {
-    if(kind === 'video') {
+    if (kind === 'video') {
       let stream = videoRef.current.srcObject;
       if (stream) {
         stream.getTracks().forEach(function (track) {
           track.stop()
         })
       }
-    } else if(kind === 'audio') {
+    } else if (kind === 'audio') {
       let audioElement = document.getElementById(consumerId);
-      if(audioElement) {
+      if (audioElement) {
         audioElement.srcObject.getTracks().forEach(function (track) {
           track.stop()
         });
@@ -367,7 +368,7 @@ const MeetingParticipant = (props) => {
           videoRef.current.srcObject = stream;
           tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
         } else {
-          if(props.isCurrentUser) {
+          if (props.isCurrentUser) {
             let audioElement = document.createElement('audio');
             audioElement.srcObject = stream;
             audioElement.id = consumer.id;
@@ -411,25 +412,129 @@ const MeetingParticipant = (props) => {
              style={{
                padding: props.padding ? props.padding : null,
                height: props.height ? props.height : null,
-               color: 'white'
+               color: 'white',
+               position: 'relative'
              }}>
-          <div style={{color: 'red'}}>
-            {
-              props.data.name
-            }
-          </div>
           {
             <>
-              <video
-                id={props.data.userId + '-video'}
-                width={640}
-                height={320}
-                autoPlay ref={videoRef} muted
-                style={{
-                  width: '100%',
-                  height: '100%'
-                }}
-              />
+              {
+                videoMuted ?
+                  <div className={'centered-flex-box'}
+                       style={{
+                         width: '100%',
+                         height: '100%',
+                         marginBottom: props.sizing === 'sm' ? '8px' : 0
+                       }}>
+                    {
+                      <div className={props.sizing === 'sm' ? 'avatar-wrapper-sm' : 'avatar-wrapper'}
+                           style={{
+                             width: ((props.sizing === 'sm' ? 72 : 112) + soundLevel / 10) + 'px',
+                             height: ((props.sizing === 'sm' ? 72 : 112) + soundLevel / 10) + 'px',
+                             border: !audioMuted && soundLevel > 3 ? (props.sizing === 'sm' ? 2 : 4) + 'px solid #00476a' : 'none'
+                           }}>
+                        <div
+                          className={props.sizing === 'md' ? 'avatar avatar-md' : props.sizing === 'sm' ? 'avatar avatar-sm' : 'avatar'}
+                          data-label={Utils.getInitials(props.data.name)}
+                          style={
+                            {
+                              fontSize: props.sizing === 'sm' ? '20px' : null
+                            }
+                          }/>
+                      </div>
+                    }
+                  </div>
+                  :
+                  <video
+                    id={props.data.userId + '-video'}
+                    width={640}
+                    height={320}
+                    autoPlay ref={videoRef} muted
+                    style={{
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  />
+              }
+              <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}
+                   style={
+                     {
+                       position: 'absolute',
+                       bottom: '0',
+                       padding: props.isCurrentUser || props.sizing !== 'sm' ? '16px' : '4px'
+                     }
+                   }>
+                {!props.isCurrentUser ? getParticipantName() : 'You'}
+                {
+                  !props.isCurrentUser &&
+                  <span style={{marginLeft: '4px'}}>
+                          {
+                            props.isHost && !audioMuted ?
+                              <IconButton
+                                onClick={(e) => {
+                                  props.onHostAudioMute(props.data)
+                                }}
+                                style={{
+                                  marginRight: '4px',
+                                  width: '16px',
+                                  height: '16px',
+                                  color: 'white'
+                                }}
+                              >
+                                <Icon id={'MIC'}/>
+                              </IconButton>
+                              :
+                              <>
+                                {audioMuted ? (
+                                  <Icon id={'MIC_OFF'}/>
+                                ) : (
+                                  <Icon id={'MIC'}/>
+                                )}
+                              </>
+                          }
+                    {
+                      props.data.inView &&
+                      <Tooltip title="Remove from view">
+                        <IconButton
+                          onClick={(e) => {
+                            props.onRemoveFromView(props.data)
+                          }}
+                          style={{
+                            marginRight: '4px',
+                            marginTop: '-16px',
+                            width: '16px',
+                            height: '16px',
+                            color: 'white'
+                          }}
+                        >
+                          <Icon id={'MINIMIZE'}/>
+                        </IconButton>
+                      </Tooltip>
+                    }
+                    {
+                      props.isHost && !videoMuted &&
+                      <IconButton
+                        onClick={(e) => {
+                          props.onHostVideoMute(props.data)
+                        }}
+                        style={{
+                          marginRight: '4px',
+                          width: '16px',
+                          height: '16px',
+                          color: 'white'
+                        }}
+                      >
+                        <Icon id={'CAMERA'}/>
+                      </IconButton>
+                    }
+                        </span>
+                }
+                {
+                  !props.isCurrentUser &&
+                  <span style={{marginLeft: '4px'}}>
+                          {handRaised && <PanTool fontSize={'small'} style={{color: '#e2b030'}}/>}
+                        </span>
+                }
+              </div>
               {
                 props.isCurrentUser &&
                 <div id={props.data.userId + '-audio-el-container'}>

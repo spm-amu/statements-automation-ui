@@ -9,6 +9,7 @@ import Box from "@material-ui/core/Box";
 import appManager from "../../../service/AppManager";
 import mediaSoupHelper from "./MediaSoupHelper";
 import Transports from "./Transports";
+import {SystemEventType} from "../../../types";
 
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
@@ -36,12 +37,50 @@ const MeetingParticipantGrid = (props) => {
       rtpCapabilities
     } = props;
 
+    const systemEventHandlerApi = () => {
+      return {
+        get id() {
+          return 'meeting-participant-grid';
+        },
+        on: (eventType, be) => {
+          switch (eventType) {
+            case SystemEventType.PARTICIPANT_IN_VIEW:
+              onBringToView(be);
+              break;
+          }
+        }
+      }
+    };
+
+    const onBringToView = (payload) => {
+      if (inViewParticipants.length === MAX_COLS * MAX_ROWS) {
+        let offViewParticipant = inViewParticipants[inViewParticipants.length - 1];
+        appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, offViewParticipant);
+
+        inViewParticipants.splice(inViewParticipants.length - 1, 1);
+        offViewParticipant.inView = false;
+      }
+
+      let participant = props.participants.find(((p) => p.userId === payload.userId));
+      inViewParticipants.push(participant);
+      setupGrid();
+    };
+
+    const removeFromView = (participant) => {
+      participant.inView = false;
+      inViewParticipants.splice(inViewParticipants.findIndex((p) => p.userId === participant.userId), 1);
+      appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, participant);
+      setupGrid();
+    };
+
     const setupSelfDevices = async () => {
       let device = await mediaSoupHelper.getParticipantDevice(rtpCapabilities);
       setParticipantDevice(device);
+
       let consumerTransport = await mediaSoupHelper.initConsumerTransport(device, meetingId, appManager.getUserDetails().userId);
-      setConsumerTransport(consumerTransport);
       let producerTransport = await mediaSoupHelper.initProducerTransport(device, meetingId, appManager.getUserDetails().userId);
+
+      setConsumerTransport(consumerTransport);
       setProducerTransport(producerTransport);
 
       transports.current.setConsumerTransport(consumerTransport);
@@ -49,16 +88,23 @@ const MeetingParticipantGrid = (props) => {
     };
 
     useEffect(() => {
+      systemEventHandler.api = systemEventHandlerApi();
+    });
+
+    useEffect(() => {
+      appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_IN_VIEW);
       setupSelfDevices();
       return () => {
+        appManager.removeSubscriptions(systemEventHandler);
+
         transports.current.closeConsumerTransport();
         transports.current.closeProducerTransport();
       };
     }, []);
 
     useEffect(() => {
-      if(grid) {
-        props.onGridSetup(true);
+      if (grid) {
+        props.onGridSetup();
       }
     }, grid);
 
@@ -74,21 +120,21 @@ const MeetingParticipantGrid = (props) => {
           audioMuted
         });
 
-        setupGrid();
+        let counter = 0;
+        inViewParticipants.splice(0, inViewParticipants.length);
+        for (const participant of props.participants) {
+          participant.inView = true;
+          inViewParticipants.push(participant);
+          if (++counter >= MAX_ROWS * MAX_COLS) {
+            break;
+          }
+        }
+
+        setupGrid(inViewParticipants);
       }
     }, [props.participants]);
 
     const setupGrid = () => {
-      let counter = 0;
-      inViewParticipants.splice(0, inViewParticipants.length);
-      for (const participant of props.participants) {
-        participant.inView = true;
-        inViewParticipants.push(participant);
-        if (++counter >= MAX_ROWS * MAX_COLS) {
-          break;
-        }
-      }
-
       let inViewGrid = [];
       let numRows = inViewParticipants.length < MAX_ROWS ? inViewParticipants.length : MAX_ROWS;
       let rows = inViewParticipants.length === 2 ? 1 : numRows;
@@ -99,7 +145,7 @@ const MeetingParticipantGrid = (props) => {
 
       let currentRowIndex = 0;
       for (let i = 0; i < inViewParticipants.length; i++) {
-        inViewGrid[currentRowIndex].push(props.participants[i]);
+        inViewGrid[currentRowIndex].push(inViewParticipants[i]);
         if (currentRowIndex++ === rows - 1) {
           currentRowIndex = 0;
         }
@@ -116,7 +162,7 @@ const MeetingParticipantGrid = (props) => {
             maxWidth: '100%',
             width: '100%',
             borderRadius: '4px',
-            height: '116px',
+            height: '148px',
             overflowY: 'hidden',
             alignItems: 'center'
           }}
@@ -127,15 +173,17 @@ const MeetingParticipantGrid = (props) => {
                           borderRadius: '4px',
                           minWidth: "200px",
                           padding: '4px',
-                          height: '116px'
+                          height: '148px'
                         }}>
               <MeetingParticipant data={participant}
                                   device={participantDevice}
                                   meetingId={meetingId}
                                   audioMuted={audioMuted}
                                   videoMuted={videoMuted}
+                                  onRemoveFromView={(participant) => removeFromView(participant)}
                                   consumerTransport={consumerTransport}
                                   rtpCapabilities={rtpCapabilities}
+                                  sizing={'sm'}
                                   onHostAudioMute={() => props.onHostAudioMute(participant)}
                                   onHostVideoMute={() => props.onHostVideoMute(participant)}
                                   isHost={isHost}/>
@@ -170,6 +218,7 @@ const MeetingParticipantGrid = (props) => {
                                     meetingId={meetingId}
                                     audioMuted={audioMuted}
                                     videoMuted={videoMuted}
+                                    onRemoveFromView={(participant) => removeFromView(participant)}
                                     consumerTransport={consumerTransport}
                                     rtpCapabilities={rtpCapabilities}
                                     onHostAudioMute={() => props.onHostAudioMute(participant)}
@@ -183,7 +232,7 @@ const MeetingParticipantGrid = (props) => {
     };
 
     return (
-      grid !== null && participantDevice ?
+      participantDevice ?
         <div className={'row grid'}
              style={{height: '100%', width: '100%', padding: '8px'}}>
           {
@@ -212,7 +261,7 @@ const MeetingParticipantGrid = (props) => {
                 (!screenShared && !whiteBoardShown) ?
                   <Box sx={{
                     flexGrow: 1,
-                    height: 'calc(100% - 200px)',
+                    height: 'calc(100% - 232px)',
                     width: '100%',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -272,16 +321,16 @@ const MeetingParticipantGrid = (props) => {
           </div>
           <div className={'row'} style={{
             width: '100%',
-            height: '120px',
+            height: '152px',
             marginLeft: '0',
             marginRight: '0',
             border: '2px solid red',
             display: 'flex',
             alignItems: 'center'
           }}>
-            <div style={{width: 'calc(100% - 200px)', height: '116px', border: '2px solid blue'}}>
+            <div style={{width: 'calc(100% - 232px)', height: '148px', border: '2px solid blue'}}>
               {
-                ((screenShared || whiteBoardShown) || step === "LOBBY") &&
+                ((screenShared || whiteBoardShown || step === "LOBBY") && grid) &&
                 <div style={{width: '100%', height: '100%'}}>
                   {
                     renderStrip()
@@ -289,7 +338,7 @@ const MeetingParticipantGrid = (props) => {
                 </div>
               }
             </div>
-            <div className={'col no-margin no-padding'} style={{width: '200px', height: '116px'}}>
+            <div className={'col no-margin no-padding'} style={{width: '200px', height: '148px'}}>
               {
                 currentUserParticipant &&
                 <MeetingParticipant data={currentUserParticipant}
@@ -301,6 +350,7 @@ const MeetingParticipantGrid = (props) => {
                                     producerTransport={producerTransport}
                                     audioMuted={audioMuted}
                                     videoMuted={videoMuted}
+                                    sizing={'md'}
                                     onHostAudioMute={() => props.onHostAudioMute(currentUserParticipant)}
                                     onHostVideoMute={() => props.onHostVideoMute(currentUserParticipant)}
                                     isHost={isHost}/>

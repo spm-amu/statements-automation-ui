@@ -88,11 +88,12 @@ a:hover {
   z-index: 1051 !important;
 }
 
+.avatar-sm,
 .avatar-md,
 .avatar {
   font-size: 36px;
-  width: 3em;
-  height: 3em;
+  width: 112px;
+  height: 112px;
   border-radius: 50%;
   background: #00476a;
   display: inline-flex;
@@ -101,8 +102,13 @@ a:hover {
 }
 
 .avatar-md {
-  width: 2.6em;
-  height: 2.6em;
+  width: 98px;
+  height: 98px;
+}
+
+.avatar-sm {
+  width: 72px;
+  height: 72px;
 }
 
 .avatar::after {
