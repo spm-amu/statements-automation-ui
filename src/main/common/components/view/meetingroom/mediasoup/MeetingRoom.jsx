@@ -410,9 +410,7 @@ const MeetingRoom = (props) => {
 
         setRtpCapabilities(result.data.rtpCapabilities);
 
-
-
-        let fakeDudes = [];
+        /*let fakeDudes = [];
         for(let i=0;i<100;i++) {
           fakeDudes.push({
             userId: 'dude-' + i,
@@ -422,8 +420,8 @@ const MeetingRoom = (props) => {
           })
         }
 
-        createParticipants(fakeDudes);
-        //createParticipants(result.data.usersInRoom);
+        createParticipants(fakeDudes);*/
+        createParticipants(result.data.usersInRoom);
 
         if (result.data.whiteboard) {
           setWhiteboardItems(result.data.whiteboard.items);
