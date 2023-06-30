@@ -16,6 +16,7 @@ import socketManager from "../../../service/SocketManager";
 const MAX_COLS = 3;
 const MAX_ROWS = 2;
 
+// TODO : Clean-up all tracks and producers and consumers when the component closes
 const MeetingParticipantGrid = (props) => {
     const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
     const [inViewParticipants, setInViewParticipants] = React.useState([]);
@@ -33,8 +34,6 @@ const MeetingParticipantGrid = (props) => {
     const [systemEventHandler] = useState({});
     const [eventHandler] = useState({});
     const transports = useRef(new Transports());
-    const shareScreenRef = useRef();
-    const tmpShareScreenRef = useRef();
     const {
       waitingList,
       step,
@@ -46,6 +45,18 @@ const MeetingParticipantGrid = (props) => {
       autoPermit,
       rtpCapabilities
     } = props;
+
+    const addShareScreenElement = (stream) => {
+      let parent = document.getElementById('share-screen-container');
+      if(parent) {
+        let shareScreenVideoElement = document.createElement('video');
+        shareScreenVideoElement.srcObject = stream;
+        shareScreenVideoElement.id = 'share-screen-video';
+        shareScreenVideoElement.playsinline = false;
+        shareScreenVideoElement.autoplay = true;
+        parent.appendChild(shareScreenVideoElement);
+      }
+    };
 
     const produceScreenShare = async () => {
       if (!device) {
@@ -95,10 +106,8 @@ const MeetingParticipantGrid = (props) => {
       let producer = await producerTransport.produce(params);
       setShareScreenProducer(producer);
 
-      if (showSharedScreen && shareScreenRef.current) {
-        shareScreenRef.current.srcObject = stream;
-      } else {
-        tmpShareScreenRef.current = stream;
+      if (showSharedScreen) {
+        addShareScreenElement(stream);
       }
 
       producer.on('transportclose', () => {
@@ -138,6 +147,8 @@ const MeetingParticipantGrid = (props) => {
           track.stop()
         });
       }
+
+      setShareScreenProducer(null);
     };
 
     const onNewProducers = (producers) => {
@@ -156,6 +167,15 @@ const MeetingParticipantGrid = (props) => {
           })
         }
       }
+
+      let el = document.getElementById('share-screen-video');
+      if(el) {
+        for (const track of el.srcObject.getTracks()) {
+          track.stop();
+        }
+      }
+
+      el.parentNode.removeChild(el);
     };
 
     const consume = async (producer) => {
@@ -166,15 +186,10 @@ const MeetingParticipantGrid = (props) => {
             setShareScreenConsumer(consumer);
 
             console.log("\n\n\n=====================================SHARING CONSUME=====================================");
-            if (shareScreenRef.current) {
-              shareScreenRef.current.srcObject = stream;
-            } else {
-              tmpShareScreenRef.current = stream;
-            }
-
             props.sharingHandler(true);
             setSomeoneSharing(true);
             setMessage(producer.username + " is sharing");
+            addShareScreenElement(stream);
 
             consumer.on(
               'trackended',
@@ -273,14 +288,6 @@ const MeetingParticipantGrid = (props) => {
       eventHandler.api = handler();
       systemEventHandler.api = systemEventHandlerApi();
     });
-
-    useEffect(() => {
-      //alert(shareScreenRef.current + " : " + tmpShareScreenRef.current);
-      if (shareScreenRef.current && tmpShareScreenRef.current) {
-        shareScreenRef.current.srcObject = tmpShareScreenRef.current;
-        tmpShareScreenRef.current = null;
-      }
-    }, [shareScreenRef.current, someoneSharing]);
 
     useEffect(() => {
       if (screenShared && shareScreenSource) {
@@ -538,12 +545,7 @@ const MeetingParticipantGrid = (props) => {
                   </Box>
                   :
                   ((screenShared && showSharedScreen) || someoneSharing) ?
-                    <div className={'content-box'}>
-                      <video
-                        hidden={false}
-                        muted playsinline autoPlay ref={shareScreenRef}
-                        style={{width: '100%', height: '100%', borderRadius: '4px', zIndex: 0}}
-                      />
+                    <div className={'content-box'} id={'share-screen-container'}>
                     </div>
                     :
                     whiteBoardShown &&
