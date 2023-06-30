@@ -128,10 +128,6 @@ const MeetingParticipant = (props) => {
   });
 
   useEffect(() => {
-    setAudioMuted(props.audioMuted);
-  }, [props.audioMuted]);
-
-  useEffect(() => {
     if (props.soundMonitor && !props.inView) {
       if (soundLevel > 3) {
         soundLevelCounter.current = 10;
