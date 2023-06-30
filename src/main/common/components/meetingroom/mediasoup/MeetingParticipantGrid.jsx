@@ -34,6 +34,7 @@ const MeetingParticipantGrid = (props) => {
     const [systemEventHandler] = useState({});
     const [eventHandler] = useState({});
     const transports = useRef(new Transports());
+    const sharingStream = useRef();
     const {
       waitingList,
       step,
@@ -175,8 +176,8 @@ const MeetingParticipantGrid = (props) => {
             console.log("\n\n\n=====================================SHARING CONSUME=====================================");
             props.sharingHandler(true);
             setSomeoneSharing(true);
+            sharingStream.current = stream;
             setMessage(producer.username + " is sharing");
-            addShareScreenElement(stream);
 
             consumer.on(
               'trackended',
@@ -275,6 +276,13 @@ const MeetingParticipantGrid = (props) => {
       eventHandler.api = handler();
       systemEventHandler.api = systemEventHandlerApi();
     });
+
+    useEffect(() => {
+      if(someoneSharing) {
+        addShareScreenElement(sharingStream.current);
+        sharingStream.current = null;
+      }
+    }, [someoneSharing]);
 
     useEffect(() => {
       if (screenShared && shareScreenSource) {

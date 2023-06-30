@@ -60,7 +60,6 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
-  const tmpVideoRef = useRef();
   const tracks = useRef(new Tracks());
   const soundLevelCounter = useRef(0);
   const showVideo = true;
@@ -183,13 +182,6 @@ const MeetingParticipant = (props) => {
   }, [props.data]);
 
   useEffect(() => {
-    if(videoRef.current && !videoRef.current.srcObject && tmpVideoRef.current) {
-      videoRef.current.srcObject = tmpVideoRef.current;
-      tmpVideoRef.current = null;
-    }
-  }, [videoRef.current, videoMuted]);
-
-  useEffect(() => {
     if (producerTransport) {
       if (videoMuted) {
         stopProducing('video');
@@ -287,11 +279,8 @@ const MeetingParticipant = (props) => {
     producers.set(type, producer);
 
     if (type === 'video') {
-      if(videoRef.current) {
-        videoRef.current.srcObject = stream;
-      } else {
-        tmpVideoRef.current = stream;
-      }
+      alert(videoRef.current);
+      videoRef.current.srcObject = stream;
     }
 
     producer.on('transportclose', () => {
@@ -382,11 +371,8 @@ const MeetingParticipant = (props) => {
 
           console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
           if (kind === 'video') {
-            if (videoRef.current) {
-              videoRef.current.srcObject = stream;
-            } else {
-              tmpVideoRef.current = stream;
-            }
+            alert(videoRef.current);
+            videoRef.current.srcObject = stream;
 
             setVideoMuted(false);
             tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
@@ -442,7 +428,7 @@ const MeetingParticipant = (props) => {
           {
             <>
               {
-                videoMuted ?
+                (videoMuted || !videoRef.current || !videoRef.current.srcObject) &&
                   <div className={'centered-flex-box'}
                        style={{
                          width: '100%',
@@ -467,17 +453,19 @@ const MeetingParticipant = (props) => {
                       </div>
                     }
                   </div>
-                  :
-                  <video
-                    id={props.data.userId + '-video'}
-                    width={640}
-                    height={320}
-                    autoPlay ref={videoRef} muted
-                    style={{
-                      width: '100%',
-                      height: '100%'
-                    }}
-                  />
+              }
+
+              {
+                <video
+                  id={props.data.userId + '-video'}
+                  width={640}
+                  height={320}
+                  autoPlay ref={videoRef} muted
+                  style={{
+                    width: '100%',
+                    height: '100%'
+                  }}
+                />
               }
               <div className={props.sizing === 'sm' ? 'name-label-sm' : 'name-label'}
                    style={
