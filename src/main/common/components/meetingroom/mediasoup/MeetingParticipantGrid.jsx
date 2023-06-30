@@ -29,6 +29,7 @@ const MeetingParticipantGrid = (props) => {
     const [message, setMessage] = React.useState(false);
     const [grid, setGrid] = React.useState(null);
     const [systemEventHandler] = useState({});
+    const [eventHandler] = useState({});
     const transports = useRef(new Transports());
     const shareScreenRef = useRef();
     const {
@@ -127,7 +128,7 @@ const MeetingParticipantGrid = (props) => {
       }).catch((e) => console.log("PRODUCER_CLOSED ERROR : ", e));
 
       shareScreenProducer.close();
-      if(shareScreenRef.current && shareScreenRef.current.srcObject) {
+      if (shareScreenRef.current && shareScreenRef.current.srcObject) {
         shareScreenRef.current.srcObject.getTracks().forEach(function (track) {
           track.stop()
         });
@@ -135,9 +136,24 @@ const MeetingParticipantGrid = (props) => {
     };
 
     const onNewProducers = (producers) => {
-      let screenShareProducer = producers.find((p) => p.isScreenSharing);
-      if(screenShareProducer) {
+      let screenShareProducer = producers.find((p) => p.screenSharing);
+      if (screenShareProducer) {
         alert(screenShareProducer.username + " is sharing");
+      }
+    };
+
+    const handler = () => {
+      return {
+        get id() {
+          return 'meeting-participant-grid';
+        },
+        on: (eventType, be) => {
+          switch (eventType) {
+            case MessageType.NEW_PRODUCERS:
+              onNewProducers(be.payload);
+              break;
+          }
+        }
       }
     };
 
@@ -194,6 +210,7 @@ const MeetingParticipantGrid = (props) => {
     };
 
     useEffect(() => {
+      eventHandler.api = handler();
       systemEventHandler.api = systemEventHandlerApi();
     });
 
@@ -221,9 +238,11 @@ const MeetingParticipantGrid = (props) => {
 
     useEffect(() => {
       appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_IN_VIEW);
+      socketManager.addSubscriptions(eventHandler, MessageType.NEW_PRODUCERS);
       setupSelfDevices();
       return () => {
         appManager.removeSubscriptions(systemEventHandler);
+        socketManager.removeSubscriptions(eventHandler);
 
         transports.current.closeConsumerTransport();
         transports.current.closeProducerTransport();

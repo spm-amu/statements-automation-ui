@@ -101,6 +101,7 @@ class MediaSoupHelper {
     producerTransport.on(
       'produce',
       async function ({kind, rtpParameters, appData}, callback, errback) {
+        console.log("\n\n\n\n\n\nAPP DATA : ", appData);
         try {
           const {producerId} = await socketManager.emitEvent(MessageType.PRODUCE, {
             producerTransportId: producerTransport.id,
