@@ -373,10 +373,9 @@ const MeetingParticipant = (props) => {
 
           console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
           if (kind === 'video') {
-            alert(videoRef.current);
             videoRef.current.srcObject = stream;
-
             setVideoMuted(false);
+            setVideoRefresher(!videoRefresher);
             tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
           } else {
             if (props.isCurrentUser) {
