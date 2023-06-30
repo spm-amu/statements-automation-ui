@@ -461,7 +461,7 @@ const MeetingParticipant = (props) => {
                   height={320}
                   autoPlay ref={videoRef} muted
                   style={{
-                    width: (videoMuted || !videoRef.current || !videoRef.current.srcObject) : 0 : '100%',
+                    width: (videoMuted || !videoRef.current || !videoRef.current.srcObject) ? 0 : '100%',
                     height: (videoMuted || !videoRef.current || !videoRef.current.srcObject) ? 0 : '100%'
                   }}
                 />
