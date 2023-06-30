@@ -5,6 +5,7 @@ import Utils from '../../../Utils';
 import {MessageType, SystemEventType} from "../../../types";
 import appManager from "../../../../common/service/AppManager";
 import socketManager from "../../../../common/service/SocketManager";
+import mediaRecorder from "./MediaRecorder";
 import mediaSoupHelper from "./MediaSoupHelper";
 import {Buffer} from "buffer/";
 import Tracks from "./Tracks";
@@ -60,7 +61,6 @@ const MeetingParticipant = (props) => {
   const [producers] = React.useState(new Map());
   const [consumers] = React.useState(new Map());
   const [soundLevel, setSoundLevel] = React.useState(0);
-  const [mediaRecorder, setMediaRecorder] = React.useState(null);
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
@@ -135,8 +135,14 @@ const MeetingParticipant = (props) => {
   }, [props.isRecording]);
 
   useEffect(() => {
-    if(isRecording) {
+    if(mediaRecorder) {
+      if (isRecording) {
+        mediaRecorder.recordMeeting();
+      } else {
+        mediaRecorder.stopRecordingMeeting();
+      }
     } else {
+      alert("NO MEDIA RECORDER");
     }
   }, [isRecording]);
 
@@ -220,12 +226,16 @@ const MeetingParticipant = (props) => {
     }
 
     if(props.isHost) {
-      setMediaRecorder(new MediaRecorder());
+      mediaRecorder.init(props.meetingId, props.meetingTitle);
     }
 
     return () => {
       stopProducing('audio');
       stopProducing('video');
+
+      if(mediaRecorder) {
+        mediaRecorder.stopRecordingMeeting();
+      }
 
       for (const consumer of consumers) {
         consumer.track?.stop();
@@ -371,9 +381,6 @@ const MeetingParticipant = (props) => {
           track.stop();
           if(mediaRecorder) {
             mediaRecorder.removeTrack(track);
-
-
-
           }
         });
 

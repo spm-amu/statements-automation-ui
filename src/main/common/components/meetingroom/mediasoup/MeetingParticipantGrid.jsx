@@ -40,6 +40,7 @@ const MeetingParticipantGrid = (props) => {
       waitingList,
       step,
       meetingId,
+      meetingTitle,
       whiteBoardShown,
       videoMuted,
       audioMuted,
@@ -587,6 +588,7 @@ const MeetingParticipantGrid = (props) => {
                 <MeetingParticipant data={currentUserParticipant}
                                     device={device}
                                     meetingId={meetingId}
+                                    meetingTitle={meetingTitle}
                                     rtpCapabilities={rtpCapabilities}
                                     isCurrentUser={true}
                                     isRecording={isRecording}

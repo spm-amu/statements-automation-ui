@@ -269,11 +269,8 @@ const MeetingRoom = (props) => {
     appManager.add('CURRENT_MEETING', selectedMeeting);
 
     return () => {
-      if (isRecordingRef.current) {
-        stopRecordingMeeting();
-      }
-
       endCall(false);
+      setIsRecording(false);
 
       socketManager.removeSubscriptions(eventHandler);
       appManager.removeSubscriptions(systemEventHandler);
@@ -494,12 +491,70 @@ const MeetingRoom = (props) => {
     }
   };
 
+  const onSystemEvent = (payload) => {
+    if (payload.systemEventType === "SHARE_SCREEN") {
+      let participant = participants.find((p) => p.userId === payload.data.userId);
+      if (participant) {
+        if (payload.data.shared) {
+          if(participant.name) {
+            handleMessageArrived({
+              message: participant.name + " started sharing"
+            });
+          }
+        }
+      }
+    } else if (payload.systemEventType === "HOST_CHANGED_AV_SETTINGS") {
+      if (payload.data.userId === appManager.getUserDetails().userId) {
+        onAVSettingsChange(payload.data);
+        if (payload.data.audioMuted) {
+          handleMessageArrived({
+            message: "You have been muted by the meeting host"
+          })
+        } else if (payload.data.videoMuted) {
+          handleMessageArrived({
+            message: "Your video has been turned off by the meeting host"
+          })
+        }
+      }
+    }
+  };
+
+  const emitSystemEvent = (eventType, data, toParticipantIds = null) => {
+    let participantIds = [];
+    if (!toParticipantIds) {
+      for (const participant of participants) {
+        if (participant.userId !== appManager.getUserDetails().userId) {
+          participantIds.push(participant.userId);
+        }
+      }
+    } else {
+      participantIds = participantIds.concat(toParticipantIds);
+    }
+
+    console.log("\n\n\\n\nSYSTEM EVENT PARTICIPANTS : ", participantIds);
+
+    socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
+      systemEventType: eventType,
+      recipients: participantIds,
+      data: data
+    }).catch((error) => {
+    });
+  };
+
   const recordMeeting = () => {
     setIsRecording(true);
+    emitSystemEvent("MEETING_RECORDING", {
+      recording: true,
+      userId: appManager.getUserDetails().userId
+    });
   };
 
   const stopRecordingMeeting = () => {
     setIsRecording(false);
+    emitSystemEvent("MEETING_RECORDING", {
+      recording: false,
+      userId: appManager.getUserDetails().userId
+    });
   };
 
   /********************************** HANG-UP *******************************/

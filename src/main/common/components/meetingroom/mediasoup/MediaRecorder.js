@@ -4,29 +4,33 @@ import appManager from "../../../service/AppManager";
 
 const {electron} = window;
 
-export default class MediaRecorder {
+class MeetingRoomRecorder {
 
-  constructor(meetingId, meetingTitle) {
-    this.meetingId = meetingId;
-    this.meetingTitle = meetingTitle;
+  constructor() {
+    this.meetingId = null;
+    this.meetingTitle = '';
     this.recordingSequence = 0;
     this.currentRecordingId = null;
     this.recordingType = null;
     this.recordingSize = null;
     this.isRecording = false;
-    this.mediaRecorder = null;
+    this.recorder = null;
   }
 
-  init = async () => {
-    this.mediaRecorder = await this.createMediaRecorder();
+  init = async (meetingId, meetingTitle) => {
+    this.meetingId = meetingId;
+    this.meetingTitle = meetingTitle;
+    this.createMediaRecorder().then((recorder) => {
+      this.recorder = recorder;
+    })
   };
 
   addTrack = (track) => {
-    this.mediaRecorder.stream.addTrack(track);
+    this.recorder.stream.addTrack(track);
   };
 
   removeTrack = (track) => {
-    this.mediaRecorder.stream.removeTrack(track);
+    this.recorder.stream.removeTrack(track);
   };
 
   handleRecordingDataAvailable = (e) => {
@@ -96,19 +100,15 @@ export default class MediaRecorder {
 
   recordMeeting = () => {
     let _this = this;
-    if (this.mediaRecorder != null) {
+    if (this.recorder != null) {
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
         roomID: this.meetingId,
         isRecording: true
       }).then((data) => {
+        console.log("RECORDING STARTED");
         _this.currentRecordingId = data.id;
-        _this.mediaRecorder.start(60000);
-
+        _this.recorder.start(60000);
         _this.isRecording = true;
-        emitSystemEvent("MEETING_RECORDING", {
-          recording: true,
-          userId: appManager.getUserDetails().userId
-        });
       }).catch((error) => {
         console.log("RECORD START ERROR");
         console.log(error);
@@ -117,19 +117,19 @@ export default class MediaRecorder {
   };
 
   stopRecordingMeeting = () => {
-    if (this.mediaRecorder != null) {
-      this.mediaRecorder.stop();
-      socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
-        roomID: this.meetingId,
-        isRecording: false
-      }).catch((error) => {
-      });
+    if (this.recorder != null) {
+      try {
+        this.recorder.stop();
+        socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
+          roomID: this.meetingId,
+          isRecording: false
+        }).catch((error) => {
+        });
 
-      this.isRecording = false;
-      emitSystemEvent("MEETING_RECORDING", {
-        recording: false,
-        userId: appManager.getUserDetails().userId
-      });
+        this.isRecording = false;
+      } catch(e) {
+        console.error(e);
+      }
     }
   };
 
@@ -137,7 +137,7 @@ export default class MediaRecorder {
     this.isRecording = false;
   };
 
-  createMediaRecorder = async () => {
+  createMediaRecorder = () => {
     return new Promise((resolve, reject) => {
       electron.ipcRenderer.getMainWindowId()
         .then((id) => {
@@ -181,3 +181,7 @@ export default class MediaRecorder {
     });
   };
 }
+
+const instance = new MeetingRoomRecorder();
+export default instance;
+
