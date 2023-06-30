@@ -162,7 +162,7 @@ const MeetingParticipantGrid = (props) => {
       mediaSoupHelper.getConsumeStream(producer.producerId, device.rtpCapabilities, consumerTransport,
         props.meetingId, appManager.getUserDetails().userId, 'video').then(
         ({consumer, stream, kind}) => {
-          if(consumer) {
+          if (consumer) {
             setShareScreenConsumer(consumer);
 
             console.log("\n\n\n=====================================SHARING CONSUME=====================================");
@@ -275,11 +275,12 @@ const MeetingParticipantGrid = (props) => {
     });
 
     useEffect(() => {
+      //alert(shareScreenRef.current + " : " + tmpShareScreenRef.current);
       if (shareScreenRef.current && tmpShareScreenRef.current) {
         shareScreenRef.current.srcObject = tmpShareScreenRef.current;
         tmpShareScreenRef.current = null;
       }
-    }, [shareScreenRef.current, tmpShareScreenRef.current]);
+    }, [shareScreenRef.current, someoneSharing]);
 
     useEffect(() => {
       if (screenShared && shareScreenSource) {
@@ -305,7 +306,7 @@ const MeetingParticipantGrid = (props) => {
 
     useEffect(() => {
       appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_IN_VIEW);
-      socketManager.addSubscriptions(eventHandler, MessageType.NEW_PRODUCERS);
+      socketManager.addSubscriptions(eventHandler, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
       setupSelfDevices();
       return () => {
         appManager.removeSubscriptions(systemEventHandler);
@@ -472,15 +473,20 @@ const MeetingParticipantGrid = (props) => {
             }}>
               {((screenShared && shareScreenSource && !showSharedScreen) || someoneSharing) && (
                 <div className={'row no-margin no-padding'}>
-                  <div>
-                    <Icon id={'WARNING'} color={'rgb(235, 63, 33)'}/>
-                  </div>
-                  <div>
-                    {
-                      (shareScreenSource.name.toLowerCase() === 'entire screen' ? 'Your entire screen' : 'The ' + shareScreenSource.name + ' window')
-                      + ' is being shared with other participants'
-                    }
-                  </div>
+                  {
+                    shareScreenSource &&
+                    <>
+                      <div>
+                        <Icon id={'WARNING'} color={'rgb(235, 63, 33)'}/>
+                      </div>
+                      <div>
+                        {
+                          (shareScreenSource.name.toLowerCase() === 'entire screen' ? 'Your entire screen' : 'The ' + shareScreenSource.name + ' window')
+                          + ' is being shared with other participants'
+                        }
+                      </div>
+                    </>
+                  }
                   {
                     message &&
                     <span>
@@ -495,7 +501,7 @@ const MeetingParticipantGrid = (props) => {
             grid && step !== "LOBBY" &&
             <>
               {
-                (!screenShared && !whiteBoardShown || (screenShared && !showSharedScreen)) ?
+                (!screenShared && !whiteBoardShown || (screenShared && !showSharedScreen) && !someoneSharing) ?
                   <Box sx={{
                     flexGrow: 1,
                     height: 'calc(100% - 232px)',
@@ -572,7 +578,7 @@ const MeetingParticipantGrid = (props) => {
           }}>
             <div style={{width: 'calc(100% - 232px)', height: '148px'}}>
               {
-                (((screenShared && showSharedScreen) || whiteBoardShown || step === "LOBBY") && grid) &&
+                (((screenShared && showSharedScreen) || whiteBoardShown || step === "LOBBY" || someoneSharing) && grid) &&
                 <div style={{width: '100%', height: '100%'}}>
                   {
                     renderStrip()

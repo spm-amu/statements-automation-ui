@@ -63,7 +63,7 @@ const InCall = (props) => {
   };
 
   const onNewProducers = (producers) => {
-    if(producers.find((p) => p.kind === 'video')) {
+    if(producers.find((p) => p.kind === 'video' && !p.screenSharing)) {
       participant.videoProducers = producers;
     }
   };
