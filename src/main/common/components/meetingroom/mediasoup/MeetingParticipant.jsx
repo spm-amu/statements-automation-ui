@@ -454,7 +454,6 @@ const MeetingParticipant = (props) => {
                     }
                   </div>
               }
-
               {
                 <video
                   id={props.data.userId + '-video'}
@@ -462,8 +461,8 @@ const MeetingParticipant = (props) => {
                   height={320}
                   autoPlay ref={videoRef} muted
                   style={{
-                    width: '100%',
-                    height: '100%'
+                    width: (videoMuted || !videoRef.current || !videoRef.current.srcObject) : 0 : '100%',
+                    height: (videoMuted || !videoRef.current || !videoRef.current.srcObject) ? 0 : '100%'
                   }}
                 />
               }
