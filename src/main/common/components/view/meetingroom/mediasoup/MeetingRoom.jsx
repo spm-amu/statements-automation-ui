@@ -689,6 +689,7 @@ const MeetingRoom = (props) => {
                                       isHost={isHost}
                                       screenShared={screenShared || someoneSharing}
                                       whiteBoardShown={showWhiteBoard}
+                                      sharingHandler={(someoneSharing) => setSomeoneSharing(someoneSharing)}
                                       autoPermit={autoPermit}
                                       rtpCapabilities={rtpCapabilities}
                                       allUserParticipantsLeft={allUserParticipantsLeft}

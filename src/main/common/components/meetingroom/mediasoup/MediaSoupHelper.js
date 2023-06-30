@@ -152,26 +152,30 @@ class MediaSoupHelper {
       kind: type
     });
 
-    const { id, kind, rtpParameters } = data.params;
+    if(data.params) {
+      const {id, kind, rtpParameters} = data.params;
 
-    let codecOptions = {};
-    const consumer = await consumerTransport.consume({
-      id,
-      producerId,
-      kind,
-      rtpParameters,
-      codecOptions
-    });
+      let codecOptions = {};
+      const consumer = await consumerTransport.consume({
+        id,
+        producerId,
+        kind,
+        rtpParameters,
+        codecOptions
+      });
 
-    console.log(consumer);
-    const stream = new MediaStream();
-    stream.addTrack(consumer.track);
+      console.log(consumer);
+      const stream = new MediaStream();
+      stream.addTrack(consumer.track);
 
-    return {
-      consumer,
-      stream,
-      kind
+      return {
+        consumer,
+        stream,
+        kind
+      }
     }
+
+    return {};
   }
 }
 

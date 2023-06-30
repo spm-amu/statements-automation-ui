@@ -377,42 +377,44 @@ const MeetingParticipant = (props) => {
   const consume = async (producerId, kind) => {
     mediaSoupHelper.getConsumeStream(producerId, device.rtpCapabilities, consumerTransport, props.meetingId, appManager.getUserDetails().userId, kind).then(
       ({consumer, stream, kind}) => {
-        consumers.set(consumer.id, consumer);
+        if (consumer) {
+          consumers.set(consumer.id, consumer);
 
-        console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
-        if (kind === 'video') {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
+          console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
+          if (kind === 'video') {
+            if (videoRef.current) {
+              videoRef.current.srcObject = stream;
+            } else {
+              tmpVideoRef.current = stream;
+            }
+
+            setVideoMuted(false);
+            tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
           } else {
-            tmpVideoRef.current = stream;
+            if (props.isCurrentUser) {
+              let audioElement = document.createElement('audio');
+              audioElement.srcObject = stream;
+              audioElement.id = consumer.id;
+              audioElement.playsinline = false;
+              audioElement.autoplay = true;
+              document.getElementById(props.data.userId + '-audio-el-container').appendChild(audioElement);
+            }
           }
 
-          setVideoMuted(false);
-          tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
-        } else {
-          if (props.isCurrentUser) {
-            let audioElement = document.createElement('audio');
-            audioElement.srcObject = stream;
-            audioElement.id = consumer.id;
-            audioElement.playsinline = false;
-            audioElement.autoplay = true;
-            document.getElementById(props.data.userId + '-audio-el-container').appendChild(audioElement);
-          }
+          consumer.on(
+            'trackended',
+            () => {
+              removeConsumer(consumer.id, kind)
+            }
+          );
+
+          consumer.on(
+            'transportclose',
+            () => {
+              removeConsumer(consumer.id, kind)
+            }
+          )
         }
-
-        consumer.on(
-          'trackended',
-          () => {
-            removeConsumer(consumer.id, kind)
-          }
-        );
-
-        consumer.on(
-          'transportclose',
-          () => {
-            removeConsumer(consumer.id, kind)
-          }
-        )
       }
     )
   };

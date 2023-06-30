@@ -25,13 +25,16 @@ const MeetingParticipantGrid = (props) => {
     const [producerTransport, setProducerTransport] = React.useState(null);
     const [shareScreenSource, setShareScreenSource] = React.useState(null);
     const [screenShared, setScreenShared] = React.useState(null);
+    const [someoneSharing, setSomeoneSharing] = React.useState(null);
     const [showSharedScreen, setShowSharedScreen] = React.useState(false);
-    const [message, setMessage] = React.useState(false);
+    const [message, setMessage] = React.useState('');
+    const [shareScreenConsumer, setShareScreenConsumer] = React.useState(null);
     const [grid, setGrid] = React.useState(null);
     const [systemEventHandler] = useState({});
     const [eventHandler] = useState({});
     const transports = useRef(new Transports());
     const shareScreenRef = useRef();
+    const tmpShareScreenRef = useRef();
     const {
       waitingList,
       step,
@@ -92,8 +95,10 @@ const MeetingParticipantGrid = (props) => {
       let producer = await producerTransport.produce(params);
       setShareScreenProducer(producer);
 
-      if (showSharedScreen) {
+      if (showSharedScreen && shareScreenRef.current) {
         shareScreenRef.current.srcObject = stream;
+      } else {
+        tmpShareScreenRef.current = stream;
       }
 
       producer.on('transportclose', () => {
@@ -138,8 +143,55 @@ const MeetingParticipantGrid = (props) => {
     const onNewProducers = (producers) => {
       let screenShareProducer = producers.find((p) => p.screenSharing);
       if (screenShareProducer) {
-        alert(screenShareProducer.username + " is sharing");
+        consume(screenShareProducer);
       }
+    };
+
+    const stopShareScreenConsumerTracks = () => {
+      if (shareScreenRef.current) {
+        let stream = shareScreenRef.current.srcObject;
+        if (stream) {
+          stream.getTracks().forEach(function (track) {
+            track.stop()
+          })
+        }
+      }
+    };
+
+    const consume = async (producer) => {
+      mediaSoupHelper.getConsumeStream(producer.producerId, device.rtpCapabilities, consumerTransport,
+        props.meetingId, appManager.getUserDetails().userId, 'video').then(
+        ({consumer, stream, kind}) => {
+          if(consumer) {
+            setShareScreenConsumer(consumer);
+
+            console.log("\n\n\n=====================================SHARING CONSUME=====================================");
+            if (shareScreenRef.current) {
+              shareScreenRef.current.srcObject = stream;
+            } else {
+              tmpShareScreenRef.current = stream;
+            }
+
+            props.sharingHandler(true);
+            setSomeoneSharing(true);
+            setMessage(producer.username + " is sharing");
+
+            consumer.on(
+              'trackended',
+              () => {
+                stopShareScreenConsumerTracks()
+              }
+            );
+
+            consumer.on(
+              'transportclose',
+              () => {
+                stopShareScreenConsumerTracks()
+              }
+            )
+          }
+        }
+      )
     };
 
     const handler = () => {
@@ -151,6 +203,14 @@ const MeetingParticipantGrid = (props) => {
           switch (eventType) {
             case MessageType.NEW_PRODUCERS:
               onNewProducers(be.payload);
+              break;
+            case MessageType.CONSUMER_CLOSED:
+              if (shareScreenConsumer && shareScreenConsumer.id === be.payload.consumerId) {
+                stopShareScreenConsumerTracks();
+                setMessage(null);
+                props.sharingHandler(false);
+                setSomeoneSharing(false);
+              }
               break;
           }
         }
@@ -213,6 +273,13 @@ const MeetingParticipantGrid = (props) => {
       eventHandler.api = handler();
       systemEventHandler.api = systemEventHandlerApi();
     });
+
+    useEffect(() => {
+      if (shareScreenRef.current && tmpShareScreenRef.current) {
+        shareScreenRef.current.srcObject = tmpShareScreenRef.current;
+        tmpShareScreenRef.current = null;
+      }
+    }, [shareScreenRef.current, tmpShareScreenRef.current]);
 
     useEffect(() => {
       if (screenShared && shareScreenSource) {
@@ -403,7 +470,7 @@ const MeetingParticipantGrid = (props) => {
               padding: '4px',
               overflowY: 'auto'
             }}>
-              {screenShared && shareScreenSource && !showSharedScreen && (
+              {((screenShared && shareScreenSource && !showSharedScreen) || someoneSharing) && (
                 <div className={'row no-margin no-padding'}>
                   <div>
                     <Icon id={'WARNING'} color={'rgb(235, 63, 33)'}/>
@@ -464,7 +531,7 @@ const MeetingParticipantGrid = (props) => {
                     </Grid>
                   </Box>
                   :
-                  (screenShared && showSharedScreen) ?
+                  ((screenShared && showSharedScreen) || someoneSharing) ?
                     <div className={'content-box'}>
                       <video
                         hidden={false}
