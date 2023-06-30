@@ -41,7 +41,6 @@ const MeetingRoom = (props) => {
   const [videoDisabled, setVideoDisabled] = useState(null);
   const [handRaised, setHandRaised] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const isRecordingRef = useRef(false);
   const [screenShared, setScreenShared] = useState(null);
   const [someoneSharing, setSomeoneSharing] = useState(null);
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
@@ -259,6 +258,15 @@ const MeetingRoom = (props) => {
 
     appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT, SystemEventType.PEER_DISCONNECT);
     initMeetingSession();
+
+    setIsHost(props.isHost);
+
+    if (!isDirectCall && props.isHost) {
+      persistMeetingSettings(props.autoPermit);
+    }
+
+    document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
+    appManager.add('CURRENT_MEETING', selectedMeeting);
 
     return () => {
       if (isRecordingRef.current) {
@@ -487,11 +495,11 @@ const MeetingRoom = (props) => {
   };
 
   const recordMeeting = () => {
-
+    setIsRecording(true);
   };
 
   const stopRecordingMeeting = () => {
-
+    setIsRecording(false);
   };
 
   /********************************** HANG-UP *******************************/
@@ -611,11 +619,20 @@ const MeetingRoom = (props) => {
 
   const lowerHand = () => {
 
-
   };
 
   const persistMeetingSettings = (autoPermit) => {
-
+    post(
+      `${appManager.getAPIHost()}/api/v1/meeting/settings`,
+      (response) => {
+      },
+      (e) => {
+      },
+      {
+        meetingId: selectedMeeting.id,
+        askToJoin: autoPermit
+      }, null, false
+    );
   };
 
   const onChangeHost = (args) => {
@@ -665,8 +682,8 @@ const MeetingRoom = (props) => {
   return (
     <div className={'meeting-room-container'}>
       <div className={'meeting-room-content'} style={{
-        height: displayState === 'MAXIMIZED' ? 'calc(100% - 72px)' : '90%',
-        maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 72px)' : '90%',
+        height: displayState === 'MAXIMIZED' ? 'calc(100% - 96px)' : '90%',
+        maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 96px)' : '90%',
         overflow: displayState === 'MAXIMIZED' ? null : 'hidden',
       }}>
         <div className={'row no-margin no-padding w-100 h-100'}>
@@ -687,6 +704,7 @@ const MeetingRoom = (props) => {
                                       }}
                                       step={step}
                                       isHost={isHost}
+                                      isRecording={isRecording}
                                       screenShared={screenShared || someoneSharing}
                                       whiteBoardShown={showWhiteBoard}
                                       sharingHandler={(someoneSharing) => setSomeoneSharing(someoneSharing)}

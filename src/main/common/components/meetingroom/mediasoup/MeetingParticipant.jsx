@@ -12,6 +12,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Icon from "../../Icon";
 import {PanTool} from "@material-ui/icons";
 import Tooltip from "@material-ui/core/Tooltip";
+import MediaRecorder from "./MediaRecorder";
 
 export const VIDEO_CODEC_OPTIONS = {
   videoGoogleStartBitrate: 1000
@@ -54,10 +55,12 @@ const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
+  const [isRecording, setIsRecording] = React.useState(props.isRecording);
   const [videoRefresher, setVideoRefresher] = React.useState(false);
   const [producers] = React.useState(new Map());
   const [consumers] = React.useState(new Map());
   const [soundLevel, setSoundLevel] = React.useState(0);
+  const [mediaRecorder, setMediaRecorder] = React.useState(null);
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
@@ -126,6 +129,16 @@ const MeetingParticipant = (props) => {
     eventHandler.api = handler();
     systemEventHandler.api = systemEventHandlerApi();
   });
+
+  useEffect(() => {
+    setIsRecording(props.isRecording);
+  }, [props.isRecording]);
+
+  useEffect(() => {
+    if(isRecording) {
+    } else {
+    }
+  }, [isRecording]);
 
   useEffect(() => {
     if (props.soundMonitor && !props.inView) {
@@ -204,6 +217,10 @@ const MeetingParticipant = (props) => {
       for (const videoProducer of props.data.videoProducers) {
         consume(videoProducer.producerId, videoProducer.kind);
       }
+    }
+
+    if(props.isHost) {
+      setMediaRecorder(new MediaRecorder());
     }
 
     return () => {
@@ -343,7 +360,7 @@ const MeetingParticipant = (props) => {
         let stream = videoRef.current.srcObject;
         if (stream) {
           stream.getTracks().forEach(function (track) {
-            track.stop()
+            track.stop();
           })
         }
       }
@@ -351,7 +368,13 @@ const MeetingParticipant = (props) => {
       let audioElement = document.getElementById(consumerId);
       if (audioElement && audioElement.srcObject) {
         audioElement.srcObject.getTracks().forEach(function (track) {
-          track.stop()
+          track.stop();
+          if(mediaRecorder) {
+            mediaRecorder.removeTrack(track);
+
+
+
+          }
         });
 
         document.getElementById(props.data.userId + '-audio-el-container')?.removeChild(audioElement)
@@ -381,6 +404,10 @@ const MeetingParticipant = (props) => {
               audioElement.playsinline = false;
               audioElement.autoplay = true;
               document.getElementById(props.data.userId + '-audio-el-container').appendChild(audioElement);
+
+              if(mediaRecorder) {
+                mediaRecorder.addTrack(stream.getAudioTracks()[0]);
+              }
             }
           }
 

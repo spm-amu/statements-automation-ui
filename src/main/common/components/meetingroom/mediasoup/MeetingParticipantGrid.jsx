@@ -45,7 +45,8 @@ const MeetingParticipantGrid = (props) => {
       audioMuted,
       isHost,
       autoPermit,
-      rtpCapabilities
+      rtpCapabilities,
+      isRecording
     } = props;
 
     const produceScreenShare = async () => {
@@ -588,6 +589,7 @@ const MeetingParticipantGrid = (props) => {
                                     meetingId={meetingId}
                                     rtpCapabilities={rtpCapabilities}
                                     isCurrentUser={true}
+                                    isRecording={isRecording}
                                     consumerTransport={consumerTransport}
                                     producerTransport={producerTransport}
                                     audioMuted={audioMuted}
