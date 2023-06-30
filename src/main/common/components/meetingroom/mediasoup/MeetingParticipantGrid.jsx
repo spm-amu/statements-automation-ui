@@ -21,6 +21,7 @@ const MeetingParticipantGrid = (props) => {
     const [currentUserParticipant, setCurrentUserParticipant] = React.useState(null);
     const [inViewParticipants, setInViewParticipants] = React.useState([]);
     const [consumerTransport, setConsumerTransport] = React.useState(null);
+    //const [videoRefresher, setVideoRefresher] = React.useState(false);
     const [device, setDevice] = React.useState(null);
     const [shareScreenProducer, setShareScreenProducer] = React.useState(null);
     const [producerTransport, setProducerTransport] = React.useState(null);
@@ -34,7 +35,7 @@ const MeetingParticipantGrid = (props) => {
     const [systemEventHandler] = useState({});
     const [eventHandler] = useState({});
     const transports = useRef(new Transports());
-    const sharingStream = useRef();
+    const shareScreenVideoRef = useRef();
     const {
       waitingList,
       step,
@@ -46,19 +47,6 @@ const MeetingParticipantGrid = (props) => {
       autoPermit,
       rtpCapabilities
     } = props;
-
-    const addShareScreenElement = (stream) => {
-      let parent = document.getElementById('share-screen-container');
-      if(parent) {
-        let el = document.createElement('video');
-        el.srcObject = stream;
-        el.id = 'share-screen-video';
-        el.playsinline = false;
-        el.autoplay = true;
-        el.className = 'share-screen-video';
-        parent.appendChild(el);
-      }
-    };
 
     const produceScreenShare = async () => {
       if (!device) {
@@ -109,7 +97,7 @@ const MeetingParticipantGrid = (props) => {
       setShareScreenProducer(producer);
 
       if (showSharedScreen) {
-        addShareScreenElement(stream);
+        shareScreenVideoRef.current.srcObject = stream;
       }
 
       producer.on('transportclose', () => {
@@ -157,7 +145,7 @@ const MeetingParticipantGrid = (props) => {
 
     const stopShareScreenConsumerTracks = () => {
       let el = document.getElementById('share-screen-video');
-      if(el) {
+      if (el) {
         for (const track of el.srcObject.getTracks()) {
           track.stop();
         }
@@ -176,8 +164,9 @@ const MeetingParticipantGrid = (props) => {
             console.log("\n\n\n=====================================SHARING CONSUME=====================================");
             props.sharingHandler(true);
             setSomeoneSharing(true);
-            sharingStream.current = stream;
             setMessage(producer.username + " is sharing");
+            shareScreenVideoRef.current.srcObject = stream;
+            //setVideoRefresher(!videoRefresher);
 
             consumer.on(
               'trackended',
@@ -196,6 +185,7 @@ const MeetingParticipantGrid = (props) => {
         }
       )
     };
+
 
     const handler = () => {
       return {
@@ -278,13 +268,6 @@ const MeetingParticipantGrid = (props) => {
     });
 
     useEffect(() => {
-      if(someoneSharing) {
-        addShareScreenElement(sharingStream.current);
-        sharingStream.current = null;
-      }
-    }, [someoneSharing]);
-
-    useEffect(() => {
       if (screenShared && shareScreenSource) {
         produceScreenShare();
       } else {
@@ -294,9 +277,9 @@ const MeetingParticipantGrid = (props) => {
 
     useEffect(() => {
       setShareScreenSource(props.shareScreenSource);
-      if (props.shareScreenSource) {
+      if (props.shareScreenSource && props.shareScreenSource.name) {
         setShowSharedScreen(
-          props.shareScreenSource.name.toLowerCase() !== 'entire screen' &&
+          props.shareScreenSource.name?.toLowerCase() !== 'entire screen' &&
           props.shareScreenSource.name.toLowerCase() !== 'armscor connect'
         )
       }
@@ -476,7 +459,7 @@ const MeetingParticipantGrid = (props) => {
               {((screenShared && shareScreenSource && !showSharedScreen) || someoneSharing) && (
                 <div className={'row no-margin no-padding'}>
                   {
-                    shareScreenSource &&
+                    shareScreenSource && shareScreenSource.name &&
                     <>
                       <div>
                         <Icon id={'WARNING'} color={'rgb(235, 63, 33)'}/>
@@ -503,50 +486,64 @@ const MeetingParticipantGrid = (props) => {
             grid && step !== "LOBBY" &&
             <>
               {
-                (!screenShared && !whiteBoardShown || (screenShared && !showSharedScreen) && !someoneSharing) ?
-                  <Box sx={{
-                    flexGrow: 1,
-                    height: 'calc(100% - 232px)',
+                (!screenShared && !whiteBoardShown || (screenShared && !showSharedScreen) && !someoneSharing) &&
+                <Box sx={{
+                  flexGrow: 1,
+                  height: 'calc(100% - 232px)',
+                  width: '100%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  display: 'flex'
+                }}>
+                  <Grid container spacing={1} style={{
                     width: '100%',
-                    justifyContent: 'center',
+                    display: 'flex',
                     alignItems: 'center',
-                    display: 'flex'
+                    maxHeight: '100%',
+                    height: "100%",
+                    overflowY: 'auto',
+                    overflowX: 'hidden'
                   }}>
-                    <Grid container spacing={1} style={{
+                    {grid.map((row, index) => {
+                      return <div style={{
+                        width: "100%",
+                        height: (100 / grid.length) + "%",
+                        maxHeight: "50%"
+                      }}>
+                        {
+                          <Fragment key={index}>
+                            {
+                              renderRow(row, index)
+                            }
+                          </Fragment>
+                        }
+                      </div>
+                    })}
+                  </Grid>
+                </Box>
+              }
+              {
+                <div className={'content-box'} style={{
+                  display: (!((screenShared && showSharedScreen) || someoneSharing)) ? 'none' : null
+                }}>
+                  <video
+                    id={'screen-share-video'}
+                    width={640}
+                    height={320}
+                    autoPlay ref={shareScreenVideoRef} muted
+                    style={{
                       width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      maxHeight: '100%',
-                      height: "100%",
-                      overflowY: 'auto',
-                      overflowX: 'hidden'
-                    }}>
-                      {grid.map((row, index) => {
-                        return <div style={{
-                          width: "100%",
-                          height: (100 / grid.length) + "%",
-                          maxHeight: "50%"
-                        }}>
-                          {
-                            <Fragment key={index}>
-                              {
-                                renderRow(row, index)
-                              }
-                            </Fragment>
-                          }
-                        </div>
-                      })}
-                    </Grid>
-                  </Box>
-                  :
-                  ((screenShared && showSharedScreen) || someoneSharing) ?
-                    <div className={'content-box'} id={'share-screen-container'}>
-                    </div>
-                    :
-                    whiteBoardShown &&
-                    <div className={'content-box'}>
-                      Whiteboard...
-                    </div>
+                      height: '100%',
+                      zIndex: '0'
+                    }}
+                  />
+                </div>
+              }
+              {
+                whiteBoardShown &&
+                <div className={'content-box'}>
+                  Whiteboard...
+                </div>
               }
             </>
           }
