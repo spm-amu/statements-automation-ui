@@ -18,6 +18,7 @@ import MeetingRoomToolbar from "../meetingroom/MeetingRoomToolbar";
 import RecordingView from '../view/RecordingView';
 import ChatPollsHistoryView from '../view/ChatPollsHistoryView';
 import PostMeetingMessage from "../view/meetingroom/PostMeetingMessage";
+import Help from '../view/Help';
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -114,6 +115,9 @@ const ViewContainer = (props) => {
         break;
       case 'people':
         element = <People dialEnabled={true} chatEnabled={false}/>;
+        break;
+      case 'help':
+        element = <Help />;
         break;
       case 'math':
         element = <Math/>;

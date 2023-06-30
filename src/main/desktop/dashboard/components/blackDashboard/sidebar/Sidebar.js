@@ -81,10 +81,7 @@ class Sidebar extends React.Component {
           <li
             className={this.state.selectedMenuItem === prop.path ? "menu-item-active" : 'menu-item'}
             key={key} onClick={(e) => {
-            if (prop.path !== 'help') {
-              this.state.selectedMenuItem = prop.path;
-            }
-
+            this.state.selectedMenuItem = prop.path;
             this.props.viewLauncher(prop.path);
           }}
           >
