@@ -54,6 +54,7 @@ const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
+  const [videoStream, setVideoStream] = React.useState(props.audioMuted);
   const [producers] = React.useState(new Map());
   const [consumers] = React.useState(new Map());
   const [soundLevel, setSoundLevel] = React.useState(0);
@@ -173,6 +174,10 @@ const MeetingParticipant = (props) => {
 
       setAudioMuted(payload.audioMuted);
       setVideoMuted(payload.videoMuted);
+
+      if(payload.videoMuted) {
+        setVideoStream(null);
+      }
     } else if (props.isCurrentUser) {
 
     }
@@ -279,8 +284,8 @@ const MeetingParticipant = (props) => {
     producers.set(type, producer);
 
     if (type === 'video') {
-      alert(videoRef.current);
       videoRef.current.srcObject = stream;
+      setVideoStream(stream);
     }
 
     producer.on('transportclose', () => {
@@ -461,8 +466,9 @@ const MeetingParticipant = (props) => {
                   height={320}
                   autoPlay ref={videoRef} muted
                   style={{
-                    width: (videoMuted || !videoRef.current || !videoRef.current.srcObject) ? 0 : '100%',
-                    height: (videoMuted || !videoRef.current || !videoRef.current.srcObject) ? 0 : '100%'
+                    width: '100%',
+                    height: '100%',
+                    display: (videoMuted || !videoStream) ? 'none' : null
                   }}
                 />
               }
