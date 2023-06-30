@@ -142,12 +142,7 @@ const MeetingParticipantGrid = (props) => {
       }).catch((e) => console.log("PRODUCER_CLOSED ERROR : ", e));
 
       shareScreenProducer.close();
-      if (shareScreenRef.current && shareScreenRef.current.srcObject) {
-        shareScreenRef.current.srcObject.getTracks().forEach(function (track) {
-          track.stop()
-        });
-      }
-
+      stopShareScreenConsumerTracks();
       setShareScreenProducer(null);
     };
 
@@ -159,15 +154,6 @@ const MeetingParticipantGrid = (props) => {
     };
 
     const stopShareScreenConsumerTracks = () => {
-      if (shareScreenRef.current) {
-        let stream = shareScreenRef.current.srcObject;
-        if (stream) {
-          stream.getTracks().forEach(function (track) {
-            track.stop()
-          })
-        }
-      }
-
       let el = document.getElementById('share-screen-video');
       if(el) {
         for (const track of el.srcObject.getTracks()) {
