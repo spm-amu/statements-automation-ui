@@ -49,12 +49,13 @@ const MeetingParticipantGrid = (props) => {
     const addShareScreenElement = (stream) => {
       let parent = document.getElementById('share-screen-container');
       if(parent) {
-        let shareScreenVideoElement = document.createElement('video');
-        shareScreenVideoElement.srcObject = stream;
-        shareScreenVideoElement.id = 'share-screen-video';
-        shareScreenVideoElement.playsinline = false;
-        shareScreenVideoElement.autoplay = true;
-        parent.appendChild(shareScreenVideoElement);
+        let el = document.createElement('video');
+        el.srcObject = stream;
+        el.id = 'share-screen-video';
+        el.playsinline = false;
+        el.autoplay = true;
+        el.className = 'share-screen-video';
+        parent.appendChild(el);
       }
     };
 
@@ -159,9 +160,9 @@ const MeetingParticipantGrid = (props) => {
         for (const track of el.srcObject.getTracks()) {
           track.stop();
         }
-      }
 
-      el.parentNode.removeChild(el);
+        el.parentNode.removeChild(el);
+      }
     };
 
     const consume = async (producer) => {

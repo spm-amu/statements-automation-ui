@@ -8,13 +8,18 @@
   width: 100%;
 }
 
+.share-screen-video {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
 .content-box {
   height: calc(100% - 232px);
   width: 100%;
   justify-content: center;
   align-items: center;
   display: flex;
-  background-color: #0dcaf0;
 }
 
 .grid .item {
