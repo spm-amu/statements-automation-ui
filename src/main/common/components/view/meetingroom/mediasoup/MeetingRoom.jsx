@@ -371,13 +371,6 @@ const MeetingRoom = (props) => {
       participants.push(participant);
       setParticipants([].concat(participants));
     }
-
-    console.log("CHECK SCREEN SHARE ONLOAD");
-    if (onloadScreenShareData.current && onloadScreenShareData.current.userId === user.userId) {
-      // TODO : Add screen share code
-      setMeetingParticipantGridMode('STRIP');
-      onloadScreenShareData.current = null;
-    }
   }
 
   const createParticipants = (users) => {

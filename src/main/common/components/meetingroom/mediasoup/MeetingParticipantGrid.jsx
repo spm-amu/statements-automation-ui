@@ -205,6 +205,8 @@ const MeetingParticipantGrid = (props) => {
                 setMessage(null);
                 props.sharingHandler(false);
                 setSomeoneSharing(false);
+                setScreenShared(false);
+                setShowSharedScreen(false);
               }
               break;
           }
