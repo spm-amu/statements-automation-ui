@@ -117,7 +117,7 @@ button:focus {
 .fc-scrollgrid-section-body table {
   background-image: url('/assets/calendar_background.png');
   background-repeat: no-repeat;
-  background-size: 35% auto;
+  background-size: 30% auto;
   background-attachment: fixed;
   background-position: center;
 }
