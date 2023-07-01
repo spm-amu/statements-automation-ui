@@ -17,6 +17,7 @@ const StyledDialog = withStyles({
     maxHeight: 'calc(100% - 48px)',
     margin: '48px 0 0 144px',
     overflow: 'hidden',
+    borderRadius: 0,
     boxShadow: 'none !important',
     ['@media (max-width:991px)']: {
       margin: '54px 0 0 0',

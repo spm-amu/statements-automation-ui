@@ -1,5 +1,5 @@
 .content {
-  padding: 0 0 0 144px !important;
+  padding: 0 0 0 136px !important;
 }
 
 .navbar {
@@ -10,6 +10,8 @@
 
 .navbar.navbar-absolute {
   /*z-index: 100000 !important;*/
+  width: 100% !important;
+  background-color: #00476c !important;
 }
 
 .navbar .navbar-brand {
@@ -56,7 +58,7 @@
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
-  color: #3E435D;
+  color: #ADA7A7;
 }
 
 .date-label {

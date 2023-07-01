@@ -18,6 +18,10 @@ body {
   width: 100%;
 }
 
+#root {
+  height: 100%;
+}
+
 button {
   background-color: white;
   padding: 10px 20px;

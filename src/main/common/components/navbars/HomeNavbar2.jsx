@@ -110,7 +110,7 @@ class HomeNavbar extends React.Component {
           expand="lg"
         >
           <div className='row' style={{width: '100%', display: 'inline-block'}}>
-            <div className="navbar-wrapper col-*-*" style={{border: '4px solid red', height: '64px', width: '64px'}}>
+            <div className="navbar-wrapper col-*-*" style={{height: '64px', width: '64px'}}>
               <div
                 className={classNames("navbar-toggle d-inline", {
                   toggled: this.props.sidebarOpened,
@@ -163,7 +163,7 @@ class HomeNavbar extends React.Component {
             </div>
             {" "}
             <div className={"col-*-*"}
-                 style={{height: '64px', border: '2px solid red', width: '80px', float: 'right', marginRight: '200px'}}>
+                 style={{height: '64px', width: '80px', float: 'right', marginRight: '200px'}}>
               <div style={{width: '80px'}}>
                 <Collapse navbar isOpen={this.state.collapseOpen}>
                   <Nav className="ml-auto" navbar>

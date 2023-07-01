@@ -182,7 +182,7 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   React.useEffect(() => {
-    if(vidTestRef.current) {
+    if (vidTestRef.current) {
       //test();
     }
   }, [vidTestRef.current]);
@@ -846,97 +846,66 @@ const BasicBusinessAppDashboard = (props) => {
         <>
           {/*<video ref={vidTestRef} autoPlay />*/}
           <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>
-            <LoadingIndicator color={"#945c33"}/>
-            <Sidebar
-              {...props}
-              routes={routes}
-              utilsRoutes={utilsRoutes}
-              activeColor={"agility"}
-              secondaryThemeColor={secondaryThemeColor}
-              activeRouteMenu={'calendar'}
-              className={"sidebar"}
-              viewLauncher={(path) => {
-                appManager.setCurrentView(path);
-                navigate('/view/' + path);
-              }}
-              appLogoPath={props.appLogoPath}
-              logo={{
-                outterLink: "",
-                text: "",
-                imgSrc: logo,
-              }}
-              closeSidebar={closeSidebar}
-            />{" "}
-            <div className="main-panel" data={activeColor}>
-              <div className="content">
-                <div style={{height: '48px'}}>
-                  <HomeNavbar
-                    {...props}
-                    color={"#FFFFFF"}
-                    themeTextColor={"#ADA7A7"}
-                    brandText={getActiveRoute(routes)}
-                    sidebarOpened={sidebarOpened}
-                    userDetails={userDetails}
-                    avatar={props.avatar}
-                    settingsMenu={null}
-                    toggleSidebar={toggleSidebar}
-                    logoutCallBack={(e) => {
-                      appManager.remove("accessToken");
-                      appManager.remove("refreshToken");
-                      appManager.remove("lastLogin");
+            <div style={{width: '100%', height: '54px'}}>
+              <HomeNavbar
+                {...props}
+                color={"#FFFFFF"}
+                themeTextColor={"#ADA7A7"}
+                brandText={getActiveRoute(routes)}
+                sidebarOpened={sidebarOpened}
+                userDetails={userDetails}
+                avatar={props.avatar}
+                settingsMenu={null}
+                toggleSidebar={toggleSidebar}
+                logoutCallBack={(e) => {
+                  appManager.remove("accessToken");
+                  appManager.remove("refreshToken");
+                  appManager.remove("lastLogin");
 
-                      tokenManager.stopTokenRefreshMonitor();
+                  tokenManager.stopTokenRefreshMonitor();
 
-                      if (!isSafari && !isChrome && !isIE && !isEdge) {
-                        electron.ipcRenderer.sendMessage('removeTokens', {});
-                      }
+                  if (!isSafari && !isChrome && !isIE && !isEdge) {
+                    electron.ipcRenderer.sendMessage('removeTokens', {});
+                  }
 
-                      navigate("/login");
-                    }}
-                  />{" "}
-                </div>
-                <div>
-                  <div style={{
-                    padding: '0 32px 0 32px',
-                    maxHeight: '64px',
-                    width: '90%',
-                    zIndex: '1200',
-                    position: 'absolute'
-                  }}>
-                    <Alert
-                      variant={'danger'}
-                      show={errorMessage !== null}
-                      fade={true}
-                      onClose={() => {
-                        setErrorMessage(null)
-                      }}
-                      dismissible
-                    >
-                      <Alert.Heading>Error</Alert.Heading>
-                      <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{errorMessage}</p>
-                    </Alert>
-                    <Alert
-                      variant={'success'}
-                      show={successMessage !== null}
-                      fade={true}
-                    >
-                      <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
-                    </Alert>
-
-                    <Alert
-                      variant={'danger'}
-                      show={activityMessage !== null}
-                      fade={true}
-                    >
-                      <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{activityMessage}</p>
-                    </Alert>
-                  </div>
-                  <ViewPort/>
-                </div>
-              </div>
-              {/*<HomeFooter fluid /> {" "}*/}
+                  navigate("/login");
+                }}
+              />{" "}
             </div>
-            {" "}
+            <div style={{width: '100%', height: 'calc(100% - 54px)'}}>
+              <div className="wrapper" style={{height: '100%', overflow: 'hidden'}}>
+                <LoadingIndicator color={"#945c33"}/>
+                <Sidebar
+                  {...props}
+                  routes={routes}
+                  utilsRoutes={utilsRoutes}
+                  activeColor={"agility"}
+                  secondaryThemeColor={secondaryThemeColor}
+                  activeRouteMenu={'calendar'}
+                  className={"sidebar"}
+                  viewLauncher={(path) => {
+                    appManager.setCurrentView(path);
+                    navigate('/view/' + path);
+                  }}
+                  appLogoPath={props.appLogoPath}
+                  logo={{
+                    outterLink: "",
+                    text: "",
+                    imgSrc: logo,
+                  }}
+                  closeSidebar={closeSidebar}
+                />{" "}
+                <div className="main-panel" data={activeColor}>
+                  <div className="content">
+                    <div>
+                      <ViewPort/>
+                    </div>
+                  </div>
+                  {/*<HomeFooter fluid /> {" "}*/}
+                </div>
+                {" "}
+              </div>
+            </div>
           </div>
         </>
 

@@ -90,8 +90,8 @@ const ExternalAttendee = () => {
 
 const Dashboard = () => {
   return (
-    <div style={{width: '100%'}}>
-      <div className="Landing">
+    <div style={{width: '100%', height: '100%'}}>
+      <div className="landing" style={{width: '100%', height: '100%'}}>
         <BasicBusinessAppDashboard
           avatar=""
           logo={icon}

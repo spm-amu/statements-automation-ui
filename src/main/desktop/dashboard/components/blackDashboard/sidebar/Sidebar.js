@@ -1,6 +1,5 @@
 /*eslint-disable*/
 import React from "react";
-import {withRouter} from "react-router-dom";
 import PropTypes from "prop-types";
 // javascript plugin used to create scrollbars on windows
 import Utils from "../../../../../common/Utils";
@@ -11,7 +10,6 @@ import MenuLink from "../../../../../common/components/menu/MenuLink";
 import {lighten} from "@material-ui/core";
 import Icon from "../../../../../common/components/Icon";
 import NotificationListener from "../../NoticationListener";
-import packageJson from '../../../../../../../release/app/package.json';
 
 let ps;
 
@@ -85,52 +83,54 @@ class Sidebar extends React.Component {
             this.props.viewLauncher(prop.path);
           }}
           >
-            <a
-              href="#pablo"
-              data-toggle="collapse"
-              style={{marginLeft: ((prop.level) * TAB) + 'px', width: '100%'}}
-              aria-expanded={this.state[prop.state]}
-              onClick={(e) => {
-                e.preventDefault();
-                this.setState(st);
-              }}
-            >
-              {prop.icon !== undefined ? (
-                <table style={{width: '100%'}}>
-                  <tbody>
-                  <tr>
-                    <td className={'menu-item-icon'}>
-                      <Icon id={prop.icon}/>{" "}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      {
-                        prop.hasNotificationListener &&
-                        <NotificationListener/>
-                      }
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={'menu-item-label'}>
+            <div className={'centered-flex-box'}>
+              <a
+                href="#pablo"
+                data-toggle="collapse"
+                style={{marginLeft: ((prop.level) * TAB) + 'px', width: '70%'}}
+                aria-expanded={this.state[prop.state]}
+                onClick={(e) => {
+                  e.preventDefault();
+                  this.setState(st);
+                }}
+              >
+                {prop.icon !== undefined ? (
+                  <table style={{width: '100%'}}>
+                    <tbody>
+                    <tr>
+                      <td className={'menu-item-icon'}>
+                        <Icon id={prop.icon}/>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        {
+                          prop.hasNotificationListener &&
+                          <NotificationListener/>
+                        }
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className={'menu-item-label'}>
+                        {prop.name}
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                ) : (
+                  <div>
+                    <div className="sidebar-normal">
+                      {" "}
                       {prop.name}
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              ) : (
-                <div>
-                  <div className="sidebar-normal">
+                      {" "}
+                      <b className="caret"/>
+                    </div>
                     {" "}
-                    {prop.name}
-                    {" "}
-                    <b className="caret"/>
                   </div>
-                  {" "}
-                </div>
-              )}
-              {" "}
-            </a>{" "}
+                )}
+                {" "}
+              </a>{" "}
+            </div>
             {prop.collapse ?
               <Collapse isOpen={this.state[prop.state]}>
                 <ul className="nav"> {this.createLinks(prop.views)} </ul>
@@ -206,8 +206,19 @@ class Sidebar extends React.Component {
           className="logo-normal"
           onClick={this.props.closeSidebar}
         >
-          <div className="logo-img" style={{paddingTop: '16px', paddingBottom: '8px'}}>
-            <img width={'64px'} src={require('/assets/armscor_logo.png')} alt="logo"/>
+          <div className="logo-img"
+               style={{
+                 paddingTop: '16px',
+                 paddingBottom: '8px',
+                 backgroundColor: 'white',
+                 borderRadius: '50%',
+                 width: '96px',
+                 height: '96px',
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center'
+               }}>
+            <img width={'72px'} src={require('/assets/armscor_logo.png')} style={{marginTop: '-8px'}} alt="logo"/>
           </div>
           {" "}
         </a>
@@ -285,13 +296,6 @@ class Sidebar extends React.Component {
                     <tr>
                       <td className={'copyright'}>
                         Copyrights &copy; {1900 + new Date().getYear()} {" "}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className={'copyright'} style={{ alignItems: 'center', justifyContent: 'center', display: "flex" }}>
-                        <span style={{ fontWeight: 'bold' }}>
-                          { `v${packageJson.version}` }
-                        </span>
                       </td>
                     </tr>
                     </tbody>

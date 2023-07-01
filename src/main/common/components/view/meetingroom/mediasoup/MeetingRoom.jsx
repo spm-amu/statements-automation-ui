@@ -485,7 +485,7 @@ const MeetingRoom = (props) => {
   const handleSidebarToggle = (e) => {
     let paper = document.getElementById('meetingDialogPaper');
     if (e.detail.open) {
-      paper.style.margin = '54px 0 0 144px';
+      paper.style.margin = '54px 0 0 136px';
     } else {
       paper.style.margin = '54px 0 0 0';
     }
