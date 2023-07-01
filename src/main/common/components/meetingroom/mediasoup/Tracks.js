@@ -15,6 +15,10 @@ export default class Tracks {
     }
   };
 
+  getAudioTrack = () => {
+    return this.audioTrack;
+  };
+
   setAudioTrack = (track) => {
     this.audioTrack = track;
   }

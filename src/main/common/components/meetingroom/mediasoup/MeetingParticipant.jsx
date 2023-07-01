@@ -63,6 +63,7 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
+  const audioRef = useRef();
   const tracks = useRef(new Tracks());
   const soundLevelCounter = useRef(0);
   const showVideo = true;
@@ -293,6 +294,12 @@ const MeetingParticipant = (props) => {
       track
     };
 
+    audioRef.current = stream;
+    if(props.isHost && type === 'audio') {
+      mediaRecorder.addTrack(track);
+      tracks.current.setAudioTrack(track);
+    }
+
     if (type === 'video') {
       params.encodings = VIDEO_ENCODINGS;
       params.codecOptions = VIDEO_CODEC_OPTIONS;
@@ -344,6 +351,10 @@ const MeetingParticipant = (props) => {
 
     if (type === 'video') {
       tracks.current.stopVideoTrack();
+    }
+
+    if(props.isHost && type === 'audio') {
+      mediaRecorder.removeTrack(tracks.current.getAudioTrack());
     }
   };
 
@@ -495,6 +506,17 @@ const MeetingParticipant = (props) => {
                     height: '100%',
                     zIndex: '0',
                     display: (videoMuted || !videoRef.current || !videoRef.current.srcObject) ? 'none' : null
+                  }}
+                />
+              }
+              {
+                /*We need this element to capture recording sound*/
+                props.isHost &&
+                <audio
+                  id={props.data.userId + '-audio'}
+                  autoPlay ref={audioRef} muted
+                  style={{
+                    display: 'none'
                   }}
                 />
               }
