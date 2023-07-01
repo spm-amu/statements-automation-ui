@@ -5,7 +5,7 @@ import Utils from '../../../Utils';
 import {MessageType, SystemEventType} from "../../../types";
 import appManager from "../../../../common/service/AppManager";
 import socketManager from "../../../../common/service/SocketManager";
-import mediaRecorder from "./MediaRecorder";
+import mediaRecorder from "./MeetingRoomRecorder";
 import mediaSoupHelper from "./MediaSoupHelper";
 import {Buffer} from "buffer/";
 import Tracks from "./Tracks";
@@ -13,7 +13,6 @@ import IconButton from "@material-ui/core/IconButton";
 import Icon from "../../Icon";
 import {PanTool} from "@material-ui/icons";
 import Tooltip from "@material-ui/core/Tooltip";
-import MediaRecorder from "./MediaRecorder";
 
 export const VIDEO_CODEC_OPTIONS = {
   videoGoogleStartBitrate: 1000
@@ -412,7 +411,7 @@ const MeetingParticipant = (props) => {
               audioElement.autoplay = true;
               document.getElementById(props.data.userId + '-audio-el-container').appendChild(audioElement);
 
-              if(mediaRecorder) {
+              if(props.isHost) {
                 mediaRecorder.addTrack(stream.getAudioTracks()[0]);
               }
             }

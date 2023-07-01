@@ -531,8 +531,6 @@ const MeetingRoom = (props) => {
       participantIds = participantIds.concat(toParticipantIds);
     }
 
-    console.log("\n\n\\n\nSYSTEM EVENT PARTICIPANTS : ", participantIds);
-
     socketManager.emitEvent(MessageType.SYSTEM_EVENT, {
       systemEventType: eventType,
       recipients: participantIds,

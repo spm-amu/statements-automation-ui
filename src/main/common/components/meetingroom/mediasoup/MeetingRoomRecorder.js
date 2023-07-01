@@ -63,25 +63,10 @@ class MeetingRoomRecorder {
         console.log(data);
         socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
           .then((data) => {
-            console.log("===== SAVE RECORDING SUCCESS ======");
-            if (!this.isRecording) {
-              console.log("======= STOPPING RECORDING =======");
-              const data = {
-                meetingId: _this.meetingId,
-                name: _this.meetingTitle,
-                type: _this.recordingType,
-                size: _this.recordingSize,
-                sequenceNumber: _this.recordingSequence,
-                sessionId: _this.currentRecordingId
-              };
-
-              socketManager.emitEvent(MessageType.STOP_RECORDING, data)
-                .catch((error) => {
-                });
-            }
+            console.log("===== SAVE RECORDING CHUNK SUCCESS ======");
           })
           .catch((error) => {
-            console.log("===== SAVE RECORDING ERROR ======")
+            console.log("===== SAVE RECORDING CHUNK ERROR ======")
           });
       };
 
@@ -100,6 +85,9 @@ class MeetingRoomRecorder {
       }).then((data) => {
         console.log("RECORDING STARTED : " + data.id);
         _this.currentRecordingId = data.id;
+        _this.recordingSequence = 0;
+        _this.recordingSize = 0;
+        _this.recordingType = '';
         _this.recorder.start(60000);
         _this.isRecording = true;
       }).catch((error) => {
@@ -113,14 +101,34 @@ class MeetingRoomRecorder {
     if (this.recorder != null) {
       try {
         this.recorder.stop();
-        socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
-          roomID: this.meetingId,
-          isRecording: false
-        }).catch((error) => {
-        });
+        console.log("======= STOPPING RECORDING =======");
+        const data = {
+          meetingId: this.meetingId,
+          name: this.meetingTitle,
+          type: this.recordingType,
+          size: this.recordingSize,
+          sequenceNumber: this.recordingSequence,
+          sessionId: this.currentRecordingId
+        };
 
-        this.isRecording = false;
-      } catch(e) {
+        let _this = this;
+        socketManager.emitEvent(MessageType.STOP_RECORDING, data).then((data) => {
+          _this.currentRecordingId = null;
+          _this.isRecording = false;
+          _this.recordingSequence = 0;
+          _this.recordingSize = 0;
+          _this.recordingType = '';
+
+          socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
+            roomID: this.meetingId,
+            isRecording: false
+          }).catch((error) => {
+          });
+
+          this.isRecording = false;
+        }).catch((error) => {
+          });
+      } catch (e) {
         console.error(e);
       }
     }
