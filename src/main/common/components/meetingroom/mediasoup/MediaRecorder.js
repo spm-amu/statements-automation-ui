@@ -1,6 +1,5 @@
 import socketManager from "../../../service/SocketManager";
 import {MessageType} from "../../../types";
-import appManager from "../../../service/AppManager";
 
 const {electron} = window;
 
@@ -73,18 +72,12 @@ class MeetingRoomRecorder {
                 type: _this.recordingType,
                 size: _this.recordingSize,
                 sequenceNumber: _this.recordingSequence,
-                sessionId: this.currentRecordingId
+                sessionId: _this.currentRecordingId
               };
 
               socketManager.emitEvent(MessageType.STOP_RECORDING, data)
                 .catch((error) => {
                 });
-
-              _this.currentRecordingId = null;
-              _this.isRecording = false;
-              _this.recordingSequence = 0;
-              _this.recordingSize = 0;
-              _this.recordingType = '';
             }
           })
           .catch((error) => {
@@ -105,7 +98,7 @@ class MeetingRoomRecorder {
         roomID: this.meetingId,
         isRecording: true
       }).then((data) => {
-        console.log("RECORDING STARTED");
+        console.log("RECORDING STARTED : " + data.id);
         _this.currentRecordingId = data.id;
         _this.recorder.start(60000);
         _this.isRecording = true;
