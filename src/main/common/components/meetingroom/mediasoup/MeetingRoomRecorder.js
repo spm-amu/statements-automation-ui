@@ -29,7 +29,7 @@ class MeetingRoomRecorder {
   };
 
   removeTrack = (track) => {
-    this.recorder.stream.removeTrack(track);
+    this.recorder?.stream?.removeTrack(track);
   };
 
   handleRecordingDataAvailable = (e) => {
