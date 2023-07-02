@@ -168,6 +168,7 @@ const MeetingParticipantGrid = (props) => {
 
             console.log("\n\n\n=====================================SHARING CONSUME=====================================");
             props.sharingHandler(true);
+            setScreenShared(true);
             setSomeoneSharing(true);
             setShowSharedScreen(true);
             setShareScreenSource(null);
