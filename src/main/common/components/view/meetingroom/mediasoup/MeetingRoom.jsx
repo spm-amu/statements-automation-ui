@@ -13,6 +13,8 @@ import Utils from "../../../../Utils";
 import MeetingParticipantGrid from "../../../meetingroom/mediasoup/MeetingParticipantGrid";
 import {get, post} from "../../../../service/RestService";
 import SelectScreenShareDialog from "../../../SelectScreenShareDialog";
+import Alert from "react-bootstrap/Alert";
+import Icon from "../../../Icon";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -61,6 +63,8 @@ const MeetingRoom = (props) => {
   const [screenSources, setScreenSources] = useState();
   const shareScreenSource = useRef();
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
+  const [chatMessage, setChatMessage] = useState(null);
+  const [chatSender, setChatSender] = useState(null);
   const {
     selectedMeeting,
     userToCall,
@@ -118,6 +122,23 @@ const MeetingRoom = (props) => {
             break;
         }
       }
+    }
+  };
+
+  const handleChatMessage = (payload) => {
+    if (!sideBarOpen && sideBarTab !== 'Chat') {
+      setChatSender(payload.chatMessage.participant.label);
+      setChatMessage(payload.chatMessage.content);
+
+      if (payload.meetingId === selectedMeeting.id) {
+        const messageTimeout = setTimeout(() => {
+          setChatMessage(null);
+          setChatSender(null);
+          clearTimeout(messageTimeout);
+        }, 4000);
+      }
+
+      setHasUnreadChats(true);
     }
   };
 
@@ -199,6 +220,15 @@ const MeetingRoom = (props) => {
   }
 
   /********************************** USE EFFECT **************************************/
+
+  useEffect(() => {
+    if (!Utils.isNull(screenShared)) {
+      emitSystemEvent("SHARE_SCREEN", {
+        shared: screenShared,
+        userId: appManager.getUserDetails().userId
+      });
+    }
+  }, [screenShared]);
 
   useEffect(() => {
     if (audioMuted !== null) {
@@ -773,6 +803,36 @@ const MeetingRoom = (props) => {
                                         }}
               />
             }
+            <>
+              <Alert
+                variant={'info'}
+                show={activityMessage !== null}
+                fade={true}
+              >
+                <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{activityMessage}</p>
+              </Alert>
+              <Alert
+                variant={'info'}
+                show={chatMessage !== null}
+                fade={true}
+              >
+                <div className={'row'} style={{borderBottom: '1px solid white', paddingBottom: '8px'}}>
+                  <div className={'col'}>
+                    <div className={'row'}>
+                      <div>
+                        <Icon id={'CHAT_BUBBLE'}/>
+                      </div>
+                      <div className={'col'}>
+                        <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{chatSender}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className={'row'} style={{marginTop: '8px'}}>
+                  <div className={'col'}><p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{chatMessage}</p></div>
+                </div>
+              </Alert>
+            </>
           </div>
           {
             sideBarOpen &&
