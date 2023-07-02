@@ -593,9 +593,7 @@ const MeetingRoom = (props) => {
       console.log(find);
 
       if (find) {
-        peerManager.removeFromUserToPeerMap(userId);
         const newParticipants = participants.filter((p) => p.userId !== userId);
-
         if (newParticipants.length === 0 && isDirectCall) {
           onCallEnded();
           props.closeHandler();
@@ -636,10 +634,6 @@ const MeetingRoom = (props) => {
   };
 
   const handleEndCall = () => {
-    if (screenShared) {
-      // TODO : Clean-up any screenshare stuff
-    }
-
     if (userToCall && isDirectCall && participants.length <= 1) {
       socketManager.emitEvent(MessageType.CANCEL_CALL, {
         userId: userToCall.userId,
