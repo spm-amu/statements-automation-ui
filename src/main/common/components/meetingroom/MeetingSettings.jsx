@@ -11,6 +11,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import {get, post} from '../../service/RestService';
 import {Alert} from "@material-ui/lab";
+import {VIDEO_CONSTRAINTS} from "./mediasoup/MeetingParticipant";
 
 const MeetingSettings = (props) => {
   const userVideo = useRef();
@@ -25,6 +26,16 @@ const MeetingSettings = (props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let videoDisabled = false;
+    navigator.mediaDevices.enumerateDevices().then((devices) =>
+      devices.forEach((device) => {
+        if ('videoinput' === device.kind) {
+          videoDisabled = true;
+        }
+      })
+    );
+
+    setVideoOptionDisabled(videoDisabled);
     return () => {
       if (stream) {
         stream.close();
@@ -32,29 +43,17 @@ const MeetingSettings = (props) => {
     };
   }, []);
 
+  const startVideo = async () => {
+    userVideo.current.srcObject = await navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
+  };
+
   useEffect(() => {
-    if(!videoMuted && !stream) {
-      setupStream();
-    } else {
-      if (stream) {
-        stream.enableVideo(!videoMuted, null, null);
-      }
+    if(!videoMuted) {
+      startVideo();
+    } else if(userVideo.current && userVideo.current.srcObject){
+      userVideo.current.srcObject.getVideoTracks()[0].stop();
     }
   }, [videoMuted]);
-
-  const setupStream = () => {
-    let videoStream = new Stream();
-    videoStream.init(true, false, (stream, shareStream) => {
-      userVideo.current.srcObject = stream;
-      setVideoOptionDisabled(false);
-      //setVideoMuted(false);
-    }, (e) => {
-      console.log(e);
-      setVideoOptionDisabled(true);
-    }, false, null, false);
-
-    setStream(videoStream);
-  };
 
   useEffect(() => {
     let userDetails = appManager.getUserDetails();

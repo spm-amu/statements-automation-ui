@@ -87,7 +87,6 @@ class MediaSoupHelper {
     producerTransport.on(
       'connect',
       async function ({dtlsParameters}, callback, errback) {
-        console.log("\n\n\n\n\nPRODUCER CONNECT DTLS PARAMS : ", dtlsParameters);
         socketManager.emitEvent(MessageType.CONNECT_TRANSPORT, {
           dtlsParameters,
           transportId: data.params.id,
@@ -101,7 +100,6 @@ class MediaSoupHelper {
     producerTransport.on(
       'produce',
       async function ({kind, rtpParameters, appData}, callback, errback) {
-        console.log("\n\n\n\n\n\nAPP DATA : ", appData);
         try {
           const {producerId} = await socketManager.emitEvent(MessageType.PRODUCE, {
             producerTransportId: producerTransport.id,

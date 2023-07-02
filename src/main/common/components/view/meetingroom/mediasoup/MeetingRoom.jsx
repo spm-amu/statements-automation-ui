@@ -388,6 +388,7 @@ const MeetingRoom = (props) => {
       participant.avatar = user.avatar;
       participant.audioMuted = user.audioMuted;
       participant.videoMuted = user.videoMuted;
+      participant.producers = user.producers;
     } else {
       console.log("DID NOT FIND EXISTING PARTICIPANT : ", participant);
       participant = {
@@ -395,7 +396,8 @@ const MeetingRoom = (props) => {
         name: user.name,
         avatar: user.avatar,
         audioMuted: user.audioMuted,
-        videoMuted: user.videoMuted
+        videoMuted: user.videoMuted,
+        producers: user.producers
       };
 
       participants.push(participant);

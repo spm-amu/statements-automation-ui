@@ -200,19 +200,30 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     if (producerTransport) {
-      if (videoMuted) {
+      if (props.videoMuted) {
         stopProducing('video');
       } else {
         produce('video');
       }
 
-      if (audioMuted) {
+      if (props.audioMuted) {
         stopProducing('audio');
       } else {
         produce('audio');
       }
     }
   }, [producerTransport]);
+
+  useEffect(() => {
+    if (consumerTransport) {
+      if (props.data.producers) {
+        let myProducers = props.data.producers.filter((p) => p.userId === props.data.userId);
+        for (const myProducer of myProducers) {
+          consume(myProducer.producerId);
+        }
+      }
+    }
+  }, [consumerTransport]);
 
   useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
