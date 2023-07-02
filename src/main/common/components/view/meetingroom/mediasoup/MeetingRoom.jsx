@@ -58,8 +58,8 @@ const MeetingRoom = (props) => {
   const [preErrorStep, setPreErrorStep] = useState('');
   const [allUserParticipantsLeft, setAllUserParticipantsLeft] = useState(false);
   const [rtpCapabilities, setRtpCapabilities] = useState(null);
+  const [onloadScreenShareData, setOnloadScreenShareData] = useState(null);
   const [lobbyWaitingList, setLobbyWaitingList] = useState([]);
-  const onloadScreenShareData = useRef(null);
   const [screenSources, setScreenSources] = useState();
   const shareScreenSource = useRef();
   const [screenSharePopupVisible, setScreenSharePopupVisible] = useState(false);
@@ -447,6 +447,7 @@ const MeetingRoom = (props) => {
         }
 
         setRtpCapabilities(result.data.rtpCapabilities);
+        setOnloadScreenShareData(result.data.shareScreenProducerData);
 
         /*let fakeDudes = [];
         for(let i=0;i<100;i++) {
@@ -782,6 +783,7 @@ const MeetingRoom = (props) => {
                                       sharingHandler={(someoneSharing) => setSomeoneSharing(someoneSharing)}
                                       autoPermit={autoPermit}
                                       rtpCapabilities={rtpCapabilities}
+                                      onloadScreenShareData={onloadScreenShareData}
                                       allUserParticipantsLeft={allUserParticipantsLeft}
                                       onHostAudioMute={(participant) => {
                                         changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);

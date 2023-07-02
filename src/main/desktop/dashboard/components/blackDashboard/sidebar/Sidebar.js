@@ -210,7 +210,6 @@ class Sidebar extends React.Component {
                style={{
                  paddingTop: '16px',
                  paddingBottom: '8px',
-                 backgroundColor: 'white',
                  borderRadius: '50%',
                  width: '96px',
                  height: '96px',
