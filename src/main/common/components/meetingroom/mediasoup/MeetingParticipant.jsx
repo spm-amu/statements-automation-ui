@@ -217,10 +217,7 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     if (consumerTransport) {
       if (props.data.producers) {
-        let myProducers = props.data.producers.filter((p) => p.userId === props.data.userId);
-        for (const myProducer of myProducers) {
-          consume(myProducer.producerId);
-        }
+        onNewProducers(props.data.producers);
       }
     }
   }, [consumerTransport]);
