@@ -216,8 +216,9 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     if (consumerTransport) {
+      console.log("\n\n\n\n\nTRANSI ARRIVED WITH PRODUCERS : ", props.data.producers);
       if (props.data.producers) {
-        onNewProducers(props.data.producers);
+        onNewProducers(props.data.producers, true);
       }
     }
   }, [consumerTransport]);
@@ -366,17 +367,19 @@ const MeetingParticipant = (props) => {
     }
   };
 
-  const onNewProducers = (producers) => {
+  const onNewProducers = (producers, loading = false) => {
     for (const producer of producers) {
       if (producer.userId === props.data.userId) {
         if (producer.kind === 'video' && !producer.screenSharing) {
           consume(producer.producerId, producer.kind);
         }
-      } else if (props.isCurrentUser) {
+      }
+
+      if (props.isCurrentUser || loading) {
         // The small participant box at the bottom belonging to the current user must consume all audio
         // This is because we do not want to disturb the audio due to any rendering such as Bring to view
         if (producer.kind === 'audio') {
-          consume(producer.producerId, producer.kind);
+          consume(producer.producerId, producer.kind, loading);
         }
       }
     }
@@ -409,7 +412,7 @@ const MeetingParticipant = (props) => {
     consumers.delete(consumerId);
   };
 
-  const consume = async (producerId, kind) => {
+  const consume = async (producerId, kind, loading) => {
     mediaSoupHelper.getConsumeStream(producerId, device.rtpCapabilities, consumerTransport, props.meetingId, appManager.getUserDetails().userId, kind).then(
       ({consumer, stream, kind}) => {
         if (consumer) {
@@ -422,13 +425,13 @@ const MeetingParticipant = (props) => {
             setVideoRefresher(!videoRefresher);
             tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
           } else {
-            if (props.isCurrentUser) {
+            if (props.isCurrentUser || loading) {
               let audioElement = document.createElement('audio');
               audioElement.srcObject = stream;
               audioElement.id = consumer.id;
               audioElement.playsinline = false;
               audioElement.autoplay = true;
-              document.getElementById(props.data.userId + '-audio-el-container').appendChild(audioElement);
+              document.getElementById('meeting-audio-el-container').appendChild(audioElement);
 
               if(props.isHost) {
                 mediaRecorder.addTrack(stream.getAudioTracks()[0]);
@@ -609,7 +612,7 @@ const MeetingParticipant = (props) => {
               </div>
               {
                 props.isCurrentUser &&
-                <div id={props.data.userId + '-audio-el-container'}>
+                <div id={'meeting-audio-el-container'}>
                 </div>
               }
             </>
