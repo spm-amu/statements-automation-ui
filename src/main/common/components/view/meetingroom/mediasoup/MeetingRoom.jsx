@@ -781,7 +781,7 @@ const MeetingRoom = (props) => {
                                       step={step}
                                       isHost={isHost}
                                       isRecording={isRecording}
-                                      screenShared={screenShared || someoneSharing}
+                                      screenShared={screenShared}
                                       whiteBoardShown={showWhiteBoard}
                                       sharingHandler={(someoneSharing) => setSomeoneSharing(someoneSharing)}
                                       autoPermit={autoPermit}
@@ -891,7 +891,7 @@ const MeetingRoom = (props) => {
                   isRecording={isRecording}
                   displayState={displayState}
                   screenShared={screenShared}
-                  someoneSharing={someoneSharing !== null}
+                  someoneSharing={someoneSharing}
                   whiteBoardShown={showWhiteBoard}
                   isHost={isHost}
                   step={step}
