@@ -47,7 +47,7 @@ const MeetingParticipantGrid = (props) => {
       isHost,
       autoPermit,
       rtpCapabilities,
-      shareScreenProducerData,
+      onloadScreenShareData,
       isRecording
     } = props;
 
@@ -287,11 +287,10 @@ const MeetingParticipantGrid = (props) => {
     }, [screenShared, shareScreenSource]);
 
     useEffect(() => {
-
-      if(shareScreenProducerData) {
-        consume(shareScreenProducerData);
+      if(onloadScreenShareData && device && consumerTransport) {
+        consume(onloadScreenShareData);
       }
-    }, [shareScreenProducerData]);
+    }, [onloadScreenShareData, device, consumerTransport]);
 
     useEffect(() => {
       setShareScreenSource(props.shareScreenSource);
