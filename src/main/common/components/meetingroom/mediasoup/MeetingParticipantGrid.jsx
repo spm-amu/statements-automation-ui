@@ -136,6 +136,9 @@ const MeetingParticipantGrid = (props) => {
       shareScreenProducer.close();
       stopShareScreenConsumerTracks();
       setShareScreenProducer(null);
+      setSomeoneSharing(false);
+      setShareScreenSource(null);
+      setScreenShared(false);
     };
 
     const onNewProducers = (producers) => {
@@ -166,6 +169,8 @@ const MeetingParticipantGrid = (props) => {
             console.log("\n\n\n=====================================SHARING CONSUME=====================================");
             props.sharingHandler(true);
             setSomeoneSharing(true);
+            setShowSharedScreen(true);
+            setShareScreenSource(null);
             setMessage(producer.username + " is sharing");
             shareScreenVideoRef.current.srcObject = stream;
             //setVideoRefresher(!videoRefresher);
