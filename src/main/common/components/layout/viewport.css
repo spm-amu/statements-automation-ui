@@ -1,7 +1,7 @@
 .viewport {
-  max-height: calc(99vh - 48px);
-  height: calc(99vh - 48px);
+  max-height: 100vh;
+  height: 100vh;
   overflow-y: hidden;
   overflow-x: hidden;
-  border-top: 3px solid #00476c
+  border-top: 1px solid #00476c
 }

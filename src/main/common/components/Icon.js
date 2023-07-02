@@ -121,17 +121,17 @@ class Icon extends Component {
     } else if (this.props.id === 'LIST') {
       return <List/>
     } else if (this.props.id === 'MIC') {
-      return <Microphone {...this.props}/>
+      return <Microphone {...this.props} style={{color: this.props.color}}/>
     } else if (this.props.id === 'MIC_OFF') {
-      return <MicrophoneOff/>
+      return <MicrophoneOff style={{color: this.props.color}}/>
     } else if (this.props.id === 'CAMERA') {
       return <Camera style={{color: this.props.color}}/>
     } else if (this.props.id === 'CAMERA_OFF') {
-      return <CameraOff/>
+      return <CameraOff style={{color: this.props.color}}/>
     } else if (this.props.id === 'VIDEOCAM_OFF') {
-      return <VideocamOff/>
+      return <VideocamOff style={{color: this.props.color}}/>
     } else if (this.props.id === 'VIDEOCAM') {
-      return <Videocam/>
+      return <Videocam style={{color: this.props.color}}/>
     } else if (this.props.id === 'CANCEL_PRESENTATION') {
       return <CancelPresentation/>
     } else if (this.props.id === 'PRESENT_TO_ALL') {

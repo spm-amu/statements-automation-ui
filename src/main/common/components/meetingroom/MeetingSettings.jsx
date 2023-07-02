@@ -6,10 +6,9 @@ import Icon from '../Icon';
 import {useNavigate} from 'react-router-dom';
 import Utils from '../../Utils';
 import appManager from "../../../common/service/AppManager";
-import {Stream} from "../../service/Stream";
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import {get, post} from '../../service/RestService';
+import {get} from '../../service/RestService';
 import {Alert} from "@material-ui/lab";
 import {VIDEO_CONSTRAINTS} from "./mediasoup/MeetingParticipant";
 
@@ -37,20 +36,20 @@ const MeetingSettings = (props) => {
 
     setVideoOptionDisabled(videoDisabled);
     return () => {
-      if (stream) {
-        stream.close();
-      }
+      closeStreams();
     };
   }, []);
 
   const startVideo = async () => {
-    userVideo.current.srcObject = await navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
+    let videoStream = await navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
+    userVideo.current.srcObject = videoStream;
+    setStream(videoStream);
   };
 
   useEffect(() => {
-    if(!videoMuted) {
+    if (!videoMuted) {
       startVideo();
-    } else if(userVideo.current && userVideo.current.srcObject){
+    } else if (userVideo.current && userVideo.current.srcObject) {
       userVideo.current.srcObject.getVideoTracks()[0].stop();
     }
   }, [videoMuted]);
@@ -69,7 +68,7 @@ const MeetingSettings = (props) => {
       }, (e) => {
       });
 
-    if(selectedMeeting && selectedMeeting.attendees) {
+    if (selectedMeeting && selectedMeeting.attendees) {
       selectedMeeting.attendees.forEach(att => {
         if (att.userId === userDetails.userId) {
           setIsHost(att.type === 'HOST');
@@ -91,8 +90,10 @@ const MeetingSettings = (props) => {
   };
 
   const closeStreams = () => {
-    if(stream) {
-      stream.close();
+    if (stream) {
+      for (const track of stream.getTracks()) {
+        track.stop();
+      }
     }
   };
 
@@ -115,146 +116,146 @@ const MeetingSettings = (props) => {
   };
 
   return (
-    <div className={'meeting-settings-container'}>
-      <div className="toolbar row">
-        <Button
-          onClick={close}
-          variant={'text'}
-          size="large"
-          style={{color: '#985F31', border: '1px solid #985F31'}}
-        >
-          CLOSE
-        </Button>
-      </div>
-      <div className={'row centered-flex-box'}>
-        <table>
-          <tbody>
-          <tr>
-            <td className={'title'} colSpan={4}>
-              {selectedMeeting.title}
-            </td>
-          </tr>
-          <tr>
-            <td style={{paddingBottom: '16px'}} colSpan={4}>
-              Please select your audio and video settings
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={4}>
-              {
-                videoOptionDisabled &&
-                <Alert severity="warning">
-                  We cannot initiate your video camera. Please check your video settings and try again. You may join the
-                  meeting without video
-                </Alert>
-              }
-            </td>
-          </tr>
-          <tr>
-            <td className={'lobby-settings'} colSpan={4}>
-              <div
-                className={'centered-flex-box'}
+    <div className={'meeting-settings-container centered-flex-box'}>
+      <div className={'meeting-settings-content'}>
+        <div className={'meeting-settings-header'}>
+          <table style={{width: '100%'}}>
+            <tbody>
+            <tr>
+              <td className={'title'} colSpan={4}>
+                {selectedMeeting.title}
+              </td>
+            </tr>
+            <tr>
+              <td style={{paddingBottom: '16px', color: 'white'}} colSpan={4}>
+                Please select your audio and video settings
+              </td>
+            </tr>
+            <tr>
+              <td>
+                {
+                  videoOptionDisabled &&
+                  <Alert severity="warning" style={{color: 'red', maxHeight: '32px'}}>
+                    No video camera available. You may join the
+                    meeting without video
+                  </Alert>
+                }
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className={'meeting-settings-video'}>
+          <div
+            className={'centered-flex-box'}
+            style={{
+              width: '100%',
+              height: '100%'
+            }}
+          >
+            {
+              videoMuted &&
+              <div className={'centered-flex-box'} style={{
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'transparent',
+                borderRadius: '4px'
+              }}>
+                <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)}/>
+              </div>
+            }
+            <div>
+              <video
+                hidden={videoMuted}
+                muted playsinline autoPlay ref={userVideo}
                 style={{
                   width: '100%',
-                  height: '100%'
+                  height: '100%',
+                  backgroundColor: 'transparent',
+                  borderRadius: '4px'
                 }}
-              >
-                {
-                  videoMuted &&
-                  <div className={'centered-flex-box'} style={{
-                    width: '280px',
-                    maxWidth: '280px',
-                    height: '280px',
-                    backgroundColor: '#000000',
-                    borderRadius: '4px'
-                  }}>
-                    <div className={'avatar'} data-label={Utils.getInitials(loggedInUser)}/>
-                  </div>
-                }
-                <div style={{maxWidth: '280px'}}>
-                  <video
-                    hidden={videoMuted}
-                    muted playsInline autoPlay ref={userVideo}
-                    style={{
-                      maxHeight: '280px',
-                      height: '280px',
-                      width: 'unset',
-                      maxWidth: '280px',
-                      backgroundColor: '#000000',
-                      borderRadius: '4px'
-                    }}
-                  />
-                </div>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td style={{paddingTop: '8px', textAlign: 'right'}}>
-              {videoMuted ? (
-                <Icon id={'CAMERA_OFF'}/>
-              ) : (
-                <Icon id={'CAMERA'}/>
-              )}
-              <Switch
-                onChange={(e, value) => {
-                  muteVideo();
-                }}
-                disabled={videoOptionDisabled || videoOptionDisabled === null}
-                value={videoMuted}
-                checked={!videoMuted}
-                color="primary"
               />
-            </td>
-            <td style={{paddingTop: '8px', textAlign: 'left'}}>
-              {audioMuted ? (
-                <Icon id={'MIC_OFF'}/>
-              ) : (
-                <Icon id={'MIC'}/>
-              )}
-              <Switch
-                onChange={(e, value) => {
-                  muteAudio();
-                }}
-                value={audioMuted}
-                checked={!audioMuted}
-                color="primary"
-              />
-            </td>
-            {
-              isHost &&
-              <td style={{paddingTop: '8px', textAlign: 'left'}}>
-                <FormGroup>
-                  <FormControlLabel style={{paddingTop: '10px'}} control={
-                    <Switch
-                      checked={autoPermit}
-                      value={autoPermit}
-                      color="primary"
-                      onChange={(e, value) => {
-                        toggleAskToJoin();
-                      }}
-                    />
-                  } label="Auto permit"/>
-                </FormGroup>
+            </div>
+          </div>
+        </div>
+        <div className={'meeting-settings-toolbar centered-flex-box'}>
+          <table>
+            <tr>
+              <td style={{textAlign: 'right'}}>
+                {videoMuted ? (
+                  <Icon id={'CAMERA_OFF'} color={'white'}/>
+                ) : (
+                  <Icon id={'CAMERA'} color={'white'}/>
+                )}
+                <Switch
+                  onChange={(e, value) => {
+                    muteVideo();
+                  }}
+                  disabled={videoOptionDisabled || videoOptionDisabled === null}
+                  value={videoMuted}
+                  checked={!videoMuted}
+                  color="primary"
+                />
               </td>
-            }
-
-            <td style={{paddingTop: '8px', textAlign: 'right'}}>
-              <Button
-                variant={'contained'}
-                disabled={videoOptionDisabled === null}
-                size="large"
-                color={'primary'}
-                onClick={(e) => {
-                  close();
-                  navigateToMeetingRoom();
-                }}
-              >
-                JOIN
-              </Button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+              <td style={{textAlign: 'left'}}>
+                {audioMuted ? (
+                  <Icon id={'MIC_OFF'} color={'white'}/>
+                ) : (
+                  <Icon id={'MIC'} color={'white'}/>
+                )}
+                <Switch
+                  onChange={(e, value) => {
+                    muteAudio();
+                  }}
+                  value={audioMuted}
+                  checked={!audioMuted}
+                  color="primary"
+                />
+              </td>
+              {
+                isHost &&
+                <td style={{textAlign: 'left'}}>
+                  <FormGroup>
+                    <FormControlLabel style={{paddingTop: '10px', color: 'white'}} control={
+                      <Switch
+                        checked={autoPermit}
+                        value={autoPermit}
+                        color="primary"
+                        onChange={(e, value) => {
+                          toggleAskToJoin();
+                        }}
+                      />
+                    } label="Auto permit"/>
+                  </FormGroup>
+                </td>
+              }
+              <td style={{textAlign: 'right'}}>
+                <Button
+                  variant={'contained'}
+                  disabled={videoOptionDisabled === null}
+                  size="large"
+                  color={'primary'}
+                  onClick={(e) => {
+                    close();
+                    navigateToMeetingRoom();
+                  }}
+                >
+                  JOIN
+                </Button>
+              </td>
+              <td style={{textAlign: 'right'}}>
+                <Button
+                  onClick={close}
+                  variant={'text'}
+                  size="large"
+                  style={{color: '#985F31', border: '1px solid #985F31'}}
+                >
+                  CLOSE
+                </Button>
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
   );
