@@ -154,22 +154,27 @@ class MediaSoupHelper {
       const {id, kind, rtpParameters} = data.params;
 
       let codecOptions = {};
-      const consumer = await consumerTransport.consume({
-        id,
-        producerId,
-        kind,
-        rtpParameters,
-        codecOptions
-      });
 
-      console.log(consumer);
-      const stream = new MediaStream();
-      stream.addTrack(consumer.track);
+      try {
+        const consumer = await consumerTransport.consume({
+          id,
+          producerId,
+          kind,
+          rtpParameters,
+          codecOptions
+        });
 
-      return {
-        consumer,
-        stream,
-        kind
+        console.log(consumer);
+        const stream = new MediaStream();
+        stream.addTrack(consumer.track);
+
+        return {
+          consumer,
+          stream,
+          kind
+        }
+      } catch (e) {
+        console.error(e);
       }
     }
 

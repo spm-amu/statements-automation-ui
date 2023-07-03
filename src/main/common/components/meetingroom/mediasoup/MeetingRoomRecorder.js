@@ -113,7 +113,7 @@ class MeetingRoomRecorder {
   };
 
   stopRecordingMeeting = () => {
-    if (this.recorder != null) {
+    if (this.recorder != null && this.isRecording) {
       try {
         this.isRecording = false;
         this.recorder.stop();

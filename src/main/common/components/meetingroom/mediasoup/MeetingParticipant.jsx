@@ -63,6 +63,7 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
+  const tempVideoRef = useRef();
   const audioRef = useRef();
   const tracks = useRef(new Tracks());
   const soundLevelCounter = useRef(0);
@@ -133,6 +134,13 @@ const MeetingParticipant = (props) => {
   useEffect(() => {
     setIsRecording(props.isRecording);
   }, [props.isRecording]);
+
+  useEffect(() => {
+    if(videoRef.current && tempVideoRef.current) {
+      videoRef.current.srcObject = tempVideoRef.current;
+      tempVideoRef.current = null;
+    }
+  }, [videoRef.current]);
 
   useEffect(() => {
     if(mediaRecorder) {
@@ -232,6 +240,8 @@ const MeetingParticipant = (props) => {
       for (const videoProducer of props.data.videoProducers) {
         consume(videoProducer.producerId, videoProducer.kind);
       }
+
+      props.data.videoProducers = null;
     }
 
     if(props.isHost) {
@@ -420,7 +430,13 @@ const MeetingParticipant = (props) => {
 
           console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
           if (kind === 'video') {
-            videoRef.current.srcObject = stream;
+            // TODO : Put the stream in a temp variable and assign it later
+            if(videoRef.current) {
+              videoRef.current.srcObject = stream;
+            } else {
+              tempVideoRef.current = stream;
+            }
+
             setVideoMuted(false);
             setVideoRefresher(!videoRefresher);
             tracks.current.setVideoTrack(stream.getVideoTracks()[0]);
