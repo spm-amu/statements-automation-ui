@@ -210,7 +210,7 @@ const Toolbar = (props) => {
               </Tooltip>
             }
             {
-              step === 'SESSION' && !videoDisabled &&
+              (step === 'SESSION' || step === 'LOBBY') && !videoDisabled &&
               <Tooltip title="Video">
                 <IconButton
                   onClick={() => {
@@ -231,7 +231,7 @@ const Toolbar = (props) => {
               </Tooltip>
             }
             {
-              step === 'SESSION' &&
+              (step === 'SESSION' || step === 'LOBBY') &&
               <Tooltip title="Audio">
                 <IconButton
                   onClick={() => {
