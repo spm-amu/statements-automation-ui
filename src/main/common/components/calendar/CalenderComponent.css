@@ -95,7 +95,7 @@ button:focus {
 }
 
 .fc-daygrid-dot-event .fc-event-title {
-  font-weight: unset !important;
+  font-weight: 500 !important;
 }
 
 .fc .fc-daygrid-event-harness .fc-event {
@@ -104,7 +104,7 @@ button:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   background-color: #dfe8ed !important;
-  font-weight: unset !important;
+  font-weight: 500 !important;
 }
 
 
