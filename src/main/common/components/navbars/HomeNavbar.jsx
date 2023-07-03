@@ -117,6 +117,40 @@ class HomeNavbar extends React.Component {
   };
 
   render() {
+    const {activeColor, logo} = this.props;
+    let logoImg = null;
+    let logoText = null;
+    if (!Utils.isNull(logo)) {
+      logoImg = (
+        <a
+          href={logo.outterLink}
+          className="logo-normal"
+          onClick={this.props.closeSidebar}
+        >
+          <div className="logo-img"
+               style={{
+                 margin: '4px',
+                 borderRadius: '4px',
+                 height: '40px',
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center'
+               }}>
+            <img height={'40px'} src={require('/assets/armscor_logo.png')} alt="logo"/>
+          </div>
+          {" "}
+        </a>
+      );
+      logoText = (
+        <a
+          href={logo.outterLink}
+          className="simple-text "
+          onClick={this.props.closeSidebar}
+        >
+          {logo.text}{" "}
+        </a>
+      );
+    }
     return (
       <>
         <Navbar
@@ -149,6 +183,38 @@ class HomeNavbar extends React.Component {
                     {" "}
                   </div>
 
+                </div>
+                <div style={{height: '54px', padding: '8px'}}>
+                  {" "}
+                  {logoImg !== null ? (
+                    <div className="logo" style={
+                      {
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%',
+
+                      }}
+                    >
+                      {" "}
+                      {logoImg}
+                      {" "}
+                    </div>
+                  ) : null}
+                  {" "}
+                  {!Utils.isNull(this.props.heading) ? (
+                    <div className="logo" style={
+                      {
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%',
+                        fontSize: '20px',
+                        fontWeight: 600
+
+                      }}
+                    >{this.props.heading}</div>
+                  ) : null}
                 </div>
                 <div className={'col no-margin no-padding'}
                      style={{float: 'left'}}>

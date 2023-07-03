@@ -39,11 +39,11 @@
 }
 
 .participant-card .bottom-strip .indicator .offline{
-  background-color: red;
+  background-color: rgb(235, 63, 33);
 }
 
 .participant-card .bottom-strip .indicator .online{
-  background-color: green;
+  background-color: #198754;
 }
 
 .participant-card .user-details {

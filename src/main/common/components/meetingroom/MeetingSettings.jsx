@@ -234,7 +234,7 @@ const MeetingSettings = (props) => {
                   variant={'contained'}
                   disabled={videoOptionDisabled === null}
                   size="large"
-                  color={'primary'}
+                  style={{color: '#FFFFFF', backgroundColor: '#198754', borderRadius: '8px'}}
                   onClick={(e) => {
                     close();
                     navigateToMeetingRoom();
@@ -245,10 +245,11 @@ const MeetingSettings = (props) => {
               </td>
               <td style={{textAlign: 'right'}}>
                 <Button
+                  variant={'contained'}
                   onClick={close}
                   variant={'text'}
                   size="large"
-                  style={{color: '#985F31', border: '1px solid #985F31'}}
+                  style={{color: '#FFFFFF', backgroundColor: 'rgb(235, 63, 33)', borderRadius: '8px'}}
                 >
                   CLOSE
                 </Button>

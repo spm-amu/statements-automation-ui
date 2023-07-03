@@ -11,7 +11,7 @@
 .navbar.navbar-absolute {
   /*z-index: 100000 !important;*/
   width: 100% !important;
-  background-color: #00476c !important;
+  background-color: rgba(234,223,213, .5) !important;
 }
 
 .navbar .navbar-brand {
@@ -58,7 +58,7 @@
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
-  color: #ADA7A7;
+  color: #a1704d;
 }
 
 .date-label {
@@ -66,7 +66,7 @@
   font-style: normal;
   font-weight: 300;
   font-size: 12px;
-  color: #ADA7A7;
+  color: #0a0c0d;
 }
 
 @media screen and (max-width: 991px) {

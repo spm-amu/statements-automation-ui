@@ -196,82 +196,12 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    const {activeColor, logo} = this.props;
-    let logoImg = null;
-    let logoText = null;
-    if (!Utils.isNull(logo)) {
-      logoImg = (
-        <a
-          href={logo.outterLink}
-          className="logo-normal"
-          onClick={this.props.closeSidebar}
-        >
-          <div className="logo-img"
-               style={{
-                 paddingTop: '16px',
-                 paddingBottom: '8px',
-                 borderRadius: '50%',
-                 width: '96px',
-                 height: '96px',
-                 display: 'flex',
-                 alignItems: 'center',
-                 justifyContent: 'center'
-               }}>
-            <img width={'72px'} src={require('/assets/armscor_logo.png')} style={{marginTop: '-8px'}} alt="logo"/>
-          </div>
-          {" "}
-        </a>
-      );
-      logoText = (
-        <a
-          href={logo.outterLink}
-          className="simple-text "
-          onClick={this.props.closeSidebar}
-        >
-          {logo.text}{" "}
-        </a>
-      );
-    }
-
+    const {activeColor} = this.props;
     return (
       <div className={this.props.className} data={activeColor}
            style={{overflow: 'auto', maxHeight: '100vh'}}>
         <table style={{height: "96%", maxHeight: "90%", width: "100%"}}>
           <tbody>
-          <tr>
-            <td style={{height: '10%'}}>
-              {" "}
-              {logoImg !== null ? (
-                <div className="logo" style={
-                  {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-
-                  }}
-                >
-                  {" "}
-                  {logoImg}
-                  {" "}
-                </div>
-              ) : null}
-              {" "}
-              {!Utils.isNull(this.props.heading) ? (
-                <div className="logo" style={
-                  {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    fontSize: '20px',
-                    fontWeight: 600
-
-                  }}
-                >{this.props.heading}</div>
-              ) : null}
-            </td>
-          </tr>
           <tr>
             <td style={{height: '65%'}} valign={"top"}>
               <Nav style={{margin: "8px"}}>
