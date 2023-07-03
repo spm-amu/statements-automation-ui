@@ -256,7 +256,7 @@ const MeetingParticipantGrid = (props) => {
       participant.inView = false;
       inViewParticipants.splice(inViewParticipants.findIndex((p) => p.userId === participant.userId), 1);
       appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, participant);
-      setupGrid();
+      setGrid(null);
     };
 
     const setupSelfDevices = async () => {
@@ -277,6 +277,12 @@ const MeetingParticipantGrid = (props) => {
       eventHandler.api = handler();
       systemEventHandler.api = systemEventHandlerApi();
     });
+
+    useEffect(() => {
+      if(grid === null) {
+        setupGrid();
+      }
+    }, [grid]);
 
     useEffect(() => {
       if (screenShared && shareScreenSource) {

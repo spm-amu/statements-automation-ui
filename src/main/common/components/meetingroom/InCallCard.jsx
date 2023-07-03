@@ -63,8 +63,17 @@ const InCall = (props) => {
   };
 
   const onNewProducers = (producers) => {
-    if(producers.find((p) => p.kind === 'video' && !p.screenSharing)) {
-      participant.videoProducers = producers;
+    let userProducers = [];
+    for (const producer of producers) {
+      if (producer.userId === participant.userId) {
+        if (producer.kind === 'video' && !producer.screenSharing) {
+          userProducers.push(producer);
+        }
+      }
+    }
+
+    if(userProducers.length > 0) {
+      participant.producers = userProducers;
     }
   };
 
@@ -74,7 +83,7 @@ const InCall = (props) => {
       setVideoMuted(payload.videoMuted);
 
       if(payload.videoMuted) {
-        participant.videoProducers = null;
+        participant.producers = null;
       }
     }
   };

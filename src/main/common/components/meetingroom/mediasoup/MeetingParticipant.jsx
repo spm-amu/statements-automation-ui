@@ -63,7 +63,7 @@ const MeetingParticipant = (props) => {
   const [eventHandler] = useState({});
   const [systemEventHandler] = useState({});
   const videoRef = useRef();
-  const tempVideoRef = useRef();
+  const videoStream = useRef();
   const audioRef = useRef();
   const tracks = useRef(new Tracks());
   const soundLevelCounter = useRef(0);
@@ -136,9 +136,8 @@ const MeetingParticipant = (props) => {
   }, [props.isRecording]);
 
   useEffect(() => {
-    if(videoRef.current && tempVideoRef.current) {
-      videoRef.current.srcObject = tempVideoRef.current;
-      tempVideoRef.current = null;
+    if(videoRef.current && videoStream.current) {
+      videoRef.current.srcObject = videoStream.current;
     }
   }, [videoRef.current]);
 
@@ -149,8 +148,6 @@ const MeetingParticipant = (props) => {
       } else {
         mediaRecorder.stopRecordingMeeting();
       }
-    } else {
-      alert("NO MEDIA RECORDER");
     }
   }, [isRecording]);
 
@@ -224,7 +221,7 @@ const MeetingParticipant = (props) => {
 
   useEffect(() => {
     if (consumerTransport) {
-      console.log("\n\n\n\n\nTRANSI ARRIVED WITH PRODUCERS : ", props.data.producers);
+      console.log("TRANSI ARRIVED WITH PRODUCERS : ", props.data.producers);
       if (props.data.producers) {
         onNewProducers(props.data.producers, true);
       }
@@ -236,18 +233,11 @@ const MeetingParticipant = (props) => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
 
-    if (props.data.videoProducers) {
-      for (const videoProducer of props.data.videoProducers) {
-        consume(videoProducer.producerId, videoProducer.kind);
-      }
-
-      props.data.videoProducers = null;
-    }
-
     if(props.isHost) {
       mediaRecorder.init(props.meetingId, props.meetingTitle);
     }
 
+    console.log("\n\n\n\n\nRENDERING : ", props.data);
     return () => {
       stopProducing('audio');
       stopProducing('video');
@@ -256,8 +246,8 @@ const MeetingParticipant = (props) => {
         mediaRecorder.stopRecordingMeeting();
       }
 
-      for (const consumer of consumers) {
-        consumer.track?.stop();
+      for (let [key, value] of consumers) {
+        removeConsumer(key, 'video');
       }
 
       appManager.removeSubscriptions(systemEventHandler);
@@ -330,6 +320,7 @@ const MeetingParticipant = (props) => {
 
     if (type === 'video') {
       videoRef.current.srcObject = stream;
+      videoStream.current = stream;
       setVideoRefresher(!videoRefresher);
     }
 
@@ -381,6 +372,7 @@ const MeetingParticipant = (props) => {
     for (const producer of producers) {
       if (producer.userId === props.data.userId) {
         if (producer.kind === 'video' && !producer.screenSharing) {
+          console.log("CALLING CONSUME FROM ON NEW PRODUCERS : ", producer);
           consume(producer.producerId, producer.kind);
         }
       }
@@ -397,8 +389,8 @@ const MeetingParticipant = (props) => {
 
   const removeConsumer = (consumerId, kind) => {
     if (kind === 'video') {
-      if (videoRef.current) {
-        let stream = videoRef.current.srcObject;
+      if (videoStream.current) {
+        let stream = videoStream.current.srcObject;
         if (stream) {
           stream.getTracks().forEach(function (track) {
             track.stop();
@@ -433,9 +425,9 @@ const MeetingParticipant = (props) => {
             // TODO : Put the stream in a temp variable and assign it later
             if(videoRef.current) {
               videoRef.current.srcObject = stream;
-            } else {
-              tempVideoRef.current = stream;
             }
+
+            videoStream.current = stream;
 
             setVideoMuted(false);
             setVideoRefresher(!videoRefresher);
@@ -588,6 +580,7 @@ const MeetingParticipant = (props) => {
                       <Tooltip title="Remove from view">
                         <IconButton
                           onClick={(e) => {
+                            stopProducing('video');
                             props.onRemoveFromView(props.data)
                           }}
                           style={{
