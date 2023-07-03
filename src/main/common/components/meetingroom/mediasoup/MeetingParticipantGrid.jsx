@@ -36,6 +36,7 @@ const MeetingParticipantGrid = (props) => {
     const [eventHandler] = useState({});
     const transports = useRef(new Transports());
     const shareScreenVideoRef = useRef();
+    const shareScreenStream = useRef();
     const {
       waitingList,
       step,
@@ -99,6 +100,7 @@ const MeetingParticipantGrid = (props) => {
       let producer = await producerTransport.produce(params);
       setShareScreenProducer(producer);
 
+      shareScreenStream.current = stream;
       if (showSharedScreen) {
         shareScreenVideoRef.current.srcObject = stream;
       }
@@ -140,6 +142,12 @@ const MeetingParticipantGrid = (props) => {
       setSomeoneSharing(false);
       setShareScreenSource(null);
       setScreenShared(false);
+
+      if(shareScreenStream.current) {
+        for (const track of shareScreenStream.current.getTracks()) {
+          track.stop();
+        }
+      }
     };
 
     const onNewProducers = (producers) => {
@@ -175,6 +183,7 @@ const MeetingParticipantGrid = (props) => {
             setShareScreenSource(null);
             setMessage(producer.username + " is sharing");
             shareScreenVideoRef.current.srcObject = stream;
+            shareScreenStream.current = stream;
             //setVideoRefresher(!videoRefresher);
 
             consumer.on(
