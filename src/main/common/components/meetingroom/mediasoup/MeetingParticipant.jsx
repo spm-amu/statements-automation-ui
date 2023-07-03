@@ -237,7 +237,6 @@ const MeetingParticipant = (props) => {
       mediaRecorder.init(props.meetingId, props.meetingTitle);
     }
 
-    console.log("\n\n\n\n\nRENDERING : ", props.data);
     return () => {
       stopProducing('audio');
       stopProducing('video');
@@ -312,6 +311,7 @@ const MeetingParticipant = (props) => {
     if (type === 'video') {
       params.encodings = VIDEO_ENCODINGS;
       params.codecOptions = VIDEO_CODEC_OPTIONS;
+      tracks.current.setVideoTrack(track);
     }
 
     let producer = await producerTransport.produce(params);
