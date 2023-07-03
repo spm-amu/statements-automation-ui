@@ -334,7 +334,7 @@ const CalendarComponent = (props) => {
     */
     eventMouseLeave({el: el}) {
       el.removeChild(document.getElementById('event-popup-toolbar'));
-      el.children[0].style.display = 'unset';
+      //el.children[0].style.display = 'unset';
     },
 
     ref: calendarRef,
