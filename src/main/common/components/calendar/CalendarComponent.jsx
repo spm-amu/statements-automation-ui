@@ -307,6 +307,7 @@ const CalendarComponent = (props) => {
       joinButton.id = 'event-join-btn';
       joinButton.style.marginLeft = '-8px';
       joinButton.style.marginRight = '4px';
+      joinButton.style.backgroundColor = '#198754';
       joinButton.classList.add('event-button');
       joinButton.onclick = (e) => {
         navigate('/view/joinMeetingSettings', {state: getCreateMeetingObject(event)});
