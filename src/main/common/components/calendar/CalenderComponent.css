@@ -7,9 +7,29 @@
   transform: scale(1);
 }
 
+.event-button-container {
+  width: 100%;
+  border: 1px solid red;
+  position: absolute;
+  background-color: #945c33;
+}
+
+.event-button {
+  width: 50%;
+  border-radius: 4px;
+  background-color: #01476C;
+  color: #ffffff;
+}
+
 .fc-header-toolbar .fc-toolbar-chunk:nth-of-type(3) .fc-button-group button {
   border-color: #dfe8ed !important;
   color: #01476C !important;
+}
+
+.fc .fc-daygrid-event-harness .fc-event:hover {
+  background-color: #945c33 !important;
+  color: #ffffff !important;
+  border-color: #945c33 !important;
 }
 
 .fc .fc-toolbar .fc-button-group .fc-button-primary:not(.fc-prev-button):not(.fc-next-button).fc-button-active,
@@ -65,10 +85,6 @@ button:focus {
   border-radius: 4px !important;
 }
 
-.fc-daygrid-day-events a:hover {
-  border: 8px solid green;
-}
-
 .fc-daygrid-body table {
   border-bottom: 1px solid #ebe9f1 !important;
 }
@@ -78,12 +94,17 @@ button:focus {
   min-height: unset !important;
 }
 
+.fc-daygrid-dot-event .fc-event-title {
+  font-weight: unset !important;
+}
+
 .fc .fc-daygrid-event-harness .fc-event {
   max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   background-color: #dfe8ed !important;
+  font-weight: unset !important;
 }
 
 
@@ -95,10 +116,16 @@ button:focus {
 
 .fc-daygrid-event-dot {
   border-color: #01476C;
+  display: none;
+}
+
+.fc-daygrid-event-dot:hover {
+  border-color: #945c33;
+  display: none;
 }
 
 .fc-daygrid-day-events a:hover .fc-daygrid-event-dot {
-  border-color: #dfe8ed !important;
+  border-color: #ffffff !important;
 }
 
 .fc-sidebarToggle-button{

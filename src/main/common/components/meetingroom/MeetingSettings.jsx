@@ -234,7 +234,7 @@ const MeetingSettings = (props) => {
                   variant={'contained'}
                   disabled={videoOptionDisabled === null}
                   size="large"
-                  style={{color: '#FFFFFF', backgroundColor: '#198754', borderRadius: '8px'}}
+                  style={{color: '#FFFFFF', backgroundColor: '#198754', borderRadius: '8px', marginRight: '2px'}}
                   onClick={(e) => {
                     close();
                     navigateToMeetingRoom();

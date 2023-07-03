@@ -18,7 +18,7 @@ import Utils from '../../Utils';
 import {useNavigate} from 'react-router-dom';
 import moment from "moment";
 import appManager from '../../service/AppManager'
-import { MessageType } from '../../types';
+import {MessageType} from '../../types';
 import socketManager from '../../service/SocketManager';
 
 const eventTemplate = {
@@ -155,6 +155,34 @@ const CalendarComponent = (props) => {
     new Date();
   };
 
+  const getCreateMeetingObject = (event) => {
+    let end = getEndDate(event);
+
+    return {
+      id: event.id,
+      title: event.title,
+      locations: event.extendedProps.locations,
+      description: event.extendedProps.description,
+      status: event.extendedProps.status,
+      attendees: event.extendedProps.attendees,
+      privacyType: event.extendedProps.privacyType,
+      documents: event.extendedProps.documents,
+      startDate: event.start,
+      startTime: event.start,
+      endDate: end,
+      endTime: end,
+      scheduleId: event.extendedProps.schedule.id,
+      recurringFreq: event.extendedProps.schedule.rrule.freq,
+      recurringInterval: event.extendedProps.schedule.rrule.interval,
+      recurringDtstart: new Date(event.extendedProps.schedule.rrule.dtstart),
+      recurringUntil: new Date(event.extendedProps.schedule.rrule.until),
+      recurringByweekday: event.extendedProps.schedule.rrule.byweekday,
+      recurringBysetpos: event.extendedProps.schedule.rrule.bysetpos,
+      recurringBymonthday: event.extendedProps.schedule.rrule.bymonthday,
+      askToJoin: event.extendedProps.askToJoin
+    };
+  };
+
   const calendarOptions = {
     events: events,
     plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, rrulePlugin],
@@ -211,34 +239,6 @@ const CalendarComponent = (props) => {
     },
 
     eventClick({event: clickedEvent}) {
-      let end = getEndDate(clickedEvent);
-
-      let value = {
-        id: clickedEvent.id,
-        title: clickedEvent.title,
-        locations: clickedEvent.extendedProps.locations,
-        description: clickedEvent.extendedProps.description,
-        status: clickedEvent.extendedProps.status,
-        attendees: clickedEvent.extendedProps.attendees,
-        privacyType: clickedEvent.extendedProps.privacyType,
-        documents: clickedEvent.extendedProps.documents,
-        startDate: clickedEvent.start,
-        startTime: clickedEvent.start,
-        endDate: end,
-        endTime: end,
-        scheduleId: clickedEvent.extendedProps.schedule.id,
-        recurringFreq: clickedEvent.extendedProps.schedule.rrule.freq,
-        recurringInterval: clickedEvent.extendedProps.schedule.rrule.interval,
-        recurringDtstart: new Date(clickedEvent.extendedProps.schedule.rrule.dtstart),
-        recurringUntil: new Date(clickedEvent.extendedProps.schedule.rrule.until),
-        recurringByweekday: clickedEvent.extendedProps.schedule.rrule.byweekday,
-        recurringBysetpos: clickedEvent.extendedProps.schedule.rrule.bysetpos,
-        recurringBymonthday: clickedEvent.extendedProps.schedule.rrule.bymonthday,
-        askToJoin: clickedEvent.extendedProps.askToJoin
-      };
-
-      setSelectedEvent(value);
-
       // * Only grab required field otherwise it goes in infinity loop
       // ! Always grab all fields rendered by form (even if it get `undefined`) otherwise due to Vue3/Composition API you might get: "object is not extensible"
       // event.value = grabEventDataFromEventApi(clickedEvent)
@@ -290,6 +290,50 @@ const CalendarComponent = (props) => {
     eventResize({event: resizedEvent}) {
       dispatch(updateEvent(resizedEvent));
       toast.success('Event Updated');
+    },
+
+    /*
+      Handle event mouse enter
+      ? Docs: https://fullcalendar.io/docs/eventMouseEnter
+    */
+    eventMouseEnter({el: el, event: event}) {
+      el.children[0].style.display = 'none';
+
+      let buttonContainer = document.createElement('div');
+      buttonContainer.classList.add('event-button-container');
+      buttonContainer.id = 'event-popup-toolbar';
+
+      let joinButton = document.createElement('button');
+      joinButton.id = 'event-join-btn';
+      joinButton.style.marginLeft = '-8px';
+      joinButton.style.marginRight = '4px';
+      joinButton.classList.add('event-button');
+      joinButton.onclick = (e) => {
+        navigate('/view/joinMeetingSettings', {state: getCreateMeetingObject(event)});
+      };
+
+      joinButton.innerHTML = 'JOIN';
+      buttonContainer.appendChild(joinButton);
+
+      let viewButton = document.createElement('button');
+      viewButton.id = 'event-view-btn';
+      viewButton.classList.add('event-button');
+      viewButton.onclick = (e) => {
+        setSelectedEvent(getCreateMeetingObject(event));
+      };
+
+      viewButton.innerHTML = 'VIEW';
+      buttonContainer.appendChild(viewButton);
+      el.insertBefore(buttonContainer, el.children[0]);
+    },
+
+    /*
+      Handle event mouse enter
+      ? Docs: https://fullcalendar.io/docs/eventMouseEnter
+    */
+    eventMouseLeave({el: el}) {
+      el.removeChild(document.getElementById('event-popup-toolbar'));
+      el.children[0].style.display = 'unset';
     },
 
     ref: calendarRef,
