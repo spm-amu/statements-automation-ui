@@ -8,15 +8,22 @@
 }
 
 .fc-header-toolbar .fc-toolbar-chunk:nth-of-type(3) .fc-button-group button {
-  border-color: #01476C !important;
+  border-color: #dfe8ed !important;
   color: #01476C !important;
 }
 
 .fc .fc-toolbar .fc-button-group .fc-button-primary:not(.fc-prev-button):not(.fc-next-button).fc-button-active,
 .fc .fc-toolbar .fc-button-group .fc-button-primary:not(.fc-prev-button):not(.fc-next-button):hover {
-  border-color: #01476C !important;
-  color: #01476C !important;
+  border-color: #dfe8ed !important;
+  color: #945c33 !important;
   background-color: rgba(1, 71, 108, 0.2) !important;
+}
+
+.fc .fc-toolbar .fc-next-button .fc-icon,
+.fc .fc-toolbar .fc-prev-button .fc-icon {
+  border-color: #dfe8ed !important;
+  color: #945c33 !important;
+  background-color: transparent !important;
 }
 
 .app-calendar .fc-day-past .fc-daygrid-day-number,
@@ -52,10 +59,10 @@ button:focus {
 }
 
 .fc-daygrid-day-events a {
-  border: 4px solid !important;
-  color: #FFFFFF;
-  background-color: #01476C !important;
-  border-radius: 8px !important;
+  color: #01476C;
+  border: 4px solid #dfe8ed;
+  background-color: #dfe8ed !important;
+  border-radius: 4px !important;
 }
 
 .fc-daygrid-day-events a:hover {
@@ -76,22 +83,22 @@ button:focus {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background-color: #a1704d !important;
+  background-color: #dfe8ed !important;
 }
 
 
 .fc-daygrid-day-events a:hover,
 .fc-daygrid-day-events a:focus {
   color: #01476C !important;
-  border-color: #01476C !important;
+  border-color: #dfe8ed !important;
 }
 
 .fc-daygrid-event-dot {
-  border-color: #FFFFFF;
+  border-color: #01476C;
 }
 
 .fc-daygrid-day-events a:hover .fc-daygrid-event-dot {
-  border-color: #01476C !important;
+  border-color: #dfe8ed !important;
 }
 
 .fc-sidebarToggle-button{
@@ -99,19 +106,19 @@ button:focus {
 }
 
 .fc-event-main-frame {
-  color: #a1704d !important;
+  color: #dfe8ed !important;
 }
 
 .fc .fc-col-header-cell-cushion {
-  color: #a1704d !important;
+  color: #dfe8ed !important;
 }
 
 .fc-direction-ltr .fc-list-day-text {
-  color: #a1704d !important;
+  color: #dfe8ed !important;
 }
 
 .fc .fc-list-event-dot {
-  border: 5px solid #a1704d !important;
+  border: 5px solid #dfe8ed !important;
 }
 
 .fc-scrollgrid-section-body table {

@@ -64,7 +64,7 @@
 
 .menu-item-active a {
   /*border-left: 3px solid #985F31;*/
-  background-color: #f9f9f9 !important;
+  background-color: #3c3f41 !important;
   color: #a1704d;
 }
 
@@ -75,7 +75,7 @@
 
 .menu-item a:focus,
 .menu-item-active a:focus {
-  color: #ffffff !important;
+  color: #a1704d !important;
   text-decoration: none;
 }
 
