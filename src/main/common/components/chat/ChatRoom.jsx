@@ -690,10 +690,10 @@ const ChatRoom = (props) => {
             </Button>
           </DialogActions>
         </Dialog>
-        <div className="chatroom__header">
+        <div className="chatroom__header" style={{paddingTop: props.chatTab ? null : '60px'}}>
           <div className="chatroom__headerleft">
             <div className={'chat-avatar'}>
-              <Avatar>
+              <Avatar style={{backgroundColor: props.chatTab ? 'transparent' : null}}>
                 {selectedChat.type === 'CALENDAR_MEETING' || selectedChat.participants.length > 2 ? (
                   <Calendar/>
                 ) : (
@@ -736,7 +736,7 @@ const ChatRoom = (props) => {
                   setMode('POLL');
                 }}
               >
-                <Poll/>
+                <Poll style={{color: props.chatTab ? 'white' : null, marginTop: props.chatTab ? '8px' : null}}/>
               </IconButton>
             </Tooltip>
           </div>
@@ -777,6 +777,7 @@ const ChatRoom = (props) => {
                     enableFile={true}
                     multiple={true}
                     id={'documents'}
+                    iconColor={props.chatTab ? 'white' : null}
                     value={documents}
                     clearUploadedFileSwitch={clearUploadedFileSwitch}
                     valueChangeHandler={(value, id) => {
@@ -802,7 +803,7 @@ const ChatRoom = (props) => {
                             sendMessage(e);
                           }}
                         >
-                          <SendIcon style={{fontSize: '24px'}}/>
+                          <SendIcon style={{fontSize: '24px', color: props.chatTab ? 'white' : null}}/>
                         </IconButton>
                       </InputAdornment>
                     ),

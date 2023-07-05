@@ -204,14 +204,14 @@ const InCall = (props) => {
                           height: '16px'
                         }}
                       >
-                        <Icon id={'MIC'}/>
+                        <Icon id={'MIC'} color={'white'}/>
                       </IconButton>
                       :
                       <>
                         {audioMuted ? (
-                          <Icon id={'MIC_OFF'}/>
+                          <Icon id={'MIC_OFF'} color={'white'}/>
                         ) : (
-                          <Icon id={'MIC'}/>
+                          <Icon id={'MIC'} color={'white'}/>
                         )}
                       </>
                   }

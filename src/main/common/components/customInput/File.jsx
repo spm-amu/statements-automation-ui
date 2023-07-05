@@ -70,7 +70,7 @@ const File = React.memo(React.forwardRef((props, ref) => {
             aria-controls="menu-list-grow"
             aria-haspopup="true"
           >
-            <Icon id={'ATTACH_FILE'}/>
+            <Icon id={'ATTACH_FILE'} color={props.iconColor ? props.iconColor : null}/>
           </IconButton>
         </label>
       </div>

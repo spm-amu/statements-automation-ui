@@ -116,7 +116,7 @@ class Icon extends Component {
     } else if (this.props.id === 'WORK') {
       return <Work/>
     } else if (this.props.id === 'ATTACH_FILE') {
-      return <AttachFile style={{fontSize: '24px'}}/>
+      return <AttachFile style={{fontSize: '24px', color: this.props.color}}/>
     } else if (this.props.id === 'NOTIFICATIONS') {
       return <Notifications/>
     } else if (this.props.id === 'HOME') {
