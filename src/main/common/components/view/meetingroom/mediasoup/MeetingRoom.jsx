@@ -725,7 +725,13 @@ const MeetingRoom = (props) => {
   };
 
   const fetchChats = () => {
+    get(`${appManager.getAPIHost()}/api/v1/chat/fetchMeetingChat/${selectedMeeting.id}`, (response) => {
+      if (response && response.id) {
+        setMeetingChat(response);
+      }
+    }, (e) => {
 
+    }, '', false)
   };
 
   const raiseHand = () => {
