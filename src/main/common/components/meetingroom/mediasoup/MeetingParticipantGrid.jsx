@@ -265,7 +265,7 @@ const MeetingParticipantGrid = (props) => {
       participant.inView = false;
       inViewParticipants.splice(inViewParticipants.findIndex((p) => p.userId === participant.userId), 1);
       appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, participant);
-      setupGrid();
+      setupGrid(null);
     };
 
     const setupSelfDevices = async () => {
