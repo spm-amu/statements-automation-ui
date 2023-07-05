@@ -690,7 +690,7 @@ const ChatRoom = (props) => {
             </Button>
           </DialogActions>
         </Dialog>
-        <div className="chatroom__header" style={{paddingTop: props.chatTab ? null : '60px'}}>
+        <div className="chatroom__header">
           <div className="chatroom__headerleft">
             <div className={'chat-avatar'}>
               <Avatar style={{backgroundColor: props.chatTab ? 'transparent' : null}}>

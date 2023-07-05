@@ -225,10 +225,10 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (!Utils.isNull(screenShared)) {
-      emitSystemEvent("SHARE_SCREEN", {
+      /*emitSystemEvent("SHARE_SCREEN", {
         shared: screenShared,
         userId: appManager.getUserDetails().userId
-      });
+      });*/
     }
   }, [screenShared]);
 

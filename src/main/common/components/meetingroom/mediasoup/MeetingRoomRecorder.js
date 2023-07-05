@@ -64,8 +64,8 @@ class MeetingRoomRecorder {
         socketManager.emitEvent(MessageType.SAVE_RECORDING, data)
           .then((data) => {
             console.log("===== SAVE RECORDING SUCCESS ======");
-            if (!this.isRecording) {
-              console.log("======= STOPPING RECORDING =======");
+            if (!_this.isRecording) {
+              console.log("======= STOPPING RECORDING =======", _this.meetingTitle);
               const data = {
                 meetingId: _this.meetingId,
                 name: _this.meetingTitle,
@@ -95,7 +95,7 @@ class MeetingRoomRecorder {
     let _this = this;
     if (this.recorder != null) {
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
-        roomID: this.meetingId,
+        roomID: _this.meetingId,
         isRecording: true
       }).then((data) => {
         console.log("RECORDING STARTED : " + data.id);
@@ -113,18 +113,20 @@ class MeetingRoomRecorder {
   };
 
   stopRecordingMeeting = () => {
-    if (this.recorder != null && this.isRecording) {
-      try {
-        this.isRecording = false;
+    try {
+      this.isRecording = false;
+
+      socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
+        roomID: this.meetingId,
+        isRecording: false
+      }).catch((error) => {
+      });
+
+      if (this.recorder) {
         this.recorder.stop();
-        socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
-          roomID: this.meetingId,
-          isRecording: false
-        }).catch((error) => {
-        });
-      } catch(e) {
-        console.error(e);
       }
+    } catch (e) {
+      console.error(e);
     }
   };
 

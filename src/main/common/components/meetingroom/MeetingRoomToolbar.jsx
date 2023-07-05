@@ -57,6 +57,7 @@ const MeetingRoomToolbar = (props) => {
 
   const onRecording = (args) => {
     if (selectedMeeting.id === args.roomID) {
+      alert(args.isRecording);
       setIsRecording(args.isRecording);
     }
   };
