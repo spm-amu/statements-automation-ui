@@ -12,6 +12,7 @@ import RotateLeft from '@material-ui/icons/RotateLeft';
 import RotateRight from '@material-ui/icons/RotateRight';
 import ZoomIn from '@material-ui/icons/ZoomIn';
 import ZoomOut from '@material-ui/icons/ZoomOut';
+import Check from '@material-ui/icons/Check';
 import Camera from '@material-ui/icons/Videocam';
 import AttachFile from '@material-ui/icons/AttachFile';
 import CameraOff from '@material-ui/icons/VideocamOff';
@@ -76,6 +77,8 @@ class Icon extends Component {
       return <Reply/>
     } else if (this.props.id === 'CLOSE') {
       return <Close style={{color: this.props.color}}/>
+    } else if (this.props.id === 'CHECK') {
+      return <Check style={{color: this.props.color}}/>
     } else if (this.props.id === 'MINIMIZE') {
       return <Minimize style={{color: this.props.color}}/>
     } else if (this.props.id === 'MAXIMIZE') {

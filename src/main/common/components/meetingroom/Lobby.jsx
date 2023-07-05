@@ -113,8 +113,8 @@ const Lobby = (props) => {
                   {
                     backgroundColor: 'transparent',
                     position: 'absolute',
-                    top: '112px',
-                    right: '48px'
+                    top: '0',
+                    right: '16px'
                   }
                 }>
                   {

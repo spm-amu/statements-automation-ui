@@ -467,7 +467,6 @@ const MeetingRoom = (props) => {
           socketManager.emitEvent(MessageType.GET_LOBBY, {
             roomId: selectedMeeting.id
           }).then((result) => {
-            console.log("\n\n\n\n\n\n\n\nLOBBY : ", result);
             if (result.status === 'SUCCESS' && result.lobby && result.lobby.people) {
               for (const person of result.lobby.people) {
                 addUserToLobby(person);
@@ -489,6 +488,7 @@ const MeetingRoom = (props) => {
   const addUserToLobby = (data) => {
     permitAudio.play();
     let item = {
+      userName: data.userName,
       userId: data.userId,
       socketId: data.socketId
     };

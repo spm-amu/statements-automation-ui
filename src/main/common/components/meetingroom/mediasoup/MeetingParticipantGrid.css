@@ -35,8 +35,7 @@
 .grid-side-bar {
   width: 320px;
   margin: 4px 12px !important;
-  height: 98%;
-  max-height: 98%;
+  max-height: 90%;
   overflow: auto;
 }
 
