@@ -362,9 +362,8 @@ const MeetingRoom = (props) => {
     let userDetails = appManager.getUserDetails();
     const userAlias = Utils.isNull(userDetails.userId) ? `${userDetails.name} (Guest)` : userDetails.userId;
 
-    // TODO : Implement re-try and timeout
     socketManager.emitEvent(MessageType.PERMISSION, {
-      user: userAlias,
+      userId: userAlias,
       room: selectedMeeting.id,
       email: userDetails.emailAddress,
     }).then((data) => {
@@ -490,7 +489,7 @@ const MeetingRoom = (props) => {
   const addUserToLobby = (data) => {
     permitAudio.play();
     let item = {
-      user: data.userId,
+      userId: data.userId,
       socketId: data.socketId
     };
 
