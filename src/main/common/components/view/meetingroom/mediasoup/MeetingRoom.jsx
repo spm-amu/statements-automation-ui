@@ -363,6 +363,7 @@ const MeetingRoom = (props) => {
 
     socketManager.emitEvent(MessageType.PERMISSION, {
       userId: userAlias,
+      userName: userDetails.name,
       room: selectedMeeting.id,
       email: userDetails.emailAddress,
     }).then((data) => {
