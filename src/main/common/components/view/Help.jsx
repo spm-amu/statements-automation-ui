@@ -5,7 +5,7 @@ import "./Files.css";
 import './Views.css';
 import packageJson from '../../../../../release/app/package.json';
 import PDFViewer from '../PDFViewer';
-import manualPDF from '../../../../../sample.pdf';
+import manualPDF from '../../../../../manual.pdf';
 
 const Help = (props) => {
 
