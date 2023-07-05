@@ -85,6 +85,7 @@ const MeetingRoom = (props) => {
       on: (eventType, be) => {
         switch (eventType) {
           case MessageType.ALLOWED:
+            alert("ALLOWED");
             join();
             break;
           case MessageType.PERMIT:
