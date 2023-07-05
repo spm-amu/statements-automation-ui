@@ -55,7 +55,6 @@ const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
-  const [isRecording, setIsRecording] = React.useState(props.isRecording);
   const [videoRefresher, setVideoRefresher] = React.useState(false);
   const [producers] = React.useState(new Map());
   const [consumers] = React.useState(new Map());
@@ -132,24 +131,10 @@ const MeetingParticipant = (props) => {
   });
 
   useEffect(() => {
-    setIsRecording(props.isRecording);
-  }, [props.isRecording]);
-
-  useEffect(() => {
     if(videoRef.current && videoStream.current) {
       videoRef.current.srcObject = videoStream.current;
     }
   }, [videoRef.current]);
-
-  useEffect(() => {
-    if(mediaRecorder) {
-      if (isRecording) {
-        mediaRecorder.recordMeeting();
-      } else {
-        mediaRecorder.stopRecordingMeeting();
-      }
-    }
-  }, [isRecording]);
 
   useEffect(() => {
     if (props.soundMonitor && !props.inView) {
@@ -240,10 +225,6 @@ const MeetingParticipant = (props) => {
     return () => {
       stopProducing('audio');
       stopProducing('video');
-
-      if(mediaRecorder) {
-        mediaRecorder.stopRecordingMeeting();
-      }
 
       for (let [key, value] of consumers) {
         removeConsumer(key, 'video');

@@ -17,6 +17,7 @@ import Alert from "react-bootstrap/Alert";
 import Icon from "../../../Icon";
 import Lobby from "../../../meetingroom/Lobby";
 import MeetingRoomSummary from "../../../meetingroom/MeetingRoomSummary";
+import mediaRecorder from "../../../meetingroom/mediasoup/MeetingRoomRecorder";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -225,10 +226,10 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     if (!Utils.isNull(screenShared)) {
-      /*emitSystemEvent("SHARE_SCREEN", {
+      emitSystemEvent("SHARE_SCREEN", {
         shared: screenShared,
         userId: appManager.getUserDetails().userId
-      });*/
+      });
     }
   }, [screenShared]);
 
@@ -302,6 +303,8 @@ const MeetingRoom = (props) => {
     return () => {
       endCall(false);
       setIsRecording(false);
+
+      mediaRecorder.stopRecordingMeeting();
 
       socketManager.removeSubscriptions(eventHandler);
       appManager.removeSubscriptions(systemEventHandler);
@@ -614,6 +617,8 @@ const MeetingRoom = (props) => {
       recording: true,
       userId: appManager.getUserDetails().userId
     });
+
+    mediaRecorder.recordMeeting();
   };
 
   const stopRecordingMeeting = () => {
@@ -622,6 +627,8 @@ const MeetingRoom = (props) => {
       recording: false,
       userId: appManager.getUserDetails().userId
     });
+
+    mediaRecorder.stopRecordingMeeting();
   };
 
   /********************************** HANG-UP *******************************/
@@ -858,7 +865,6 @@ const MeetingRoom = (props) => {
                                       }}
                                       step={step}
                                       isHost={isHost}
-                                      isRecording={isRecording}
                                       screenShared={screenShared}
                                       whiteBoardShown={showWhiteBoard}
                                       sharingHandler={(someoneSharing) => setSomeoneSharing(someoneSharing)}
