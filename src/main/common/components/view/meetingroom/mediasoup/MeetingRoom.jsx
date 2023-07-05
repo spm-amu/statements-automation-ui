@@ -496,7 +496,7 @@ const MeetingRoom = (props) => {
     if (isHost && autoPermit === true) {
       acceptUser(item);
     } else {
-      let find = lobbyWaitingList.find((u) => u.user === item.user);
+      let find = lobbyWaitingList.find((u) => u.userId === item.userId);
       if (!find) {
         lobbyWaitingList.push(item);
         setLobbyWaitingList([].concat(lobbyWaitingList));
@@ -527,7 +527,7 @@ const MeetingRoom = (props) => {
   };
 
   const removeFromLobbyWaiting = (item) => {
-    setLobbyWaitingList(lobbyWaitingList.filter((i) => i.user !== item.user));
+    setLobbyWaitingList(lobbyWaitingList.filter((i) => i.userId !== item.userId));
   };
 
   /****************************** END HANDSHAKE ******************************/
