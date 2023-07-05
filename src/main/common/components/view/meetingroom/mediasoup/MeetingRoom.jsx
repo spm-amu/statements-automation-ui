@@ -16,6 +16,7 @@ import SelectScreenShareDialog from "../../../SelectScreenShareDialog";
 import Alert from "react-bootstrap/Alert";
 import Icon from "../../../Icon";
 import Lobby from "../../../meetingroom/Lobby";
+import MeetingRoomSummary from "../../../meetingroom/MeetingRoomSummary";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -819,12 +820,13 @@ const MeetingRoom = (props) => {
   return (
     <div className={'meeting-room-container'}>
       <div className={'meeting-room-content'} style={{
-        height: displayState === 'MAXIMIZED' ? 'calc(100% - 96px)' : '90%',
-        maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 96px)' : '90%',
+        height: displayState === 'MAXIMIZED' ? 'calc(100% - 96px)' : '70%',
+        maxHeight: displayState === 'MAXIMIZED' ? 'calc(100% - 96px)' : '70%',
         overflow: displayState === 'MAXIMIZED' ? null : 'hidden',
       }}>
         <div className={'row no-margin no-padding w-100 h-100'}>
-          <div className={'participants-container col no-margin no-padding'}>
+          <div className={'participants-container col no-margin no-padding'}
+               style={{display: displayState === 'MAXIMIZED' ? 'inherit' : 'none'}}>
             {
               step === Steps.LOBBY &&
               <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={userToCall} displayState={displayState}
@@ -912,7 +914,7 @@ const MeetingRoom = (props) => {
             </>
           </div>
           {
-            sideBarOpen &&
+            sideBarOpen && sideBarTab && displayState === 'MAXIMIZED' &&
             <div className={'closable-panel-container'}>
               <ClosablePanel
                 closeHandler={(e) => {
@@ -954,6 +956,9 @@ const MeetingRoom = (props) => {
               selectSourceHandler={(selectedSource) => selectSourceHandler(selectedSource)}
             />
           }
+          <div style={{display: displayState === 'MINIMIZED' ? 'inherit' : 'none', width: '100%'}}>
+            <MeetingRoomSummary participants={participants}/>
+          </div>
         </div>
       </div>
       {

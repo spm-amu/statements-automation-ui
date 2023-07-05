@@ -177,7 +177,9 @@ const MeetingRoomToolbar = (props) => {
               size="large"
               onClick={(e) => handleEndMeetingButton()}
             >
-              END MEETING
+              <span style={{color: '#FFFFFF'}}>
+                END MEETING
+              </span>
             </Button>
           </div>
         }
