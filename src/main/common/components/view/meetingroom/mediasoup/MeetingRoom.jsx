@@ -507,7 +507,8 @@ const MeetingRoom = (props) => {
   const acceptUser = (item) => {
     socketManager.emitEvent(MessageType.PERMIT_STATUS, {
       allowed: true,
-      userId: item.userId
+      userId: item.userId,
+      meetingId: selectedMeeting.id
     }).catch((error) => {
     });
 
