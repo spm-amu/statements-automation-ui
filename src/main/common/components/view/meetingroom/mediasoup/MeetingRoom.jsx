@@ -15,6 +15,7 @@ import {get, post} from "../../../../service/RestService";
 import SelectScreenShareDialog from "../../../SelectScreenShareDialog";
 import Alert from "react-bootstrap/Alert";
 import Icon from "../../../Icon";
+import Lobby from "../../../meetingroom/Lobby";
 
 const Steps = {
   LOBBY: 'LOBBY',
@@ -406,15 +407,16 @@ const MeetingRoom = (props) => {
     users.forEach((user) => {
       console.log("ADDING ITEM TO PARTICIPANTS : ", user);
       addUserToParticipants(user);
-      setAllUserParticipantsLeft(false);
-      if (participants.length > 0) {
-        if (step === Steps.LOBBY) {
-          setStep(Steps.SESSION);
-          setSideBarOpen(true);
-          props.windowHandler.show();
-        }
-      }
     });
+
+    setAllUserParticipantsLeft(false);
+    if (participants.length > 0) {
+      if (step === Steps.LOBBY) {
+        setStep(Steps.SESSION);
+        setSideBarOpen(true);
+        props.windowHandler.show();
+      }
+    }
   };
 
   const join = () => {
@@ -758,7 +760,12 @@ const MeetingRoom = (props) => {
         <div className={'row no-margin no-padding w-100 h-100'}>
           <div className={'participants-container col no-margin no-padding'}>
             {
-              rtpCapabilities &&
+              step === Steps.LOBBY &&
+              <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={userToCall} displayState={displayState}
+                     meetingTitle={selectedMeeting.title} videoMuted={videoMuted}/>
+            }
+            {
+              step === Steps.SESSION &&
               <MeetingParticipantGrid participants={participants}
                                       waitingList={lobbyWaitingList}
                                       mode={meetingParticipantGridMode}

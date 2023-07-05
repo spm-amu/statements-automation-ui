@@ -470,11 +470,6 @@ const MeetingParticipantGrid = (props) => {
         <div className={'row grid'}
              style={{height: '100%', width: '100%'}}>
           {
-            step === "LOBBY" &&
-            <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={props.userToCall} displayState={props.displayState}
-                   meetingTitle={props.meetingTitle}/>
-          }
-          {
             step !== "LOBBY" &&
             <div className={'row messages'} style={{
               width: '100%',

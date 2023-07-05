@@ -9,9 +9,8 @@
 
 .event-button-container {
   width: 100%;
-  border: 1px solid red;
   position: absolute;
-  background-color: #945c33;
+  background-color: #dfe8ed;
 }
 
 .event-button {
@@ -27,9 +26,8 @@
 }
 
 .fc .fc-daygrid-event-harness .fc-event:hover {
-  background-color: #945c33 !important;
-  color: #ffffff !important;
-  border-color: #945c33 !important;
+  background-color: #dfe8ed !important;
+  border-color: #dfe8ed !important;
 }
 
 .fc .fc-toolbar .fc-button-group .fc-button-primary:not(.fc-prev-button):not(.fc-next-button).fc-button-active,
@@ -99,6 +97,7 @@ button:focus {
 }
 
 .fc .fc-daygrid-event-harness .fc-event {
+  width: 100%;
   max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -120,7 +119,7 @@ button:focus {
 }
 
 .fc-daygrid-event-dot:hover {
-  border-color: #945c33;
+  border-color: #dfe8ed;
   display: none;
 }
 
