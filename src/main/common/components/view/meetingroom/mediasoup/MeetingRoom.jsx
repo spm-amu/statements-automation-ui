@@ -47,7 +47,7 @@ const MeetingRoom = (props) => {
   const [screenShared, setScreenShared] = useState(null);
   const [someoneSharing, setSomeoneSharing] = useState(null);
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
-  const [isHost, setIsHost] = useState(false);
+  const [isHost, setIsHost] = useState(props.isHost);
   const [step, setStep] = useState('LOBBY');
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
   const [activityMessage, setActivityMessage] = useState(null);
@@ -289,10 +289,9 @@ const MeetingRoom = (props) => {
 
     appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_CONNECT, SystemEventType.SOCKET_DISCONNECT, SystemEventType.PEER_DISCONNECT);
     initMeetingSession();
-
     setIsHost(props.isHost);
 
-    if (!isDirectCall && props.isHost) {
+    if (!isDirectCall && isHost) {
       persistMeetingSettings(props.autoPermit);
     }
 
@@ -468,6 +467,7 @@ const MeetingRoom = (props) => {
           socketManager.emitEvent(MessageType.GET_LOBBY, {
             roomId: selectedMeeting.id
           }).then((result) => {
+            console.log("\n\n\n\n\n\n\n\nLOBBY : ", result);
             if (result.status === 'SUCCESS' && result.lobby && result.lobby.people) {
               for (const person of result.lobby.people) {
                 addUserToLobby(person);
@@ -484,6 +484,49 @@ const MeetingRoom = (props) => {
       setPreErrorStep(step);
       setStep(error.message);
     });
+  };
+
+  const addUserToLobby = (data) => {
+    permitAudio.play();
+    let item = {
+      user: data.userId,
+      socketId: data.socketId
+    };
+
+    if (isHost && autoPermit === true) {
+      acceptUser(item);
+    } else {
+      let find = lobbyWaitingList.find((u) => u.user === item.user);
+      if (!find) {
+        lobbyWaitingList.push(item);
+        setLobbyWaitingList([].concat(lobbyWaitingList));
+      }
+    }
+  };
+
+  const acceptUser = (item) => {
+    socketManager.emitEvent(MessageType.PERMIT_STATUS, {
+      allowed: true,
+      id: item.socketId
+    }).catch((error) => {
+    });
+
+    removeFromLobbyWaiting(item);
+  };
+
+  const rejectUser = (item) => {
+    socketManager.emitEvent(MessageType.PERMIT_STATUS, {
+      allowed: false,
+      id: item.socketId,
+      meetingId: selectedMeeting.id
+    }).catch((error) => {
+    });
+
+    removeFromLobbyWaiting(item);
+  };
+
+  const removeFromLobbyWaiting = (item) => {
+    setLobbyWaitingList(lobbyWaitingList.filter((i) => i.user !== item.user));
   };
 
   /****************************** END HANDSHAKE ******************************/
@@ -520,7 +563,7 @@ const MeetingRoom = (props) => {
       let participant = participants.find((p) => p.userId === payload.data.userId);
       if (participant) {
         if (payload.data.shared) {
-          if(participant.name) {
+          if (participant.name) {
             handleMessageArrived({
               message: participant.name + " started sharing"
             });
@@ -762,7 +805,17 @@ const MeetingRoom = (props) => {
             {
               step === Steps.LOBBY &&
               <Lobby isHost={isHost} autoPermit={autoPermit} userToCall={userToCall} displayState={displayState}
-                     meetingTitle={selectedMeeting.title} videoMuted={videoMuted}/>
+                     meetingTitle={selectedMeeting.title} videoMuted={videoMuted}
+                     waitingList={lobbyWaitingList}
+                     acceptUserHandler={
+                       (item) => {
+                         acceptUser(item);
+                       }}
+                     rejectUserHandler={
+                       (item) => {
+                         rejectUser(item);
+                       }}
+              />
             }
             {
               step === Steps.SESSION &&

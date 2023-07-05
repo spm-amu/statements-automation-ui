@@ -4,6 +4,7 @@ import LottieIcon from "../LottieIcon";
 import Utils from '../../Utils';
 import appManager from "../../../common/service/AppManager";
 import {VIDEO_CONSTRAINTS} from "./mediasoup/MeetingParticipant";
+import LobbyWaitingList from "./LobbyWaitingList";
 
 const WAITING_FOR_OTHERS_TO_JOIN_MESSAGE = 'Waiting for others to join';
 const ATTENDEE_WAITING_FOR_PERMISION_MESSAGE = 'Waiting for the meeting host to let you in';
@@ -12,6 +13,7 @@ const Lobby = (props) => {
 
   const videoRef = useRef();
   const streamRef = useRef();
+  const {waitingList} = props;
 
   function stopVideoTracks() {
     if (streamRef.current) {
@@ -105,6 +107,25 @@ const Lobby = (props) => {
                     ATTENDEE_WAITING_FOR_PERMISION_MESSAGE
                 }
               </div>
+              {
+                ((waitingList && waitingList.length > 0)) &&
+                <div className={'no-side-margin no-side-padding grid-side-bar'} style={
+                  {
+                    backgroundColor: 'transparent',
+                    position: 'absolute',
+                    top: '112px',
+                    right: '48px'
+                  }
+                }>
+                  {
+                    waitingList && waitingList.length > 0 &&
+                    <LobbyWaitingList waitingList={waitingList}
+                                      autoHeight={true}
+                                      rejectUserHandler={props.rejectUserHandler}
+                                      acceptUserHandler={props.acceptUserHandler}/>
+                  }
+                </div>
+              }
             </div>
         }
       </div>
