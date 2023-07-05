@@ -728,11 +728,27 @@ const MeetingRoom = (props) => {
   };
 
   const raiseHand = () => {
+    let userDetails = appManager.getUserDetails();
 
+    socketManager.emitEvent(MessageType.RAISE_HAND, {
+      userId: userDetails.userId,
+      roomID: selectedMeeting.id
+    }).catch((error) => {
+    });
+
+    setHandRaised(!handRaised);
   };
 
   const lowerHand = () => {
+    let userDetails = appManager.getUserDetails();
 
+    socketManager.emitEvent(MessageType.LOWER_HAND, {
+      userId: userDetails.userId,
+      roomID: selectedMeeting.id
+    }).catch((error) => {
+    });
+
+    setHandRaised(!handRaised);
   };
 
   const persistMeetingSettings = (autoPermit) => {
