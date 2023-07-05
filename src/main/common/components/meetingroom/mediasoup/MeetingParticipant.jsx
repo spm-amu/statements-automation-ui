@@ -35,18 +35,18 @@ export const VIDEO_CONSTRAINTS = {
 export const VIDEO_ENCODINGS = [
   {
     rid: 'r0',
-    maxBitrate: 100000,
+    maxBitrate: 20000,
     //scaleResolutionDownBy: 10.0,
     scalabilityMode: 'S1T3'
   },
   {
     rid: 'r1',
-    maxBitrate: 300000,
+    maxBitrate: 150000,
     scalabilityMode: 'S1T3'
   },
   {
     rid: 'r2',
-    maxBitrate: 900000,
+    maxBitrate: 450000,
     scalabilityMode: 'S1T3'
   }
 ];
