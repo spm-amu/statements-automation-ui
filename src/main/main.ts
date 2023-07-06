@@ -391,9 +391,9 @@ ipcMain.on("receivingCall", async (_event, args) => {
     throw new Error('"incomingCallWindowContent" is not defined');
   }
 
-  inComingCallWindow.webContents.send('incomingCallWindowContent', args);
-  inComingCallWindow.show();
-  inComingCallWindow.focus();
+  //inComingCallWindow.webContents.send('incomingCallWindowContent', args);
+  //inComingCallWindow.show();
+  //inComingCallWindow.focus();
 });
 
 ipcMain.on("systemAlert", async (_event, args) => {
