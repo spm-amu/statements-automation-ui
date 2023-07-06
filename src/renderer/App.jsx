@@ -16,6 +16,8 @@ import ExternalMeetingAttendee from "../main/common/components/view/security/Ext
 import WebLinkLanding from '../main/common/components/view/WebLinkLanding';
 import Guest from '../main/common/components/view/security/Guest';
 import SystemAlertWindow from "../main/common/components/meetingroom/SystemAlertWindow";
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorPage from '../main/common/components/view/ErrorPage';
 
 const armscorTheme = createTheme({
     palette: {
@@ -31,6 +33,17 @@ const armscorTheme = createTheme({
     }
   },
 );
+
+const Fallback = ({ error, resetErrorBoundary }) => {
+  // Call resetErrorBoundary() to reset the error boundary and retry the render.
+  console.log('Error: ' + error.message);
+
+  return (
+    <div style={{width: '100%', height: '100vh', backgroundColor: '#E5E5E5'}}>
+      <ErrorPage />
+    </div>
+  );
+}
 
 const Login = () => {
   return (
@@ -107,19 +120,27 @@ export default function App() {
   return (
     <MuiThemeProvider muiTheme={ThemeDefault}>
       <ThemeProvider theme={armscorTheme}>
-        <Router>
-          <Routes>
-            <Route path="*" element={<Dashboard />}/>
-            <Route path="/dashboard/*" element={<Dashboard />}/>
-            <Route path="/login" element={<Login />}/>
-            <Route path="/incomingCall" element={<InComingCall />}/>
-            <Route path="/systemAlert" element={<SystemAlert />}/>
-            <Route path="/messagePreview" element={<Message />}/>
-            <Route path="/webLink" element={<WebLink />}/>
-            <Route path="/guest" element={<GuestLink />}/>
-            <Route path="/externalAttendeeView" element={<ExternalAttendee />}/>
-          </Routes>
-        </Router>
+        <ErrorBoundary
+          FallbackComponent={Fallback}
+          onReset={(details) => {
+            console.log('###### ERROR DETAILS: ', details);
+            // Reset the state of your app so the error doesn't happen again
+          }}
+        >
+          <Router>
+            <Routes>
+              <Route path="*" element={<Dashboard />}/>
+              <Route path="/dashboard/*" element={<Dashboard />}/>
+              <Route path="/login" element={<Login />}/>
+              <Route path="/incomingCall" element={<InComingCall />}/>
+              <Route path="/systemAlert" element={<SystemAlert />}/>
+              <Route path="/messagePreview" element={<Message />}/>
+              <Route path="/webLink" element={<WebLink />}/>
+              <Route path="/guest" element={<GuestLink />}/>
+              <Route path="/externalAttendeeView" element={<ExternalAttendee />}/>
+            </Routes>
+          </Router>
+        </ErrorBoundary>
       </ThemeProvider>
     </MuiThemeProvider>
   );
