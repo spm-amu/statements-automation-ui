@@ -25,11 +25,32 @@ class MeetingRoomRecorder {
   };
 
   addTrack = (track) => {
-    this.recorder.stream.addTrack(track);
+    let mediaStream = new MediaStream([
+      track
+    ]);
+
+    if(this.recorder && this.recorder.stream) {
+      for (const existingTrack of this.recorder.stream.getTracks()) {
+        if (existingTrack.enabled && !existingTrack.muted) {
+          mediaStream.addTrack(track);
+        }
+      }
+    } else {
+      console.log("NULL STREAM");
+    }
+
+    const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
+      this.audioContext,
+      { mediaStream: mediaStream }
+    );
+
+    mediaStreamAudioSourceNode.connect(this.mediaStreamAudioDestinationNode);
+    this.mediaStreamAudioSourceNode.disconnect();
+    this.mediaStreamAudioSourceNode = mediaStreamAudioSourceNode;
   };
 
   removeTrack = (track) => {
-    this.recorder?.stream?.removeTrack(track);
+    //this.recorder?.stream?.removeTrack(track);
   };
 
   handleRecordingDataAvailable = (e) => {
@@ -122,7 +143,7 @@ class MeetingRoomRecorder {
       }).catch((error) => {
       });
 
-      if (this.recorder) {
+      if (this.recorder && this.recorder.state === 'recording') {
         this.recorder.stop();
       }
     } catch (e) {
@@ -161,9 +182,27 @@ class MeetingRoomRecorder {
                   mimeType: "video/webm; codecs=vp9"
                 };
 
-                const recorder = new MediaRecorder(stream, options);
+                let audioContext = new AudioContext();
+                let mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audioContext);
+                let initialMediaStream = new MediaStream([
+                  mediaStreamAudioDestinationNode.stream.getAudioTracks()[0],
+                  stream.getVideoTracks()[0]
+                ]);
+
+                const recorder = new MediaRecorder(initialMediaStream, options);
+                let mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
+                  audioContext,
+                  { mediaStream: initialMediaStream }
+                );
+
+                mediaStreamAudioSourceNode.connect(mediaStreamAudioDestinationNode);
+
                 recorder.ondataavailable = _this.handleRecordingDataAvailable;
                 recorder.onstop = _this.handleStopRecording;
+
+                this.audioContext = audioContext;
+                this.mediaStreamAudioDestinationNode = mediaStreamAudioDestinationNode;
+                this.mediaStreamAudioSourceNode = mediaStreamAudioSourceNode;
 
                 resolve(recorder);
               })

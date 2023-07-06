@@ -895,9 +895,9 @@ const BasicBusinessAppDashboard = (props) => {
                   appLogoPath={props.appLogoPath}
                   closeSidebar={closeSidebar}
                 />{" "}
-                <div className="main-panel" data={activeColor}>
-                  <div className="content">
-                    <div>
+                <div data={activeColor} className={'h-100'}>
+                  <div className={'content h-100'}>
+                    <div className={'h-100'}>
                       <ViewPort/>
                     </div>
                   </div>
