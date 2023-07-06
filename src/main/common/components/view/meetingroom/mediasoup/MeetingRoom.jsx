@@ -356,6 +356,20 @@ const MeetingRoom = (props) => {
 
   /********************************* HANDSHAKE *******************************/
 
+  const requestUserToJoin = (requestedUser) => {
+    let userDetails = appManager.getUserDetails();
+    socketManager.emitEvent(MessageType.REQUEST_TO_JOIN, {
+      roomId: selectedMeeting.id,
+      callerName: userDetails.name,
+      meetingJoinRequest: true,
+      userToCall: requestedUser,
+      callerUser: {
+        userId: userDetails.userId
+      }
+    }).catch((error) => {
+    });
+  };
+
   function initMeetingSession() {
     if (isHost || isDirectCall || isRequestToJoin || autoPermit) {
       console.log("CALLING JOIN FROM INIT initMeetingSession()");

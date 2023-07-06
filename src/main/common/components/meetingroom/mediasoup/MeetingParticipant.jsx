@@ -57,6 +57,7 @@ const MeetingParticipant = (props) => {
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
   const [videoRefresher, setVideoRefresher] = React.useState(false);
   const [producers] = React.useState(new Map());
+  const [failedProducersDueToNullTransport] = React.useState([]);
   const [consumers] = React.useState(new Map());
   const [soundLevel, setSoundLevel] = React.useState(0);
   const [eventHandler] = useState({});
@@ -131,7 +132,7 @@ const MeetingParticipant = (props) => {
   });
 
   useEffect(() => {
-    if(videoRef.current && videoStream.current) {
+    if (videoRef.current && videoStream.current) {
       videoRef.current.srcObject = videoStream.current;
     }
   }, [videoRef.current]);
@@ -210,6 +211,9 @@ const MeetingParticipant = (props) => {
       if (props.data.producers) {
         onNewProducers(props.data.producers, true);
       }
+
+      onNewProducers(failedProducersDueToNullTransport);
+      failedProducersDueToNullTransport.splice(0, failedProducersDueToNullTransport.length);
     }
   }, [consumerTransport]);
 
@@ -280,7 +284,7 @@ const MeetingParticipant = (props) => {
     };
 
     audioRef.current = stream;
-    if(props.isHost && type === 'audio') {
+    if (props.isHost && type === 'audio') {
       mediaRecorder.addTrack(track);
       tracks.current.setAudioTrack(track);
     }
@@ -340,26 +344,30 @@ const MeetingParticipant = (props) => {
       tracks.current.stopVideoTrack();
     }
 
-    if(props.isHost && type === 'audio') {
+    if (props.isHost && type === 'audio') {
       mediaRecorder.removeTrack(tracks.current.getAudioTrack());
     }
   };
 
   const onNewProducers = (producers, loading = false) => {
     for (const producer of producers) {
-      if (producer.userId === props.data.userId) {
-        if (producer.kind === 'video' && !producer.screenSharing) {
-          console.log("CALLING CONSUME FROM ON NEW PRODUCERS : ", producer);
-          consume(producer.producerId, producer.kind);
+      if (consumerTransport) {
+        if (producer.userId === props.data.userId) {
+          if (producer.kind === 'video' && !producer.screenSharing) {
+            console.log("CALLING CONSUME FROM ON NEW PRODUCERS : ", producer);
+            consume(producer.producerId, producer.kind);
+          }
         }
-      }
 
-      if (props.isCurrentUser || loading) {
-        // The small participant box at the bottom belonging to the current user must consume all audio
-        // This is because we do not want to disturb the audio due to any rendering such as Bring to view
-        if (producer.kind === 'audio') {
-          consume(producer.producerId, producer.kind, loading);
+        if (props.isCurrentUser || loading) {
+          // The small participant box at the bottom belonging to the current user must consume all audio
+          // This is because we do not want to disturb the audio due to any rendering such as Bring to view
+          if (producer.kind === 'audio') {
+            consume(producer.producerId, producer.kind, loading);
+          }
         }
+      } else {
+        failedProducersDueToNullTransport.push(producer);
       }
     }
   };
@@ -379,7 +387,7 @@ const MeetingParticipant = (props) => {
       if (audioElement && audioElement.srcObject) {
         audioElement.srcObject.getTracks().forEach(function (track) {
           track.stop();
-          if(mediaRecorder) {
+          if (mediaRecorder) {
             mediaRecorder.removeTrack(track);
           }
         });
@@ -400,7 +408,7 @@ const MeetingParticipant = (props) => {
           console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
           if (kind === 'video') {
             // TODO : Put the stream in a temp variable and assign it later
-            if(videoRef.current) {
+            if (videoRef.current) {
               videoRef.current.srcObject = stream;
             }
 
@@ -418,7 +426,7 @@ const MeetingParticipant = (props) => {
               audioElement.autoplay = true;
               document.getElementById('meeting-audio-el-container').appendChild(audioElement);
 
-              if(props.isHost) {
+              if (props.isHost) {
                 mediaRecorder.addTrack(stream.getAudioTracks()[0]);
               }
             }
@@ -466,30 +474,30 @@ const MeetingParticipant = (props) => {
             <>
               {
                 (videoMuted || !videoRef.current || !videoRef.current.srcObject) &&
-                  <div className={'centered-flex-box'}
-                       style={{
-                         width: '100%',
-                         height: '100%',
-                         marginBottom: props.sizing === 'sm' ? '8px' : 0
-                       }}>
-                    {
-                      <div className={props.sizing === 'sm' ? 'avatar-wrapper-sm' : 'avatar-wrapper'}
-                           style={{
-                             width: ((props.sizing === 'sm' ? 72 : 112) + soundLevel / 10) + 'px',
-                             height: ((props.sizing === 'sm' ? 72 : 112) + soundLevel / 10) + 'px',
-                             border: !audioMuted && soundLevel > 3 ? (props.sizing === 'sm' ? 2 : 4) + 'px solid #00476a' : 'none'
-                           }}>
-                        <div
-                          className={props.sizing === 'md' ? 'avatar avatar-md' : props.sizing === 'sm' ? 'avatar avatar-sm' : 'avatar'}
-                          data-label={Utils.getInitials(props.data.name)}
-                          style={
-                            {
-                              fontSize: props.sizing === 'sm' ? '20px' : null
-                            }
-                          }/>
-                      </div>
-                    }
-                  </div>
+                <div className={'centered-flex-box'}
+                     style={{
+                       width: '100%',
+                       height: '100%',
+                       marginBottom: props.sizing === 'sm' ? '8px' : 0
+                     }}>
+                  {
+                    <div className={props.sizing === 'sm' ? 'avatar-wrapper-sm' : 'avatar-wrapper'}
+                         style={{
+                           width: ((props.sizing === 'sm' ? 72 : 112) + soundLevel / 10) + 'px',
+                           height: ((props.sizing === 'sm' ? 72 : 112) + soundLevel / 10) + 'px',
+                           border: !audioMuted && soundLevel > 3 ? (props.sizing === 'sm' ? 2 : 4) + 'px solid #00476a' : 'none'
+                         }}>
+                      <div
+                        className={props.sizing === 'md' ? 'avatar avatar-md' : props.sizing === 'sm' ? 'avatar avatar-sm' : 'avatar'}
+                        data-label={Utils.getInitials(props.data.name)}
+                        style={
+                          {
+                            fontSize: props.sizing === 'sm' ? '20px' : null
+                          }
+                        }/>
+                    </div>
+                  }
+                </div>
               }
               {
                 <video

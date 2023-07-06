@@ -141,40 +141,43 @@ class MediaSoupHelper {
 
   getConsumeStream = async (producerId, rtpCapabilities, consumerTransport, roomId, userId, type) => {
     console.log("\n\n\n\n\nCONSUMING FROM : " + producerId);
-    const data = await socketManager.emitEvent(MessageType.CONSUME, {
-      rtpCapabilities,
-      consumerTransportId: consumerTransport.id,
-      producerId,
-      roomId,
-      userId,
-      kind: type
-    });
 
-    if(data.params) {
-      const {id, kind, rtpParameters} = data.params;
+    if(consumerTransport) {
+      const data = await socketManager.emitEvent(MessageType.CONSUME, {
+        rtpCapabilities,
+        consumerTransportId: consumerTransport.id,
+        producerId,
+        roomId,
+        userId,
+        kind: type
+      });
 
-      let codecOptions = {};
+      if (data.params) {
+        const {id, kind, rtpParameters} = data.params;
 
-      try {
-        const consumer = await consumerTransport.consume({
-          id,
-          producerId,
-          kind,
-          rtpParameters,
-          codecOptions
-        });
+        let codecOptions = {};
 
-        console.log(consumer);
-        const stream = new MediaStream();
-        stream.addTrack(consumer.track);
+        try {
+          const consumer = await consumerTransport.consume({
+            id,
+            producerId,
+            kind,
+            rtpParameters,
+            codecOptions
+          });
 
-        return {
-          consumer,
-          stream,
-          kind
+          console.log(consumer);
+          const stream = new MediaStream();
+          stream.addTrack(consumer.track);
+
+          return {
+            consumer,
+            stream,
+            kind
+          }
+        } catch (e) {
+          console.error(e);
         }
-      } catch (e) {
-        console.error(e);
       }
     }
 

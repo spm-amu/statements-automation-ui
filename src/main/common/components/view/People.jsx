@@ -113,7 +113,7 @@ const People = (props) => {
                             props.onAudioCallCancelHandler(data);
                           }
                         }}
-                        onClosePeopleDialogHandler={() => props.onClosePeopleDialogHandler()}
+                        onClosePeopleDialogHandler={() => alert('Brovovoooo')}
                         data={user}
                         avatarSize={!Utils.isNull(props.avatarSize) ? props.avatarSize : true}
                         showOnlineIndicator={!Utils.isNull(props.showOnlineIndicator) ? props.showOnlineIndicator : true}
