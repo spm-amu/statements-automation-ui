@@ -239,9 +239,17 @@ const MeetingParticipantGrid = (props) => {
             case SystemEventType.PARTICIPANT_IN_VIEW:
               onBringToView(be);
               break;
+            case SystemEventType.CONSUMER_TRANSPORT_FAILED:
+              onConsumerTransportFailure();
+              break;
           }
         }
       }
+    };
+
+    const onConsumerTransportFailure = async () => {
+      let consumerTransport = await mediaSoupHelper.initConsumerTransport(device, meetingId, appManager.getUserDetails().userId);
+      setConsumerTransport(consumerTransport);
     };
 
     const onBringToView = (payload) => {
@@ -326,7 +334,7 @@ const MeetingParticipantGrid = (props) => {
     }, [props.screenShared]);
 
     useEffect(() => {
-      appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_IN_VIEW);
+      appManager.addSubscriptions(systemEventHandler, SystemEventType.PARTICIPANT_IN_VIEW, SystemEventType.CONSUMER_TRANSPORT_FAILED);
       socketManager.addSubscriptions(eventHandler, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
       setupSelfDevices();
       return () => {

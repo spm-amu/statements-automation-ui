@@ -214,6 +214,18 @@ const MeetingParticipant = (props) => {
 
       onNewProducers(failedProducersDueToNullTransport, true);
       failedProducersDueToNullTransport.splice(0, failedProducersDueToNullTransport.length);
+
+      if(producers) {
+        console.log("RE-INSTATING CONSUMERS");
+        for (let [key, value] of producers) {
+          console.log("PROCESSING PRODUCER OF TYPE : " + key + " : " + value.id);
+          if(!(props.data.producers && this.props.data.producers.find((p) => p.producerId === value.id))) {
+            consume(value.id, key, true);
+          } else {
+            console.log("PRODUCER ALREADY PROCESSED");
+          }
+        }
+      }
     }
   }, [consumerTransport]);
 
@@ -362,7 +374,7 @@ const MeetingParticipant = (props) => {
       if (consumerTransport) {
         if (producer.userId === props.data.userId) {
           if (producer.kind === 'video' && !producer.screenSharing) {
-            console.log("CALLING CONSUME FROM ON NEW PRODUCERS FOR : " + props.data.userId + " - " + producer.id);
+            console.log("CALLING CONSUME FROM ON NEW PRODUCERS FOR : " + props.data.userId + " - " + producer.producerId);
             consume(producer.producerId, producer.kind);
           }
         }

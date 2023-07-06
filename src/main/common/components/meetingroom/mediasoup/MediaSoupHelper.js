@@ -1,6 +1,7 @@
 import {Device} from "mediasoup-client";
-import {MessageType} from "../../../types";
+import {MessageType, SystemEventType} from "../../../types";
 import socketManager from "../../../../common/service/SocketManager";
+import appManager from "../../../service/AppManager";
 
 class MediaSoupHelper {
   constructor() {
@@ -61,6 +62,7 @@ class MediaSoupHelper {
           case 'failed':
             alert("Transport closed");
             consumerTransport.close();
+            appManager.fireEvent(SystemEventType.CONSUMER_TRANSPORT_FAILED, {});
             break;
           default:
             break
