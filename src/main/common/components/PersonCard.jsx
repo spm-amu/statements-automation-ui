@@ -3,12 +3,32 @@ import "./PersonCard.css"
 import Icon from "./Icon";
 import IconButton from "@material-ui/core/IconButton";
 import socketManager from "../../common/service/SocketManager";
-import {MessageType} from "../types";
+import {MessageType, SystemEventType} from "../types";
 import appManager from "../service/AppManager";
 import Utils from '../Utils';
+import peerManager from "../service/simplepeer/PeerManager";
 
 const PersonCardComponent = (props) => {
-  const socketEventHandler = useState({});
+  const [socketEventHandler] = useState({});
+  const [systemEventHandler] = useState({});
+
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'person-card-' + props.data.userId + '-' + props.inCall;
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.CALL_REJECTED:
+            if (!Utils.isNull(props.onClosePeopleDialogHandler)) {
+              props.onClosePeopleDialogHandler();
+            }
+
+            break;
+        }
+      }
+    }
+  };
 
   const handler = () => {
     return {
@@ -44,6 +64,7 @@ const PersonCardComponent = (props) => {
 
   useEffect(() => {
     socketEventHandler.api = handler();
+    systemEventHandler.api = systemEventHandlerApi();
   });
 
   useEffect(() => {
@@ -52,13 +73,15 @@ const PersonCardComponent = (props) => {
 
   useEffect(() => {
     socketManager.removeSubscriptions(socketEventHandler);
-    socketManager.addSubscriptions(socketEventHandler, MessageType.USER_ONLINE, MessageType.USERS_ONLINE, MessageType.USER_OFFLINE, MessageType.CALL_ENDED, MessageType.SYSTEM_EVENT)
-  }, []);
+    appManager.removeSubscriptions(systemEventHandler);
 
-  useEffect(() => {
+    socketManager.addSubscriptions(socketEventHandler, MessageType.USER_ONLINE, MessageType.USERS_ONLINE, MessageType.USER_OFFLINE, MessageType.CALL_ENDED, MessageType.SYSTEM_EVENT)
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.CALL_REJECTED);
+
     return () => {
       setCalling(false);
       socketManager.removeSubscriptions(socketEventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
     };
   }, []);
 

@@ -275,9 +275,6 @@ const MeetingRoom = (props) => {
 
   useEffect(() => {
     eventHandler.api = handler();
-  });
-
-  useEffect(() => {
     systemEventHandler.api = systemEventHandlerApi();
   });
 
@@ -356,6 +353,17 @@ const MeetingRoom = (props) => {
   /******************************** END USE EFFECT ************************************/
 
   /********************************* HANDSHAKE *******************************/
+
+  const cancelRequestCall = (requestedUser) => {
+    socketManager.emitEvent(MessageType.CANCEL_CALL, {
+      userId: requestedUser.userId,
+      userDescription: requestedUser.name,
+      callerId: appManager.getUserDetails().userId,
+      callerDescription: appManager.getUserDetails().name,
+      meetingId: selectedMeeting.id
+    }).catch((error) => {
+    });
+  };
 
   const requestUserToJoin = (requestedUser) => {
     let userDetails = appManager.getUserDetails();
@@ -700,7 +708,9 @@ const MeetingRoom = (props) => {
     if(data && data.reject) {
       handleMessageArrived({
         message: data.reason
-      })
+      });
+
+      appManager.fireEvent(SystemEventType.CALL_REJECTED, {});
     } else {
       socketManager.removeSubscriptions(eventHandler);
       appManager.removeSubscriptions(systemEventHandler);

@@ -114,9 +114,6 @@ const People = (props) => {
                           }
                         }}
                         onClosePeopleDialogHandler={() => {
-
-
-
                           if(!Utils.isNull(props.onClosePeopleDialogHandler)) {
                             props.onClosePeopleDialogHandler()
                           }
