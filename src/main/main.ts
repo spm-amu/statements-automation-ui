@@ -170,18 +170,18 @@ const createDialWindow = () => {
   // Create the browser window.
   inComingCallWindow = new BrowserWindow({
     title: "Armscor",
-    width: 900,
-    height: 900,
-    maxWidth: 900,
-    maxHeight: 900,
+    width: 300,
+    height: largeWindowHeight,
+    maxWidth: 300,
+    maxHeight: largeWindowHeight,
     resizable: false,
     minimizable: false,
     maximizable: false,
     fullscreenable: false,
     parent: mainWindow,
     roundedCorners: false,
-    x: screenWidth - 920,
-    y: 20,
+    x: screenWidth - 320,
+    y: screenHeight - largeWindowHeight - 20,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')

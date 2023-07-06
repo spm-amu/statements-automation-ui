@@ -7,14 +7,13 @@ import {MessageType} from "../types";
 import appManager from "../service/AppManager";
 import Utils from '../Utils';
 
-const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
-
+const PersonCardComponent = (props) => {
   const socketEventHandler = useState({});
 
   const handler = () => {
     return {
       get id() {
-        return 'person-card-' + props.data.userId;
+        return 'person-card-' + props.data.userId + '-' + props.inCall;
       },
       on: (eventType, be) => {
         switch (eventType) {
@@ -161,9 +160,9 @@ const PersonCardComponent = React.memo(React.forwardRef((props, ref) => {
       </div>
     </div>
   );
-}));
+};
 
-const PersonCard = React.memo(React.forwardRef((props, ref) => {
+const PersonCard = (props) => {
   return (
     <PersonCardComponent
       ref={ref}
@@ -171,6 +170,6 @@ const PersonCard = React.memo(React.forwardRef((props, ref) => {
     >
     </PersonCardComponent>
   );
-}));
+};
 
 export default PersonCard;
