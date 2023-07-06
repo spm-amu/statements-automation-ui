@@ -64,7 +64,6 @@ const People = (props) => {
     if (props.onAudioCallHandler) {
       props.onAudioCallHandler(userToCall);
     } else {
-      alert("REQUEST TO JOIN GENERATING ID");
       get(
         `${appManager.getAPIHost()}/api/v1/meeting/generateId`,
         (response) => {
@@ -114,7 +113,7 @@ const People = (props) => {
                             props.onAudioCallCancelHandler(data);
                           }
                         }}
-                        onClosePeopleDialogHandler={() => alert('Brovovoooo')}
+                        onClosePeopleDialogHandler={() => props.onClosePeopleDialogHandler()}
                         data={user}
                         avatarSize={!Utils.isNull(props.avatarSize) ? props.avatarSize : true}
                         showOnlineIndicator={!Utils.isNull(props.showOnlineIndicator) ? props.showOnlineIndicator : true}
