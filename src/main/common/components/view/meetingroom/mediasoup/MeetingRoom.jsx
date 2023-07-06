@@ -300,6 +300,10 @@ const MeetingRoom = (props) => {
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     appManager.add('CURRENT_MEETING', selectedMeeting);
 
+    if(isHost) {
+      mediaRecorder.init(selectedMeeting.id, selectedMeeting.title);
+    }
+
     return () => {
       endCall(false);
       setIsRecording(false);

@@ -218,10 +218,6 @@ const MeetingParticipant = (props) => {
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
 
-    if(props.isHost) {
-      mediaRecorder.init(props.meetingId, props.meetingTitle);
-    }
-
     return () => {
       stopProducing('audio');
       stopProducing('video');
