@@ -153,6 +153,7 @@ class SocketManager {
   endCall = (isDirect = false, caller = null, roomId) => {
     if (this.socket) {
       this.emitEvent(MessageType.END_CALL, {
+        userId: appManager.getUserDetails().userId,
         callerID: isDirect && caller ? caller.socketId : this.socket.id,
         direct: isDirect,
         roomID: roomId
