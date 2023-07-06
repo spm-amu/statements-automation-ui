@@ -62,8 +62,10 @@ const People = (props) => {
 
   const onAudioCallHandler = (userToCall) => {
     if (props.onAudioCallHandler) {
+      console.log("\n\n\n\n\n\n\n\n\n\nCALLING CALL HANDLER");
       props.onAudioCallHandler(userToCall);
     } else {
+      console.log("\n\n\n\n\n\n\n\n\n\nGENERATING MEETING ID");
       get(
         `${appManager.getAPIHost()}/api/v1/meeting/generateId`,
         (response) => {

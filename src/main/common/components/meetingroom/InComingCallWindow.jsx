@@ -42,8 +42,10 @@ const InComingCallWindow = (props) => {
       }, 100);
 
       if (args.payload.meetingJoinRequest) {
+        console.log("\n\n\n\n\n\n\nSETTING MEETING REQUEST");
         setMeetingRequest(args.payload);
       } else {
+        console.log("\n\n\n\n\n\n\nSETTING MEETING JOIN REQUEST");
         setCallPayload(args.payload);
       }
 
@@ -73,6 +75,9 @@ const InComingCallWindow = (props) => {
 
   const answerCall = () => {
     stopRingingSound();
+
+    console.log("\n\n\n\n\n\nANSWER CALL : ", callPayload);
+    console.log(meetingRequest);
 
     electron.ipcRenderer.sendMessage('answerCall', {
       payload: callPayload ? callPayload : meetingRequest
