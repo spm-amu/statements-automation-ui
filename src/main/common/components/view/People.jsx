@@ -64,6 +64,7 @@ const People = (props) => {
     if (props.onAudioCallHandler) {
       props.onAudioCallHandler(userToCall);
     } else {
+      alert("REQUEST TO JOIN GENERATING ID");
       get(
         `${appManager.getAPIHost()}/api/v1/meeting/generateId`,
         (response) => {

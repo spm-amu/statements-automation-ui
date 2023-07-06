@@ -357,6 +357,7 @@ const MeetingRoom = (props) => {
   /********************************* HANDSHAKE *******************************/
 
   const requestUserToJoin = (requestedUser) => {
+    alert("REQUEST TO JOIN FIREEEEEEEE : " + selectedMeeting.id);
     let userDetails = appManager.getUserDetails();
     socketManager.emitEvent(MessageType.REQUEST_TO_JOIN, {
       roomId: selectedMeeting.id,
