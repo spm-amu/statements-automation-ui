@@ -212,7 +212,7 @@ const MeetingParticipant = (props) => {
         onNewProducers(props.data.producers, true);
       }
 
-      onNewProducers(failedProducersDueToNullTransport);
+      onNewProducers(failedProducersDueToNullTransport, true);
       failedProducersDueToNullTransport.splice(0, failedProducersDueToNullTransport.length);
     }
   }, [consumerTransport]);
