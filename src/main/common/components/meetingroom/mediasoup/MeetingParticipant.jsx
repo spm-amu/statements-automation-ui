@@ -223,8 +223,16 @@ const MeetingParticipant = (props) => {
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
 
     return () => {
-      stopProducing('audio');
-      stopProducing('video');
+      console.log("======================DESTROYING PARTICIPANT========================= : " + props.data.userId);
+
+      if(props.isCurrentUser) {
+        stopProducing('audio');
+        stopProducing('video');
+      }
+
+      /*if(videoStream.current) {
+        alert("I got vibes : " + videoStream.current.)
+      }*/
 
       for (let [key, value] of consumers) {
         removeConsumer(key, 'video');
@@ -354,7 +362,7 @@ const MeetingParticipant = (props) => {
       if (consumerTransport) {
         if (producer.userId === props.data.userId) {
           if (producer.kind === 'video' && !producer.screenSharing) {
-            console.log("CALLING CONSUME FROM ON NEW PRODUCERS : ", producer);
+            console.log("CALLING CONSUME FROM ON NEW PRODUCERS FOR : " + props.data.userId + " - " + producer.id);
             consume(producer.producerId, producer.kind);
           }
         }
@@ -375,9 +383,8 @@ const MeetingParticipant = (props) => {
   const removeConsumer = (consumerId, kind) => {
     if (kind === 'video') {
       if (videoStream.current) {
-        let stream = videoStream.current.srcObject;
-        if (stream) {
-          stream.getTracks().forEach(function (track) {
+        if (videoStream.current) {
+          videoStream.current.getTracks().forEach(function (track) {
             track.stop();
           })
         }
@@ -405,7 +412,7 @@ const MeetingParticipant = (props) => {
         if (consumer) {
           consumers.set(consumer.id, consumer);
 
-          console.log("\n\n\n=====================================CONSUME===================================== : " + kind);
+          console.log("\n\n\n=====================================CONSUME===================================== : " + kind + " FOR : " + props.data.userId);
           if (kind === 'video') {
             // TODO : Put the stream in a temp variable and assign it later
             if (videoRef.current) {

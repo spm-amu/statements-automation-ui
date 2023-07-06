@@ -256,15 +256,16 @@ const MeetingParticipantGrid = (props) => {
 
         let participant = props.participants.find(((p) => p.userId === payload.userId));
         inViewParticipants.push(participant);
-        setupGrid();
+
+        // Refresh the list
+        setInViewParticipants([].concat(inViewParticipants));
       }
     };
 
     const removeFromView = (participant) => {
       participant.inView = false;
-      inViewParticipants.splice(inViewParticipants.findIndex((p) => p.userId === participant.userId), 1);
+      setInViewParticipants(inViewParticipants.filter((p) => p.userId !== participant.userId));
       appManager.fireEvent(SystemEventType.PARTICIPANT_OFF_VIEW, participant);
-      setupGrid(null);
     };
 
     const setupSelfDevices = async () => {
@@ -287,10 +288,14 @@ const MeetingParticipantGrid = (props) => {
     });
 
     useEffect(() => {
+      setupGrid();
+    }, [inViewParticipants]);
+
+    /*useEffect(() => {
       if(grid === null) {
         setupGrid();
       }
-    }, [grid]);
+    }, [grid]);*/
 
     useEffect(() => {
       if (screenShared && shareScreenSource) {
@@ -337,7 +342,7 @@ const MeetingParticipantGrid = (props) => {
       if (grid) {
         props.onGridSetup();
       }
-    }, grid);
+    }, [grid]);
 
     useEffect(() => {
       if (props.participants) {
@@ -434,7 +439,7 @@ const MeetingParticipantGrid = (props) => {
           alignItems="center" container item spacing={2}>
           <React.Fragment>
             {row.map((participant, index) => {
-              return <Grid item xs={4} key={index}
+              return <Grid item xs={4} key={index + "-" + participant.userId}
                            className={'meetingParticipantContainer'} style={
                 {
                   borderRadius: '4px',

@@ -923,7 +923,7 @@ const MeetingRoom = (props) => {
                                         }}
               />
             }
-            <>
+            <div style={{position: 'absolute', right: '48px', bottom: '48px'}}>
               <Alert
                 variant={'info'}
                 show={activityMessage !== null}
@@ -952,7 +952,7 @@ const MeetingRoom = (props) => {
                   <div className={'col'}><p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{chatMessage}</p></div>
                 </div>
               </Alert>
-            </>
+            </div>
           </div>
           {
             sideBarOpen && sideBarTab && displayState === 'MAXIMIZED' &&
