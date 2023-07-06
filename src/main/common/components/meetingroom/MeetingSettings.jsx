@@ -150,8 +150,7 @@ const MeetingSettings = (props) => {
             className={'centered-flex-box'}
             style={{
               width: '100%',
-              height: '100%',
-              backgroundColor: 'rgb(40, 40, 43)'
+              height: '100%'
             }}
           >
             {
@@ -235,7 +234,7 @@ const MeetingSettings = (props) => {
                   variant={'contained'}
                   disabled={videoOptionDisabled === null}
                   size="large"
-                  style={{color: '#FFFFFF', backgroundColor: '#198754', borderRadius: '8px', marginRight: '2px'}}
+                  style={{color: '#FFFFFF', backgroundColor: '#198754', borderRadius: '4px', marginRight: '2px'}}
                   onClick={(e) => {
                     close();
                     navigateToMeetingRoom();
@@ -250,7 +249,7 @@ const MeetingSettings = (props) => {
                   onClick={close}
                   variant={'text'}
                   size="large"
-                  style={{color: '#FFFFFF', backgroundColor: 'rgb(235, 63, 33)', borderRadius: '8px'}}
+                  style={{color: '#FFFFFF', backgroundColor: 'rgb(235, 63, 33)', borderRadius: '4px'}}
                 >
                   CLOSE
                 </Button>
