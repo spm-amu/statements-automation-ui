@@ -440,6 +440,7 @@ const BasicBusinessAppDashboard = (props) => {
   };
 
   const receiveCall = (payload) => {
+    console.log("\n\n\n\n\nRECEIVING CALL : ", payload);
     if (appManager.get('CURRENT_MEETING')) {
       socketManager.declineDirectCall(payload.callerUser.socketId, payload.roomId, "In another meeting");
     } else {
