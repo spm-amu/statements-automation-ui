@@ -59,6 +59,7 @@ class MediaSoupHelper {
           case 'connected':
             break;
           case 'failed':
+            alert("Transport closed");
             consumerTransport.close();
             break;
           default:
