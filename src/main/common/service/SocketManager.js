@@ -153,7 +153,7 @@ class SocketManager {
   endCall = (isDirect = false, caller = null, roomId) => {
     if (this.socket) {
       this.emitEvent(MessageType.END_CALL, {
-        userId: appManager.getUserDetails().userId,
+        callerUserId: appManager.getUserDetails().userId,
         callerID: isDirect && caller ? caller.socketId : this.socket.id,
         direct: isDirect,
         roomID: roomId
@@ -165,7 +165,7 @@ class SocketManager {
   declineDirectCall = (callerSocketId, callRoom, reason) => {
     this.emitEvent(MessageType.END_CALL,
       {
-        userId: appManager.getUserDetails().userId,
+        callerUserId: appManager.getUserDetails().userId,
         callerID: callerSocketId,
         roomID: callRoom,
         direct: true,
