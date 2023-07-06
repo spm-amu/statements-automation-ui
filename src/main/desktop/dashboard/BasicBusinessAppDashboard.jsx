@@ -569,6 +569,10 @@ const BasicBusinessAppDashboard = (props) => {
         })
       });
 
+      electron.ipcRenderer.on('homeRedirect', args => {
+        navigate('/');
+      });
+
       electron.ipcRenderer.on('answerCall', args => {
         console.log("\n\n\n\nANSWERING CALLL.....", args);
         post(

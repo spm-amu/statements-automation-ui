@@ -465,6 +465,14 @@ ipcMain.on("answerCall", async (_event, args) => {
   inComingCallWindow?.hide();
 });
 
+ipcMain.on("homeRedirect", async (_event, args) => {
+  if (!mainWindow) {
+    throw new Error('"mainWindow" is not defined');
+  }
+
+  mainWindow.webContents.send('homeRedirect', args);
+});
+
 ipcMain.on("readTokens", async (_event, args) => {
   if (!mainWindow) {
     throw new Error('"mainWindow" is not defined');
