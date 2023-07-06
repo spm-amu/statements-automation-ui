@@ -33,6 +33,7 @@ const InComingCallWindow = (props) => {
 
   useEffect(() => {
     electron.ipcRenderer.on('incomingCallWindowContent', args => {
+      alert('incomingCallWindowContent');
       console.log("\n\n\n\n\n\nincomingCallWindowContent : ", args);
       resetValues();
       soundInterval.current = setInterval(() => {
