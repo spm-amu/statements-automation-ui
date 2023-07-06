@@ -99,7 +99,8 @@ const MeetingRoom = (props) => {
             removeUser(be.payload);
             break;
           case MessageType.CALL_ENDED:
-            onCallEnded();
+            console.log("\n\n\n\n\n\n\n\nCALL ENDED : ", be.payload);
+            onCallEnded(true, be.payload);
             break;
           case MessageType.AUDIO_VISUAL_SETTINGS_CHANGED:
             onAVSettingsChange(be.payload);
@@ -695,13 +696,19 @@ const MeetingRoom = (props) => {
     setSideBarTab('');
   };
 
-  const onCallEnded = (showMessage = true) => {
-    socketManager.removeSubscriptions(eventHandler);
-    appManager.removeSubscriptions(systemEventHandler);
-    socketManager.disconnectSocket();
-    socketManager.init();
-    props.onEndCall(isDirectCall, showMessage);
-    props.closeHandler();
+  const onCallEnded = (showMessage = true, data = null) => {
+    if(data && data.reject) {
+      handleMessageArrived({
+        message: data.reason
+      })
+    } else {
+      socketManager.removeSubscriptions(eventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
+      socketManager.disconnectSocket();
+      socketManager.init();
+      props.onEndCall(isDirectCall, showMessage);
+      props.closeHandler();
+    }
   };
 
   const handleEndCall = () => {

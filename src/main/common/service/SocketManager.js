@@ -164,6 +164,7 @@ class SocketManager {
   declineDirectCall = (callerSocketId, callRoom, reason) => {
     this.emitEvent(MessageType.END_CALL,
       {
+        userId: appManager.getUserDetails().userId,
         callerID: callerSocketId,
         roomID: callRoom,
         direct: true,

@@ -3,9 +3,7 @@ import SearchBar from "../SearchBar";
 import './People.css'
 import PersonCard from "../PersonCard";
 import {get, post} from '../../service/RestService';
-import socketManager from '../../service/SocketManager';
 import appManager from '../../service/AppManager'
-import {MessageType} from '../../types';
 import {useNavigate} from 'react-router-dom';
 import Utils from "../../Utils";
 
@@ -115,7 +113,14 @@ const People = (props) => {
                             props.onAudioCallCancelHandler(data);
                           }
                         }}
-                        onClosePeopleDialogHandler={() => props.onClosePeopleDialogHandler()}
+                        onClosePeopleDialogHandler={() => {
+
+
+
+                          if(!Utils.isNull(props.onClosePeopleDialogHandler)) {
+                            props.onClosePeopleDialogHandler()
+                          }
+                        }}
                         data={user}
                         avatarSize={!Utils.isNull(props.avatarSize) ? props.avatarSize : true}
                         showOnlineIndicator={!Utils.isNull(props.showOnlineIndicator) ? props.showOnlineIndicator : true}
