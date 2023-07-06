@@ -165,7 +165,6 @@ const PersonCardComponent = (props) => {
 const PersonCard = (props) => {
   return (
     <PersonCardComponent
-      ref={ref}
       {...props}
     >
     </PersonCardComponent>
