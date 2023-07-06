@@ -150,7 +150,8 @@ const MeetingSettings = (props) => {
             className={'centered-flex-box'}
             style={{
               width: '100%',
-              height: '100%'
+              height: '100%',
+              backgroundColor: 'rgb(40, 40, 43)'
             }}
           >
             {
