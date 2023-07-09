@@ -1,13 +1,6 @@
-import {memo, useEffect, useRef, useState} from 'react';
+import React, {memo, useEffect, useRef, useState} from 'react';
 
 import FullCalendar from '@fullcalendar/react';
-import listPlugin from '@fullcalendar/list';
-import rrulePlugin from '@fullcalendar/rrule';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import toast from 'react-hot-toast';
-import {Menu} from 'react-feather';
 import {Card, CardBody} from 'reactstrap';
 import '../../assets/scss/app-calendar.scss';
 import "./CalenderComponent.css";
@@ -20,6 +13,18 @@ import moment from "moment";
 import appManager from '../../service/AppManager'
 import {MessageType} from '../../types';
 import socketManager from '../../service/SocketManager';
+import Icon from "../Icon";
+import IconButton from "@material-ui/core/IconButton";
+import Dialog from "@material-ui/core/Dialog";
+import withStyles from "@material-ui/core/styles/withStyles";
+import listPlugin from '@fullcalendar/list';
+import rrulePlugin from '@fullcalendar/rrule';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import toast from 'react-hot-toast';
+import {Menu} from 'react-feather';
+import Button from "@material-ui/core/Button";
 
 const eventTemplate = {
   id: '',
@@ -53,16 +58,38 @@ const eventTemplate = {
   },
 };
 
+
 const CalendarComponent = (props) => {
   const {isRtl} = props;
   const [calendarApi, setCalendarApi] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const calendarRef = useRef(null);
+  const dialogRef = useRef(null);
+  const [dialogTop, setDialogTop] = useState(null);
+  const [dialogLeft, setDialogLeft] = useState(null);
   const navigate = useNavigate();
 
   const [socketEventHandler] = useState({});
+
+  const StyledDialog = withStyles({
+    root: {pointerEvents: "none"},
+    paper: {
+      pointerEvents: 'auto',
+      width: '400px',
+      height: '228px',
+      minWidth: '400px',
+      padding: '0',
+      overflow: 'hidden',
+      position: 'absolute',
+      top: dialogTop,
+      left: dialogLeft,
+      borderRadius: '4px'
+    }
+  })(props => <Dialog hideBackdrop {...props} />);
+
 
   const handler = () => {
     return {
@@ -83,7 +110,7 @@ const CalendarComponent = (props) => {
     if (payload.systemEventType === MessageType.UPDATE_CALENDAR) {
       loadEvents(false);
     }
-  }
+  };
 
   useEffect(() => {
     socketEventHandler.api = handler();
@@ -104,27 +131,33 @@ const CalendarComponent = (props) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (dialogLeft) {
+      setOpen(true);
+    }
+  }, [dialogLeft]);
+
   const loadEvents = (track = true) => {
     get(`${appManager.getAPIHost()}/api/v1/meeting/fetchMeetings`, (response) => {
       // FREQ=MONTHLY;BYSETPOS=3;BYDAY=WE;INTERVAL=1
-     // let myEvent = {
-     //    events: [
-     //      {
-     //        title: 'my recurring event',
-     //       // rrule: 'DTSTART:20221113T103000Z\nRRULE:FREQ=MONTHLY;BYSETPOS=-1;BYDAY=WE;INTERVAL=1'
-     //        rrule: {
-     //          freq: 'MONTHLY',
-     //          dtstart: '2022-11-13',
-     //          bysetpos: -1,
-     //          byweekday: 'WE',
-     //          // bymonthday: 21,
-     //          interval: 1
-     //        }
-     //      }
-     //    ]
-     //  };
-     //
-     //  setEvents(myEvent.events);
+      // let myEvent = {
+      //    events: [
+      //      {
+      //        title: 'my recurring event',
+      //       // rrule: 'DTSTART:20221113T103000Z\nRRULE:FREQ=MONTHLY;BYSETPOS=-1;BYDAY=WE;INTERVAL=1'
+      //        rrule: {
+      //          freq: 'MONTHLY',
+      //          dtstart: '2022-11-13',
+      //          bysetpos: -1,
+      //          byweekday: 'WE',
+      //          // bymonthday: 21,
+      //          interval: 1
+      //        }
+      //      }
+      //    ]
+      //  };
+      //
+      //  setEvents(myEvent.events);
       setEvents(response);
     }, (e) => {
 
@@ -139,14 +172,14 @@ const CalendarComponent = (props) => {
 
   useEffect(() => {
     if (!Utils.isNull(selectedEvent) && !Utils.isNull(selectedEvent.id) && !Utils.isStringEmpty(selectedEvent.id)) {
-      navigate("/view/meeting", {state: selectedEvent})
+      //navigate("/view/meeting", {state: selectedEvent})
     }
   }, [selectedEvent]);
 
   const getEndDate = (event) => {
-    if(event.end) {
+    if (event.end) {
       return new Date(event.end);
-    } else if(event.extendedProps.schedule.rrule) {
+    } else if (event.extendedProps.schedule.rrule) {
       let startDate = new Date(event.start);
       return moment(startDate).add("minutes", event.extendedProps.duration).toDate();
     }
@@ -181,6 +214,73 @@ const CalendarComponent = (props) => {
       recurringBymonthday: event.extendedProps.schedule.rrule.bymonthday,
       askToJoin: event.extendedProps.askToJoin
     };
+  };
+
+  const createEventPopup = (el) => {
+    return <>
+      {
+        selectedEvent && <div className={'event-popup'}>
+          <div className={'top-toolbar row no-padding no-margin'}>
+            <div className={'left col no-padding no-margin'}>
+              <IconButton
+                onClick={() => setOpen(false)}
+                style={{
+                  color: '#FFFFFF'
+                }}
+              >
+                <Icon id={'CLOSE'} color={'#945c33'}/>
+              </IconButton>
+            </div>
+            <div className={'right col no-padding no-margin'}>
+              <IconButton
+                onClick={() => {
+                  navigate("/view/meeting", {state: getCreateMeetingObject(selectedEvent)});
+                }}
+                style={{
+                  color: '#FFFFFF'
+                }}
+              >
+                <Icon id={'MAXIMIZE'} color={'#945c33'}/>
+              </IconButton>
+            </div>
+          </div>
+          <div className={'summary'}>
+            <div className={'title'}>
+              {selectedEvent.title}
+            </div>
+            <div>
+              {toDateTimeString(selectedEvent.start)}
+            </div>
+            <div className={'organiser'}>
+              Organiser: {selectedEvent.extendedProps.attendees.find((a) => a.type === 'HOST').name}
+            </div>
+            <div style={{marginTop: '16px'}}>
+              <Button
+                variant={'contained'}
+                size="large"
+                style={{color: '#ffffff', backgroundColor: '#198754', borderRadius: '4px', marginRight: '2px'}}
+                onClick={(e) => {
+                    navigate('/view/joinMeetingSettings', {state: getCreateMeetingObject(selectedEvent)});
+                }}
+              >
+                JOIN
+              </Button>
+            </div>
+          </div>
+        </div>
+      }
+    </>
+  };
+
+  const toDateTimeString = (date) => {
+    let dateStr = selectedEvent.start.toLocaleDateString();
+    let timeStrTokens = selectedEvent.start.toLocaleTimeString().split(':');
+
+    return dateStr + ' ' + timeStrTokens[0] + ':' + timeStrTokens[1];
+  };
+
+  const calenderScrollListener = () => {
+    setOpen(false)
   };
 
   const calendarOptions = {
@@ -238,13 +338,43 @@ const CalendarComponent = (props) => {
       ];
     },
 
-    eventClick({event: clickedEvent}) {
+    viewDidMount() {
+      setOpen(false);
+    },
+
+    eventClick({el: el, event: event}) {
       // * Only grab required field otherwise it goes in infinity loop
       // ! Always grab all fields rendered by form (even if it get `undefined`) otherwise due to Vue3/Composition API you might get: "object is not extensible"
       // event.value = grabEventDataFromEventApi(clickedEvent)
 
       // eslint-disable-next-line no-use-before-define
       // isAddNewEventSidebarActive.value = true
+
+      if (selectedEvent) {
+        setOpen(event.id === selectedEvent.id);
+      } else {
+        setOpen(false);
+      }
+
+      var rect = el.getBoundingClientRect();
+
+      let topOffset = rect.bottom + 250 > document.body.getBoundingClientRect().bottom ? -1 * ((rect.bottom + 250) - document.body.getBoundingClientRect().bottom) : 8;
+      let leftOffset = rect.right + 400 > document.body.getBoundingClientRect().right ? (rect.right + 400) - document.body.getBoundingClientRect().right : 64;
+      setDialogTop((rect.top + topOffset) + 'px');
+      setDialogLeft((rect.left - leftOffset) + 'px');
+      setSelectedEvent(event);
+
+      let elementsByClassName = document.getElementsByClassName('fc-scroller-liquid-absolute');
+      if (elementsByClassName && elementsByClassName.length > 0) {
+        elementsByClassName[0].removeEventListener("scroll", calenderScrollListener);
+        elementsByClassName[0].addEventListener('scroll', calenderScrollListener);
+      }
+
+      elementsByClassName = document.getElementsByClassName('fc-scroller-liquid');
+      if (elementsByClassName && elementsByClassName.length > 0) {
+        elementsByClassName[0].removeEventListener("scroll", calenderScrollListener);
+        elementsByClassName[0].addEventListener('scroll', calenderScrollListener);
+      }
     },
 
     customButtons: {
@@ -257,7 +387,6 @@ const CalendarComponent = (props) => {
     },
 
     dateClick(info) {
-
       let date = new Date(info.dateStr);
       const event = {
         ...eventTemplate,
@@ -267,7 +396,7 @@ const CalendarComponent = (props) => {
         "recurringEndDate": date
       };
 
-      if(moment(new Date()).startOf('day') <= moment(date).startOf('day')) {
+      if (!open && moment(new Date()).startOf('day') <= moment(date).startOf('day')) {
         setSelectedEvent(event);
         navigate("/view/meeting", {state: event});
       }
@@ -297,44 +426,14 @@ const CalendarComponent = (props) => {
       ? Docs: https://fullcalendar.io/docs/eventMouseEnter
     */
     eventMouseEnter({el: el, event: event}) {
-      el.children[0].style.display = 'none';
-
-      let buttonContainer = document.createElement('div');
-      buttonContainer.classList.add('event-button-container');
-      buttonContainer.id = 'event-popup-toolbar';
-
-      let joinButton = document.createElement('button');
-      joinButton.id = 'event-join-btn';
-      joinButton.style.marginLeft = '-8px';
-      joinButton.style.marginRight = '4px';
-      joinButton.style.backgroundColor = '#198754';
-      joinButton.classList.add('event-button');
-      joinButton.onclick = (e) => {
-        navigate('/view/joinMeetingSettings', {state: getCreateMeetingObject(event)});
-      };
-
-      joinButton.innerHTML = 'JOIN';
-      buttonContainer.appendChild(joinButton);
-
-      let viewButton = document.createElement('button');
-      viewButton.id = 'event-view-btn';
-      viewButton.classList.add('event-button');
-      viewButton.onclick = (e) => {
-        setSelectedEvent(getCreateMeetingObject(event));
-      };
-
-      viewButton.innerHTML = 'VIEW';
-      buttonContainer.appendChild(viewButton);
-      el.insertBefore(buttonContainer, el.children[0]);
     },
+
 
     /*
       Handle event mouse enter
       ? Docs: https://fullcalendar.io/docs/eventMouseEnter
     */
     eventMouseLeave({el: el}) {
-      el.removeChild(document.getElementById('event-popup-toolbar'));
-      //el.children[0].style.display = 'unset';
     },
 
     ref: calendarRef,
@@ -361,6 +460,23 @@ const CalendarComponent = (props) => {
               <FullCalendar {...calendarOptions} />{' '}
             </CardBody>
           </Card>
+          <StyledDialog
+            open={open}
+            ref={dialogRef}
+            onClose={() => {
+              setOpen(false)
+            }}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            aria-modal={false}
+            fullWidth
+          >
+            <div className={'w-100 h-100'}>
+              {
+                createEventPopup()
+              }
+            </div>
+          </StyledDialog>
         </div>
       }
     </>

@@ -7,10 +7,54 @@
   transform: scale(1);
 }
 
-.event-button-container {
+.event-popup {
+  background-color: #ffffff;
+  height: 100%;
   width: 100%;
-  position: absolute;
-  background-color: #dfe8ed;
+  padding: 8px;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.event-popup .pointer {
+  width: 100%;
+  height: 8px;
+}
+
+.event-popup .top-toolbar {
+  width: 100%;
+  height: 48px;
+}
+
+.event-popup .top-toolbar .left {
+  width: 50%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.event-popup .top-toolbar .right {
+  width: 50%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.event-popup .summary {
+  width: 376px;
+  height: calc(100% - 72px);
+  padding: 16px;
+}
+
+.event-popup .summary .title {
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-popup .summary .organiser {
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .event-button {
@@ -20,6 +64,8 @@
   color: #ffffff;
 }
 
+.fc-direction-ltr .fc-list-day-text,
+.fc-event-main-frame,
 .fc-header-toolbar .fc-toolbar-chunk:nth-of-type(3) .fc-button-group button {
   border-color: #dfe8ed !important;
   color: #01476C !important;
@@ -127,20 +173,8 @@ button:focus {
   border-color: #ffffff !important;
 }
 
-.fc-sidebarToggle-button{
+.fc-sidebarToggle-button {
   display: none !important;
-}
-
-.fc-event-main-frame {
-  color: #dfe8ed !important;
-}
-
-.fc .fc-col-header-cell-cushion {
-  color: #dfe8ed !important;
-}
-
-.fc-direction-ltr .fc-list-day-text {
-  color: #dfe8ed !important;
 }
 
 .fc .fc-list-event-dot {
@@ -156,7 +190,7 @@ button:focus {
 }
 
 .fc .fc-daygrid-day.fc-day-today {
-  background-color: rgba(234,223,213, .5) !important;
+  background-color: rgba(234, 223, 213, .5) !important;
 }
 
 .app-calendar .fc-day-past .fc-daygrid-day-number {
@@ -166,6 +200,7 @@ button:focus {
 .fc .fc-day-other .fc-daygrid-day-top, .fc .fc-day-other .fc-daygrid-day-botton {
   opacity: .5
 }
+
 /*
 
 .fc-day-past {

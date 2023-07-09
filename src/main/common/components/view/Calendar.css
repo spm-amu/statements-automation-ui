@@ -4,6 +4,10 @@
   box-shadow: rgb(113 122 131 / 11%) 0px 7px 30px 0px;
 }
 
+.fc .fc-col-header-cell-cushion {
+  color: #945c33 !important;
+}
+
 .nav-item,
 .navbar {
   z-index: 10000;

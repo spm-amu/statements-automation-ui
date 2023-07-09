@@ -19,6 +19,7 @@ import RecordingView from '../view/RecordingView';
 import ChatPollsHistoryView from '../view/ChatPollsHistoryView';
 import PostMeetingMessage from "../view/meetingroom/PostMeetingMessage";
 import Help from '../view/Help';
+import Activity from "../view/Activity";
 
 const ViewContainer = (props) => {
   const params = useParams();
@@ -97,6 +98,9 @@ const ViewContainer = (props) => {
         break;
       case 'files':
         element = <Files/>;
+        break;
+      case 'activity':
+        element = <Activity/>;
         break;
       case 'meeting':
         element = <Meeting selectedEvent={location.state}/>;
