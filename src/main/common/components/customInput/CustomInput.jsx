@@ -76,7 +76,6 @@ export default function CustomInput(props) {
       ) : null}
       <Input
         classes={{
-          input: inputClasses,
           root: marginTop,
           disabled: classes.disabled,
           underline: underlineClasses,
@@ -87,6 +86,7 @@ export default function CustomInput(props) {
         {...inputProps}
         inputProps={newInputProps}
         disabled={disabled}
+        style={{color: props.color ? props.color : null}}
       />
       {helperText !== undefined ? (
         <FormHelperText id={`${id}-text`} className={helpTextClasses}>

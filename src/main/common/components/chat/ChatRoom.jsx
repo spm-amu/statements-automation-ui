@@ -630,6 +630,7 @@ const ChatRoom = (props) => {
     } else {
       return <PollContainer
         poll={message.poll}
+        chatTab={props.chatTab}
         pollCreator={message.participant}
         createdDate={message.createdDate}
         submitPollVoteHandler={(poll) => submitPollVoteHandler(poll)}
@@ -786,12 +787,13 @@ const ChatRoom = (props) => {
                   />
                 </div>
                 <CustomInput
-                  style={{zIndex: !Utils.isNull(documents) ? 0 : 1}}
+                  style={{zIndex: !Utils.isNull(documents) ? 0 : 1, color: props.chatTab ? 'white' : null}}
                   labelText={documents ? "" : "Type a new message"}
                   disabled={!Utils.isNull(documents)}
                   multiline={true}
                   id="message"
                   formControlProps={{fullWidth: true}}
+                  color={props.chatTab ? 'white' : null}
                   autoFocus
                   inputProps={{
                     endAdornment: (
