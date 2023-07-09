@@ -178,7 +178,7 @@ const MeetingParticipantGrid = (props) => {
             props.sharingHandler(true);
             setScreenShared(true);
             setSomeoneSharing(true);
-            setShowSharedScreen(true);
+            //setShowSharedScreen(true);
             setShareScreenSource(null);
             setMessage(producer.username + " is sharing");
             shareScreenVideoRef.current.srcObject = stream;

@@ -255,16 +255,19 @@ const CalendarComponent = (props) => {
               Organiser: {selectedEvent.extendedProps.attendees.find((a) => a.type === 'HOST').name}
             </div>
             <div style={{marginTop: '16px'}}>
-              <Button
-                variant={'contained'}
-                size="large"
-                style={{color: '#ffffff', backgroundColor: '#198754', borderRadius: '4px', marginRight: '2px'}}
-                onClick={(e) => {
+              {
+                moment(new Date()).startOf('day') <= moment(selectedEvent.start).startOf('day') &&
+                <Button
+                  variant={'contained'}
+                  size="large"
+                  style={{color: '#ffffff', backgroundColor: '#198754', borderRadius: '4px', marginRight: '2px'}}
+                  onClick={(e) => {
                     navigate('/view/joinMeetingSettings', {state: getCreateMeetingObject(selectedEvent)});
-                }}
-              >
-                JOIN
-              </Button>
+                  }}
+                >
+                  JOIN
+                </Button>
+              }
             </div>
           </div>
         </div>
