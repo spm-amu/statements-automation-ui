@@ -61,7 +61,6 @@ class MediaSoupHelper {
             break;
           case 'failed':
             alert("Transport closed");
-            consumerTransport.close();
             appManager.fireEvent(SystemEventType.CONSUMER_TRANSPORT_FAILED, {});
             break;
           default:
