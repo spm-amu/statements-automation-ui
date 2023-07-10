@@ -43,7 +43,7 @@ const MeetingRoom = (props) => {
   const [participants, setParticipants] = useState([]);
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
-  const [videoDisabled, setVideoDisabled] = useState(null);
+  const [videoDisabled] = useState(props.videoDisabled);
   const [handRaised, setHandRaised] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [screenShared, setScreenShared] = useState(null);

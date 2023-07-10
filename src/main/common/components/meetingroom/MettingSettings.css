@@ -16,6 +16,7 @@
 }
 
 .meeting-settings-header .MuiAlert-message{
+  color: rgb(235, 63, 33);
 }
 
 .meeting-settings-header {

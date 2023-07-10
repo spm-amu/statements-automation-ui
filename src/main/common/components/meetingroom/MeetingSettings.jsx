@@ -41,9 +41,14 @@ const MeetingSettings = (props) => {
   }, []);
 
   const startVideo = async () => {
-    let videoStream = await navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
-    userVideo.current.srcObject = videoStream;
-    setStream(videoStream);
+    try {
+      let videoStream = await navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
+      userVideo.current.srcObject = videoStream;
+      setStream(videoStream);
+    } catch (e) {
+      setVideoMuted(true);
+      setVideoOptionDisabled(true);
+    }
   };
 
   useEffect(() => {
@@ -109,6 +114,7 @@ const MeetingSettings = (props) => {
         selectedMeeting: selectedMeeting,
         videoMuted: videoMuted,
         audioMuted: audioMuted,
+        videoDisabled: videoOptionDisabled,
         isHost,
         autoPermit: autoPermit
       }
@@ -135,7 +141,15 @@ const MeetingSettings = (props) => {
               <td>
                 {
                   videoOptionDisabled &&
-                  <Alert severity="warning" style={{color: 'red', maxHeight: '32px'}}>
+                  <Alert severity="warning" style={
+                    {
+                      color: 'rgb(235, 63, 33)',
+                      maxHeight: '32px',
+                      padding: '0 8px',
+                      margin: '0 -16px 0 16px',
+                      width: 'calc(100% - 32px)'
+                    }
+                  }>
                     No video camera available. You may join the
                     meeting without video
                   </Alert>
@@ -247,7 +261,6 @@ const MeetingSettings = (props) => {
                 <Button
                   variant={'contained'}
                   onClick={close}
-                  variant={'text'}
                   size="large"
                   style={{color: '#FFFFFF', backgroundColor: 'rgb(235, 63, 33)', borderRadius: '4px'}}
                 >
