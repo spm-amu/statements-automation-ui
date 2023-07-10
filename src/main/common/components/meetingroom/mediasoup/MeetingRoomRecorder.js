@@ -145,6 +145,9 @@ class MeetingRoomRecorder {
 
       if (this.recorder && this.recorder.state === 'recording') {
         this.recorder.stop();
+        if(this.videoTrack) {
+          this.videoTrack.stop();
+        }
       }
     } catch (e) {
       console.error(e);
@@ -189,6 +192,7 @@ class MeetingRoomRecorder {
                   stream.getVideoTracks()[0]
                 ]);
 
+                this.videoTrack = stream.getVideoTracks()[0];
                 const recorder = new MediaRecorder(initialMediaStream, options);
                 let mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
                   audioContext,
