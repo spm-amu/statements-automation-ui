@@ -1,0 +1,34 @@
+.help-view-header {
+  background-color: #525f7f;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 0 16px;
+}
+
+.help-content {
+  width: 100%;
+  max-height: calc(100% - 32px);
+  height: calc(100% - 32px);
+  overflow: auto;
+  font-size: 32px;
+  margin: 16px 0;
+  border: 1px solid #525f7f;
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.faq-heading {
+  color: #000000
+}
+
+.first-level-headings li {
+  list-style: circle;
+  font-size: 24px;
+}
+
+.second-level-headings li {
+  list-style: decimal;
+  font-size: 20px;
+}
