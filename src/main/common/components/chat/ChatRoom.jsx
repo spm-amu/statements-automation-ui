@@ -1,9 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Avatar, IconButton} from '@material-ui/core';
 import SendIcon from '@material-ui/icons/Send';
-import CallIcon from '@material-ui/icons/Call';
 import Tooltip from '@material-ui/core/Tooltip';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import './ChatRooms.scss';
 import moment from 'moment';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -13,7 +12,7 @@ import LottieIcon from '../LottieIcon';
 import {Calendar} from 'react-feather';
 import Utils from '../../Utils';
 import socketManager from '../../service/SocketManager';
-import { MessageType, SystemEventType } from '../../types';
+import {MessageType, SystemEventType} from '../../types';
 import appManager from "../../../common/service/AppManager";
 import {GroupAdd, Info, Poll} from '@material-ui/icons';
 import AutoComplete from '../customInput/AutoComplete';
@@ -24,15 +23,11 @@ import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import ChatPoll from './ChatPoll';
 import Linkify from "linkify-react";
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Radio from '@material-ui/core/Radio';
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import PollResult from './PollResult';
 import File from "../customInput/File";
 import Icon from '../Icon';
 import PollContainer from './PollContainer';
-const { electron } = window;
+
+const {electron} = window;
 
 const ChatRoom = (props) => {
   const navigate = useNavigate();
@@ -102,7 +97,7 @@ const ChatRoom = (props) => {
   const submitPollVoteHandler = (poll) => {
     let chatParticipant = selectedChat.participants.find(p => p.userId === currentUser.userId);
 
-    const date = {
+    const data = {
       pollId: poll.id,
       optionId: poll.selectedOption,
       chatParticipant: chatParticipant
@@ -117,15 +112,15 @@ const ChatRoom = (props) => {
       },
       (e) => {
       },
-      date
+      data
     );
   };
 
   const onSystemEvent = (payload) => {
     console.log(messages);
-    if(payload.systemEventType === "NEW_POLL_VOTE") {
+    if (payload.systemEventType === "NEW_POLL_VOTE") {
       let find = messages.find((msg) => msg.poll && msg.poll.id === payload.data.pollId);
-      if(find) {
+      if (find) {
         //find.totalVotes++;
       }
     }
@@ -187,7 +182,7 @@ const ChatRoom = (props) => {
           },
           {
             chatId: selectedChat.id,
-            participants: [ appManager.getUserDetails() ]
+            participants: [appManager.getUserDetails()]
           }
         );
       }
@@ -398,14 +393,14 @@ const ChatRoom = (props) => {
   };
 
   const renderFileThumbnail = (message) => {
-    const { documents } = message;
+    const {documents} = message;
     const thumbnails = [];
 
     documents.forEach((doc, index) => {
       if (doc.type.includes('image')) {
         return (
           thumbnails.push(
-            <div style={{ borderBottom: '5px solid black' }}>
+            <div style={{borderBottom: '5px solid black'}}>
               <div key={index} className={'col'}>
                 <img
                   key={index}
@@ -416,7 +411,9 @@ const ChatRoom = (props) => {
               </div>
               <IconButton
                 component="span"
-                onClick={() => onDownload(message.document[index])}
+                onClick={() => {
+                  onDownload(documents[index])
+                }}
               >
                 <Icon id={'DOWNLOAD'}/>
               </IconButton>
@@ -427,7 +424,7 @@ const ChatRoom = (props) => {
 
       if (doc.type.includes('pdf')) {
         thumbnails.push(
-          <div key={index} style={{ borderBottom: '0.7px solid black' }}>
+          <div key={index} style={{borderBottom: '0.7px solid black'}}>
             <div className={'col'}>
               <img
                 key={index}
@@ -446,7 +443,7 @@ const ChatRoom = (props) => {
         )
       } else if (doc.type.includes('doc')) {
         thumbnails.push(
-          <div key={index} style={{ borderBottom: '5px solid black' }}>
+          <div key={index} style={{borderBottom: '5px solid black'}}>
             <div className={'col'}>
               <img
                 key={index}
@@ -465,7 +462,7 @@ const ChatRoom = (props) => {
         )
       } else if (doc.type.includes('word')) {
         thumbnails.push(
-          <div key={index} style={{ borderBottom: '5px solid black' }}>
+          <div key={index} style={{borderBottom: '5px solid black'}}>
             <div className={'col'}>
               <img
                 key={index}
@@ -484,7 +481,7 @@ const ChatRoom = (props) => {
         )
       } else if (doc.type.includes('xls')) {
         thumbnails.push(
-          <div key={index} style={{ borderBottom: '5px solid black' }}>
+          <div key={index} style={{borderBottom: '5px solid black'}}>
             <div className={'col'}>
               <img
                 key={index}
@@ -504,7 +501,8 @@ const ChatRoom = (props) => {
       } else {
         thumbnails.push(
           <div key={index}>
-            <div className={'col'} style={{ borderBottom: '0.7px solid black', paddingBottom: '8px', borderWidth: '50%' }} >
+            <div className={'col'}
+                 style={{borderBottom: '0.7px solid black', paddingBottom: '8px', borderWidth: '50%'}}>
               <img
                 key={index}
                 src={require('../../assets/img/files/php.png')}
@@ -512,7 +510,7 @@ const ChatRoom = (props) => {
                 style={{width: 100, height: 'auto'}}
               />
 
-              <p style={{ marginTop: '4px' }}>{ documents[index].name }</p>
+              <p style={{marginTop: '4px'}}>{documents[index].name}</p>
             </div>
             <IconButton
               component="span"
@@ -528,8 +526,8 @@ const ChatRoom = (props) => {
     return thumbnails;
   };
 
-  const renderLink = ({ attributes, content }) => {
-    const { href } = attributes;
+  const renderLink = ({attributes, content}) => {
+    const {href} = attributes;
     return <a
       onClick={() => {
         window.open(href);
@@ -579,7 +577,7 @@ const ChatRoom = (props) => {
           <div key={index} className="chatroom__message">
             <div className="mychat">
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
-              <Linkify key={index} options={{ render: renderLink }}>
+              <Linkify key={index} options={{render: renderLink}}>
                 <div key={index} style={{marginBottom: '4px'}}>
                   {message.content.split('\n').map((token, index) => {
                     return <>{token}<br/></>
@@ -599,7 +597,7 @@ const ChatRoom = (props) => {
             <div className="peer">
               <span>{message.participant.name}</span>
               <span>{moment(message.createdDate).format('DD/MM, HH:mm')}</span>
-              <Linkify key={index} options={{ render: renderLink }}>
+              <Linkify key={index} options={{render: renderLink}}>
                 <div key={index} style={{marginBottom: '4px'}}>
                   {message.content.split('\n').map((token, index) => {
                     return <>{token}<br/></>

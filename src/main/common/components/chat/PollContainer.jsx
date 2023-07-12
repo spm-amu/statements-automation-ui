@@ -174,7 +174,6 @@ const PollContainer = (props) => {
             className="poll-choice-radio-group"
             value={currentVote ? currentVote : poll.selectedOption ? poll.selectedOption : ''}
             onChange={(e) => {
-              console.log('SELECTED ON CHANGE: ', e.target.value);
               setCurrentVote(e.target.value);
             }}
           >
@@ -190,7 +189,7 @@ const PollContainer = (props) => {
               className="vote-button"
               variant={'outlined'}
               onClick={() => {
-                const hasVoted = !!poll.selectedOption;
+                const hasVoted = poll.selectedOption;
                 poll.selectedOption = currentVote ? currentVote : '';
                 props.submitPollVoteHandler(poll);
 
@@ -238,7 +237,7 @@ const PollContainer = (props) => {
             {
               poll.selectedOption &&
               <div className="poll-creation-date">
-                <span style={{color: '#945c33'}}>You have Voted</span>
+                <span style={{color: '#945c33'}}>You have voted {props.poll.options.find((o) => o.id === poll.selectedOption)?.text}</span>
               </div>
             }
           </div> :
