@@ -438,6 +438,7 @@
 .cv-poll-choice {
   position: relative;
   margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.75);
 }
 
 .cv-poll-choice-details {
@@ -450,9 +451,6 @@
   padding-top: 6px;
   padding-bottom: 6px;
   max-width: 100%;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 
 .cv-choice-percentage {
@@ -467,6 +465,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  color: rgba(0, 0, 0, 0.75);
 }
 
 .selected-choice-icon {
