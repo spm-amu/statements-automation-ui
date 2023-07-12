@@ -1420,7 +1420,7 @@ const Meeting = (props) => {
                   value={newHostAttendee}
                   multiple={true}
                   showImages={true}
-                  searchAttribute={'emailAddress'}
+                  searchAttribute={'name'}
                   validationRegex={/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/}
                   valueChangeHandler={(value, id) => {
                     setNewHostAttendee([].concat(value[1]));

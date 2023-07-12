@@ -53,7 +53,7 @@ const MeetingRoom = (props) => {
   const [step, setStep] = useState('LOBBY');
   const [meetingParticipantGridMode, setMeetingParticipantGridMode] = useState('DEFAULT');
   const [activityMessage, setActivityMessage] = useState(null);
-  const [autoPermit, setAutoPermit] = useState(false);
+  const [autoPermit, setAutoPermit] = useState(props.autoPermit);
   const [meetingChat, setMeetingChat] = useState(null);
   const [meetingStarted, setMeetingStarted] = useState(null);
   const [eventHandler] = useState({});
