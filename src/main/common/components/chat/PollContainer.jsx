@@ -222,13 +222,13 @@ const PollContainer = (props) => {
               </Button>
             }
 
-            <span style={{marginLeft: '8px'}}
+            <span style={{marginLeft: '8px', color: '#000000'}}
                   className="time-left">
               {`${totalVotes} votes out of ${props.numberOfPollParticipants}`}
             </span>
 
             <span className="separator">•</span>
-            <span className="time-left" style={{marginLeft: '4px'}}>
+            <span className="time-left" style={{marginLeft: '4px', color: '#000000'}}>
               {
                 pollRemainingTime(poll.expirationDateTime)
               }
