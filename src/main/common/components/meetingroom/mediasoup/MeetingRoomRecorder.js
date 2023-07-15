@@ -27,22 +27,13 @@ class MeetingRoomRecorder {
     this.audioTracks.set(id, track);
 
     if (this.recorder && this.recorder.state === 'recording') {
-      let tracks = [];
-      for (const value of this.audioTracks.values()) {
-        this.mediaStreamAudioDestinationNode.stream.addTrack(value);
-        tracks.push(value);
-      }
-
-      console.log("INITIALIZING STREAM WITH : " + tracks.length + " TRACKS");
-      let mediaStream = new MediaStream(tracks);
+      let mediaStream = new MediaStream([track]);
       const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
         this.audioContext,
         {mediaStream: mediaStream}
       );
 
       mediaStreamAudioSourceNode.connect(this.mediaStreamAudioDestinationNode);
-      this.mediaStreamAudioSourceNode.disconnect();
-      this.mediaStreamAudioSourceNode = mediaStreamAudioSourceNode;
     }
   };
 
@@ -194,32 +185,29 @@ class MeetingRoomRecorder {
                 ];
 
                 for (const value of this.audioTracks.values()) {
-                  mediaStreamAudioDestinationNode.stream.addTrack(value);
                   tracks.push(value);
+                  let mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
+                    audioContext,
+                    { mediaStream: new MediaStream([value]) }
+                  );
+
+                  mediaStreamAudioSourceNode.connect(mediaStreamAudioDestinationNode);
                 }
 
                 console.log("INIT WITH TRACKS : ", tracks);
                 let initialMediaStream = new MediaStream(tracks);
 
                 const recorder = new MediaRecorder(initialMediaStream, options);
-                let mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
-                  audioContext,
-                  { mediaStream: initialMediaStream }
-                );
-
-                mediaStreamAudioSourceNode.connect(mediaStreamAudioDestinationNode);
-
                 recorder.ondataavailable = _this.handleRecordingDataAvailable;
                 recorder.onstop = _this.handleStopRecording;
 
                 this.audioContext = audioContext;
                 this.mediaStreamAudioDestinationNode = mediaStreamAudioDestinationNode;
-                this.mediaStreamAudioSourceNode = mediaStreamAudioSourceNode;
 
                 resolve(recorder);
               })
               .catch(e => {
-                console.log(e);
+                console.error(e);
                 reject(new Error(e.message));
               });
           } else {
