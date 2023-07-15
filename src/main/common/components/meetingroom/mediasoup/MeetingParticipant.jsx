@@ -220,7 +220,7 @@ const MeetingParticipant = (props) => {
         for (let [key, value] of producers) {
           console.log("PROCESSING PRODUCER OF TYPE : " + key + " : " + value.id);
           if(!(props.data.producers && this.props.data.producers.find((p) => p.producerId === value.id))) {
-            consume(value.id, key, true);
+            consume(value.id, key, true, value.userId);
           } else {
             console.log("PRODUCER ALREADY PROCESSED");
           }
@@ -363,10 +363,6 @@ const MeetingParticipant = (props) => {
     if (type === 'video') {
       tracks.current.stopVideoTrack();
     }
-
-    if (props.isHost && type === 'audio') {
-      mediaRecorder.removeTrack(props.data.userId);
-    }
   };
 
   const onNewProducers = (producers, loading = false) => {
@@ -375,7 +371,7 @@ const MeetingParticipant = (props) => {
         if (producer.userId === props.data.userId) {
           if (producer.kind === 'video' && !producer.screenSharing) {
             console.log("CALLING CONSUME FROM ON NEW PRODUCERS FOR : " + props.data.userId + " - " + producer.producerId);
-            consume(producer.producerId, producer.kind);
+            consume(producer.producerId, producer.kind, loading, producer.userId);
           }
         }
 
@@ -383,7 +379,7 @@ const MeetingParticipant = (props) => {
           // The small participant box at the bottom belonging to the current user must consume all audio
           // This is because we do not want to disturb the audio due to any rendering such as Bring to view
           if (producer.kind === 'audio') {
-            consume(producer.producerId, producer.kind, loading);
+            consume(producer.producerId, producer.kind, loading, producer.userId);
           }
         }
       } else {
@@ -392,7 +388,7 @@ const MeetingParticipant = (props) => {
     }
   };
 
-  const removeConsumer = (consumerId, kind) => {
+  const removeConsumer = (consumerId, kind, userId) => {
     if (kind === 'video') {
       if (videoStream.current) {
         if (videoStream.current) {
@@ -406,11 +402,11 @@ const MeetingParticipant = (props) => {
       if (audioElement && audioElement.srcObject) {
         audioElement.srcObject.getTracks().forEach(function (track) {
           track.stop();
-          if (mediaRecorder) {
-            mediaRecorder.removeTrack(props.data.userId);
-          }
         });
 
+        if (userId && mediaRecorder) {
+          mediaRecorder.removeTrack(userId);
+        }
         document.getElementById(props.data.userId + '-audio-el-container')?.removeChild(audioElement)
       }
     }
@@ -418,13 +414,13 @@ const MeetingParticipant = (props) => {
     consumers.delete(consumerId);
   };
 
-  const consume = async (producerId, kind, loading) => {
+  const consume = async (producerId, kind, loading, userId) => {
     mediaSoupHelper.getConsumeStream(producerId, device.rtpCapabilities, consumerTransport, props.meetingId, appManager.getUserDetails().userId, kind).then(
       ({consumer, stream, kind}) => {
         if (consumer) {
           consumers.set(consumer.id, consumer);
 
-          console.log("\n\n\n=====================================CONSUME===================================== : " + kind + " FOR : " + props.data.userId);
+          console.log("\n\n\n=====================================CONSUME===================================== : " + kind + " FOR : " + userId);
           if (kind === 'video') {
             if (videoRef.current) {
               videoRef.current.srcObject = stream;
@@ -445,7 +441,7 @@ const MeetingParticipant = (props) => {
               document.getElementById('meeting-audio-el-container').appendChild(audioElement);
 
               if (props.isHost) {
-                mediaRecorder.addTrack(props.data.userId, stream.getAudioTracks()[0]);
+                mediaRecorder.addTrack(userId, stream.getAudioTracks()[0]);
               }
             }
           }
@@ -453,14 +449,14 @@ const MeetingParticipant = (props) => {
           consumer.on(
             'trackended',
             () => {
-              removeConsumer(consumer.id, kind)
+              removeConsumer(consumer.id, kind, userId)
             }
           );
 
           consumer.on(
             'transportclose',
             () => {
-              removeConsumer(consumer.id, kind)
+              removeConsumer(consumer.id, kind, userId)
             }
           )
         }

@@ -26,13 +26,20 @@ class MeetingRoomRecorder {
   };
 
   addTrack = (id, track) => {
+    console.log("ADDING TRACK FOR : " + id);
     this.audioTracks.set(id, track);
 
     let tracks = [];
+    if(this.recorder && this.recorder.stream && this.recorder.stream.getVideoTracks()?.length > 0) {
+      console.log("KEEPING VIDEO TRACK");
+      tracks.push(this.recorder.stream.getVideoTracks()[0])
+    }
+
     for (const value of this.audioTracks.values()) {
       tracks.push(value);
     }
 
+    console.log("INITIALIZING STREAM WITH : " + tracks.length + " TRACKS");
     let mediaStream = new MediaStream(tracks);
     const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
       this.audioContext,
@@ -144,8 +151,8 @@ class MeetingRoomRecorder {
 
       if (this.recorder && this.recorder.state === 'recording') {
         this.recorder.stop();
-        if(this.videoTrack) {
-          this.videoTrack.stop();
+        if(this.recorder.stream?.getVideoTracks()?.length > 0) {
+          this.recorder.stream?.getVideoTracks()[0].stop();
         }
       }
     } catch (e) {
@@ -191,7 +198,6 @@ class MeetingRoomRecorder {
                   stream.getVideoTracks()[0]
                 ]);
 
-                this.videoTrack = stream.getVideoTracks()[0];
                 const recorder = new MediaRecorder(initialMediaStream, options);
                 let mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
                   audioContext,
