@@ -32,7 +32,7 @@ class MeetingRoomRecorder {
     if(this.recorder && this.recorder.stream) {
       for (const existingTrack of this.recorder.stream.getTracks()) {
         if (existingTrack.enabled && !existingTrack.muted) {
-          mediaStream.addTrack(track);
+          mediaStream.addTrack(existingTrack);
         }
       }
     } else {

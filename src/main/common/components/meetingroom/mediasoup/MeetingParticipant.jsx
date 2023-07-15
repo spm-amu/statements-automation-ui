@@ -426,7 +426,6 @@ const MeetingParticipant = (props) => {
 
           console.log("\n\n\n=====================================CONSUME===================================== : " + kind + " FOR : " + props.data.userId);
           if (kind === 'video') {
-            // TODO : Put the stream in a temp variable and assign it later
             if (videoRef.current) {
               videoRef.current.srcObject = stream;
             }
