@@ -14,6 +14,7 @@ class MeetingRoomRecorder {
     this.recordingSize = null;
     this.isRecording = false;
     this.recorder = null;
+    this.audioTracks = new Map();
   }
 
   init = async (meetingId, meetingTitle) => {
@@ -24,21 +25,15 @@ class MeetingRoomRecorder {
     })
   };
 
-  addTrack = (track) => {
-    let mediaStream = new MediaStream([
-      track
-    ]);
+  addTrack = (id, track) => {
+    this.audioTracks.set(id, track);
 
-    if(this.recorder && this.recorder.stream) {
-      for (const existingTrack of this.recorder.stream.getTracks()) {
-        if (existingTrack.enabled && !existingTrack.muted) {
-          mediaStream.addTrack(existingTrack);
-        }
-      }
-    } else {
-      console.log("NULL STREAM");
+    let tracks = [];
+    for (const value of this.audioTracks.values()) {
+      tracks.push(value);
     }
 
+    let mediaStream = new MediaStream(tracks);
     const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
       this.audioContext,
       { mediaStream: mediaStream }
@@ -49,8 +44,12 @@ class MeetingRoomRecorder {
     this.mediaStreamAudioSourceNode = mediaStreamAudioSourceNode;
   };
 
-  removeTrack = (track) => {
-    //this.recorder?.stream?.removeTrack(track);
+  removeTrack = (id) => {
+    if(this.audioTracks.has(id)) {
+      let track = this.audioTracks.get(id);
+      track.stop();
+      this.audioTracks.delete(id);
+    }
   };
 
   handleRecordingDataAvailable = (e) => {

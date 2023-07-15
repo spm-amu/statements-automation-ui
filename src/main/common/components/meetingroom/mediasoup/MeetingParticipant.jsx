@@ -305,7 +305,7 @@ const MeetingParticipant = (props) => {
 
     audioRef.current = stream;
     if (props.isHost && type === 'audio') {
-      mediaRecorder.addTrack(track);
+      mediaRecorder.addTrack(props.data.userId, track);
       tracks.current.setAudioTrack(track);
     }
 
@@ -365,7 +365,7 @@ const MeetingParticipant = (props) => {
     }
 
     if (props.isHost && type === 'audio') {
-      mediaRecorder.removeTrack(tracks.current.getAudioTrack());
+      mediaRecorder.removeTrack(props.data.userId);
     }
   };
 
@@ -407,7 +407,7 @@ const MeetingParticipant = (props) => {
         audioElement.srcObject.getTracks().forEach(function (track) {
           track.stop();
           if (mediaRecorder) {
-            mediaRecorder.removeTrack(track);
+            mediaRecorder.removeTrack(props.data.userId);
           }
         });
 
@@ -445,7 +445,7 @@ const MeetingParticipant = (props) => {
               document.getElementById('meeting-audio-el-container').appendChild(audioElement);
 
               if (props.isHost) {
-                mediaRecorder.addTrack(stream.getAudioTracks()[0]);
+                mediaRecorder.addTrack(props.data.userId, stream.getAudioTracks()[0]);
               }
             }
           }
