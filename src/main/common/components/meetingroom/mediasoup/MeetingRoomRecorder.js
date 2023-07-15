@@ -20,9 +20,6 @@ class MeetingRoomRecorder {
   init = async (meetingId, meetingTitle) => {
     this.meetingId = meetingId;
     this.meetingTitle = meetingTitle;
-    this.createMediaRecorder().then((recorder) => {
-      this.recorder = recorder;
-    })
   };
 
   addTrack = (id, track) => {
@@ -30,11 +27,6 @@ class MeetingRoomRecorder {
     this.audioTracks.set(id, track);
 
     let tracks = [];
-    if(this.recorder && this.recorder.stream && this.recorder.stream.getVideoTracks()?.length > 0) {
-      console.log("KEEPING VIDEO TRACK");
-      tracks.push(this.recorder.stream.getVideoTracks()[0])
-    }
-
     for (const value of this.audioTracks.values()) {
       tracks.push(value);
     }
@@ -53,8 +45,6 @@ class MeetingRoomRecorder {
 
   removeTrack = (id) => {
     if(this.audioTracks.has(id)) {
-      let track = this.audioTracks.get(id);
-      track.stop();
       this.audioTracks.delete(id);
     }
   };
@@ -118,7 +108,8 @@ class MeetingRoomRecorder {
     }
   };
 
-  recordMeeting = () => {
+  recordMeeting = async() => {
+    this.recorder = await this.createMediaRecorder();
     let _this = this;
     if (this.recorder != null) {
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
@@ -142,7 +133,6 @@ class MeetingRoomRecorder {
   stopRecordingMeeting = () => {
     try {
       this.isRecording = false;
-
       socketManager.emitEvent(MessageType.TOGGLE_RECORD_MEETING, {
         roomID: this.meetingId,
         isRecording: false
@@ -150,10 +140,11 @@ class MeetingRoomRecorder {
       });
 
       if (this.recorder && this.recorder.state === 'recording') {
-        this.recorder.stop();
         if(this.recorder.stream?.getVideoTracks()?.length > 0) {
           this.recorder.stream?.getVideoTracks()[0].stop();
         }
+
+        this.recorder.stop();
       }
     } catch (e) {
       console.error(e);
