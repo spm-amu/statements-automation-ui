@@ -26,21 +26,23 @@ class MeetingRoomRecorder {
     console.log("ADDING TRACK FOR : " + id);
     this.audioTracks.set(id, track);
 
-    let tracks = [];
-    for (const value of this.audioTracks.values()) {
-      tracks.push(value);
+    if (this.recorder && this.recorder.state === 'recording') {
+      let tracks = [];
+      for (const value of this.audioTracks.values()) {
+        tracks.push(value);
+      }
+
+      console.log("INITIALIZING STREAM WITH : " + tracks.length + " TRACKS");
+      let mediaStream = new MediaStream(tracks);
+      const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
+        this.audioContext,
+        {mediaStream: mediaStream}
+      );
+
+      mediaStreamAudioSourceNode.connect(this.mediaStreamAudioDestinationNode);
+      this.mediaStreamAudioSourceNode.disconnect();
+      this.mediaStreamAudioSourceNode = mediaStreamAudioSourceNode;
     }
-
-    console.log("INITIALIZING STREAM WITH : " + tracks.length + " TRACKS");
-    let mediaStream = new MediaStream(tracks);
-    const mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
-      this.audioContext,
-      { mediaStream: mediaStream }
-    );
-
-    mediaStreamAudioSourceNode.connect(this.mediaStreamAudioDestinationNode);
-    this.mediaStreamAudioSourceNode.disconnect();
-    this.mediaStreamAudioSourceNode = mediaStreamAudioSourceNode;
   };
 
   removeTrack = (id) => {
@@ -184,10 +186,17 @@ class MeetingRoomRecorder {
 
                 let audioContext = new AudioContext();
                 let mediaStreamAudioDestinationNode = new MediaStreamAudioDestinationNode(audioContext);
-                let initialMediaStream = new MediaStream([
+
+                let tracks = [
                   mediaStreamAudioDestinationNode.stream.getAudioTracks()[0],
                   stream.getVideoTracks()[0]
-                ]);
+                ];
+
+                for (const value of this.audioTracks.values()) {
+                  tracks.push(value);
+                }
+
+                let initialMediaStream = new MediaStream(tracks);
 
                 const recorder = new MediaRecorder(initialMediaStream, options);
                 let mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
