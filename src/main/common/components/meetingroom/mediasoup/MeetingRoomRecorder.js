@@ -29,6 +29,7 @@ class MeetingRoomRecorder {
     if (this.recorder && this.recorder.state === 'recording') {
       let tracks = [];
       for (const value of this.audioTracks.values()) {
+        this.mediaStreamAudioDestinationNode.stream.addTrack(value);
         tracks.push(value);
       }
 
@@ -193,9 +194,11 @@ class MeetingRoomRecorder {
                 ];
 
                 for (const value of this.audioTracks.values()) {
+                  mediaStreamAudioDestinationNode.stream.addTrack(value);
                   tracks.push(value);
                 }
 
+                console.log("INIT WITH TRACKS : ", tracks);
                 let initialMediaStream = new MediaStream(tracks);
 
                 const recorder = new MediaRecorder(initialMediaStream, options);
