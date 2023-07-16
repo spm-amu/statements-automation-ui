@@ -49,7 +49,8 @@ const Toolbar = (props) => {
     handRaised,
     isHost,
     someoneSharing,
-    videoDisabled
+    videoDisabled,
+    audioDisabled
   } = props;
 
   useEffect(() => {
@@ -235,7 +236,7 @@ const Toolbar = (props) => {
               </Tooltip>
             }
             {
-              (step === 'SESSION' || step === 'LOBBY') &&
+              (step === 'SESSION' || step === 'LOBBY') && !audioDisabled &&
               <Tooltip title="Audio">
                 <IconButton
                   onClick={() => {

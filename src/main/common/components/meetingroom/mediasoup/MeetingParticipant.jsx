@@ -55,6 +55,7 @@ const MeetingParticipant = (props) => {
   const [handRaised, setHandRaised] = React.useState(false);
   const [videoMuted, setVideoMuted] = React.useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = React.useState(props.audioMuted);
+  const [producerTransport, setProducerTransport] = React.useState(props.producerTransport);
   const [videoRefresher, setVideoRefresher] = React.useState(false);
   const [producers] = React.useState(new Map());
   const [failedProducersDueToNullTransport] = React.useState([]);
@@ -68,7 +69,7 @@ const MeetingParticipant = (props) => {
   const tracks = useRef(new Tracks());
   const soundLevelCounter = useRef(0);
   const showVideo = true;
-  const {consumerTransport, producerTransport, device} = props;
+  const {consumerTransport, device} = props;
   const {numberOfInViewParticipants} = props;
 
   const handler = () => {
@@ -206,6 +207,10 @@ const MeetingParticipant = (props) => {
   }, [producerTransport]);
 
   useEffect(() => {
+    setProducerTransport(props.producerTransport);
+  }, [props.producerTransport]);
+
+  useEffect(() => {
     if (consumerTransport) {
       console.log("TRANSI ARRIVED WITH PRODUCERS : ", props.data.producers);
       if (props.data.producers) {
@@ -229,10 +234,33 @@ const MeetingParticipant = (props) => {
     }
   }, [consumerTransport]);
 
+  const createProducerTransport = async () => {
+    setProducerTransport(await mediaSoupHelper.initProducerTransport(props.device, props.meetingId, appManager.getUserDetails().userId))
+  };
+
   useEffect(() => {
     appManager.removeSubscriptions(systemEventHandler);
     appManager.addSubscriptions(systemEventHandler, SystemEventType.AUDIO_VISUAL_SETTINGS_CHANGED);
     socketManager.addSubscriptions(eventHandler, MessageType.RAISE_HAND, MessageType.LOWER_HAND, MessageType.NEW_PRODUCERS, MessageType.CONSUMER_CLOSED);
+
+    if(props.isCurrentUser) {
+      navigator.mediaDevices.ondevicechange = () => {
+        navigator.mediaDevices.enumerateDevices().then((devices) => {
+            devices.forEach((device) => {
+              if ('audioinput' === device.kind) {
+                props.onNewAudioDevice();
+                stopProducing('audio');
+                if(!producerTransport) {
+                  createProducerTransport();
+                } else if(!audioMuted) {
+                  produce('audio');
+                }
+              }
+            });
+          }
+        );
+      };
+    }
 
     return () => {
       console.log("======================DESTROYING PARTICIPANT========================= : " + props.data.userId);

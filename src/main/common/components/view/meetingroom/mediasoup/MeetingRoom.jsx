@@ -44,6 +44,7 @@ const MeetingRoom = (props) => {
   const [videoMuted, setVideoMuted] = useState(props.videoMuted);
   const [audioMuted, setAudioMuted] = useState(props.audioMuted);
   const [videoDisabled] = useState(props.videoDisabled);
+  const [audioDisabled, setAudioDisabled] = useState(props.audioDisabled);
   const [handRaised, setHandRaised] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [screenShared, setScreenShared] = useState(null);
@@ -945,6 +946,7 @@ const MeetingRoom = (props) => {
                                       rtpCapabilities={rtpCapabilities}
                                       onloadScreenShareData={onloadScreenShareData}
                                       allUserParticipantsLeft={allUserParticipantsLeft}
+                                      onNewAudioDevice={() => setAudioDisabled(false)}
                                       onHostAudioMute={(participant) => {
                                         changeOtherParticipantAVSettings(participant.userId, true, participant.videoMuted);
                                       }}
@@ -1047,6 +1049,7 @@ const MeetingRoom = (props) => {
                   hasUnseenWhiteboardEvent={hasUnseenWhiteboardEvent}
                   participants={participants}
                   videoDisabled={videoDisabled}
+                  audioDisabled={audioDisabled}
                   videoMuted={videoMuted}
                   handRaised={handRaised}
                   isRecording={isRecording}

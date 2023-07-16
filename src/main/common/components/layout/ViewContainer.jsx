@@ -226,6 +226,7 @@ const ViewContainer = (props) => {
               videoMuted={attributes.current.data.videoMuted}
               audioMuted={attributes.current.data.audioMuted}
               videoDisabled={attributes.current.data.videoDisabled}
+              audioDisabled={attributes.current.data.audioDisabled}
               isHost={attributes.current.data.isHost}
               autoPermit={attributes.current.data.autoPermit}
               isDirectCall={attributes.current.data.isDirectCall}

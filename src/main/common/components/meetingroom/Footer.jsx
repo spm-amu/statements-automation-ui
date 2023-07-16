@@ -21,6 +21,7 @@ const Footer = (props) => {
     autoPermit,
     someoneSharing,
     videoDisabled,
+    audioDisabled,
     isRecording
   } = props;
 
@@ -59,6 +60,7 @@ const Footer = (props) => {
                    userVideo={userVideo}
                    userStream={userStream}
                    videoDisabled={videoDisabled}
+                   audioDisabled={audioDisabled}
                    videoMuted={videoMuted}
                    audioMuted={audioMuted}
                    displayState={displayState}

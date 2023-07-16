@@ -16,6 +16,7 @@ const MeetingSettings = (props) => {
   const userVideo = useRef();
   const [stream, setStream] = useState();
   const [videoOptionDisabled, setVideoOptionDisabled] = useState(false);
+  const [audioOptionDisabled, setAudioOptionDisabled] = useState(false);
   const [videoMuted, setVideoMuted] = useState(true);
   const [audioMuted, setAudioMuted] = useState(true);
   const [autoPermit, setAutoPermit] = useState(true);
@@ -25,16 +26,23 @@ const MeetingSettings = (props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let videoDisabled = false;
-    navigator.mediaDevices.enumerateDevices().then((devices) =>
-      devices.forEach((device) => {
-        if ('videoinput' === device.kind) {
-          videoDisabled = true;
-        }
-      })
+    let videoDisabled = true;
+    let audioDisabled = true;
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+        devices.forEach((device) => {
+          if ('videoinput' === device.kind) {
+            videoDisabled = false;
+          }
+          if ('audioinput' === device.kind) {
+            audioDisabled = false;
+          }
+        });
+
+        setVideoOptionDisabled(videoDisabled);
+        setAudioOptionDisabled(audioDisabled);
+      }
     );
 
-    setVideoOptionDisabled(videoDisabled);
     return () => {
       closeStreams();
     };
@@ -115,6 +123,7 @@ const MeetingSettings = (props) => {
         videoMuted: videoMuted,
         audioMuted: audioMuted,
         videoDisabled: videoOptionDisabled,
+        audioDisabled: audioOptionDisabled,
         isHost,
         autoPermit: autoPermit
       }
@@ -140,7 +149,7 @@ const MeetingSettings = (props) => {
             <tr>
               <td>
                 {
-                  videoOptionDisabled &&
+                  (videoOptionDisabled || audioOptionDisabled) &&
                   <Alert severity="warning" style={
                     {
                       color: 'rgb(235, 63, 33)',
@@ -150,8 +159,14 @@ const MeetingSettings = (props) => {
                       width: 'calc(100% - 32px)'
                     }
                   }>
-                    No video camera available. You may join the
-                    meeting without video
+                    {
+                      videoOptionDisabled &&
+                      <span>No video camera available </span>
+                    }
+                    {
+                      audioOptionDisabled &&
+                      <span>No audio device available</span>
+                    }
                   </Alert>
                 }
               </td>
@@ -205,7 +220,7 @@ const MeetingSettings = (props) => {
                   onChange={(e, value) => {
                     muteVideo();
                   }}
-                  disabled={videoOptionDisabled || videoOptionDisabled === null}
+                  disabled={videoOptionDisabled}
                   value={videoMuted}
                   checked={!videoMuted}
                   color="primary"
@@ -221,6 +236,7 @@ const MeetingSettings = (props) => {
                   onChange={(e, value) => {
                     muteAudio();
                   }}
+                  disabled={audioOptionDisabled}
                   value={audioMuted}
                   checked={!audioMuted}
                   color="primary"
@@ -246,7 +262,6 @@ const MeetingSettings = (props) => {
               <td style={{textAlign: 'right'}}>
                 <Button
                   variant={'contained'}
-                  disabled={videoOptionDisabled === null}
                   size="large"
                   style={{color: '#FFFFFF', backgroundColor: '#198754', borderRadius: '4px', marginRight: '2px'}}
                   onClick={(e) => {

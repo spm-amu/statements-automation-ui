@@ -628,6 +628,7 @@ const MeetingParticipantGrid = (props) => {
                                     meetingTitle={meetingTitle}
                                     rtpCapabilities={rtpCapabilities}
                                     isCurrentUser={true}
+                                    onNewAudioDevice={props.onNewAudioDevice}
                                     consumerTransport={consumerTransport}
                                     producerTransport={producerTransport}
                                     audioMuted={audioMuted}
