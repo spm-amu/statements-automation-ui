@@ -904,6 +904,41 @@ const BasicBusinessAppDashboard = (props) => {
                 <div data={activeColor} className={'h-100'}>
                   <div className={'content h-100'}>
                     <div className={'h-100'}>
+                      <div style={{
+                        padding: '0 32px 0 32px',
+                        maxHeight: '64px',
+                        width: '90%',
+                        zIndex: '1200',
+                        position: 'absolute'
+                      }}>
+                        <Alert
+                          variant={'danger'}
+                          show={errorMessage !== null}
+                          fade={true}
+                          onClose={() => {
+                            setErrorMessage(null)
+                          }}
+                          dismissible
+                        >
+                          <Alert.Heading>Error</Alert.Heading>
+                          <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{errorMessage}</p>
+                        </Alert>
+                        <Alert
+                          variant={'success'}
+                          show={successMessage !== null}
+                          fade={true}
+                        >
+                          <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{successMessage}</p>
+                        </Alert>
+
+                        <Alert
+                          variant={'danger'}
+                          show={activityMessage !== null}
+                          fade={true}
+                        >
+                          <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>{activityMessage}</p>
+                        </Alert>
+                      </div>
                       <ViewPort/>
                     </div>
                   </div>
