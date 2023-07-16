@@ -20,7 +20,8 @@ const Footer = (props) => {
     isHost,
     autoPermit,
     someoneSharing,
-    videoDisabled
+    videoDisabled,
+    isRecording
   } = props;
 
   useEffect(() => {
@@ -66,6 +67,7 @@ const Footer = (props) => {
                    autoPermit={autoPermit}
                    someoneSharing={someoneSharing}
                    screenShared={screenShared}
+                   isRecording={isRecording}
           />
         </div>
         {

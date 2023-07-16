@@ -8,6 +8,7 @@ import appManager from "../../service/AppManager";
 import Button from '@material-ui/core/Button';
 import AlertDialog from "../AlertDialog";
 import LottieIcon from '../LottieIcon';
+import peerManager from "../../service/simplepeer/PeerManager";
 
 const MeetingRoomToolbar = (props) => {
 
@@ -18,6 +19,7 @@ const MeetingRoomToolbar = (props) => {
   const [isRecording, setIsRecording] = useState(false);
   const [remainingTime, setRemainingTime] = useState();
   const [socketEventHandler] = useState({});
+  const [systemEventHandler] = useState({});
 
   const handler = () => {
     return {
@@ -31,6 +33,22 @@ const MeetingRoomToolbar = (props) => {
             break;
           case MessageType.TOGGLE_RECORD_MEETING:
             onRecording(be.payload);
+            break;
+        }
+      }
+    }
+  };
+
+  const systemEventHandlerApi = () => {
+    return {
+      get id() {
+        return 'meeting-room-toolbar-system-event-handler-api';
+      },
+      on: (eventType, be) => {
+        switch (eventType) {
+          case SystemEventType.SOCKET_DISCONNECT:
+            alert(123);
+            setIsRecording(false);
             break;
         }
       }
@@ -63,10 +81,12 @@ const MeetingRoomToolbar = (props) => {
 
   useEffect(() => {
     socketEventHandler.api = handler();
+    systemEventHandler.api = systemEventHandlerApi();
   });
 
   useEffect(() => {
     socketManager.addSubscriptions(socketEventHandler, MessageType.CHANGE_HOST, MessageType.TOGGLE_RECORD_MEETING);
+    appManager.addSubscriptions(systemEventHandler, SystemEventType.SOCKET_DISCONNECT);
     socketManager.emitEvent(MessageType.POLL_RECORDING_STATUS, {
       roomID: selectedMeeting.id
     }).catch((error) => {
@@ -81,6 +101,7 @@ const MeetingRoomToolbar = (props) => {
   useEffect(() => {
     return () => {
       socketManager.removeSubscriptions(socketEventHandler);
+      appManager.removeSubscriptions(systemEventHandler);
     };
   }, []);
 

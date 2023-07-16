@@ -56,6 +56,10 @@ const Toolbar = (props) => {
     setScreenShared(props.screenShared);
   }, [props.screenShared]);
 
+  useEffect(() => {
+    setIsRecording(props.isRecording);
+  }, [props.isRecording]);
+
   const onRaiseHand = (payload) => {
     setNumberOfHandsRaised(numberOfHandsRaised + 1);
   };
