@@ -2,7 +2,6 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
 import './MeetingParticipantGrid.css';
 import LobbyWaitingList from "../LobbyWaitingList";
-import Lobby from "../Lobby";
 import Grid from "@material-ui/core/Grid";
 import MeetingParticipant from "../mediasoup/MeetingParticipant";
 import Box from "@material-ui/core/Box";
@@ -142,7 +141,7 @@ const MeetingParticipantGrid = (props) => {
       setShareScreenSource(null);
       setScreenShared(false);
 
-      if(shareScreenStream.current) {
+      if (shareScreenStream.current) {
         for (const track of shareScreenStream.current.getTracks()) {
           track.stop();
         }
@@ -314,7 +313,7 @@ const MeetingParticipantGrid = (props) => {
     }, [screenShared, shareScreenSource]);
 
     useEffect(() => {
-      if(onloadScreenShareData && device && consumerTransport) {
+      if (onloadScreenShareData && device && consumerTransport) {
         consume(onloadScreenShareData);
       }
     }, [onloadScreenShareData, device, consumerTransport]);
@@ -609,7 +608,10 @@ const MeetingParticipantGrid = (props) => {
             display: 'flex',
             alignItems: 'center'
           }}>
-            <div style={{width: 'calc(100% - 232px)', height: '148px'}}>
+            <div style={{
+              width: 'calc(100% - 232px)', height: '148px', borderRadius: '4px', marginRight: '16px', paddingLeft: '16px',
+              backgroundColor: (((screenShared && showSharedScreen) || whiteBoardShown || step === "LOBBY" || someoneSharing) && grid) ? '#00476a' : null
+            }}>
               {
                 (((screenShared && showSharedScreen) || whiteBoardShown || step === "LOBBY" || someoneSharing) && grid) &&
                 <div style={{width: '100%', height: '100%'}}>
