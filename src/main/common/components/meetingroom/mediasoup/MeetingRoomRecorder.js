@@ -1,4 +1,5 @@
 import socketManager from "../../../service/SocketManager";
+import appManager from "../../../service/AppManager";
 import {MessageType} from "../../../types";
 
 const {electron} = window;
@@ -51,6 +52,7 @@ class MeetingRoomRecorder {
       });
 
       const data = {
+        userId: appManager.getUserDetails().userId,
         meetingId: this.meetingId,
         name: this.meetingTitle,
         type: blob.type,

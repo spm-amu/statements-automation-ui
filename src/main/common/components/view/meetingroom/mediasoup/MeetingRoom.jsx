@@ -195,6 +195,10 @@ const MeetingRoom = (props) => {
             }
 
             setStep(Steps.CONNECTION_ERROR);
+            if(isRecording) {
+              stopRecordingMeeting();
+            }
+
             break;
         }
       }
