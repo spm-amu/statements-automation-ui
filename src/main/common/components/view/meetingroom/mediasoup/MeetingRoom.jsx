@@ -9,7 +9,7 @@ import peerManager from "../../../../service/simplepeer/PeerManager";
 import socketManager from "../../../../service/SocketManager";
 import MeetingRoomSideBarContent from "../../../meetingroom/SideBarContent";
 import ClosablePanel from "../../../layout/ClosablePanel";
-import Utils from "../../../../Utils";
+import Utils, {CONNECTION_ERROR_MESSAGE, STREAM_ERROR_MESSAGE, SYSTEM_ERROR_MESSAGE} from "../../../../Utils";
 import MeetingParticipantGrid from "../../../meetingroom/mediasoup/MeetingParticipantGrid";
 import {get, post} from "../../../../service/RestService";
 import SelectScreenShareDialog from "../../../SelectScreenShareDialog";
@@ -195,7 +195,7 @@ const MeetingRoom = (props) => {
             }
 
             setStep(Steps.CONNECTION_ERROR);
-            if(isRecording) {
+            if (isRecording) {
               stopRecordingMeeting(false);
             }
 
@@ -302,7 +302,7 @@ const MeetingRoom = (props) => {
     document.addEventListener("sideBarToggleEvent", handleSidebarToggle);
     appManager.add('CURRENT_MEETING', selectedMeeting);
 
-    if(isHost) {
+    if (isHost) {
       mediaRecorder.init(selectedMeeting.id, selectedMeeting.title);
     }
 
@@ -655,7 +655,7 @@ const MeetingRoom = (props) => {
   const stopRecordingMeeting = (publish = true) => {
     setIsRecording(false);
 
-    if(publish) {
+    if (publish) {
       emitSystemEvent("MEETING_RECORDING", {
         recording: false,
         userId: appManager.getUserDetails().userId
@@ -712,7 +712,7 @@ const MeetingRoom = (props) => {
   };
 
   const onCallEnded = (showMessage = true, data = null) => {
-    if(data && data.reject) {
+    if (data && data.reject) {
       handleMessageArrived({
         message: data.reason
       });
@@ -831,7 +831,7 @@ const MeetingRoom = (props) => {
     post(
       `${appManager.getAPIHost()}/api/v1/meeting/changeHost`,
       (response) => {
-        if(isRecording) {
+        if (isRecording) {
           stopRecordingMeeting();
         }
 
@@ -894,6 +894,33 @@ const MeetingRoom = (props) => {
                          rejectUser(item);
                        }}
               />
+            }
+            {
+              step === Steps.SYSTEM_ERROR &&
+              <div style={{
+                backgroundColor: 'rgb(40, 40, 43)',
+                color: 'rgb(235, 63, 33)',
+                fontSize: '24px',
+                width: '100%',
+                height: '100%'
+              }} className={'centered-flex-box'}>
+                {SYSTEM_ERROR_MESSAGE}
+              </div>
+            }
+            {
+              step === Steps.CONNECTION_ERROR &&
+              <div style={{
+                backgroundColor: 'rgb(40, 40, 43)',
+                color: 'rgb(235, 63, 33)',
+                fontSize: '24px',
+                width: '100%',
+                height: '100%'
+              }} className={'centered-flex-box'}>
+                <div>
+                  {/*<LottieIcon id={'waiting'}/>*/}
+                  {CONNECTION_ERROR_MESSAGE}
+                </div>
+              </div>
             }
             {
               step === Steps.SESSION &&
