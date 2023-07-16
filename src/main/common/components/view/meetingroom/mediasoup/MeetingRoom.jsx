@@ -196,7 +196,7 @@ const MeetingRoom = (props) => {
 
             setStep(Steps.CONNECTION_ERROR);
             if(isRecording) {
-              stopRecordingMeeting();
+              stopRecordingMeeting(false);
             }
 
             break;
@@ -652,12 +652,15 @@ const MeetingRoom = (props) => {
     mediaRecorder.recordMeeting();
   };
 
-  const stopRecordingMeeting = () => {
+  const stopRecordingMeeting = (publish = true) => {
     setIsRecording(false);
-    emitSystemEvent("MEETING_RECORDING", {
-      recording: false,
-      userId: appManager.getUserDetails().userId
-    });
+
+    if(publish) {
+      emitSystemEvent("MEETING_RECORDING", {
+        recording: false,
+        userId: appManager.getUserDetails().userId
+      });
+    }
 
     mediaRecorder.stopRecordingMeeting();
   };
