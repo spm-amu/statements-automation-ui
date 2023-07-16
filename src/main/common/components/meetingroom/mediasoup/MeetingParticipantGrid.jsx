@@ -610,7 +610,7 @@ const MeetingParticipantGrid = (props) => {
           }}>
             <div style={{
               width: 'calc(100% - 232px)', height: '148px', borderRadius: '4px', marginRight: '16px', paddingLeft: '16px',
-              backgroundColor: (((screenShared && showSharedScreen) || whiteBoardShown || step === "LOBBY" || someoneSharing) && grid) ? '#00476a' : null
+              backgroundColor: (((screenShared && showSharedScreen) || whiteBoardShown || step === "LOBBY" || someoneSharing) && grid) ? 'rgba(40, 40, 43, .9)' : null
             }}>
               {
                 (((screenShared && showSharedScreen) || whiteBoardShown || step === "LOBBY" || someoneSharing) && grid) &&
