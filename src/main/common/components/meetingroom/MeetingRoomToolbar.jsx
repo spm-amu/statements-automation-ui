@@ -47,7 +47,6 @@ const MeetingRoomToolbar = (props) => {
       on: (eventType, be) => {
         switch (eventType) {
           case SystemEventType.SOCKET_DISCONNECT:
-            alert(123);
             setIsRecording(false);
             break;
         }
