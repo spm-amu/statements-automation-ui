@@ -824,6 +824,10 @@ const MeetingRoom = (props) => {
     post(
       `${appManager.getAPIHost()}/api/v1/meeting/changeHost`,
       (response) => {
+        if(isRecording) {
+          stopRecordingMeeting();
+        }
+
         socketManager.emitEvent(MessageType.CHANGE_HOST, {
           roomID: selectedMeeting.id,
           host: participant.userId,
