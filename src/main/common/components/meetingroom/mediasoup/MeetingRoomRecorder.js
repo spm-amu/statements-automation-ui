@@ -184,11 +184,20 @@ class MeetingRoomRecorder {
                   stream.getVideoTracks()[0]
                 ];
 
-                for (const value of this.audioTracks.values()) {
-                  tracks.push(value);
+                if(this.audioTracks.size > 0) {
+                  for (const value of this.audioTracks.values()) {
+                    tracks.push(value);
+                    let mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
+                      audioContext,
+                      {mediaStream: new MediaStream([value])}
+                    );
+
+                    mediaStreamAudioSourceNode.connect(mediaStreamAudioDestinationNode);
+                  }
+                } else {
                   let mediaStreamAudioSourceNode = new MediaStreamAudioSourceNode(
                     audioContext,
-                    { mediaStream: new MediaStream([value]) }
+                    { mediaStream: new MediaStream(tracks) }
                   );
 
                   mediaStreamAudioSourceNode.connect(mediaStreamAudioDestinationNode);
