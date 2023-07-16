@@ -256,7 +256,7 @@ const CalendarComponent = (props) => {
             </div>
             <div style={{marginTop: '16px'}}>
               {
-                moment(new Date()).startOf('day') <= moment(selectedEvent.start).startOf('day') &&
+                moment(new Date()).startOf('day') <= moment(selectedEvent.start).startOf('day') && !appManager.get('CURRENT_MEETING') &&
                 <Button
                   variant={'contained'}
                   size="large"
