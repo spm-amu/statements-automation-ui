@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <!--[if !mso]>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <![endif]-->
+  <meta name="x-apple-disable-message-reformatting">
+  <!--[if mso]>
+  <style>
+    * { font-family: sans-serif !important; }
+  </style>
+  <![endif]-->
+  <!--[if !mso]><!-->
+  <!-- Insert font reference, e.g. <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet"> -->
+  <!--<![endif]-->
+  <style>
+    *,
+    *:after,
+    *:before {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    * {
+      -ms-text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
+      font-family: Arial,sans-serif;
+    }
+
+    html,
+    body {
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      background-color: #f7fbf9;
+    }
+
+    .outer {
+      background-color: #ffffff;
+      height: 100%;
+      width: 100%;
+      padding: 32px;
+    }
+
+    .inner {
+      background-color: #f4f7f8;
+      height: 100%;
+      width: 100%;
+    }
+
+    .top-left-img {
+      position: absolute;
+      margin: -32px 0 0 -32px;
+    }
+
+    .bottom-right-img {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      margin: 48px 0 0 32px;
+    }
+
+    .logo {
+      display: flex;
+      width: 100%;
+      justify-content: right;
+      padding: 16px;
+    }
+
+    .title {
+      width: 100%;
+      text-align: center;
+      font-size: 32px;
+      color: #945c33;
+      font-weight: 600;
+      padding: 64px;
+    }
+
+    .hr {
+      width: 100%;
+      border: 2px solid #7094a2;
+    }
+
+    td,
+    .description {
+      color: #01476C;
+      padding-left: 8px;
+      font-size: 24px;
+    }
+    table {
+      width: 100%;
+    }
+
+    .table-container {
+      padding: 32px;
+    }
+
+    .icon {
+      width: 20%;
+      text-align: center;
+    }
+
+    .description {
+      padding: 32px;
+    }
+
+    @media screen and (max-width: 750px) {
+    }
+  </style>
+</head>
+
+<body>
+<div style="overflow: hidden; width: 60%; height: 100%; min-width: 280px; margin: auto">
+  <div class='outer'>
+    <div class="inner">
+      <div class="top-left-img">
+        <img src="top-left.png"  alt="" height=150/>
+      </div>
+      <div class="logo">
+        <img src="armscor_connect_logo.png"  alt="" height=96/>
+      </div>
+      <div class="title">
+        ::title::
+      </div>
+      <div class="hr"></div>
+      <div class="table-container">
+        <table>
+          <tr>
+            <td class="icon">
+              <img src="calendar.png"  alt="" height=96/>
+            </td>
+            <td>
+              Date: ::startDate::
+            </td>
+          </tr>
+          <tr>
+            <td class="icon">
+              <img src="clock.png"  alt="" height=96/>
+            </td>
+            <td>
+              Time: ::startTime:: ::endTime::
+            </td>
+          </tr>
+          <tr>
+            <td class="icon">
+              <img src="building.png"  alt="" height=96/>
+            </td>
+            <td>
+              Location ::locations::
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="hr"></div>
+      <div class="table-container">
+        <table>
+          <tr>
+            <td class="icon">
+              <img src="computer.png"  alt="" height=96/>
+            </td>
+            <td>
+              ::passcode::
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="hr"></div>
+      <div class="description">
+        ::description::
+      </div>
+      <div class="bottom-right-img">
+        <img src="bottom-right.png"  alt="" height=48/>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
