@@ -421,8 +421,8 @@ const MeetingParticipantGrid = (props) => {
               <MeetingParticipant data={participant}
                                   device={device}
                                   meetingId={meetingId}
-                                  audioMuted={audioMuted}
-                                  videoMuted={videoMuted}
+                                  audioMuted={participant.audioMuted}
+                                  videoMuted={participant.videoMuted}
                                   onRemoveFromView={(participant) => removeFromView(participant)}
                                   consumerTransport={consumerTransport}
                                   rtpCapabilities={rtpCapabilities}
@@ -460,8 +460,8 @@ const MeetingParticipantGrid = (props) => {
                 <MeetingParticipant data={participant}
                                     device={device}
                                     meetingId={meetingId}
-                                    audioMuted={audioMuted}
-                                    videoMuted={videoMuted}
+                                    audioMuted={participant.audioMuted}
+                                    videoMuted={participant.videoMuted}
                                     onRemoveFromView={(participant) => removeFromView(participant)}
                                     consumerTransport={consumerTransport}
                                     numberOfInViewParticipants={inViewParticipants.length}
