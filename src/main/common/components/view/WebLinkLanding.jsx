@@ -56,7 +56,8 @@ const WebLinkLanding = (props) => {
       loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za");
     }*/
 
-    loadHost("http://ARMHOVC01/vc", "http://ARMHOVC01", false);
+    loadHost("http://ARMHOVC01/vc", "https://ARMHOVC01:38080", true);
+    // loadHost("https://svn.agilemotion.co.za/vc", "https://svn.agilemotion.co.za", true);
   };
 
   const openApp = () => {
@@ -182,24 +183,24 @@ const WebLinkLanding = (props) => {
               How do you want to join your Armscor meeting?
             </CardTitle>
 
-            <div className="card-wrapper card mb-3 mt-3">
-              <CardBody className={'card-body-wrapper'}>
-                <CardTitle tag="h4" className="mb-1" style={{color: '#00476a'}}>
-                  Continue on this browser
-                </CardTitle>
-                <CardText style={{color: '#00476a'}}>
-                  No download or installation required.
-                </CardText>
-                <Button
-                  onClick={() => continueOnBrowser()}
-                  style={{marginTop: '0.75rem'}}
-                  color={'primary'}
-                  variant={'outlined'}
-                >
-                  Continue
-                </Button>
-              </CardBody>
-            </div>
+            {/*<div className="card-wrapper card mb-3 mt-3">*/}
+            {/*  <CardBody className={'card-body-wrapper'}>*/}
+            {/*    <CardTitle tag="h4" className="mb-1" style={{color: '#00476a'}}>*/}
+            {/*      Continue on this browser*/}
+            {/*    </CardTitle>*/}
+            {/*    <CardText style={{color: '#00476a'}}>*/}
+            {/*      No download or installation required.*/}
+            {/*    </CardText>*/}
+            {/*    <Button*/}
+            {/*      onClick={() => continueOnBrowser()}*/}
+            {/*      style={{marginTop: '0.75rem'}}*/}
+            {/*      color={'primary'}*/}
+            {/*      variant={'outlined'}*/}
+            {/*    >*/}
+            {/*      Continue*/}
+            {/*    </Button>*/}
+            {/*  </CardBody>*/}
+            {/*</div>*/}
 
             <div className="card-wrapper card mb-3 mt-3">
               <CardBody className={'card-body-wrapper'}>
