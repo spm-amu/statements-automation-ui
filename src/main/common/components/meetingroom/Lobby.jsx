@@ -32,15 +32,26 @@ const Lobby = (props) => {
   }, []);
 
   useEffect(() => {
-    if(props.videoMuted) {
+    if (props.videoMuted) {
       stopVideoTracks();
     } else {
+      if (videoRef.current) {
+        navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS).then((stream) => {
+          videoRef.current.srcObject = stream;
+          streamRef.current = stream;
+        });
+      }
+    }
+  }, [props.videoMuted]);
+
+  useEffect(() => {
+    if (videoRef.current) {
       navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS).then((stream) => {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
       });
     }
-  }, [props.videoMuted]);
+  }, [videoRef.current]);
 
   return (
     <div style={{
@@ -130,7 +141,8 @@ const Lobby = (props) => {
         }
       </div>
       <div style={{width: '100%', display: 'flex', justifyContent: 'flex-end'}}>
-        <div style={{width: '200px', height: '148px', backgroundColor: 'rgb(40, 40, 43)'}} className={'centered-flex-box'}>
+        <div style={{width: '200px', height: '148px', backgroundColor: 'rgb(40, 40, 43)'}}
+             className={'centered-flex-box'}>
           {
             props.videoMuted &&
             <div

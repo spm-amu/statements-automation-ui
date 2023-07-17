@@ -411,7 +411,7 @@ const MeetingParticipantGrid = (props) => {
           }}
           className="row flex-row flex-nowrap">
           {inViewParticipants.map((participant, index) => {
-            return <div className={'col-*-*'} key={index}
+            return <div className={'col-*-*'}  key={index + "-" + participant.userId}
                         style={{
                           borderRadius: '4px',
                           minWidth: "200px",
