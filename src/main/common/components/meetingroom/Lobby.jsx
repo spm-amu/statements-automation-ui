@@ -35,22 +35,22 @@ const Lobby = (props) => {
     if (props.videoMuted) {
       stopVideoTracks();
     } else {
-      if (videoRef.current) {
         navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS).then((stream) => {
-          videoRef.current.srcObject = stream;
-          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            streamRef.current = stream;
+          }
         });
-      }
     }
   }, [props.videoMuted]);
 
   useEffect(() => {
-    if (videoRef.current) {
-      navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS).then((stream) => {
+    navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS).then((stream) => {
+      if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
-      });
-    }
+      }
+    });
   }, [videoRef.current]);
 
   return (
