@@ -1,11 +1,11 @@
 {
-  "name": "armscor_connect",
+  "name": "statements-automation",
   "version": "1.0.0",
-  "description": "Armscor Connect VC",
+  "description": "Statements Automation",
   "license": "MIT",
   "author": {
-    "name": "Agilemotion",
-    "email": "agilemotion@gmail.com"
+    "name": "Amukelani Shandlale",
+    "email": "amukelani.shandlale@absa.co.za"
   },
   "main": "./dist/main/main.js",
   "scripts": {

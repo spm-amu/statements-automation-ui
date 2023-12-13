@@ -17,7 +17,7 @@
       name="keywords"
       content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app"
     />
-    <title>Armscor Connect | Join Meeting</title>
+    <title>Statements Automation</title>
     <link rel="apple-touch-icon" href="./icon.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="./icon.ico" />
     <link
@@ -83,61 +83,6 @@
   >
     <!-- BEGIN: Content-->
     <div class="app-content content">
-      <div class="content-overlay"></div>
-      <div class="header-navbar-shadow"></div>
-      <div class="content-wrapper">
-        <div class="content-header row"></div>
-        <div class="content-body">
-          <div class="auth-wrapper auth-cover">
-            <div class="auth-inner row m-0">
-              <a class="brand-logo" href="join-meeting.html">
-                <img alt="..." src="armscor_logo.png" width="72px" />
-              </a>
-              <!-- /Brand logo-->
-              <!-- Left Text-->
-              <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
-                <div
-                  class="w-100 d-lg-flex align-items-center justify-content-center px-5"
-                >
-                  <img class="img-fluid" src="meet.svg" alt="Join Mr" />
-                </div>
-              </div>
-              <!-- /Left Text-->
-              <!-- verify email v2-->
-              <div
-                class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-5"
-              >
-                <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
-                  <h2 class="card-title fw-bolder mb-1">
-                    How do you want to join your Armscor meeting?
-                  </h2>
-
-                  <div class="card mb-3">
-                    <div class="card-body">
-                      <h4 class="card-title">Continue on this browser</h4>
-                      <p class="card-text">
-                        No download or installation required.
-                      </p>
-                      <button id='open-web' onc="http://localhost:1212/" class="btn btn-outline-primary">Continue</button>
-                    </div>
-                  </div>
-
-                  <div class="card mb-3">
-                    <div class="card-body">
-                      <h4 class="card-title">Open your Armscor App</h4>
-                      <p class="card-text">
-                        Already have it? Go right to your meeting.
-                      </p>
-                      <button id='open-app' onc="armscor-connect://" class="btn btn-outline-primary">Open App</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- verify email-->
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <script src="./assets/js/vendors.min.js"></script>
@@ -146,48 +91,6 @@
 
     <script src="./assets/js/app-menu.js"></script>
     <script src="./assets/js/app.js"></script>
-
-    <script>
-      $(function() {
-        $.urlParam = function(name){
-          const results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-          if (results==null) {
-            return null;
-          }
-          return decodeURI(results[1]) || 0;
-        };
-
-        $( "#open-app" ).click(function() {
-
-          const meetingId = $.urlParam('meetingId');
-          const accessToken = $.urlParam('accessToken');
-
-          window.location.href = `armscor-connect://meetingId=${meetingId}&accessToken=${accessToken}`;
-        });
-
-        $( window ).on( "load", function() {
-
-          console.log("on load app ...");
-          const meetingId = $.urlParam('meetingId');
-          const accessToken = $.urlParam('accessToken');
-
-          console.log("meetingId", meetingId);
-          console.log("accessToken", accessToken);
-
-          window.location.href = `armscor-connect://meetingId=${meetingId}&accessToken=${accessToken}`;
-        });
-
-        $( "#open-web" ).click(function() {
-
-          const meetingId = $.urlParam('meetingId');
-          const accessToken = $.urlParam('accessToken');
-          <!-- /#/webView -->
-          const webUrl = `http://localhost:1212/#/?meetingId=${meetingId}&accessToken=${accessToken}`;
-          window.open(webUrl);
-        });
-
-      });
-    </script>
   </body>
   <!-- END: Body-->
 </html>

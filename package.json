@@ -1,303 +1,98 @@
 {
-  "browser": {
-    "fs": false
-  },
-  "description": "A foundation for scalable desktop apps",
-  "keywords": [
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
-  ],
-  "homepage": "",
-  "license": "MIT",
-  "main": "./src/main/main.ts",
-  "scripts": {
-    "web:dev": "cross-env TARGET=web NODE_ENV=development webpack-dev-server --hot --open --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
-    "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
-    "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
-    "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
-    "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
-    "prepare": "husky install",
-    "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
-    "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
-    "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
-    "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
-    "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "test": "jest"
-  },
-  "browserslist": [],
-  "prettier": {
-    "singleQuote": true,
-    "overrides": [
-      {
-        "files": [
-          ".prettierrc"
-        ],
-        "options": {
-          "parser": "json"
-        }
-      }
+  "name": "@absa/statements-automation",
+  "version": "1.0.0",
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-proposal-class-properties"
+      ]
     ]
   },
-  "jest": {
-    "moduleDirectories": [
-      "node_modules",
-      "release/app/node_modules"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "ts",
-      "tsx",
-      "json"
-    ],
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/.erb/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
-    },
-    "setupFiles": [
-      "./.erb/scripts/check-build-exists.ts"
-    ],
-    "testEnvironment": "jsdom",
-    "testEnvironmentOptions": {
-      "url": "http://localhost/"
-    },
-    "testPathIgnorePatterns": [
-      "release/app/dist"
-    ],
-    "transform": {
-      "\\.(ts|tsx|js|jsx)$": "ts-jest"
-    }
-  },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
+    "@agilemotion/signi-vault-ui": "^1.0.2",
     "@date-io/date-fns": "^1.3.13",
-    "@exponent/electron-cookies": "^2.0.0",
-    "@fullcalendar/rrule": "^5.11.3",
-    "@material-ui/core": "^4.12.4",
-    "@material-ui/icons": "^4.11.3",
-    "@material-ui/lab": "^4.0.0-alpha.61",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
     "@material-ui/pickers": "^3.3.10",
-    "@material-ui/styles": "^4.11.5",
-    "@sentry/react": "^7.34.0",
-    "@sentry/tracing": "^7.34.0",
-    "@syncfusion/ej2": "^19.4.48",
-    "@syncfusion/ej2-react-calendars": "^19.4.48",
-    "@syncfusion/ej2-react-charts": "^19.4.50",
-    "@syncfusion/ej2-react-dropdowns": "^19.4.52",
-    "@syncfusion/ej2-react-grids": "^19.4.50",
-    "@syncfusion/ej2-react-inputs": "^19.4.52",
-    "@syncfusion/ej2-react-kanban": "^19.4.48",
-    "@syncfusion/ej2-react-popups": "^19.4.52",
-    "@syncfusion/ej2-react-richtexteditor": "^19.4.50",
-    "@syncfusion/ej2-react-schedule": "^19.4.50",
-    "body-parser": "^1.20.1",
-    "bootstrap": "^5.2.2",
-    "buffer": "^6.0.3",
+    "@material-ui/styles": "^4.11.3",
+    "async-mutex": "^0.2.6",
     "classnames": "^2.3.1",
-    "date-fns": "^2.29.2",
-    "electron-debug": "^3.2.0",
-    "electron-log": "^4.4.7",
-    "electron-store": "^8.1.0",
-    "electron-updater": "^5.0.3",
-    "eletron": "0.0.1-security",
-    "express": "^4.18.2",
-    "fs": "0.0.1-security",
-    "jquery": "^3.6.1",
-    "linkify-react": "^4.1.0",
-    "linkifyjs": "^4.1.0",
+    "connected-react-router": "^6.9.1",
+    "date-fns": "^2.21.0",
+    "handlebars": "^4.7.7",
+    "html-to-image": "^1.6.2",
+    "install": "^0.13.0",
+    "jquery": "^3.6.0",
+    "js-base64": "^3.6.0",
     "material-ui": "^0.20.2",
-    "mediasoup-client": "^3.6.89",
-    "mobx": "^6.6.2",
-    "moment": "^2.29.4",
-    "net": "^1.0.2",
-    "path": "^0.12.7",
-    "perfect-scrollbar": "^1.5.5",
-    "process": "^0.11.10",
-    "react": "^18.1.0",
-    "react-bootstrap": "^2.6.0",
-    "react-device-detect": "^2.2.2",
-    "react-dom": "^18.1.0",
-    "react-draggable": "^4.4.5",
-    "react-error-boundary": "^4.0.10",
-    "react-file-base64": "^1.0.3",
-    "react-html-renderer": "^0.3.3",
-    "react-icons": "^4.3.1",
-    "react-loader-spinner": "^5.3.4",
-    "react-lottie": "^1.2.3",
-    "react-pdf": "^7.1.2",
+    "mobx": "^5.15.4",
+    "npm": "^6.14.13",
+    "perfect-scrollbar": "^1.5.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-alert": "^7.0.0",
+    "react-bootstrap": "^1.5.2",
+    "react-bootstrap-switch": "^15.5.3",
+    "react-dom": "^16.13.1",
+    "react-google-autocomplete": "^2.4.0",
+    "react-html-renderer": "^0.3.2",
+    "react-inlinesvg": "1.2.0",
+    "react-loader-spinner": "^3.1.5",
+    "react-pdf": "^4.1.0",
     "react-promise-tracker": "^2.1.0",
-    "react-redux": "^8.0.2",
-    "react-router": "^6.3.0",
-    "react-router-dom": "^6.3.0",
-    "react-super-responsive-table": "^5.2.1",
-    "react-uuid": "^1.0.3",
-    "reactstrap": "^9.1.4",
-    "redux": "^4.2.0",
-    "rrule": "^2.7.1",
-    "simple-peer": "^9.11.1",
-    "socket.io-client": "^4.5.2",
-    "styled-components": "^5.3.6",
-    "url": "^0.11.0"
+    "react-redux": "^7.2.3",
+    "react-router": "^5.1.2",
+    "react-router-dom": "^5.1.2",
+    "react-router-redux": "^5.0.0-alpha.9",
+    "react-scripts": "^3.0.0",
+    "react-spring": "^8.0.27",
+    "react-super-responsive-table": "^5.2.0",
+    "reactstrap": "^8.9.0",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
+    "styled-components": "^5.2.3"
   },
   "devDependencies": {
-    "@fullcalendar/core": "^5.11.0",
-    "@fullcalendar/daygrid": "^5.11.0",
-    "@fullcalendar/interaction": "^5.11.0",
-    "@fullcalendar/list": "^5.11.0",
-    "@fullcalendar/react": "^5.11.1",
-    "@fullcalendar/timegrid": "^5.11.0",
-    "@fullcalendar/timeline": "^5.11.0",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.6",
-    "@reduxjs/toolkit": "^1.2.5",
-    "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.4.0",
-    "@types/jest": "^27.5.1",
-    "@types/node": "17.0.33",
-    "@types/react": "^18.0.19",
-    "@types/react-dom": "^18.0.4",
-    "@types/react-test-renderer": "^18.0.0",
-    "@types/terser-webpack-plugin": "^5.0.4",
-    "@types/webpack-bundle-analyzer": "^4.4.1",
-    "axios": "^0.27.2",
-    "axios-mock-adapter": "^1.20.0",
-    "browserslist-config-erb": "^0.0.3",
-    "chalk": "^4.1.2",
-    "concurrently": "^7.4.0",
-    "core-js": "^3.25.1",
-    "cross-env": "^7.0.3",
-    "css-loader": "^6.7.1",
-    "css-minimizer-webpack-plugin": "^3.4.1",
-    "detect-port": "^1.3.0",
-    "electron": "^23.1.4",
-    "electron-builder": "^23.6.0",
-    "electron-devtools-installer": "^3.2.0",
-    "electron-notarize": "^1.2.1",
-    "electron-rebuild": "^3.2.7",
-    "electronmon": "^2.0.2",
-    "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.0",
-    "husky": "^8.0.1",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^28.1.0",
-    "jest-environment-jsdom": "^28.1.0",
-    "lint-staged": "^12.4.1",
-    "mini-css-extract-plugin": "^2.6.0",
-    "prettier": "^2.6.2",
-    "react-error-overlay": "^6.0.9",
-    "react-feather": "~2.0.3",
-    "react-flatpickr": "^3.10.12",
-    "react-hook-form": "^7.39.2",
-    "react-hot-toast": "2.2.0",
-    "react-perfect-scrollbar": "^1.5.8",
-    "react-refresh": "^0.13.0",
-    "react-select": "^5.3.2",
-    "react-test-renderer": "^18.1.0",
-    "rimraf": "^3.0.2",
-    "sass": "^1.54.9",
-    "sass-loader": "^12.6.0",
-    "style-loader": "^3.3.1",
-    "terser-webpack-plugin": "^5.3.6",
-    "ts-jest": "^28.0.2",
-    "ts-loader": "^9.3.0",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.8.3",
-    "url-loader": "^4.1.1",
-    "webpack": "^5.75.0",
-    "webpack-bundle-analyzer": "^4.6.1",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.11.0",
-    "webpack-merge": "^5.8.0"
+    "@babel/cli": "^7.13.14",
+    "@babel/preset-react": "^7.13.13",
+    "gulp": "4.0.2",
+    "gulp-append-prepend": "1.0.8",
+    "sass": "^1.64.2"
   },
-  "build": {
-    "productName": "Armscor Connect",
-    "appId": "armscode.connect",
-    "protocols": {
-      "name": "armscor-deep-linking",
-      "schemes": [
-        "armscor-connect"
-      ]
-    },
-    "asar": true,
-    "asarUnpack": "**\\*.{node,dll}",
-    "files": [
-      "dist",
-      "node_modules",
-      "package.json"
-    ],
-    "afterSign": ".erb/scripts/notarize.js",
-    "mac": {
-      "target": {
-        "target": "default",
-        "arch": [
-          "arm64",
-          "x64"
-        ]
-      },
-      "extendInfo": {
-        "NSMicrophoneUsageDescription": "Please give us access to your microphone",
-        "NSCameraUsageDescription": "Please give us access to your camera",
-        "com.apple.security.device.audio-input": true,
-        "com.apple.security.device.camera": true
-      },
-      "type": "distribution",
-      "hardenedRuntime": true,
-      "entitlements": "assets/entitlements.mac.plist",
-      "entitlementsInherit": "assets/entitlements.mac.plist",
-      "gatekeeperAssess": false
-    },
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "win": {
-      "target": [
-        "nsis"
-      ]
-    },
-    "linux": {
-      "target": [
-        "AppImage"
-      ],
-      "category": "Development"
-    },
-    "directories": {
-      "app": "release/app",
-      "buildResources": "assets",
-      "output": "release/build"
-    },
-    "extraResources": [
-      "./assets/**"
-    ],
-    "publish": {
-      "provider": "github",
-      "owner": "",
-      "repo": ""
-    }
+  "scripts": {
+    "publish:npm": "rm -rf dist && mkdir dist &&  babel src/lib -d dist --copy-files",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
   },
-  "devEngines": {
-    "node": ">=14.x",
-    "npm": ">=7.x"
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "optionalDependencies": {
+    "@types/googlemaps": "3.39.3",
+    "@types/markerclustererplus": "2.1.33",
+    "eslint-plugin-flowtype": "3.13.0",
+    "typescript": "3.8.3"
   },
-  "electronmon": {
-    "patterns": [
-      "!**/**",
-      "src/main/*"
-    ],
-    "logLevel": "quiet"
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).",
+  "main": "gulpfile.js",
+  "author": "Amukelani Shandlale",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://ashandla@bitbucket.org/ashandla/statements-automation.git"
   }
 }

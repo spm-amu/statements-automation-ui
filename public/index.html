@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link href="%PUBLIC_URL%/favicon.ico" id="favicon" rel="shortcut icon">
+  <link crossorigin="anonymous"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+        rel="stylesheet"/>
+  <link href="https://use.fontawesome.com/releases/v5.11.2/css/all.css" rel="stylesheet">
+  <link href="https://use.fontawesome.com/releases/v5.11.2/css/v4-shims.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/charts/loader.js" type="text/javascript"></script>
+  <script src="https://kit.fontawesome.com/b7cf064c88.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+  <base href=""/>
+  <!--
+    Notice the use of %PUBLIC_URL% in the tag above.
+    It will be replaced with the URL of the `public` folder during the build.
+    Only files inside the `public` folder can be referenced from the HTML.
+
+    Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+    work correctly both with client-side routing and a non-root public URL.
+    Learn how to configure a non-root public URL by running `npm run build`.
+  -->
+  <title>React App</title>
+</head>
+<body style="overflow: hidden" onload="document.getElementById('favicon').href =
+  (window.location.protocol + '//' + window.location.hostname + '/portal/api/v1/settings/favicon/get/'
+  + (new URLSearchParams(location.search).get('implId') ? new URLSearchParams(location.search).get('implId') : sessionStorage.getItem('implId')))">
+<div id="root"></div>
+<!--
+  This HTML file is a template.
+  If you open it directly in the browser, you will see an empty page.
+
+  You can add webfonts, meta tags, or analytics to this file.
+  The build step will place the bundled scripts into the <body> tag.
+
+  To begin the development, run `npm start`.
+  To create a production bundle, use `npm run build`.
+-->
+</body>
+</html>
