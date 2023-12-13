@@ -1,40 +1,68 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import {components} from 'react-select';
-import {Form} from 'reactstrap';
-import Button from '@material-ui/core/Button';
-import TextField from '../customInput/TextField';
-import DatePicker from '../customInput/DatePicker';
-import CustomTimePicker from '../customInput/CustomTimePicker';
-import AutoComplete from '../customInput/AutoComplete';
-import Utils from '../../Utils';
-import Avatar from '../avatar';
-import {get, post} from '../../service/RestService';
+import React, {useState} from 'react';
 
 import '../../assets/scss/react-select/_react-select.scss';
 import '../../assets/scss/flatpickr/flatpickr.scss';
-import FormControl from '@material-ui/core/FormControl';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
-import {useNavigate} from 'react-router-dom';
-import {Checkbox, Switch} from '@material-ui/core';
-import appManager from "../../../common/service/AppManager";
-import AlertDialog from "../AlertDialog";
-import SelectItem from "../customInput/SelectItem";
-import moment from 'moment';
-
+import Box from "@material-ui/core/Box";
+import {Tab, Tabs} from "@material-ui/core";
+import {TabContext, TabList, TabPanel} from "@material-ui/lab";
+import IconButton from "@material-ui/core/IconButton";
+import Icon from "../Icon";
+import {useNavigate} from "react-router-dom";
 const ViewCase = (props) => {
-  return <div style={{width: '100%', display: 'flex', padding: '32px'}} className={'caseContainer'}>
-               <div style={{marginRight: '4px'}}>
-                 <div className={'view-header row'}>
-                   <div>COB Request - [ {props.selected.clientName} ]</div>
-                 </div>
-                 <div>
 
-                 </div>
-               </div>
-             </div>
+  const [tabValue, setTabValue] = useState('1');
+  const navigate = useNavigate();
+
+  const handleChange = (e, newValue) => {
+    setTabValue(newValue);
+  };
+
+  return <div style={{width: '100%', display: 'flex', padding: '32px'}} className={'view-container'}>
+    <div style={{marginRight: '4px'}}>
+      <div className={'view-header row'}>
+        <div>COB Request - [ {props.selected.clientName} ]</div>
+        <div>
+          <IconButton
+            style={{color: '#01476C', width: '36px', height: '36px'}}
+            onClick={(e) => {
+              navigate('/view/caseList');
+            }}
+          >
+            <Icon id={'CLOSE'} color={'rgb(175, 20, 75)'}/>
+          </IconButton>
+        </div>
+      </div>
+      <div className={'view-case-content'}>
+        <Box sx={{width: '100%', typography: 'body1'}}>
+          <TabContext value={tabValue}>
+            <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+              <TabList onChange={handleChange} aria-label="">
+                <Tab label="Case Details" value="1" />
+                <Tab label="Certificate of Balance" value="2" />
+              </TabList>
+            </Box>
+            <TabPanel value="1">
+              <div className={'card'} style={{padding: '32px', width: '100%'}}>
+                <div className={'row'} style={{marginBottom: '4px'}}>
+                  <div className={'col'}>Reference number: </div>
+                  <div className={'col'}>{props.selected.id}</div>
+                </div>
+                <div className={'row'} style={{marginBottom: '8px'}}>
+                  <div className={'col'}>Name: </div>
+                  <div className={'col'}>{props.selected.clientName}</div>
+                </div>
+                <div className={'row'} style={{marginBottom: '8px'}}>
+                  <div className={'col'}>ID number: </div>
+                  <div className={'col'}>{props.selected.clientIDNumber}</div>
+                </div>
+              </div>
+            </TabPanel>
+            <TabPanel value="2">Item Two</TabPanel>
+          </TabContext>
+        </Box>
+      </div>
+    </div>
+  </div>
 };
 
 export default ViewCase;

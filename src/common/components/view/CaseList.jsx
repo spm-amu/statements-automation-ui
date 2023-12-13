@@ -85,7 +85,7 @@ const CaseList = (props) => {
   };
 
   return (
-    <div style={{width: '100%', display: 'flex', padding: '32px'}} className={'caseContainer'}>
+    <div style={{width: '100%', display: 'flex', padding: '32px'}} className={'view-container'}>
       <div style={{marginRight: '4px'}}>
         <div className={'view-header row'}>
           <div>Cases</div>

@@ -1,3 +1,7 @@
+.view-container {
+  font-family: "Poppins", sans-serif;
+}
+
 .view-header {
   font-weight: 400;
   color: #0c102a;
@@ -10,4 +14,13 @@
   color: #0c102a;
   font-size: 20px;
   margin-bottom: 8px;
+}
+
+.view-case-content {
+  margin-top: 16px;
+  border-top: 1px solid #aaaaaa;
+}
+
+button:focus {
+  outline: unset !important;
 }
