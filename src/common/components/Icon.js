@@ -29,6 +29,7 @@ import Folder from '@material-ui/icons/Folder';
 import Help from '@material-ui/icons/Help';
 import Close from '@material-ui/icons/Close';
 import Link from "@material-ui/icons/Link";
+import DownArrow from "@material-ui/icons/ArrowDownward";
 import React, {Component} from "react";
 import {
   MeetingRoom,
@@ -175,6 +176,8 @@ class Icon extends Component {
       return <PlayArrow/>
     } else if (this.props.id === 'STOP') {
       return <Stop/>
+    } else if (this.props.id === 'CHEVRON_DOWN') {
+      return <i className="fas fa-chevron-down" style={{color: this.props.color}}/>
     } else if (this.props.id === 'TEXT_FIELDS') {
       return <TextFields/>
     } else if (this.props.id === 'PERSON_ADD') {
