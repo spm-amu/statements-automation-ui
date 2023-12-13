@@ -12,11 +12,13 @@ import Typography from "@material-ui/core/Typography";
 import {get} from "../../service/RestService";
 import appManager from "../../service/AppManager";
 import Utils from "../../Utils";
+import AccountCOBValuesForm from "./AccountCOBValuesForm";
 
 const ViewCase = (props) => {
 
   const [tabValue, setTabValue] = useState('1');
   const [caseQueryData, setCaseQueryData] = useState(null);
+  const [cobValues, setCOBValues] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -99,8 +101,15 @@ const ViewCase = (props) => {
                               {
                                 !Utils.isNull(account.cobValues) &&
                                 <div className={'row'} style={{marginBottom: '8px'}}>
-                                  <div>Certificate of Balance value:</div>
-                                  <div className={'col'}>{JSON.stringify(account.cobValues)}</div>
+                                  <div>Certificate of Balance values</div>
+                                  <div className={'col'}>
+                                    <AccountCOBValuesForm valueChangeHandler={(value) => {
+                                      let cobValue = cobValues.filter((val) => val.accountNumber === value.accountNumber);
+
+                                      //if(value)
+
+                                    }}/>
+                                  </div>
                                 </div>
                               }
                             </div>
