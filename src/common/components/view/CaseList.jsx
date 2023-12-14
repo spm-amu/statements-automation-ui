@@ -93,7 +93,7 @@ const CaseList = (props) => {
             <IconButton
               style={{color: '#01476C', width: '36px', height: '36px'}}
               onClick={(e) => {
-                navigate('addCase');
+                navigate('/view/addCase');
               }}
             >
               <Icon id={'ADD'} color={'rgb(175, 20, 75)'}/>

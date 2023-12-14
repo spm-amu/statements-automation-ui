@@ -143,7 +143,7 @@ const ViewCase = (props) => {
                   <div style={{width: '100%', padding: '16px'}} className={'row'}>
                     <div style={{width: '100%'}}>
                       <Button
-                        style={{height: '36px', backgroundColor: '#4BB543'}}
+                        style={{height: '36px', backgroundColor: 'rgb(175, 20, 75)', color: '#FFFFFF'}}
                         onClick={(e) => {
                           post(`${appManager.getAPIHost()}/statements/api/v1/cob/generate`, (response) => {
                             setCobFile("data:image/png;base64," + response.cobFile);

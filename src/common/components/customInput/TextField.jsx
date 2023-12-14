@@ -17,7 +17,6 @@ const TextFieldWrapper = React.memo(React.forwardRef((props, ref) => {
       required={props.required}
       label={props.label}
       inputProps={props.inputProps}
-      value={props.value ? props.value : ''}
       onChange={
         (e) => {
           if(props.valueChangeHandler) {
@@ -25,7 +24,6 @@ const TextFieldWrapper = React.memo(React.forwardRef((props, ref) => {
           }
         }
       }
-      onKeyPress={props.keyHandler}
       error={props.hasError}
       helperText={props.hasError ? props.errorMessage : ''}
       margin="dense"
