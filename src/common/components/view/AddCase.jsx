@@ -84,7 +84,8 @@ const AddCase = (props) => {
           style={{height: '36px', backgroundColor: 'rgb(175, 20, 75)', color: '#FFFFFF'}}
           onClick={(e) => {
             post(`${appManager.getAPIHost()}/statements/api/v1/cob/start`, (response) => {
-              setCobFile("data:image/png;base64," + response.cobFile);
+              setMessage('The case has been submitted successfully');
+              setMessageType('success');
             }, (e) => {
             }, value, '', false);
           }}
