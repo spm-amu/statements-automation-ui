@@ -97,7 +97,7 @@ const ViewCase = (props) => {
                         </AccordionSummary>
                         <AccordionDetails>
                           <div className={'w-100 row'} style={{height: '400px', maxHeight: '400px', overflowY: 'auto'}}>
-                            <div style={{width: '30%', paddingLeft: '28px'}}>
+                            <div style={{width: '300px', paddingLeft: '28px'}}>
                               <div className={'row'} style={{marginBottom: '4px'}}>
                                 <div>Status:</div>
                                 <div className={'col'}>{account.status.replaceAll('_', ' ')}</div>
