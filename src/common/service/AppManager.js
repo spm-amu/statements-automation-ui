@@ -3,7 +3,7 @@ class AppManager {
     if (!AppManager.instance) {
       this.subscriptions = [];
       this.store = {
-        apiHost: 'http://localhost:8080'
+        apiHost: 'https://zapxs1m70d58030.corp.dsarena.com'
       };
 
       AppManager.instance = this;
