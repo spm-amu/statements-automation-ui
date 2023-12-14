@@ -84,7 +84,8 @@ const ViewCase = (props) => {
                 props.selected.status === 'READY' && !Utils.isNull(caseQueryData) &&
                 <div>
                   <div style={{fontSize: '20px', marginBottom: '16px'}}>Accounts</div>
-                  <div style={{maxHeight: '400px', overflowY: 'auto', border: '1px solid #aaaaaa', borderRadius: '4px'}}>
+                  <div
+                    style={{maxHeight: '400px', overflowY: 'auto', border: '1px solid #aaaaaa', borderRadius: '4px'}}>
                     {caseQueryData.accounts.map((account, i) => (
                       <Accordion key={i}>
                         <AccordionSummary
@@ -104,8 +105,10 @@ const ViewCase = (props) => {
                               {
                                 !Utils.isNull(account.cobValues) &&
                                 <div className={'row'} style={{margin: '0 8px 32px 0'}}>
-                                  <div className={'row'} style={{fontSize: '16px', fontWeight: 600}}>Certificate of Balance values</div>
-                                  <div  className={'row'}>
+                                  <div className={'row'} style={{fontSize: '16px', fontWeight: 600}}>Certificate of
+                                    Balance values
+                                  </div>
+                                  <div className={'row'}>
                                     <AccountCOBValuesForm data={account.cobValues} valueChangeHandler={(value) => {
                                       let cobValue = cobValues.filter((val) => val.accountNumber === value.accountNumber);
 
@@ -137,6 +140,30 @@ const ViewCase = (props) => {
                       </Accordion>
                     ))}
                   </div>
+                  <div style={{width: '100%', padding: '16px'}} className={'row'}>
+                    <div style={{width: '100%'}}>
+                      <Button
+                        style={{height: '36px', backgroundColor: '#4BB543'}}
+                        onClick={(e) => {
+                          post(`${appManager.getAPIHost()}/statements/api/v1/cob/generate`, (response) => {
+                            setCobFile("data:image/png;base64," + response.cobFile);
+                          }, (e) => {
+                          }, {
+                            referenceNumber: props.selected.id,
+                            accounts: []
+                          }, '', false);
+                        }}
+                      >
+                        GENERATE COB
+                      </Button>
+                    </div>
+                    <div style={{width: '100%'}}>
+                      {
+                        cobFile &&
+                        <PDFViewer pdf={cobFile}/>
+                      }
+                    </div>
+                  </div>
                 </div>
               }
               {
@@ -148,30 +175,6 @@ const ViewCase = (props) => {
             </TabPanel>
           </TabContext>
         </Box>
-      </div>
-    </div>
-    <div style={{width: '100%', padding: '20px'}} className={'row'}>
-      <div style={{width: '100%'}}>
-        <Button
-          style={{height: '36px', backgroundColor: '#4BB543'}}
-          onClick={(e) => {
-            post(`${appManager.getAPIHost()}/statements/api/v1/cob/generate`, (response) => {
-              setCobFile("data:image/png;base64," + response.cobFile);
-            }, (e) => {
-            }, {
-              referenceNumber: props.selected.id,
-              accounts: []
-            }, '', false);
-          }}
-        >
-          GENERATE COB
-        </Button>
-      </div>
-      <div style={{width: '100%'}}>
-        {
-          cobFile &&
-          <PDFViewer pdf={cobFile}/>
-        }
       </div>
     </div>
   </div>
