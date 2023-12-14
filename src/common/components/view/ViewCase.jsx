@@ -34,6 +34,7 @@ const ViewCase = (props) => {
     setTabValue(newValue);
   };
 
+
   return <div style={{width: '100%', padding: '32px', maxHeight: '100%', overflowY: 'auto'}} className={'view-container'}>
     <div style={{width: '100%',marginRight: '4px'}} className={'row'}>
       <div className={'view-header row'}>
