@@ -5,14 +5,16 @@ import Button from "@material-ui/core/Button";
 import Alert from "react-bootstrap/Alert";
 import {Form} from 'reactstrap';
 import TextField from "../customInput/TextField";
+import IconButton from "@material-ui/core/IconButton";
+import Icon from "../Icon";
+import {useNavigate} from "react-router-dom";
 
 const AddCase = (props) => {
 
+  const navigate = useNavigate();
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState(null);
-  const [value] = useState({
-    businessUnit: ''
-  });
+  const [value] = useState({});
 
   const handleFormValueChange = (fieldValue, id, required) => {
     value[id] = fieldValue;
@@ -26,6 +28,16 @@ const AddCase = (props) => {
     <div style={{width: '100%',marginRight: '4px'}}>
       <div className={'view-header row'}>
         <div>Add new cob request</div>
+        <div>
+          <IconButton
+            style={{color: '#01476C', width: '36px', height: '36px'}}
+            onClick={(e) => {
+              navigate('/view/caseList');
+            }}
+          >
+            <Icon id={'CLOSE'} color={'rgb(175, 20, 75)'}/>
+          </IconButton>
+        </div>
       </div>
       <div className={'row w-100'}>
         <div className={'w-100'}>
