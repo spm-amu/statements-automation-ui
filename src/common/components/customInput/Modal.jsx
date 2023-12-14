@@ -1,6 +1,4 @@
 ﻿import React from 'react';
-import '../../assets/scss/react-select/_react-select.scss';
-import '../../assets/scss/flatpickr/flatpickr.scss';
 import "./Modal.css";
 import Modal from "@material-ui/core/Modal";
 import Button from "@material-ui/core/Button";

@@ -221,38 +221,6 @@ export default class Utils {
       });
   }
 
-  static getPropertyChainPath = (expression) => {
-    const path = {};
-
-    if (!this.isNull(expression)) {
-      const tokens = expression.split('.');
-      path.property = tokens[tokens.length - 1];
-
-      const voExpression = expression.substring(0, expression.indexOf('.'));
-      path.valueObject = dynamicJS.executeScript(
-        `${Math.random()}_PropertyChainUtilsEval`,
-        voExpression
-      );
-      for (let i = 1; i < tokens.length - 1; i++) {
-        const token = tokens[i];
-        if (!this.isNull(path.valueObject)) {
-          const getter = path.valueObject[token];
-          if (!Utils.isNull(getter)) {
-            if (typeof getter === 'function') {
-              path.valueObject = getter();
-            } else {
-              path.valueObject = getter;
-            }
-          }
-        } else {
-          break;
-        }
-      }
-    }
-
-    return path;
-  };
-
   static mergeStyles = (defaultStyle, config) => {
     const configStyle = Utils.getComponentAttribute(config, 'style', null);
     if (configStyle) {

@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from 'react';
 
-import '../../assets/scss/react-select/_react-select.scss';
-import '../../assets/scss/flatpickr/flatpickr.scss';
 import Box from "@material-ui/core/Box";
 import {Accordion, AccordionDetails, AccordionSummary, Tab} from "@material-ui/core";
 import {TabContext, TabList, TabPanel} from "@material-ui/lab";
