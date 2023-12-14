@@ -7,13 +7,17 @@ import IconButton from "@material-ui/core/IconButton";
 import Icon from "../Icon";
 import {useNavigate} from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
-import {get} from "../../service/RestService";
+import {get, post} from "../../service/RestService";
 import appManager from "../../service/AppManager";
 import Utils from "../../Utils";
 import AccountCOBValuesForm from "./AccountCOBValuesForm";
+import StatementViewer from "../StatementViewer";
+import Button from "@material-ui/core/Button";
+import PDFViewer from "../PDFViewer";
 
 const ViewCase = (props) => {
 
+  const [cobFile, setCobFile] = useState(null);
   const [tabValue, setTabValue] = useState('1');
   const [caseQueryData, setCaseQueryData] = useState(null);
   const [cobValues, setCOBValues] = useState([]);
@@ -30,8 +34,8 @@ const ViewCase = (props) => {
     setTabValue(newValue);
   };
 
-  return <div style={{width: '100%', display: 'flex', padding: '32px'}} className={'view-container'}>
-    <div style={{width: '100%',marginRight: '4px'}}>
+  return <div style={{width: '100%', padding: '32px', maxHeight: '100%', overflowY: 'auto'}} className={'view-container'}>
+    <div style={{width: '100%',marginRight: '4px'}} className={'row'}>
       <div className={'view-header row'}>
         <div>COB Request - [ {props.selected.clientName} ]</div>
         <div>
@@ -45,7 +49,7 @@ const ViewCase = (props) => {
           </IconButton>
         </div>
       </div>
-      <div className={'view-case-content'}>
+      <div className={'view-case-content'} style={{width: '100%'}}>
         <Box sx={{width: '100%', typography: 'body1'}}>
           <TabContext value={tabValue}>
             <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
@@ -90,18 +94,18 @@ const ViewCase = (props) => {
                           <Typography>{account.accountNumber + " (" + account.accountType + ")"}</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                          <div className={'w-100 row'} style={{border: '2px solid red', height: '400px', maxHeight: '400px', overflowY: 'auto'}}>
-                            <div style={{width: '30%', border: '2px solid green', paddingLeft: '28px'}}>
+                          <div className={'w-100 row'} style={{height: '400px', maxHeight: '400px', overflowY: 'auto'}}>
+                            <div style={{width: '30%', paddingLeft: '28px'}}>
                               <div className={'row'} style={{marginBottom: '4px'}}>
                                 <div>Status:</div>
                                 <div className={'col'}>{account.status.replaceAll('_', ' ')}</div>
                               </div>
                               {
                                 !Utils.isNull(account.cobValues) &&
-                                <div className={'row'} style={{marginBottom: '8px'}}>
-                                  <div>Certificate of Balance values</div>
-                                  <div className={'col'}>
-                                    <AccountCOBValuesForm valueChangeHandler={(value) => {
+                                <div className={'row'} style={{margin: '0 8px 32px 0'}}>
+                                  <div className={'row'} style={{fontSize: '16px', fontWeight: 600}}>Certificate of Balance values</div>
+                                  <div  className={'row'}>
+                                    <AccountCOBValuesForm data={account.cobValues} valueChangeHandler={(value) => {
                                       let cobValue = cobValues.filter((val) => val.accountNumber === value.accountNumber);
 
                                       //if(value)
@@ -111,7 +115,22 @@ const ViewCase = (props) => {
                                 </div>
                               }
                             </div>
-                            <div className={'col'} style={{border: '2px solid blue'}}></div>
+                            <div className={'col'}>
+                              {account.statements.map((statement, i) => (
+                                <Accordion key={i}>
+                                  <AccordionSummary
+                                    expandIcon={<Icon id={'CHEVRON_DOWN'} color='rgb(175, 20, 75)'/>}
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header"
+                                  >
+                                    <Typography>{statement.EndDate}</Typography>
+                                  </AccordionSummary>
+                                  <AccordionDetails style={{width: '100%', padding: '32px 64px'}}>
+                                    <StatementViewer data={statement}/>
+                                  </AccordionDetails>
+                                </Accordion>
+                              ))}
+                            </div>
                           </div>
                         </AccordionDetails>
                       </Accordion>
@@ -128,6 +147,30 @@ const ViewCase = (props) => {
             </TabPanel>
           </TabContext>
         </Box>
+      </div>
+    </div>
+    <div style={{width: '100%', padding: '20px'}} className={'row'}>
+      <div style={{width: '100%'}}>
+        <Button
+          style={{height: '36px', backgroundColor: '#4BB543'}}
+          onClick={(e) => {
+            post(`${appManager.getAPIHost()}/statements/api/v1/cob/generate`, (response) => {
+              setCobFile("data:image/png;base64," + response.cobFile);
+            }, (e) => {
+            }, {
+              referenceNumber: props.selected.id,
+              accounts: []
+            }, '', false);
+          }}
+        >
+          GENERATE COB
+        </Button>
+      </div>
+      <div style={{width: '100%'}}>
+        {
+          cobFile &&
+          <PDFViewer pdf={cobFile}/>
+        }
       </div>
     </div>
   </div>

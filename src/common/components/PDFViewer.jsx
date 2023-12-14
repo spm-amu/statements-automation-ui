@@ -1,6 +1,4 @@
 import React, {useState} from 'react';
-import '../assets/scss/react-select/_react-select.scss';
-import '../assets/scss/flatpickr/flatpickr.scss';
 import { pdfjs, Document, Page } from 'react-pdf';
 import './PDFViewer.css';
 

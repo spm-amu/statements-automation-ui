@@ -165,11 +165,11 @@ class Icon extends Component {
     } else if (this.props.id === 'INITIAL') {
       return <i className="fas fa-signature" style={{color: this.props.color}}/>
     } else if (this.props.id === 'FOLDER') {
-      return <Folder/>
+      return <Folder style={{color: this.props.color}}/>
     } else if (this.props.id === 'HISTORY') {
       return <History/>
     } else if (this.props.id === 'MORE') {
-      return <MoreHoriz  style={{color: this.props.color}}/>
+      return <MoreHoriz style={{color: this.props.color}}/>
     } else if (this.props.id === 'NOTE') {
       return <Note/>
     } else if (this.props.id === 'PLAY') {
