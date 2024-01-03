@@ -17,6 +17,7 @@ const TextFieldWrapper = React.memo(React.forwardRef((props, ref) => {
       required={props.required}
       label={props.label}
       inputProps={props.inputProps}
+      value={props.value ? props.value : ''}
       onChange={
         (e) => {
           if(props.valueChangeHandler) {

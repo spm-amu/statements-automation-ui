@@ -24,3 +24,12 @@
 button:focus {
   outline: unset !important;
 }
+
+.searchbar {
+  width: 90%;
+}
+
+.MuiPaper-elevation1 {
+  box-shadow: unset !important;
+  border-bottom: 1px solid #e1e1e1;
+}

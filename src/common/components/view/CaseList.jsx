@@ -49,7 +49,7 @@ const grid = {
       "id": "viewActions",
       "attributes": {
         "filterable": false,
-        "width": "20.0%",
+        "width": "10.0%",
         "label": "View case",
         "toolbar": {
           "items": [

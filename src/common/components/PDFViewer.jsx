@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { pdfjs, Document, Page } from 'react-pdf';
+import {pdfjs, Document, Page} from 'react-pdf';
 import './PDFViewer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -13,12 +13,12 @@ const options = {
 };
 
 const PDFViewer = (props) => {
-  const { pdf } = props;
+  const {pdf} = props;
 
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
 
-  const onDocumentLoadSuccess = ({ numPages }) => {
+  const onDocumentLoadSuccess = ({numPages}) => {
     setNumPages(numPages);
     setPageNumber(1);
   }
@@ -37,6 +37,11 @@ const PDFViewer = (props) => {
 
   return (
     <>
+      <div className={'doc-container'}>
+        <Document file={pdf} onLoadSuccess={onDocumentLoadSuccess} options={options}>
+          <Page pageNumber={pageNumber}/>
+        </Document>
+      </div>
       <div className={'help-container'}>
         <p>
           Page {pageNumber || (numPages ? 1 : "--")} of {numPages || "--"}
@@ -53,9 +58,6 @@ const PDFViewer = (props) => {
           Next
         </button>
       </div>
-      <Document file={pdf} onLoadSuccess={onDocumentLoadSuccess} options={options}>
-        <Page pageNumber={pageNumber} />
-      </Document>
     </>
   );
 };

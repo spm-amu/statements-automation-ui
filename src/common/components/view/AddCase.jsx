@@ -14,10 +14,10 @@ const AddCase = (props) => {
   const navigate = useNavigate();
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState(null);
-  const [value] = useState({});
+  const [value, setValue] = useState({});
 
   const handleFormValueChange = (fieldValue, id, required) => {
-    value[id] = fieldValue;
+    setValue({...value, [id]: fieldValue});
   };
 
   const formValueChangeHandler = (e) => {
@@ -60,6 +60,7 @@ const AddCase = (props) => {
                 label="Business unit"
                 id="businessUnit"
                 required={true}
+                value={value.businessUnit}
                 valueChangeHandler={(e) => formValueChangeHandler(e)}
                 errorMessage={
                   'A business unit is required. Please enter a value'
@@ -71,6 +72,7 @@ const AddCase = (props) => {
                 label="Client code"
                 id="clientCode"
                 required={true}
+                value={value.clientCode}
                 valueChangeHandler={(e) => formValueChangeHandler(e)}
                 errorMessage={
                   'A client code is required. Please enter a value'
@@ -82,6 +84,7 @@ const AddCase = (props) => {
                 label="CoB date"
                 id="cobDate"
                 required={true}
+                value={value.cobDate}
                 valueChangeHandler={(e) => formValueChangeHandler(e)}
                 errorMessage={
                   'A statement date is required. Please enter a value'

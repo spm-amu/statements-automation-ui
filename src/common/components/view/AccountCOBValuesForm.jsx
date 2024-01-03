@@ -1,22 +1,73 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
+import TextField from "../customInput/TextField";
 
 const AccountCOBValuesForm = (props) => {
+
+  const [value, setValue] = useState(props.data);
+
+  useEffect(() => {
+    props.valueChangeHandler(value, props.accountNumber);
+  }, [value]);
+
+  const handleFormValueChange = (fieldValue, id, required) => {
+    setValue({...value, [id]: fieldValue});
+  };
+
+  const formValueChangeHandler = (e) => {
+    handleFormValueChange(e.target.value, e.target.id, e.target.required);
+  };
+
   return <div className={'card'} style={{padding: '32px', width: '100%'}}>
-    <div className={'row'} style={{marginBottom: '4px'}}>
-      <div>Interest rate:</div>
-      <div className={'col'}>{props.data.interestRate}</div>
-    </div>
-    <div className={'row'} style={{marginBottom: '8px'}}>
-      <div>Capital:</div>
-      <div className={'col'}>{props.data.capital}</div>
-    </div>
-    <div className={'row'} style={{marginBottom: '8px'}}>
-      <div>Nett accrued interest:</div>
-      <div className={'col'}>{props.data.netAccruedInterest}</div>
-    </div>
-    <div className={'row'} style={{marginBottom: '8px'}}>
-      <div>Total balance:</div>
-      <div className={'col'}>{props.data.totalBalance}</div>
+    <div style={{marginBottom: '4px'}}>
+      <div>
+        <TextField
+          label="Interest rate"
+          id="interestRate"
+          required={true}
+          value={value.interestRate}
+          valueChangeHandler={(e) => formValueChangeHandler(e)}
+          errorMessage={
+            'An interest rate value is required. Please enter a value'
+          }
+        />
+      </div>
+      <div>
+        <TextField
+          label="Capital"
+          id="capital"
+          required={true}
+          value={value.capital}
+          valueChangeHandler={(e) => formValueChangeHandler(e)}
+          errorMessage={
+            'A capital value is required. Please enter a value'
+          }
+        />
+      </div>
+      <div>
+        <TextField
+          label="Nett accrued interest"
+          id="netAccruedInterest"
+          required={true}
+          value={value.netAccruedInterest}
+          valueChangeHandler={(e) => formValueChangeHandler(e)}
+          errorMessage={
+            'A nett accrued interest value is required. Please enter a value'
+          }
+        />
+      </div>
+      <div>
+        <TextField
+          label="Total balance"
+          id="totalBalance"
+          disabled
+          required={true}
+          value={value.totalBalance}
+          valueChangeHandler={(e) => formValueChangeHandler(e)}
+          errorMessage={
+            'A total balance interest value is required. Please enter a value'
+          }
+        />
+      </div>
     </div>
   </div>
 };

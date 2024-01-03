@@ -35,10 +35,11 @@ const ViewCase = (props) => {
   };
 
 
-  return <div style={{width: '100%', padding: '32px', maxHeight: '100%', overflowY: 'auto'}} className={'view-container'}>
-    <div style={{width: '100%',marginRight: '4px'}} className={'row'}>
+  return <div style={{width: '100%', padding: '32px', maxHeight: '100%', overflowY: 'auto'}}
+              className={'view-container'}>
+    <div style={{width: '100%', marginRight: '4px'}} className={'row'}>
       <div className={'view-header row'}>
-        <div>COB Request - [ {props.selected.clientName} ]</div>
+        <div style={{marginLeft: '12px'}}>COB Request - [ {props.selected.clientName} ]</div>
         <div>
           <IconButton
             style={{color: '#01476C', width: '36px', height: '36px'}}
@@ -85,7 +86,7 @@ const ViewCase = (props) => {
                 <div>
                   <div style={{fontSize: '20px', marginBottom: '16px'}}>Accounts</div>
                   <div
-                    style={{maxHeight: '400px', overflowY: 'auto', border: '1px solid #aaaaaa', borderRadius: '4px'}}>
+                    style={{border: '1px solid #aaaaaa', borderRadius: '4px'}}>
                     {caseQueryData.accounts.map((account, i) => (
                       <Accordion key={i}>
                         <AccordionSummary
@@ -96,7 +97,7 @@ const ViewCase = (props) => {
                           <Typography>{account.accountNumber + " (" + account.accountType + ")"}</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                          <div className={'w-100 row'} style={{height: '400px', maxHeight: '400px', overflowY: 'auto'}}>
+                          <div className={'w-100 row'} style={{overflowY: 'auto', whiteSpace: 'nowrap'}}>
                             <div style={{width: '300px', paddingLeft: '28px'}}>
                               <div className={'row'} style={{marginBottom: '4px'}}>
                                 <div>Status:</div>
@@ -109,31 +110,37 @@ const ViewCase = (props) => {
                                     Balance values
                                   </div>
                                   <div className={'row'}>
-                                    <AccountCOBValuesForm data={account.cobValues} valueChangeHandler={(value) => {
-                                      let cobValue = cobValues.filter((val) => val.accountNumber === value.accountNumber);
+                                    <AccountCOBValuesForm accountNumber={account.accountNumber} data={account.cobValues}
+                                                          valueChangeHandler={(value, accountNumber) => {
+                                                            console.log("==================== VALUE FOR [" + accountNumber + "] ==================");
+                                                            console.log(value);
+                                                            let cobValue = cobValues.filter((val) => val.accountNumber === accountNumber);
 
-                                      //if(value)
+                                                            //if(value)
 
-                                    }}/>
+                                                          }}/>
                                   </div>
                                 </div>
                               }
                             </div>
-                            <div className={'col'}>
-                              {account.statements.map((statement, i) => (
-                                <Accordion key={i}>
-                                  <AccordionSummary
-                                    expandIcon={<Icon id={'CHEVRON_DOWN'} color='rgb(175, 20, 75)'/>}
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header"
-                                  >
-                                    <Typography>{statement.EndDate}</Typography>
-                                  </AccordionSummary>
-                                  <AccordionDetails style={{width: '100%', padding: '32px 64px'}}>
-                                    <StatementViewer data={statement}/>
-                                  </AccordionDetails>
-                                </Accordion>
-                              ))}
+                            <div style={{width: 'calc(100% - 308px)', marginLeft: '8px'}}>
+                              <div>Statements</div>
+                              <div>
+                                {account.statements.map((statement, i) => (
+                                  <Accordion key={i}>
+                                    <AccordionSummary
+                                      expandIcon={<Icon id={'CHEVRON_DOWN'} color='rgb(175, 20, 75)'/>}
+                                      aria-controls="panel1a-content"
+                                      id="panel1a-header"
+                                    >
+                                      <Typography>{statement.EndDate}</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                      <StatementViewer data={statement}/>
+                                    </AccordionDetails>
+                                  </Accordion>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </AccordionDetails>

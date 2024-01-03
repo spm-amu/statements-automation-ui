@@ -301,7 +301,7 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
         criteria.parameters.push(parameter);
       }
 
-      console.log("\n\n\nCRITERIA", criteria);
+      console.log("CRITERIA", criteria);
       search();
     }
   }, [props.criteriaParams]);

@@ -10,7 +10,7 @@ const StatementViewer = (props) => {
   const [file, setFile] = useState(null);
 
   return <div style={{width: '100%'}}>
-    <div style={{padding: '0 32px', borderTop: '1px solid #aaaaaa', width: '100%'}}>
+    <div style={{padding: '0 32px', borderTop: '1px solid #e1e1e1', width: '100%'}}>
       <IconButton
         style={{color: '#01476C', width: '36px', height: '36px'}}
         onClick={(e) => {
