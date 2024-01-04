@@ -59,7 +59,6 @@ const AccountCOBValuesForm = (props) => {
         <TextField
           label="Total balance"
           id="totalBalance"
-          disabled
           required={true}
           value={value.totalBalance}
           valueChangeHandler={(e) => formValueChangeHandler(e)}

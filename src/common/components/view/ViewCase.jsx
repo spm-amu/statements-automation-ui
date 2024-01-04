@@ -20,15 +20,24 @@ const ViewCase = (props) => {
   const [cobFile, setCobFile] = useState(null);
   const [tabValue, setTabValue] = useState('1');
   const [caseQueryData, setCaseQueryData] = useState(null);
-  const [cobValues, setCOBValues] = useState([]);
+  const [cobAccounts, setCobAccounts] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     get(`${appManager.getAPIHost()}/statements/api/v1/cob/query/${props.selected.id}`, (response) => {
       setCaseQueryData(response);
+      setCobAccounts(response.accounts);
     }, (e) => {
     }, '', false);
   }, []);
+
+  useEffect(() => {
+    for (const cobAccount of cobAccounts) {
+      if(!cobAccount.cobValues) {
+        cobAccount.cobValues = {};
+      }
+    }
+  }, [cobAccounts]);
 
   const handleChange = (e, newValue) => {
     setTabValue(newValue);
@@ -101,7 +110,7 @@ const ViewCase = (props) => {
                             <div style={{width: '300px', paddingLeft: '28px'}}>
                               <div className={'row'} style={{marginBottom: '4px'}}>
                                 <div>Status:</div>
-                                <div className={'col'}>{account.status.replaceAll('_', ' ')}</div>
+                                <div className={'col field-value'}>{account.status.replaceAll('_', ' ')}</div>
                               </div>
                               {
                                 !Utils.isNull(account.cobValues) &&
@@ -112,12 +121,27 @@ const ViewCase = (props) => {
                                   <div className={'row'}>
                                     <AccountCOBValuesForm accountNumber={account.accountNumber} data={account.cobValues}
                                                           valueChangeHandler={(value, accountNumber) => {
-                                                            console.log("==================== VALUE FOR [" + accountNumber + "] ==================");
-                                                            console.log(value);
-                                                            let cobValue = cobValues.filter((val) => val.accountNumber === accountNumber);
+                                                            let find = cobAccounts.filter((val) => val.accountNumber === accountNumber);
+                                                            let cobAccount;
 
-                                                            //if(value)
+                                                            if (find.length === 0) {
+                                                              cobAccount = {};
+                                                              cobAccount.accountNumber = account.accountNumber;
+                                                              cobAccounts.push(cobAccount);
+                                                            } else {
+                                                              cobAccount = find[0];
+                                                            }
 
+                                                            if(!cobAccount.cobValues) {
+                                                              cobAccount.cobValues = {};
+                                                            }
+
+                                                            cobAccount.cobValues.interestRate = value.interestRate;
+                                                            cobAccount.cobValues.capital = value.capital;
+                                                            cobAccount.cobValues.netAccruedInterest = value.netAccruedInterest;
+                                                            cobAccount.cobValues.totalBalance = value.totalBalance;
+
+                                                            console.log("COB ACCOUNT : ", cobAccount);
                                                           }}/>
                                   </div>
                                 </div>
@@ -141,6 +165,11 @@ const ViewCase = (props) => {
                                   </Accordion>
                                 ))}
                               </div>
+                              {account.statements.length === 0 &&
+                                <div style={{height: '90%', color: '#FF9494', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                  NO STATEMENTS FOUND FOR ACCOUNT
+                                </div>
+                              }
                             </div>
                           </div>
                         </AccordionDetails>
@@ -157,7 +186,7 @@ const ViewCase = (props) => {
                           }, (e) => {
                           }, {
                             referenceNumber: props.selected.id,
-                            accounts: []
+                            accounts: cobAccounts
                           }, '', false);
                         }}
                       >

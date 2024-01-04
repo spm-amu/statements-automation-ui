@@ -99,8 +99,13 @@ const AddCase = (props) => {
           style={{height: '36px', backgroundColor: 'rgb(175, 20, 75)', color: '#FFFFFF'}}
           onClick={(e) => {
             post(`${appManager.getAPIHost()}/statements/api/v1/cob/start`, (response) => {
-              setMessage('The case has been submitted successfully');
-              setMessageType('success');
+              if(response.status === 'SUCCESS') {
+                setMessage('The case has been submitted successfully');
+                setMessageType('success');
+              } else {
+                setMessage(response.message);
+                setMessageType('danger');
+              }
             }, (e) => {
             }, value, '', false);
           }}

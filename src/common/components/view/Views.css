@@ -33,3 +33,10 @@ button:focus {
   box-shadow: unset !important;
   border-bottom: 1px solid #e1e1e1;
 }
+
+.field-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 240px;
+}

@@ -87,7 +87,7 @@ const CaseList = (props) => {
   return (
     <div style={{width: '100%', display: 'flex', padding: '32px'}} className={'view-container'}>
       <div style={{marginRight: '4px'}}>
-        <div className={'view-header row'}>
+        <div className={'view-header row'} style={{paddingLeft: '12px'}}>
           <div>Cases</div>
           <div>
             <IconButton
