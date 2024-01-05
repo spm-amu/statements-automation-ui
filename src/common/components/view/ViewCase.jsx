@@ -14,10 +14,13 @@ import AccountCOBValuesForm from "./AccountCOBValuesForm";
 import StatementViewer from "../StatementViewer";
 import Button from "@material-ui/core/Button";
 import PDFViewer from "../PDFViewer";
+import Alert from "react-bootstrap/Alert";
 
 const ViewCase = (props) => {
 
   const [cobFile, setCobFile] = useState(null);
+  const [generating, setGenerating] = useState(false);
+  const [generateErrorMessage, setGenerateErrorMessage] = useState(null);
   const [tabValue, setTabValue] = useState('1');
   const [caseQueryData, setCaseQueryData] = useState(null);
   const [cobAccounts, setCobAccounts] = useState([]);
@@ -178,19 +181,41 @@ const ViewCase = (props) => {
                   </div>
                   <div style={{width: '100%', padding: '16px'}} className={'row'}>
                     <div style={{width: '100%'}}>
+                      {
+                        generateErrorMessage &&
+                        <Alert
+                          variant={'danger'}
+                          show={true}
+                        >
+                          <p>{generateErrorMessage}</p>
+                        </Alert>
+                      }
                       <Button
+                        disabled={generating}
                         style={{height: '36px', backgroundColor: 'rgb(175, 20, 75)', color: '#FFFFFF'}}
                         onClick={(e) => {
+                          setGenerating(true);
+                          setGenerateErrorMessage(null);
                           post(`${appManager.getAPIHost()}/statements/api/v1/cob/generate`, (response) => {
+                            setGenerating(false);
                             setCobFile("data:image/png;base64," + response.cobFile);
                           }, (e) => {
+                            setGenerating(false);
+                            setGenerateErrorMessage("A system error has occurred while generating COB file");
                           }, {
                             referenceNumber: props.selected.id,
                             accounts: cobAccounts
                           }, '', false);
                         }}
                       >
-                        GENERATE COB
+                        {generating && (
+                          <i
+                            className="fa fa-refresh fa-spin"
+                            style={{ marginRight: '8px' }}
+                          />
+                        )}
+                        {generating && <span>LOADING...</span>}
+                        {!generating && <span>GENERATE COB</span>}
                       </Button>
                     </div>
                     <div style={{width: '100%'}}>

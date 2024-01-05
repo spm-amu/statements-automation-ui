@@ -1,5 +1,5 @@
-import React, {Fragment, useState} from 'react';
-import {post} from "../../service/RestService";
+import React, {Fragment, useEffect, useState} from 'react';
+import {get, post} from "../../service/RestService";
 import appManager from "../../service/AppManager";
 import Button from "@material-ui/core/Button";
 import Alert from "react-bootstrap/Alert";
@@ -8,16 +8,26 @@ import TextField from "../customInput/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import Icon from "../Icon";
 import {useNavigate} from "react-router-dom";
+import DatePicker from "../customInput/DatePicker";
+import Utils from "../../Utils";
 
 const AddCase = (props) => {
 
   const navigate = useNavigate();
   const [message, setMessage] = useState(null);
+  const [formValid, setFormValid] = useState(false);
   const [messageType, setMessageType] = useState(null);
   const [value, setValue] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [edited, setEdited] = useState(false);
+
+  useEffect(() => {
+    setFormValid(!Utils.isNull(value.businessUnit) && !Utils.isNull(value.cobDate) && !Utils.isNull(value.clientCode));
+  }, [value]);
 
   const handleFormValueChange = (fieldValue, id, required) => {
-    setValue({...value, [id]: fieldValue});
+    setEdited(true);
+    setValue({...value, [id]: fieldValue ? fieldValue.trim() : ''});
   };
 
   const formValueChangeHandler = (e) => {
@@ -80,12 +90,14 @@ const AddCase = (props) => {
               />
             </div>
             <div>
-              <TextField
+              <DatePicker
                 label="CoB date"
                 id="cobDate"
-                required={true}
                 value={value.cobDate}
-                valueChangeHandler={(e) => formValueChangeHandler(e)}
+                required={true}
+                valueChangeHandler={(date, id) =>
+                  handleFormValueChange(date.toLocaleDateString('en-GB').split('/').reverse().join('-'), id, true)
+                }
                 errorMessage={
                   'A statement date is required. Please enter a value'
                 }
@@ -96,21 +108,33 @@ const AddCase = (props) => {
       </div>
       <div className={'row'}>
         <Button
+          disabled={!edited || !formValid}
           style={{height: '36px', backgroundColor: 'rgb(175, 20, 75)', color: '#FFFFFF'}}
           onClick={(e) => {
+            setSaving(true);
             post(`${appManager.getAPIHost()}/statements/api/v1/cob/start`, (response) => {
               if(response.status === 'SUCCESS') {
                 setMessage('The case has been submitted successfully');
                 setMessageType('success');
+                setEdited(false);
               } else {
                 setMessage(response.message);
                 setMessageType('danger');
               }
+
+              setSaving(false);
             }, (e) => {
             }, value, '', false);
           }}
         >
-          SAVE
+          {saving && (
+            <i
+              className="fa fa-refresh fa-spin"
+              style={{ marginRight: '8px' }}
+            />
+          )}
+          {saving && <span>LOADING...</span>}
+          {!saving && <span>SAVE</span>}
         </Button>
       </div>
     </div>
