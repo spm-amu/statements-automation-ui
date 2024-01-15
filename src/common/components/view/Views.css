@@ -41,6 +41,10 @@ button:focus {
   max-width: 240px;
 }
 
+.field-container {
+  padding-right: 4px;
+}
+
 .MuiButton-root.Mui-disabled {
   opacity: .4;
 }

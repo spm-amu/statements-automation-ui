@@ -36,7 +36,7 @@ const ViewCase = (props) => {
 
   useEffect(() => {
     for (const cobAccount of cobAccounts) {
-      if(!cobAccount.cobValues) {
+      if (!cobAccount.cobValues) {
         cobAccount.cobValues = {};
       }
     }
@@ -69,7 +69,9 @@ const ViewCase = (props) => {
             <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
               <TabList onChange={handleChange} aria-label="">
                 <Tab label="Case Details" value="1"/>
-                <Tab label="Certificate of Balance" value="2"/>
+                <Tab label="COB" value="2"/>
+                <Tab label="Claims" value="3"/>
+                <Tab label="Unclassified Accounts" value="4"/>
               </TabList>
             </Box>
             <TabPanel value="1">
@@ -94,12 +96,173 @@ const ViewCase = (props) => {
             </TabPanel>
             <TabPanel value="2">
               {
-                props.selected.status === 'READY' && !Utils.isNull(caseQueryData) &&
+                props.selected.status === 'READY' && !Utils.isNull(caseQueryData) && caseQueryData.accounts.filter((a) => a.classification === 'COB').length > 0 &&
                 <div>
                   <div style={{fontSize: '20px', marginBottom: '16px'}}>Accounts</div>
                   <div
                     style={{border: '1px solid #aaaaaa', borderRadius: '4px'}}>
-                    {caseQueryData.accounts.map((account, i) => (
+                    {caseQueryData.accounts.filter((a) => a.classification === 'COB').map((account, i) => (
+                      <Accordion key={i}>
+                        <AccordionSummary
+                          expandIcon={<Icon id={'CHEVRON_DOWN'} color='rgb(175, 20, 75)'/>}
+                          aria-controls="panel1a-content"
+                          id="panel1a-header"
+                        >
+                          <Typography>{account.accountNumber + " (" + account.accountType + ")"}</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <div className={'w-100 row'}
+                               style={{overflowY: 'auto', overflowX: 'hidden', whiteSpace: 'nowrap'}}>
+                            <div style={{width: '100%', paddingLeft: '28px'}}>
+                              <div className={'row'} style={{marginBottom: '4px'}}>
+                                <div>Status:</div>
+                                <div className={'col field-value'}>{account.status.replaceAll('_', ' ')}</div>
+                              </div>
+                              {
+                                !Utils.isNull(account.cobValues) &&
+                                <div className={'row'} style={{margin: '0 8px 32px 0', width: '100%'}}>
+                                  <div className={'row'}
+                                       style={{fontSize: '16px', fontWeight: 600, width: '100%'}}>Certificate of
+                                    Balance values
+                                  </div>
+                                  <div className={'row'} style={{width: '100%'}}>
+                                    <AccountCOBValuesForm accountNumber={account.accountNumber} data={account.cobValues}
+                                                          valueChangeHandler={(value, accountNumber) => {
+                                                            let find = cobAccounts.filter((val) => val.accountNumber === accountNumber);
+                                                            let cobAccount;
+
+                                                            if (find.length === 0) {
+                                                              cobAccount = {};
+                                                              cobAccount.accountNumber = account.accountNumber;
+                                                              cobAccounts.push(cobAccount);
+                                                            } else {
+                                                              cobAccount = find[0];
+                                                            }
+
+                                                            if (!cobAccount.cobValues) {
+                                                              cobAccount.cobValues = {};
+                                                            }
+
+                                                            cobAccount.cobValues.interestRate = value.interestRate;
+                                                            cobAccount.cobValues.capital = value.capital;
+                                                            cobAccount.cobValues.netAccruedInterest = value.netAccruedInterest;
+                                                            cobAccount.cobValues.totalBalance = value.totalBalance;
+
+                                                            console.log("COB ACCOUNT : ", cobAccount);
+                                                          }}/>
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                            <div style={{width: '100%', marginLeft: '8px'}} className={'row'}>
+                              <div style={{width: '40%'}}>
+                                <div>Calculator values</div>
+                              </div>
+                              <div>
+                                <div>Statements</div>
+                                <div>
+                                  {account.statements.map((statement, i) => (
+                                    <Accordion key={i}>
+                                      <AccordionSummary
+                                        expandIcon={<Icon id={'CHEVRON_DOWN'} color='rgb(175, 20, 75)'/>}
+                                        aria-controls="panel1a-content"
+                                        id="panel1a-header"
+                                      >
+                                        <Typography>{statement.EndDate}</Typography>
+                                      </AccordionSummary>
+                                      <AccordionDetails>
+                                        <StatementViewer data={statement}/>
+                                      </AccordionDetails>
+                                    </Accordion>
+                                  ))}
+                                </div>
+                                {account.statements.length === 0 &&
+                                  <div style={{
+                                    height: '90%',
+                                    color: '#FF9494',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}>
+                                    NO STATEMENTS FOUND FOR ACCOUNT
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        </AccordionDetails>
+                      </Accordion>
+                    ))}
+                  </div>
+                  <div style={{width: '100%', padding: '16px'}} className={'row'}>
+                    <div style={{width: '100%'}}>
+                      {
+                        generateErrorMessage &&
+                        <Alert
+                          variant={'danger'}
+                          show={true}
+                        >
+                          <p>{generateErrorMessage}</p>
+                        </Alert>
+                      }
+                      <Button
+                        disabled={generating}
+                        style={{height: '36px', backgroundColor: 'rgb(175, 20, 75)', color: '#FFFFFF'}}
+                        onClick={(e) => {
+                          setGenerating(true);
+                          setGenerateErrorMessage(null);
+                          post(`${appManager.getAPIHost()}/statements/api/v1/cob/generate`, (response) => {
+                            setGenerating(false);
+                            setCobFile("data:image/png;base64," + response.cobFile);
+                          }, (e) => {
+                            setGenerating(false);
+                            setGenerateErrorMessage("A system error has occurred while generating COB file");
+                          }, {
+                            referenceNumber: props.selected.id,
+                            accounts: cobAccounts
+                          }, '', false);
+                        }}
+                      >
+                        {generating && (
+                          <i
+                            className="fa fa-refresh fa-spin"
+                            style={{marginRight: '8px'}}
+                          />
+                        )}
+                        {generating && <span>LOADING...</span>}
+                        {!generating && <span>GENERATE COB</span>}
+                      </Button>
+                    </div>
+                    <div style={{width: '100%'}}>
+                      {
+                        cobFile &&
+                        <PDFViewer pdf={cobFile}/>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+              {
+                (props.selected.status !== 'READY' || !caseQueryData) &&
+                <div style={{color: '#FF9494', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  Certificate of Balance values for this case is not currently available
+                </div>
+              }
+              {
+                props.selected.status === 'READY' && !Utils.isNull(caseQueryData) && caseQueryData.accounts.filter((a) => a.classification === 'COB').length === 0 &&
+                <div style={{color: '#4BB543', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  This porfolio has no certificate of balance
+                </div>
+              }
+            </TabPanel>
+            <TabPanel value="3">
+              {
+                props.selected.status === 'READY' && !Utils.isNull(caseQueryData) && caseQueryData.accounts.filter((a) => a.classification === 'CLAIM').length > 0 &&
+                <div>
+                  <div style={{fontSize: '20px', marginBottom: '16px'}}>Accounts</div>
+                  <div
+                    style={{border: '1px solid #aaaaaa', borderRadius: '4px'}}>
+                    {caseQueryData.accounts.filter((a) => a.classification === 'CLAIM').map((account, i) => (
                       <Accordion key={i}>
                         <AccordionSummary
                           expandIcon={<Icon id={'CHEVRON_DOWN'} color='rgb(175, 20, 75)'/>}
@@ -135,7 +298,7 @@ const ViewCase = (props) => {
                                                               cobAccount = find[0];
                                                             }
 
-                                                            if(!cobAccount.cobValues) {
+                                                            if (!cobAccount.cobValues) {
                                                               cobAccount.cobValues = {};
                                                             }
 
@@ -169,7 +332,13 @@ const ViewCase = (props) => {
                                 ))}
                               </div>
                               {account.statements.length === 0 &&
-                                <div style={{height: '90%', color: '#FF9494', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                <div style={{
+                                  height: '90%',
+                                  color: '#FF9494',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}>
                                   NO STATEMENTS FOUND FOR ACCOUNT
                                 </div>
                               }
@@ -211,11 +380,11 @@ const ViewCase = (props) => {
                         {generating && (
                           <i
                             className="fa fa-refresh fa-spin"
-                            style={{ marginRight: '8px' }}
+                            style={{marginRight: '8px'}}
                           />
                         )}
                         {generating && <span>LOADING...</span>}
-                        {!generating && <span>GENERATE COB</span>}
+                        {!generating && <span>GENERATE CLAIMS</span>}
                       </Button>
                     </div>
                     <div style={{width: '100%'}}>
@@ -233,6 +402,15 @@ const ViewCase = (props) => {
                   Certificate of Balance values for this case is not currently available
                 </div>
               }
+              {
+                props.selected.status === 'READY' && !Utils.isNull(caseQueryData) && caseQueryData.accounts.filter((a) => a.classification === 'CLAIM').length === 0 &&
+                <div style={{color: '#4BB543', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  This porfolio has no claims
+                </div>
+              }
+            </TabPanel>
+            <TabPanel value="4">
+              UNCLASSIFIED
             </TabPanel>
           </TabContext>
         </Box>
