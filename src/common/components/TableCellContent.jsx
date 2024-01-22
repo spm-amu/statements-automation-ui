@@ -65,6 +65,9 @@ const TableCellContent = React.memo(React.forwardRef((props, ref) => {
     }
   }, [props.editor]);
 
+  React.useEffect(() => {
+  }, []);
+
   const getStaticDisplayValue = () => {
     let displayValue;
     let contentValue = props.row[props.dataBinding];
@@ -134,7 +137,7 @@ const TableCellContent = React.memo(React.forwardRef((props, ref) => {
             style={{color: '#f44336'}}/></CustomTooltip>
           </td> : null}
         <td style={props.columnConfig.cellFormat === 'MONEY' || props.columnConfig.cellFormat === 'NUMBER'
-          ? {textAlign: 'right', maxWidth: 0} : {textAlign: 'left', maxWidth: 0}}>{doRender()}</td>
+          ? {textAlign: 'right', maxWidth: 0, color: props.textColor} : {textAlign: 'left', maxWidth: 0, color: props.textColor}}>{doRender()}</td>
       </tr>
       </tbody>
     </table>

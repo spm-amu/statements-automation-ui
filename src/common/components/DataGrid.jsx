@@ -22,7 +22,7 @@ function evaluateTableCellWidth(multiSelect, column, columnCount) {
   let width = column.attributes['width'];
   return multiSelect === true ?
     "calc(" + (typeof width !== 'undefined' ? width :
-    (100 / columnCount) + "%") + " - " + (MULTI_SELECT_CHECKBOX_COL_WIDTH / columnCount) + "px)"
+      (100 / columnCount) + "%") + " - " + (MULTI_SELECT_CHECKBOX_COL_WIDTH / columnCount) + "px)"
     :
     (typeof width !== 'undefined' ? width : (100 / columnCount) + "%");
 }
@@ -266,14 +266,16 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
   }
 
   const search = () => {
-    post(props.dataUrl, (response) => {
-        console.log('SEARCH RESPONSE: ', response);
-        setOriginalData(response.records);
-        processData(response);
-      }, (e) => {
+    if (props.dataUrl) {
+      post(props.dataUrl, (response) => {
+          console.log('SEARCH RESPONSE: ', response);
+          setOriginalData(response.records);
+          processData(response);
+        }, (e) => {
 
-      },
-      criteria);
+        },
+        criteria);
+    }
   };
 
   React.useEffect(() => {
@@ -285,7 +287,7 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
   }, [rowsPerPage]);
 
   React.useEffect(() => {
-    if(props.criteriaParams) {
+    if (props.criteriaParams) {
       criteria.currentPage = 0;
       criteria.pageSize = !Utils.isNull(rowsPerPage) ? rowsPerPage : config.pageSize;
       criteria.parameters = [];
@@ -294,7 +296,7 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
         let parameter = {};
         let paramValue = props.criteriaParams[property];
         parameter.name = property;
-        if(!Utils.isNull(paramValue)) {
+        if (!Utils.isNull(paramValue)) {
           parameter.value = paramValue;
         }
 
@@ -312,7 +314,7 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
       let visibleColumnCount = 0;
 
       for (const column of config.columns) {
-        if(!Utils.getComponentAttribute(column, "hidden", false)) {
+        if (!Utils.getComponentAttribute(column, "hidden", false)) {
           visibleColumnCount++;
         }
       }
@@ -342,7 +344,7 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
       criteria.currentPage = 0;
       criteria.pageSize = config.pageSize;
       if (loadingRef.current === true) {
-        if(!Utils.isNull(props.loadCompleteHandler)) {
+        if (!Utils.isNull(props.loadCompleteHandler)) {
           props.loadCompleteHandler(config.id);
         }
 
@@ -595,88 +597,90 @@ export const DataGrid = React.memo(React.forwardRef((props, ref) => {
                   <Tbody className={classes.tableBody}
                          style={{maxHeight: !Utils.isNull(props.bodyMaxHeight) ? props.bodyMaxHeight : "42vh"}}
                          id="mainTableBody">
-                  {stableSort(rows, getSorting(order, orderBy)).map((row, index) => {
-                    const isItemSelected = isSelected(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
-                    row.index = index;
-                    let counter = 0;
+                    {stableSort(rows, getSorting(order, orderBy)).map((row, index) => {
+                      const isItemSelected = isSelected(row.id);
+                      const labelId = `enhanced-table-checkbox-${index}`;
+                      row.index = index;
+                      let counter = 0;
 
-                    return (
-                      <Tr
-                        style={{display: 'flex', flexWrap: 'wrap'}}
-                        onClick={event => handleClick(event, row.id)}
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.id}
-                        id={'ROW-' + row.id}
-                        selected={props.selectionMode === 'SINGLE' ? isItemSelected : false}
-                        className={props.selectionMode === 'SINGLE' && isItemSelected ? classes.tableSelected : classes.tableRow}
-                      >
-                        {
-                          config.selectionMode === 'MULTIPLE' ?
-                            <Td padding="checkbox"
+                      return (
+                        <Tr
+                          style={{display: 'flex', flexWrap: 'wrap'}}
+                          onClick={event => handleClick(event, row.id)}
+                          role="checkbox"
+                          aria-checked={isItemSelected}
+                          tabIndex={-1}
+                          key={row.id}
+                          id={'ROW-' + row.id}
+                          selected={props.selectionMode === 'SINGLE' ? isItemSelected : false}
+                          className={props.selectionMode === 'SINGLE' && isItemSelected ? classes.tableSelected : classes.tableRow}
+                        >
+                          {
+                            config.selectionMode === 'MULTIPLE' ?
+                              <Td
+                                padding="checkbox"
                                 width={MULTI_SELECT_CHECKBOX_COL_WIDTH + "px"}
                                 className={"selectCell"}>
-                              <Checkbox
-                                checked={isItemSelected}
-                                inputProps={{'aria-labelledby': labelId}}
-                              />
-                            </Td> : null
+                                <Checkbox
+                                  checked={isItemSelected}
+                                  inputProps={{'aria-labelledby': labelId}}
+                                />
+                              </Td> : null
 
-                        }
-                        {config.columns.map(column => (
-                          column.attributes['hidden'] === true ? null :
-                            counter++ === config.columns.length - 1 && actionsToolbar !== null && typeof actionsToolbar !== "undefined" ?
-                              <Td
-                                style={{
-                                  width: column.attributes.width
-                                }}
-                                align="left"
-                                className={isItemSelected && !Utils.isNull(props.form) && !Utils.isNull(column.editor) ? "editCell" : null}
-                                key={column.id}>
-                                Row action toolbar not supported
-                              </Td> :
-                              <Td
-                                style={{
-                                  width: column.attributes.width
-                                }}
-                                align="left"
-                                className={isItemSelected && !Utils.isNull(props.form) && !Utils.isNull(column.editor) ? "editCell" : null}
-                                key={column.id}
-                                onClick={event => handleCellClick(event, row.id, column)}
-                              >
-                                <TableCellContent
-                                  viewId={props.viewId}
-                                  form={props.form}
-                                  formValues={props.formValues}
-                                  editor={column.editor}
-                                  ref={React.createRef()}
-                                  refCallback={createCell}
-                                  selected={isItemSelected}
-                                  validator={column.validator}
-                                  valueChangeHandler={editorChangeHandler}
-                                  columnConfig={column}
-                                  actionHandler={
-                                    (e) => {
-                                      if(props.actionHandler) {
-                                        if (!Utils.isNull(props.retrieveOriginalData) && props.retrieveOriginalData) {
-                                          props.actionHandler(e, originalData);
-                                        } else {
-                                          props.actionHandler(e);
+                          }
+                          {config.columns.map(column => (
+                            column.attributes['hidden'] === true ? null :
+                              counter++ === config.columns.length - 1 && actionsToolbar !== null && typeof actionsToolbar !== "undefined" ?
+                                <Td
+                                  style={{
+                                    width: column.attributes.width
+                                  }}
+                                  align="left"
+                                  className={isItemSelected && !Utils.isNull(props.form) && !Utils.isNull(column.editor) ? "editCell" : null}
+                                  key={column.id}>
+                                  Row action toolbar not supported
+                                </Td> :
+                                <Td
+                                  style={{
+                                    width: column.attributes.width
+                                  }}
+                                  align="left"
+                                  className={isItemSelected && !Utils.isNull(props.form) && !Utils.isNull(column.editor) ? "editCell" : null}
+                                  key={column.id}
+                                  onClick={event => handleCellClick(event, row.id, column)}
+                                >
+                                  <TableCellContent
+                                    viewId={props.viewId}
+                                    form={props.form}
+                                    formValues={props.formValues}
+                                    editor={column.editor}
+                                    ref={React.createRef()}
+                                    refCallback={createCell}
+                                    selected={isItemSelected}
+                                    validator={column.validator}
+                                    valueChangeHandler={editorChangeHandler}
+                                    columnConfig={column}
+                                    textColor={props.rowTextColorEvaluator ? props.rowTextColorEvaluator(row) : null}
+                                    actionHandler={
+                                      (e) => {
+                                        if (props.actionHandler) {
+                                          if (!Utils.isNull(props.retrieveOriginalData) && props.retrieveOriginalData) {
+                                            props.actionHandler(e, originalData);
+                                          } else {
+                                            props.actionHandler(e);
+                                          }
                                         }
                                       }
                                     }
-                                  }
-                                  dataBinding={!Utils.isNull(column.dataBinding) ? column.dataBinding : column.id}
-                                  row={row}
-                                  contentType={column.fieldType}/>
-                              </Td>
+                                    dataBinding={!Utils.isNull(column.dataBinding) ? column.dataBinding : column.id}
+                                    row={row}
+                                    contentType={column.fieldType}/>
+                                </Td>
 
-                        ))}
-                      </Tr>
-                    );
-                  })}
+                          ))}
+                        </Tr>
+                      );
+                    })}
                   </Tbody>
                 </Table>
               </div>

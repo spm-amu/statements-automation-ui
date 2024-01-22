@@ -52,6 +52,7 @@ import {
   Warning,
   TextFields,
   PlayArrow,
+  Replay,
   Stop,
   Note, MoreHoriz, PersonAdd, Poll
 } from '@material-ui/icons';
@@ -173,7 +174,9 @@ class Icon extends Component {
     } else if (this.props.id === 'NOTE') {
       return <Note/>
     } else if (this.props.id === 'PLAY') {
-      return <PlayArrow/>
+      return <PlayArrow style={{color: this.props.color}}/>
+    } else if (this.props.id === 'REPLAY') {
+      return <Replay style={{color: this.props.color}}/>
     } else if (this.props.id === 'STOP') {
       return <Stop/>
     } else if (this.props.id === 'CHEVRON_DOWN') {

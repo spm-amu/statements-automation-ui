@@ -15,6 +15,8 @@ import StatementViewer from "../StatementViewer";
 import Button from "@material-ui/core/Button";
 import PDFViewer from "../PDFViewer";
 import Alert from "react-bootstrap/Alert";
+import MultiTermCalculatorInputForm from "./MultiTermCalculatorInputForm";
+import UnclassifiedAccountList from "./UnclassifiedAccountList";
 
 const ViewCase = (props) => {
 
@@ -24,6 +26,8 @@ const ViewCase = (props) => {
   const [tabValue, setTabValue] = useState('1');
   const [caseQueryData, setCaseQueryData] = useState(null);
   const [cobAccounts, setCobAccounts] = useState([]);
+  const [recalculating, setRecalculating] = useState({});
+  const [recalculateErrors, setRecalculateErrors] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -128,39 +132,66 @@ const ViewCase = (props) => {
                                   <div className={'row'} style={{width: '100%'}}>
                                     <AccountCOBValuesForm accountNumber={account.accountNumber} data={account.cobValues}
                                                           valueChangeHandler={(value, accountNumber) => {
-                                                            let find = cobAccounts.filter((val) => val.accountNumber === accountNumber);
-                                                            let cobAccount;
-
-                                                            if (find.length === 0) {
-                                                              cobAccount = {};
-                                                              cobAccount.accountNumber = account.accountNumber;
-                                                              cobAccounts.push(cobAccount);
-                                                            } else {
-                                                              cobAccount = find[0];
-                                                            }
-
-                                                            if (!cobAccount.cobValues) {
-                                                              cobAccount.cobValues = {};
-                                                            }
-
-                                                            cobAccount.cobValues.interestRate = value.interestRate;
-                                                            cobAccount.cobValues.capital = value.capital;
-                                                            cobAccount.cobValues.netAccruedInterest = value.netAccruedInterest;
-                                                            cobAccount.cobValues.totalBalance = value.totalBalance;
-
-                                                            console.log("COB ACCOUNT : ", cobAccount);
                                                           }}/>
+                                  </div>
+                                  <div style={{width: '100%', marginTop: '8px'}}>
+                                    {
+                                      recalculateErrors[account.accountNumber] &&
+                                      <Alert
+                                        variant={'danger'}
+                                        show={true}
+                                      >
+                                        <p>{recalculateErrors[account.accountNumber]}</p>
+                                      </Alert>
+                                    }
+                                    <Button
+                                      disabled={recalculating[account.accountNumber]}
+                                      style={{height: '36px', backgroundColor: 'rgb(175, 20, 75)', color: '#FFFFFF'}}
+                                      onClick={(e) => {
+                                        setRecalculating({...recalculating, [account.accountNumber]: true});
+                                        setRecalculateErrors({...recalculateErrors, [account.accountNumber]: null});
+                                        post(`${appManager.getAPIHost()}/statements/api/v1/cob/accounts/recalculate`, (response) => {
+                                          setRecalculating({...recalculating, [account.accountNumber]: false});
+                                        }, (e) => {
+                                          setRecalculating({...recalculating, [account.accountNumber]: false});
+                                          setRecalculateErrors({
+                                            ...recalculateErrors,
+                                            [account.accountNumber]: "Error re-calculating values for account [ " + account.accountNumber + " ]"
+                                          });
+                                        }, {
+                                          accountNumber: account.accountNumber,
+                                          values: {}
+                                        }, '', false);
+                                      }}
+                                    >
+                                      {recalculating[account.accountNumber] && (
+                                        <i
+                                          className="fa fa-refresh fa-spin"
+                                          style={{marginRight: '8px'}}
+                                        />
+                                      )}
+                                      {recalculating[account.accountNumber] && <span>LOADING...</span>}
+                                      {!recalculating[account.accountNumber] && <span>Re-Calculate</span>}
+                                    </Button>
                                   </div>
                                 </div>
                               }
                             </div>
                             <div style={{width: '100%', marginLeft: '8px'}} className={'row'}>
-                              <div style={{width: '40%'}}>
+                              <div style={{width: '50%', marginRight: '8px'}}>
                                 <div>Calculator values</div>
-                              </div>
-                              <div>
-                                <div>Statements</div>
                                 <div>
+                                  <MultiTermCalculatorInputForm
+                                    accountNumber={account.accountNumber}
+                                    valueChangeHandler={(value, accountNumber) => {
+
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                              <div style={{width: '48%'}}>
+                                <div>Statements</div>
+                                <div style={{border: '1px solid #e1e1e1', borderRadius: '4px'}}>
                                   {account.statements.map((statement, i) => (
                                     <Accordion key={i}>
                                       <AccordionSummary
@@ -410,7 +441,10 @@ const ViewCase = (props) => {
               }
             </TabPanel>
             <TabPanel value="4">
-              UNCLASSIFIED
+              {
+                caseQueryData && caseQueryData.accounts.filter((a) => Utils.isNull(a.classification)).length > 0 &&
+                <UnclassifiedAccountList data={caseQueryData.accounts.filter((a) => Utils.isNull(a.classification))}/>
+              }
             </TabPanel>
           </TabContext>
         </Box>

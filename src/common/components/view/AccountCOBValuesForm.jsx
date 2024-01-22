@@ -24,6 +24,7 @@ const AccountCOBValuesForm = (props) => {
           style={{width: '100%'}}
           label="Interest rate"
           id="interestRate"
+          disabled
           required={true}
           value={value.interestRate}
           valueChangeHandler={(e) => formValueChangeHandler(e)}
@@ -37,6 +38,7 @@ const AccountCOBValuesForm = (props) => {
           style={{width: '100%'}}
           label="Capital"
           id="capital"
+          disabled
           required={true}
           value={value.capital}
           valueChangeHandler={(e) => formValueChangeHandler(e)}
@@ -50,6 +52,7 @@ const AccountCOBValuesForm = (props) => {
           style={{width: '100%'}}
           label="Nett accrued interest"
           id="netAccruedInterest"
+          disabled
           required={true}
           value={value.netAccruedInterest}
           valueChangeHandler={(e) => formValueChangeHandler(e)}
@@ -63,6 +66,7 @@ const AccountCOBValuesForm = (props) => {
           style={{width: '100%'}}
           label="Total balance"
           id="totalBalance"
+          disabled
           required={true}
           value={value.totalBalance}
           valueChangeHandler={(e) => formValueChangeHandler(e)}
