@@ -93,8 +93,8 @@ const MultiTermCalculatorInputForm = (props) => {
         <>
           <DataGrid config={grid}
                     rowTextColorEvaluator={(row) => {
-                      console.log(typeof(row.transactionDate));
-                      return new Date(row.transactionDate) < new Date(calculatorInput.cobDate) ? '#4BB543' : 'red';
+                      return new Date(row.transactionDate).getTime() === new Date(calculatorInput.cobDate).getTime() ?
+                        'blue' : new Date(row.transactionDate).getTime() < new Date(calculatorInput.cobDate).getTime() ? '#4BB543' : 'red';
                     }}
                     rows={calculatorInput.lines.sort((a, b) => new Date(a.transactionDate) - new Date(b.transactionDate))}
                     bodyMaxHeight={"65vh"}

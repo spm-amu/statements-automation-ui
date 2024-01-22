@@ -199,7 +199,7 @@ const ViewCase = (props) => {
                                         aria-controls="panel1a-content"
                                         id="panel1a-header"
                                       >
-                                        <Typography>{statement.EndDate}</Typography>
+                                        <Typography>{statement.StatementDate}</Typography>
                                       </AccordionSummary>
                                       <AccordionDetails>
                                         <StatementViewer data={statement}/>
