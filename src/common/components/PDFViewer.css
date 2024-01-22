@@ -18,13 +18,6 @@
   box-shadow: 2px 2px 2px 1px #ccc;
 }
 
-.react-pdf__Page {
-  margin-top: 10px;
-}
-
-.react-pdf__Page__textContent {
-}
-
 .doc-container {
   margin-top: 16px;
   border: 1px solid #e1e1e1;
@@ -48,3 +41,4 @@
   max-height: 500px;
   overflow: auto;
 }
+

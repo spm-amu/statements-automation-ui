@@ -47,7 +47,7 @@
     "react-html-renderer": "^0.3.2",
     "react-inlinesvg": "1.2.0",
     "react-loader-spinner": "^3.1.5",
-    "react-pdf": "^4.1.0",
+    "react-pdf": "^5.2.0",
     "react-promise-tracker": "^2.1.0",
     "react-redux": "^7.2.3",
     "react-router": "^5.1.2",
