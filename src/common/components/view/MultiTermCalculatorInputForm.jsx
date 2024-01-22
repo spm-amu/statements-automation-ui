@@ -96,7 +96,7 @@ const MultiTermCalculatorInputForm = (props) => {
                       return new Date(row.transactionDate).getTime() === new Date(calculatorInput.cobDate).getTime() ?
                         'blue' : new Date(row.transactionDate).getTime() < new Date(calculatorInput.cobDate).getTime() ? '#4BB543' : 'red';
                     }}
-                    rows={calculatorInput.lines.sort((a, b) => new Date(a.transactionDate) - new Date(b.transactionDate))}
+                    rows={calculatorInput.lines.sort((a, b) => new Date(a.transactionDate).getTime() - new Date(b.transactionDate).getTime())}
                     bodyMaxHeight={"65vh"}
                     defaultOrderField={'start'}
                     actionHandler={(e) => {
