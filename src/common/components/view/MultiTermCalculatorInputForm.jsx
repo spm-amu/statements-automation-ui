@@ -67,7 +67,7 @@ const MultiTermCalculatorInputForm = (props) => {
   const [calculatorInput, setCalculatorInput] = useState();
 
   useEffect(() => {
-    let url = `${appManager.getAPIHost()}/statements/api/v1/cob/accounts/multiTermCalculatorValues/get/${props.accountNumber}`;
+    let url = `${appManager.getAPIHost()}/statements/api/v1/cob/accounts/multiTermCalculatorValues/get/${props.accountNumber}/${props.referenceNumber}`;
     get(url, (response) => {
       setCalculatorInput(response);
     }, (e) => {
