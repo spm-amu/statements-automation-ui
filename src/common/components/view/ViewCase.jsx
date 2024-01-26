@@ -17,6 +17,7 @@ import PDFViewer from "../PDFViewer";
 import Alert from "react-bootstrap/Alert";
 import MultiTermCalculatorInputForm from "./MultiTermCalculatorInputForm";
 import UnclassifiedAccountList from "./UnclassifiedAccountList";
+import TermCalculatorInputForm from "./TermCalculatorInputForm";
 
 const ViewCase = (props) => {
 
@@ -319,7 +320,7 @@ const ViewCase = (props) => {
                                     Balance values
                                   </div>
                                   <div className={'row'} style={{width: '100%'}}>
-                                    <AccountCOBValuesForm accountNumber={account.accountNumber} data={account.cobValues}
+                                    <AccountCOBValuesForm accountNumber={account.accountNumber} data={account.claimValues}
                                                           valueChangeHandler={(value, accountNumber) => {
                                                           }}/>
                                   </div>
@@ -370,7 +371,7 @@ const ViewCase = (props) => {
                               <div style={{width: '50%', marginRight: '8px'}}>
                                 <div>Calculator values</div>
                                 <div>
-                                  <MultiTermCalculatorInputForm
+                                  <TermCalculatorInputForm
                                     accountNumber={account.accountNumber}
                                     referenceNumber={props.selected.id}
                                     valueChangeHandler={(value, accountNumber) => {
